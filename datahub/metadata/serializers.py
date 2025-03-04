@@ -129,13 +129,13 @@ class HVCSerializer(ConstantModelSerializer):
     financial_year = serializers.ReadOnlyField()
 
 
-class PostcodeDataSerializer(ConstantModelSerializer):
+class PostcodeDataSerializer(serializers.Serializer):
     """Postcode data serializer"""
 
-    id = serializers.UUIDField()
+    id = serializers.IntegerField()
     postcode = serializers.CharField()
     modified_on = serializers.DateTimeField()
-    postcode_region = NestedRelatedField(UKRegion, read_only=True)
+    region = NestedRelatedField(UKRegion, read_only=True)
     publication_date = serializers.DateTimeField()
 
     class Meta:

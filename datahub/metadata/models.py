@@ -407,12 +407,13 @@ class ExportBarrierType(BaseOrderedConstantModel):
     """Export barrier type (used for company interactions)."""
 
 
-class PostcodeData(BaseConstantModel):
+class PostcodeData(models.Model):
     """Postcode data (for the manual addition of a company)."""
 
-    postcode = models.CharField(max_length=MAX_LENGTH)
+    id = models.IntegerField(primary_key=True)
+    postcode = models.CharField(max_length=MAX_LENGTH, unique=True)
     modified_on = models.DateTimeField(auto_now=True, null=True)
-    postcode_region = models.ForeignKey(
+    region = models.ForeignKey(
         UKRegion,
         blank=True,
         null=True,

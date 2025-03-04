@@ -1,42 +1,70 @@
 import logging
-import uuid
 
 from unittest import mock
-from uuid import uuid4
 
+import boto3
 import pytest
-from faker import Faker
+
 from moto import mock_aws
 
 from datahub.ingest.boto3 import S3ObjectProcessor
-from datahub.metadata.models import PostcodeData
-from datahub.metadata.serializers import PostcodeDataSerializer
+from datahub.ingest.constants import (
+    AWS_REGION,
+    S3_BUCKET_NAME,
+)
+from datahub.metadata.models import (
+    PostcodeData,
+    UKRegion,
+)
 from datahub.metadata.tasks import (
     postcode_data_identification_task,
     postcode_data_ingestion_task,
     POSTCODE_DATA_PREFIX,
-    PostcodeDataIngestionTask,
 )
 from datahub.metadata.test.factories import (
-    postcode_data_record_faker,
+    PostcodeDataFactory,
 )
-
-pytestmark = pytest.mark.django_db
-
-fake = Faker(locale='en_GB')
 
 
 @pytest.fixture
-def postcode_object_key():
+def test_file_path():
     return f'{POSTCODE_DATA_PREFIX}object.json.gz'
 
 
+@pytest.fixture
+def test_file():
+    filepath = (
+        'datahub/metadata/test/fixtures/postcodes.json.gz'
+    )
+    return open(filepath, 'rb')
+
+
 @mock_aws
-def test_identification_task_schedules_ingestion_task(postcode_object_key, caplog):
+def setup_s3_client():
+    return boto3.client('s3', AWS_REGION)
+
+
+@mock_aws
+def setup_s3_bucket(bucket_name):
+    mock_s3_client = setup_s3_client()
+    mock_s3_client.create_bucket(
+        Bucket=bucket_name,
+        CreateBucketConfiguration={'LocationConstraint': AWS_REGION},
+    )
+
+
+@mock_aws
+def setup_s3_files(bucket_name, test_file, test_file_path):
+    mock_s3_client = setup_s3_client()
+    mock_s3_client.put_object(Bucket=bucket_name, Key=test_file_path, Body=test_file)
+
+
+@mock_aws
+def test_identification_task_schedules_ingestion_task(test_file_path, caplog):
     with (
         mock.patch('datahub.ingest.tasks.job_scheduler') as mock_scheduler,
         mock.patch.object(
-            S3ObjectProcessor, 'get_most_recent_object_key', return_value=postcode_object_key,
+            S3ObjectProcessor, 'get_most_recent_object_key', return_value=test_file_path,
         ),
         mock.patch.object(S3ObjectProcessor, 'has_object_been_ingested', return_value=False),
         caplog.at_level(logging.INFO),
@@ -44,51 +72,38 @@ def test_identification_task_schedules_ingestion_task(postcode_object_key, caplo
         postcode_data_identification_task()
 
         assert 'Postcode data identification task started...' in caplog.text
-        assert f'Scheduled ingestion of {postcode_object_key}' in caplog.text
+        assert f'Scheduled ingestion of {test_file_path}' in caplog.text
         assert 'Postcode data identification task finished.' in caplog.text
 
     mock_scheduler.assert_called_once_with(
         function=postcode_data_ingestion_task,
         function_kwargs={
-            'object_key': postcode_object_key,
+            'object_key': test_file_path,
         },
         queue_name='long-running',
-        description=f'Ingest {postcode_object_key}',
+        description=f'Ingest {test_file_path}',
     )
 
 
-@mock_aws
 class TestPostcodeDataIngestionTask:
-
-    @pytest.fixture
-    def ingestion_task(self, postcode_object_key):
-        return PostcodeDataIngestionTask(
-            object_key=postcode_object_key,
-            s3_processor=S3ObjectProcessor(prefix=POSTCODE_DATA_PREFIX),
-            serializer_class=PostcodeDataSerializer,
-        )
-
     @pytest.mark.django_db
-    def test_should_process_new_record(self, ingestion_task):
-        new_id = uuid4()
-        record = {'id': new_id}
-
-        assert ingestion_task._should_process_record(record) is True
-
-    @pytest.mark.django_db
-    def test_should_process_existing_record(self, ingestion_task):
-        existing_id = uuid4()
-        PostcodeData.objects.create(id=existing_id)
-        record = {'id': existing_id}
-
-        assert ingestion_task._should_process_record(record) is False
-
-    def test_process_record_creates_postcode_data_instance(self, ingestion_task):
-        primary_key = str(uuid.uuid4())
-        record = postcode_data_record_faker({'id': primary_key})
-        ingestion_task._process_record(record)
-
-        assert len(ingestion_task.created_ids) == 1
-        assert len(ingestion_task.updated_ids) == 0
-        assert len(ingestion_task.errors) == 0
-        assert PostcodeData.objects.filter(pk=primary_key).exists()
+    @mock_aws
+    def test_ingesting_postcodes(self, test_file_path, test_file):
+        """
+        Test that when given a postcode file, the task inserts new records,
+        updates the field values of existing records, and deletes records
+        that exist in the database but not in the file.
+        """
+        region = UKRegion.objects.get(name='South West')
+        PostcodeDataFactory(id=400859, region=region)
+        PostcodeDataFactory(id=999999999)
+        initial_postcode_ids = PostcodeData.objects.values_list('id', flat=True)
+        assert set(initial_postcode_ids) == set([400859, 999999999])
+        setup_s3_bucket(S3_BUCKET_NAME)
+        setup_s3_files(S3_BUCKET_NAME, test_file, test_file_path)
+        postcode_data_ingestion_task(test_file_path)
+        result_postcode_ids = PostcodeData.objects.values_list('id', flat=True)
+        assert set(result_postcode_ids) == set([2656, 400858, 400859, 426702])
+        updated_postcode = PostcodeData.objects.get(id=400859)
+        expected_region = UKRegion.objects.get(name='East of England')
+        assert (updated_postcode.region) == expected_region
