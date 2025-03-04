@@ -231,29 +231,29 @@ class GenericDocument(BaseModel, ArchivableModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
 
     # Generic relation to type-specific document model instance
-    document_content_type = models.ForeignKey(
+    document_type = models.ForeignKey(
         ContentType,
         on_delete=models.CASCADE,
         related_name='documents',
     )
     document_object_id = models.UUIDField()
-    document = GenericForeignKey("document_content_type", "document_object_id")
+    document = GenericForeignKey("document_type", "document_object_id")
 
     # Generic relation to model instance the document relates to
-    related_object_content_type = models.ForeignKey(
+    related_object_type = models.ForeignKey(
         ContentType,
         on_delete=models.CASCADE,
         related_name='related_documents',
     )
     related_object_id = models.UUIDField()
-    related_object = GenericForeignKey("related_object_content_type", "related_object_id")
+    related_object = GenericForeignKey("related_object_type", "related_object_id")
 
     class Meta:
         indexes = [
             models.Index(fields=[
-                "document_content_type",
+                "document_type",
                 "document_object_id",
-                "related_object_content_type",
+                "related_object_type",
                 "related_object_id",
             ]),
         ]
