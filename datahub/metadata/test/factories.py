@@ -1,6 +1,3 @@
-import uuid
-from datetime import timezone
-
 from random import randrange, sample
 
 import factory
@@ -132,25 +129,8 @@ class PostcodeDataFactory(factory.django.DjangoModelFactory):
 
     postcode = factory.Faker('postcode')
     modified_on = '2025-10-08T08:06:53+00:00'
-    postcode_region = factory.Faker('postcode_region')
+    region_id = constants.UKRegion.east_midlands.value.id
     publication_date = '2025-02-02T08:08:52+00:00'
 
     class Meta:
         model = 'metadata.PostcodeData'
-
-
-def postcode_data_record_faker(overrides: dict | None = None) -> dict:
-    data = {
-        'id': str(uuid.uuid4()),
-        'postcode': fake.postcode(),
-        'modified_on': fake.date_time_between(
-            start_date='-1y', tzinfo=timezone.utc,
-        ),
-        'publication_date': fake.date_time_between(
-            start_date='-1y', tzinfo=timezone.utc,
-        ),
-        'postcode_region': constants.UKRegion.london.name,
-    }
-    if overrides:
-        data.update(overrides)
-    return data
