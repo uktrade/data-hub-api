@@ -3,8 +3,13 @@ from django.core.exceptions import PermissionDenied
 from rest_framework.decorators import action
 
 from datahub.core.schemas import StubSchema
-from datahub.core.viewsets import CoreViewSet
+from datahub.core.viewsets import (
+    CoreViewSet,
+    SoftDeleteCoreViewSet,
+)
 from datahub.documents.exceptions import TemporarilyUnavailableException
+from datahub.documents.models import GenericDocument
+from datahub.documents.serializers import GenericDocumentSerializer
 from datahub.documents.tasks import schedule_delete_document
 
 
@@ -55,3 +60,10 @@ class BaseEntityDocumentModelViewSet(CoreViewSet):
         instance.document.mark_deletion_pending()
 
         schedule_delete_document(instance.document.pk)
+
+
+class GenericDocumentViewSet(SoftDeleteCoreViewSet):
+    """Generic document viewset."""
+
+    queryset = GenericDocument.objects.all()
+    serializer_class = GenericDocumentSerializer
