@@ -1,12 +1,9 @@
 from random import randrange, sample
 
 import factory
-from faker import Faker
 
 from datahub.core import constants
 from datahub.metadata.models import Service
-
-fake = Faker(locale='en_GB')
 
 
 class ServiceFactory(factory.django.DjangoModelFactory):

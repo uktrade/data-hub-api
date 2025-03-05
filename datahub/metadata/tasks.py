@@ -44,6 +44,7 @@ class PostcodeDataIngestionTask(BaseObjectIngestionTask):
     ) -> None:
         super().__init__(object_key, s3_processor)
         self._existing_ids = set(PostcodeData.objects.values_list('id', flat=True))
+        self._fields_to_update = PostcodeDataIngestionTask._fields_to_update()
         self._to_create = []
         self._to_update = []
         self._to_delete = []
@@ -67,9 +68,17 @@ class PostcodeDataIngestionTask(BaseObjectIngestionTask):
                 if len(all_file_ids) > 0:
                     self._to_delete = self._existing_ids - all_file_ids
                     PostcodeData.objects.bulk_create(self._to_create)
-                    PostcodeData.objects.bulk_update(self._to_update, ['region_name'])
+                    PostcodeData.objects.bulk_update(
+                        self._to_update,
+                        self._fields_to_update,
+                    )
                     PostcodeData.objects.filter(id__in=self._to_delete).delete()
         except Exception as e:
             logger.error(f'An error occurred trying to process {self.object_key}: {e}')
             raise e
         self._log_ingestion_metrics()
+
+    def _fields_to_update():
+        fields = [field.name for field in PostcodeData._meta.get_fields()]
+        fields.remove('id')
+        return fields

@@ -1,4 +1,5 @@
 import logging
+from decimal import Decimal
 
 from unittest import mock
 
@@ -14,7 +15,6 @@ from datahub.ingest.constants import (
 )
 from datahub.metadata.models import (
     PostcodeData,
-    # UKRegion,
 )
 from datahub.metadata.tasks import (
     postcode_data_identification_task,
@@ -94,8 +94,7 @@ class TestPostcodeDataIngestionTask:
         updates the field values of existing records, and deletes records
         that exist in the database but not in the file.
         """
-        # region = UKRegion.objects.get(name='South West')
-        PostcodeDataFactory(id=400859, region_name='South West')
+        PostcodeDataFactory(id=400859, region_name='South West', lat=44.244941)
         PostcodeDataFactory(id=999999999)
         initial_postcode_ids = PostcodeData.objects.values_list('id', flat=True)
         assert set(initial_postcode_ids) == set([400859, 999999999])
@@ -106,4 +105,6 @@ class TestPostcodeDataIngestionTask:
         assert set(result_postcode_ids) == set([2656, 8661, 400858, 400859, 426702])
         updated_postcode = PostcodeData.objects.get(id=400859)
         expected_region = 'East of England'
+        expected_lat = Decimal('52.244847')
         assert (updated_postcode.region_name) == expected_region
+        assert (updated_postcode.lat) == expected_lat
