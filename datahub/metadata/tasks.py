@@ -60,6 +60,8 @@ class PostcodeDataIngestionTask(BaseObjectIngestionTask):
                 for line in s3_object:
                     jsn = json.loads(line)
                     object = PostcodeData(**jsn)
+                    if not object.id:
+                        continue
                     if object.id in self._existing_ids:
                         self._to_update.append(object)
                     else:

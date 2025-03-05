@@ -41,6 +41,14 @@ def test_file():
     return open(filepath, 'rb')
 
 
+@pytest.fixture
+def empty_test_file():
+    filepath = (
+        'datahub/metadata/test/fixtures/empty.json.gz'
+    )
+    return open(filepath, 'rb')
+
+
 @mock_aws
 def setup_s3_client():
     return boto3.client('s3', AWS_REGION)
@@ -124,6 +132,23 @@ class TestPostcodeDataIngestionTask:
 
     @pytest.mark.django_db
     @mock_aws
+    def test_only_delete_if_valid_records_found(self, test_file_path, empty_test_file):
+        """
+        Test that we don't delete postcode records if no valid ids are found in the
+        file as that indicates something has gone wrong with processing it
+        """
+        PostcodeDataFactory(id=400859, region_name='South West', lat=44.244941)
+        PostcodeDataFactory(id=999999999)
+        initial_postcode_ids = PostcodeData.objects.values_list('id', flat=True)
+        assert set(initial_postcode_ids) == set([400859, 999999999])
+        setup_s3_bucket(S3_BUCKET_NAME)
+        setup_s3_files(S3_BUCKET_NAME, empty_test_file, test_file_path)
+        postcode_data_ingestion_task(test_file_path)
+        result_postcode_ids = PostcodeData.objects.values_list('id', flat=True)
+        assert set(result_postcode_ids) == set(initial_postcode_ids)
+
+    @pytest.mark.django_db
+    @mock_aws
     def test_invalid_file(self, test_file_path):
         """
         Test that an exception is raised when the file is not valid
@@ -134,4 +159,4 @@ class TestPostcodeDataIngestionTask:
         with pytest.raises(Exception) as e:
             postcode_data_ingestion_task(test_file_path)
         exception = e.value.args[0]
-        assert" key: 'data-flow/exports/ExportPostcodeDirectory/object.json.gz" in exception
+        assert " key: 'data-flow/exports/ExportPostcodeDirectory/object.json.gz" in exception
