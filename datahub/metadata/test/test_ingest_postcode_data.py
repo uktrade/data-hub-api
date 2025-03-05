@@ -7,6 +7,8 @@ import boto3
 import pytest
 
 from moto import mock_aws
+from sentry_sdk import init
+from sentry_sdk.transport import Transport
 
 from datahub.ingest.boto3 import S3ObjectProcessor
 from datahub.ingest.constants import (
@@ -51,6 +53,17 @@ def setup_s3_bucket(bucket_name):
         Bucket=bucket_name,
         CreateBucketConfiguration={'LocationConstraint': AWS_REGION},
     )
+
+
+class MockSentryTransport(Transport):
+    def __init__(self):
+        self.events = []
+
+    def capture_event(self, event):
+        pass
+
+    def capture_envelope(self, envelope):
+        self.events.append(envelope)
 
 
 @mock_aws
@@ -108,3 +121,17 @@ class TestPostcodeDataIngestionTask:
         expected_lat = Decimal('52.244847')
         assert (updated_postcode.region_name) == expected_region
         assert (updated_postcode.lat) == expected_lat
+
+    @pytest.mark.django_db
+    @mock_aws
+    def test_invalid_file(self, test_file_path):
+        """
+        Test that an exception is raised when the file is not valid
+        """
+        mock_transport = MockSentryTransport()
+        init(transport=mock_transport)
+        setup_s3_bucket(S3_BUCKET_NAME)
+        with pytest.raises(Exception) as e:
+            postcode_data_ingestion_task(test_file_path)
+        exception = e.value.args[0]
+        assert" key: 'data-flow/exports/ExportPostcodeDirectory/object.json.gz" in exception
