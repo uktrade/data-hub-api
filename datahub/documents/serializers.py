@@ -15,6 +15,9 @@ from datahub.documents.utils import format_content_type
 
 class SharePointDocumentSerializer(serializers.ModelSerializer):
 
+    created_by = NestedRelatedField(Advisor, extra_fields=['name', 'email'])
+    modified_by = NestedRelatedField(Advisor, extra_fields=['name', 'email'])
+
     class Meta:
         model = SharePointDocument
         fields = '__all__'

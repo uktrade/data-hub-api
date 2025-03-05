@@ -127,10 +127,8 @@ def assert_retrieved_sharepoint_document(instance, retrieved_instance):
     """Asserts retrieved JSON contains the correct fields and data from the SharePointDocument."""
     assert str(instance.id) == retrieved_instance['id']
 
-    if instance.created_by is not None:
-        assert str(instance.created_by.id) == retrieved_instance['created_by']['id']
-    if instance.modified_by is not None:
-        assert str(instance.modified_by.id) == retrieved_instance['modified_by']['id']
+    assert str(instance.created_by.id) == retrieved_instance['created_by']['id']
+    assert str(instance.modified_by.id) == retrieved_instance['modified_by']['id']
 
     assert instance.created_on.timestamp() == \
         datetime.strptime(retrieved_instance['created_on'], DATETIME_FORMAT).timestamp()
@@ -149,10 +147,8 @@ def assert_retrieved_generic_document(instance, retrieved_instance):
     """Asserts retrieved JSON contains the correct fields and data from the GenericDocument."""
     assert str(instance.id) == retrieved_instance['id']
 
-    if instance.created_by is not None:
-        assert str(instance.created_by.id) == retrieved_instance['created_by']['id']
-    if instance.modified_by is not None:
-        assert str(instance.modified_by.id) == retrieved_instance['modified_by']['id']
+    assert str(instance.created_by.id) == retrieved_instance['created_by']['id']
+    assert str(instance.modified_by.id) == retrieved_instance['modified_by']['id']
 
     assert instance.created_on.timestamp() == \
         datetime.strptime(retrieved_instance['created_on'], DATETIME_FORMAT).timestamp()
