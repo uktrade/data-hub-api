@@ -1,12 +1,13 @@
+import json
 import logging
 
-from rest_framework import serializers
+import smart_open
+
 
 from datahub.ingest.boto3 import S3ObjectProcessor
 from datahub.ingest.tasks import BaseObjectIdentificationTask, BaseObjectIngestionTask
 from datahub.metadata.constants import POSTCODE_DATA_PREFIX
 from datahub.metadata.models import PostcodeData
-from datahub.metadata.serializers import PostcodeDataSerializer
 
 
 logger = logging.getLogger(__name__)
@@ -28,7 +29,6 @@ def postcode_data_ingestion_task(object_key: str) -> None:
     ingestion_task = PostcodeDataIngestionTask(
         object_key=object_key,
         s3_processor=S3ObjectProcessor(prefix=POSTCODE_DATA_PREFIX),
-        serializer_class=PostcodeDataSerializer,
     )
     ingestion_task.ingest_object()
     logger.info('Postcode data ingestion task finished.')
@@ -41,46 +41,35 @@ class PostcodeDataIngestionTask(BaseObjectIngestionTask):
         self,
         object_key: str,
         s3_processor: S3ObjectProcessor,
-        serializer_class: serializers.Serializer,
     ) -> None:
-        self.serializer_class = serializer_class
         super().__init__(object_key, s3_processor)
+        self._existing_ids = set(PostcodeData.objects.values_list('id', flat=True))
+        self._to_create = []
+        self._to_update = []
+        self._to_delete = []
 
-    existing_ids = []
-
-    def _should_process_record(self, record: dict) -> bool:
-        """Checks whether the record has already been ingested or not."""
-        if not self.existing_ids:
-            self.existing_ids = set(PostcodeData.objects.values_list(
-                'id', flat=True))
-
-        postcode_data_id = record.get('id')
-        if postcode_data_id in self.existing_ids:
-            logger.info(f'Record already exists for postcode_data_id: {postcode_data_id}')
-            return False
-
-        return True
-
-    def _process_record(self, record: dict) -> None:
-        """Processes a single record.
-
-        This method should take a single record, update an existing instance,
-        or create a new one, and return None.
-        """
-        serializer = self.serializer_class(data=record)
-        if serializer.is_valid():
-            primary_key = serializer.validated_data.pop('id')
-            queryset = PostcodeData.objects.filter(pk=primary_key)
-            instance, created = queryset.update_or_create(
-                pk=primary_key,
-                defaults=serializer.validated_data,
-            )
-            if created:
-                self.created_ids.append(str(instance.id))
-            else:
-                self.updated_ids.append(str(instance.id))
-        else:
-            self.errors.append({
-                'record': record,
-                'errors': serializer.errors,
-            })
+    def ingest_object(self) -> None:
+        """Process all records in the object key specified when the class instance was created."""
+        try:
+            with smart_open.open(
+                f's3://{self.s3_processor.bucket}/{self.object_key}',
+                transport_params={'client': self.s3_processor.s3_client},
+            ) as s3_object:
+                all_file_ids = set()
+                for line in s3_object:
+                    jsn = json.loads(line)
+                    object = PostcodeData(**jsn)
+                    if object.id in self._existing_ids:
+                        self._to_update.append(object)
+                    else:
+                        self._to_create.append(object)
+                    all_file_ids.add(object.id)
+                if len(all_file_ids) > 0:
+                    self._to_delete = self._existing_ids - all_file_ids
+                    PostcodeData.objects.bulk_create(self._to_create)
+                    PostcodeData.objects.bulk_update(self._to_update, ['region_name'])
+                    PostcodeData.objects.filter(id__in=self._to_delete).delete()
+        except Exception as e:
+            logger.error(f'An error occurred trying to process {self.object_key}: {e}')
+            raise e
+        self._log_ingestion_metrics()

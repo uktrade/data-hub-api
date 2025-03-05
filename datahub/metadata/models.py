@@ -411,13 +411,73 @@ class PostcodeData(models.Model):
     """Postcode data (for the manual addition of a company)."""
 
     id = models.IntegerField(primary_key=True)
-    postcode = models.CharField(max_length=MAX_LENGTH, unique=True)
-    modified_on = models.DateTimeField(auto_now=True, null=True)
-    region = models.ForeignKey(
-        UKRegion,
-        blank=True,
-        null=True,
-        on_delete=models.SET_NULL,
-        related_name='+',
+    ccg = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    ced = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    eer = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    imd = models.IntegerField(null=True)
+    lat = models.DecimalField(max_digits=9, decimal_places=6)
+    pcd = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    pct = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    pfa = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    rgn = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    stp = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    ctry = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    lep1 = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    lep2 = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    long = models.DecimalField(max_digits=9, decimal_places=6)
+    nuts = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    oa01 = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    oa11 = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    park = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    pcd2 = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    pcds = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    pcon = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    ttwa = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    wz11 = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    bua11 = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    nhser = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    oac01 = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    oac11 = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    oscty = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    streg = models.IntegerField(null=True)
+    calncv = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    dointr = models.DateTimeField(null=True, blank=True)
+    doterm = models.DateTimeField(null=True, blank=True)
+    lsoa01 = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    lsoa11 = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    msoa01 = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    msoa11 = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    oslaua = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    osward = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    parish = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    teclec = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    buasd11 = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    casward = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    ru11ind = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    ur01ind = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    oseast1m = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    osgrdind = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    oshlthau = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    osnrth1m = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    usertype = models.IntegerField(null=True)
+    statsward = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    region_name = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    pcd_normalised = models.CharField(
+        max_length=MAX_LENGTH, null=True, blank=True,
+    )
+    uk_super_region = models.CharField(
+        max_length=MAX_LENGTH, null=True, blank=True,
     )
     publication_date = models.DateTimeField(null=True, blank=True)
+    local_authority_district_name = models.CharField(
+        max_length=MAX_LENGTH, null=True, blank=True,
+    )
+    parliamentary_constituency_name = models.CharField(
+        max_length=MAX_LENGTH, null=True, blank=True,
+    )
+    lep1_local_enterprise_partnership_name = models.CharField(
+        max_length=MAX_LENGTH, null=True, blank=True,
+    )
+    lep2_local_enterprise_partnership_name = models.CharField(
+        max_length=MAX_LENGTH, null=True, blank=True,
+    )

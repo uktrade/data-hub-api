@@ -14,7 +14,7 @@ from datahub.ingest.constants import (
 )
 from datahub.metadata.models import (
     PostcodeData,
-    UKRegion,
+    # UKRegion,
 )
 from datahub.metadata.tasks import (
     postcode_data_identification_task,
@@ -94,8 +94,8 @@ class TestPostcodeDataIngestionTask:
         updates the field values of existing records, and deletes records
         that exist in the database but not in the file.
         """
-        region = UKRegion.objects.get(name='South West')
-        PostcodeDataFactory(id=400859, region=region)
+        # region = UKRegion.objects.get(name='South West')
+        PostcodeDataFactory(id=400859, region_name='South West')
         PostcodeDataFactory(id=999999999)
         initial_postcode_ids = PostcodeData.objects.values_list('id', flat=True)
         assert set(initial_postcode_ids) == set([400859, 999999999])
@@ -103,7 +103,7 @@ class TestPostcodeDataIngestionTask:
         setup_s3_files(S3_BUCKET_NAME, test_file, test_file_path)
         postcode_data_ingestion_task(test_file_path)
         result_postcode_ids = PostcodeData.objects.values_list('id', flat=True)
-        assert set(result_postcode_ids) == set([2656, 400858, 400859, 426702])
+        assert set(result_postcode_ids) == set([2656, 8661, 400858, 400859, 426702])
         updated_postcode = PostcodeData.objects.get(id=400859)
-        expected_region = UKRegion.objects.get(name='East of England')
-        assert (updated_postcode.region) == expected_region
+        expected_region = 'East of England'
+        assert (updated_postcode.region_name) == expected_region

@@ -7,7 +7,7 @@ from datahub.core.serializers import ConstantModelSerializer, NestedRelatedField
 from datahub.export_win.models import TeamType
 from datahub.interaction.models import ServiceAnswerOption, ServiceQuestion
 from datahub.metadata.models import (
-    Country, ExchangeRate, OverseasRegion, PostcodeData, Service, TeamRole, UKRegion,
+    Country, ExchangeRate, OverseasRegion, Service, TeamRole, UKRegion,
 )
 
 
@@ -127,17 +127,3 @@ class HVCSerializer(ConstantModelSerializer):
 
     campaign_id = serializers.ReadOnlyField()
     financial_year = serializers.ReadOnlyField()
-
-
-class PostcodeDataSerializer(serializers.Serializer):
-    """Postcode data serializer"""
-
-    id = serializers.IntegerField()
-    postcode = serializers.CharField()
-    modified_on = serializers.DateTimeField()
-    region = NestedRelatedField(UKRegion, read_only=True)
-    publication_date = serializers.DateTimeField()
-
-    class Meta:
-        model = PostcodeData
-        fields = '__all__'
