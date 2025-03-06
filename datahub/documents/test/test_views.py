@@ -28,7 +28,7 @@ from datahub.documents.models import (
 )
 from datahub.documents.test.factories import CompanySharePointDocumentFactory
 from datahub.documents.test.my_entity_document.models import MyEntityDocument
-from datahub.documents.utils import assert_retrieved_generic_document
+from datahub.documents.test.test_utils import assert_retrieved_generic_document
 
 
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'

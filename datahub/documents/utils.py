@@ -1,4 +1,3 @@
-from datetime import datetime
 from functools import lru_cache
 from logging import getLogger
 
@@ -11,9 +10,6 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from datahub.core.exceptions import DataHubError
 from datahub.documents.exceptions import DocumentDeleteException
-
-
-DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
 
 
 logger = getLogger(__name__)
@@ -121,49 +117,3 @@ def delete_document(bucket_id, document_key):
 def format_content_type(content_type_instance: ContentType):
     """Return a string representation of the content type in the form: `app_label.model`."""
     return f'{content_type_instance.app_label}.{content_type_instance.model}'
-
-
-def assert_retrieved_sharepoint_document(instance, retrieved_instance):
-    """Asserts retrieved JSON contains the correct fields and data from the SharePointDocument."""
-    assert str(instance.id) == retrieved_instance['id']
-
-    assert str(instance.created_by.id) == retrieved_instance['created_by']['id']
-    assert str(instance.modified_by.id) == retrieved_instance['modified_by']['id']
-
-    assert instance.created_on.timestamp() == \
-        datetime.strptime(retrieved_instance['created_on'], DATETIME_FORMAT).timestamp()
-    assert instance.modified_on.timestamp() == \
-        datetime.strptime(retrieved_instance['modified_on'], DATETIME_FORMAT).timestamp()
-
-    assert instance.archived == retrieved_instance['archived']
-    assert instance.archived_on == retrieved_instance['archived_on']
-    assert instance.archived_reason == retrieved_instance['archived_reason']
-
-    assert instance.title == retrieved_instance['title']
-    assert instance.url == retrieved_instance['url']
-
-
-def assert_retrieved_generic_document(instance, retrieved_instance):
-    """Asserts retrieved JSON contains the correct fields and data from the GenericDocument."""
-    assert str(instance.id) == retrieved_instance['id']
-
-    assert str(instance.created_by.id) == retrieved_instance['created_by']['id']
-    assert str(instance.modified_by.id) == retrieved_instance['modified_by']['id']
-
-    assert instance.created_on.timestamp() == \
-        datetime.strptime(retrieved_instance['created_on'], DATETIME_FORMAT).timestamp()
-    assert instance.modified_on.timestamp() == \
-        datetime.strptime(retrieved_instance['modified_on'], DATETIME_FORMAT).timestamp()
-
-    assert instance.archived == retrieved_instance['archived']
-    assert instance.archived_on == retrieved_instance['archived_on']
-    assert instance.archived_reason == retrieved_instance['archived_reason']
-
-    assert str(instance.document.id) == retrieved_instance['document']['id']
-    assert str(instance.related_object.id) == retrieved_instance['related_object']['id']
-    assert str(instance.document_object_id) == retrieved_instance['document_object_id']
-    assert str(instance.related_object_id) == retrieved_instance['related_object_id']
-
-    assert format_content_type(instance.document_type) == retrieved_instance['document_type']
-    assert format_content_type(instance.related_object_type) == \
-        retrieved_instance['related_object_type']

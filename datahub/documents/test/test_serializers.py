@@ -8,7 +8,7 @@ from datahub.documents.test.factories import (
     CompanySharePointDocumentFactory,
     SharePointDocumentFactory,
 )
-from datahub.documents.utils import (
+from datahub.documents.test.test_utils import (
     assert_retrieved_generic_document,
     assert_retrieved_sharepoint_document,
 )
