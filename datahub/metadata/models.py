@@ -410,74 +410,345 @@ class ExportBarrierType(BaseOrderedConstantModel):
 class PostcodeData(models.Model):
     """Postcode data (for the manual addition of a company)."""
 
-    id = models.IntegerField(primary_key=True)
-    ccg = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    ced = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    eer = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    imd = models.IntegerField(null=True)
-    lat = models.DecimalField(max_digits=9, decimal_places=6)
-    pcd = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    pct = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    pfa = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    rgn = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    stp = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    ctry = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    lep1 = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    lep2 = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    long = models.DecimalField(max_digits=9, decimal_places=6)
-    nuts = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    oa01 = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    oa11 = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    park = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    pcd2 = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    pcds = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    pcon = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    ttwa = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    wz11 = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    bua11 = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    nhser = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    oac01 = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    oac11 = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    oscty = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    streg = models.IntegerField(null=True)
-    calncv = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    dointr = models.DateTimeField(null=True, blank=True)
-    doterm = models.DateTimeField(null=True, blank=True)
-    lsoa01 = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    lsoa11 = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    msoa01 = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    msoa11 = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    oslaua = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    osward = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    parish = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    teclec = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    buasd11 = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    casward = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    ru11ind = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    ur01ind = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    oseast1m = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    osgrdind = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    oshlthau = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    osnrth1m = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    usertype = models.IntegerField(null=True)
-    statsward = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
-    region_name = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    id = models.IntegerField(
+        primary_key=True,
+        help_text='External ID from data workspace',
+    )
+    ccg = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='Clinical Commissioning Group',
+    )
+    ced = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='County Electoral Division',
+    )
+    eer = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='European Electoral Region',
+    )
+    imd = models.IntegerField(
+        null=True,
+        help_text='Index of Multiple Deprivation',
+    )
+    lat = models.DecimalField(
+        max_digits=9,
+        decimal_places=6,
+        help_text='Degress Latitude',
+    )
+    pcd = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='Unit Postcode (7 character version)',
+    )
+    pct = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='Primary Care Trust',
+    )
+    pfa = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='Police Force Area',
+    )
+    rgn = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='Region Code',
+    )
+    stp = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='Sustainability and Transformation Partnership',
+    )
+    ctry = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='Country',
+    )
+    lep1 = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='Primary Local Enterprise Partnership',
+    )
+    lep2 = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='Secondary Local Enterprise Partnership',
+    )
+    long = models.DecimalField(
+        max_digits=9,
+        decimal_places=6,
+        help_text='Degrees Longitude',
+    )
+    nuts = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='International Terratorial Levels (ITL  - Former\
+        Nomenclature of Units for Territorial Statistics (NUTS)',
+    )
+    oa01 = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='Census Output Area',
+    )
+    oa11 = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='Census Output Area/Small Area',
+    )
+    park = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='National Parks',
+    )
+    pcd2 = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='Unit Postcode (8 character version)',
+    )
+    pcds = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='Unit Postcode (variable length version)',
+    )
+    pcon = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='Westminster Parliamentary Consituency',
+    )
+    ttwa = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='Travel to Work Area',
+    )
+    wz11 = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='Workplace Zone',
+    )
+    bua11 = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='Built-up Area',
+    )
+    nhser = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='NHS England Region',
+    )
+    oac01 = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='Census Area Output Classification',
+    )
+    oac11 = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='Census Area/Small Area Output Classification',
+    )
+    oscty = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='County',
+    )
+    streg = models.IntegerField(
+        null=True,
+        help_text='Standard Statistical Region',
+    )
+    calncv = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='Cancer Alliance',
+    )
+    dointr = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text='Date of Introduction (YYYYMM)',
+    )
+    doterm = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text='Date of Termination (YYYYMM)',
+    )
+    lsoa01 = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='Census Lower Layer Super Output Area',
+    )
+    lsoa11 = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='Census Lower Layer Super Output Area',
+    )
+    msoa01 = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='Census Middle Layer Super Output Area',
+    )
+    msoa11 = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='Census Middle Layer Super Output Area',
+    )
+    oslaua = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='Local Authority District',
+    )
+    osward = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='Electoral Ward',
+    )
+    parish = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='Parish',
+    )
+    teclec = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='Local Learning and Skills Council',
+    )
+    buasd11 = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='Built-up Areas Subdivision',
+    )
+    casward = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='Census Area Statistics Ward',
+    )
+    ru11ind = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='Census Rural-Urban Classification',
+    )
+    ur01ind = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='Census Rural-Urban Indicator',
+    )
+    oseast1m = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='National Grid Reference - Easting',
+    )
+    osgrdind = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='Grid Reference Positional Quality Indicator',
+    )
+    oshlthau = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='Former Strategic Health Authority/Health Board',
+    )
+    osnrth1m = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='National Grid Reference - Northing',
+    )
+    usertype = models.IntegerField(
+        null=True,
+        help_text='Postcode User Type (0 - Small or 1 - Large)',
+    )
+    statsward = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='Statistical Ward',
+    )
+    region_name = models.CharField(
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='Region Name',
+    )
     pcd_normalised = models.CharField(
-        max_length=MAX_LENGTH, null=True, blank=True,
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='Unit Postcode Normalised',
     )
     uk_super_region = models.CharField(
-        max_length=MAX_LENGTH, null=True, blank=True,
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='UK Super Region',
     )
-    publication_date = models.DateTimeField(null=True, blank=True)
+    publication_date = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text='Publication Date',
+    )
     local_authority_district_name = models.CharField(
-        max_length=MAX_LENGTH, null=True, blank=True,
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text=' Local Authority District Name',
     )
     parliamentary_constituency_name = models.CharField(
-        max_length=MAX_LENGTH, null=True, blank=True,
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='Parliamentary Constituency Name',
     )
     lep1_local_enterprise_partnership_name = models.CharField(
-        max_length=MAX_LENGTH, null=True, blank=True,
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='Primary Local Enterprise Partnership Name',
     )
     lep2_local_enterprise_partnership_name = models.CharField(
-        max_length=MAX_LENGTH, null=True, blank=True,
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='Secondary Local Enterprise Partnership Name',
     )
