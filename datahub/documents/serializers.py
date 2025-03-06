@@ -62,13 +62,13 @@ class RelatedObjectRelatedField(serializers.RelatedField):
 
     def to_representation(self, instance):
         """Convert model instance to built-in Python (JSON friendly) data types."""
-        content_type = ContentType.objects.get_for_model(instance)
         if isinstance(instance, (Company)):
             return {
                 'id': str(instance.id),
                 'name': instance.name,
             }
-        return Exception(f'Unexpected type of related object: {content_type.model}')
+        content_type = ContentType.objects.get_for_model(instance)
+        raise Exception(f'Unexpected type of related object: {format_content_type(content_type)}')
 
 
 class GenericDocumentRetrieveSerializer(serializers.ModelSerializer):
