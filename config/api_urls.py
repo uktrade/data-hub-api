@@ -14,6 +14,7 @@ from datahub.company_activity.urls import urls as company_activity_urls
 from datahub.company_referral import urls as company_referral_urls
 from datahub.dataset import urls as dataset_urls
 from datahub.dnb_api import urls as dnb_api_urls
+from datahub.documents import urls as document_urls
 from datahub.event import urls as event_urls
 from datahub.export_win import urls as export_win_urls
 from datahub.feature_flag import urls as feature_flag_urls
@@ -106,7 +107,9 @@ v4_urls = [
         include((investment_lead_urls, 'investment-lead'), namespace='investment-lead'),
     ),
     path(
-        'company-activity/', include((company_activity_urls,
-                                     'company-activity'), namespace='company-activity'),
+        'company-activity/', include(
+            (company_activity_urls, 'company-activity'), namespace='company-activity',
+        ),
     ),
+    path('document/', include((document_urls, 'document'), namespace='document')),
 ]

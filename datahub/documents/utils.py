@@ -2,12 +2,15 @@ from functools import lru_cache
 from logging import getLogger
 
 import boto3
+
 from django.apps import apps
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 
 from datahub.core.exceptions import DataHubError
 from datahub.documents.exceptions import DocumentDeleteException
+
 
 logger = getLogger(__name__)
 
@@ -109,3 +112,8 @@ def delete_document(bucket_id, document_key):
     """Deletes document in S3 bucket."""
     client = get_s3_client_for_bucket(bucket_id=bucket_id)
     client.delete_object(Bucket=get_bucket_name(bucket_id=bucket_id), Key=document_key)
+
+
+def format_content_type(content_type_instance: ContentType):
+    """Return a string representation of the content type in the form: `app_label.model`."""
+    return f'{content_type_instance.app_label}.{content_type_instance.model}'

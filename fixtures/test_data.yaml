@@ -624,7 +624,15 @@
     created_on: "2018-02-28T15:00:00Z"
     modified_on: "2018-06-05T00:00:00Z"
     archived_documents_url_path: "/documents/123"
-    consent_data: [{"source_system": "System A", "consent_domain": "Domestic", "email_contact_consent": true, "telephone_contact_consent": false}]
+    consent_data:
+      [
+        {
+          "source_system": "System A",
+          "consent_domain": "Domestic",
+          "email_contact_consent": true,
+          "telephone_contact_consent": false,
+        },
+      ]
     consent_data_last_modified: "2024-09-09T14:10:00"
 
 - model: company.contact
@@ -643,7 +651,15 @@
     notes: This is a dummy contact for testing
     created_on: "2018-02-28T15:00:00Z"
     modified_on: "2018-06-05T00:00:00Z"
-    consent_data: [{"source_system": "System B", "consent_domain": "International", "email_contact_consent": false, "telephone_contact_consent": false}]
+    consent_data:
+      [
+        {
+          "source_system": "System B",
+          "consent_domain": "International",
+          "email_contact_consent": false,
+          "telephone_contact_consent": false,
+        },
+      ]
     consent_data_last_modified: "2023-09-09T14:10:00"
 
 - model: company_referral.companyreferral
@@ -2476,3 +2492,37 @@
     times_used: 7
     expires_on: "2028-06-21T10:00:00Z"
     created_on: "2024-06-21T11:00:00Z"
+
+- model: documents.sharepointdocument
+  pk: a1a39417-0f9e-403c-afc0-cb7ecefb1d6b
+  fields:
+    {
+      title: Project Proposal,
+      url: https://sharepoint.example.com/project-proposal,
+      archived: false,
+    }
+- model: documents.sharepointdocument
+  pk: 08a8c016-71b1-4851-869c-1223742cf6e5
+  fields:
+    {
+      title: Financial Statement,
+      url: https://sharepoint.example.com/financial-statement,
+      archived: false,
+    }
+
+- model: documents.genericdocument
+  pk: a1a39417-0f9e-403c-afc0-cb7ecefb1d6b
+  fields: {
+      document_type: ["documents", "sharepointdocument"],
+      document_object_id: a1a39417-0f9e-403c-afc0-cb7ecefb1d6b, # ID of Project Proposal document
+      related_object_type: ["company", "company"],
+      related_object_id: 731bdcc1-f685-4c8e-bd66-b356b2c16995, # ID of Mars Components Ltd
+    }
+- model: documents.genericdocument
+  pk: b89ac8d4-fb3a-438b-868c-8ddb793b2adb
+  fields: {
+      document_type: ["documents", "sharepointdocument"],
+      document_object_id: 08a8c016-71b1-4851-869c-1223742cf6e5, # ID of Financial Statement document
+      related_object_type: ["company", "company"],
+      related_object_id: 731bdcc1-f685-4c8e-bd66-b356b2c16995, # ID of Mars Components Ltd
+    }
