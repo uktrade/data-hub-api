@@ -124,7 +124,7 @@ django-environ==0.12.0
     # via -r requirements.in
 django-extensions==3.2.3
     # via -r requirements.in
-django-filter==24.3
+django-filter==25.1
     # via -r requirements.in
 django-js-asset==2.0.0
     # via django-mptt
@@ -233,7 +233,7 @@ isort==5.11.4
     # via pylint
 jedi==0.18.2
     # via ipython
-jinja2==3.1.5
+jinja2==3.1.6
     # via moto
 jmespath==1.0.1
     # via
