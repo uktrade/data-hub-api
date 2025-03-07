@@ -12,6 +12,7 @@ import pytest
 from moto import mock_aws
 from rq.job import Job
 
+from datahub.core.queues.constants import THIRTY_MINUTES_IN_SECONDS, THREE_MINUTES_IN_SECONDS
 from datahub.ingest.constants import (
     TEST_OBJECT_KEY,
     TEST_PREFIX,
@@ -217,6 +218,33 @@ class TestBaseObjectIdentificationTask:
             function_kwargs={
                 'object_key': TEST_OBJECT_KEY,
             },
+            job_timeout=THREE_MINUTES_IN_SECONDS,  # default timeout
+            queue_name='long-running',
+            description=f'Ingest {TEST_OBJECT_KEY}',
+        )
+
+    def test_identify_new_objects_schedules_ingestion_task_with_given_timeout(
+        self, mock_scheduler, caplog,
+    ):
+        identification_task = BaseObjectIdentificationTask(
+            prefix=TEST_PREFIX,
+            job_timeout=THIRTY_MINUTES_IN_SECONDS,
+        )
+        with (
+            mock.patch.object(
+                S3ObjectProcessor, 'get_most_recent_object_key', return_value=TEST_OBJECT_KEY,
+            ),
+            mock.patch.object(S3ObjectProcessor, 'has_object_been_ingested', return_value=False),
+            caplog.at_level(logging.INFO),
+        ):
+            identification_task.identify_new_objects(base_ingestion_task)
+            assert f'Scheduled ingestion of {TEST_OBJECT_KEY}' in caplog.text
+        mock_scheduler.assert_called_once_with(
+            function=base_ingestion_task,
+            function_kwargs={
+                'object_key': TEST_OBJECT_KEY,
+            },
+            job_timeout=THIRTY_MINUTES_IN_SECONDS,
             queue_name='long-running',
             description=f'Ingest {TEST_OBJECT_KEY}',
         )

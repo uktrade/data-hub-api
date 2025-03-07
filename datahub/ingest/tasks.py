@@ -9,6 +9,7 @@ from redis import Redis
 from rq import Queue, Worker
 from rq.job import Job
 
+from datahub.core.queues.constants import THREE_MINUTES_IN_SECONDS
 from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.ingest.boto3 import S3ObjectProcessor
 from datahub.ingest.models import IngestedObject
@@ -58,9 +59,10 @@ class BaseObjectIdentificationTask:
     ```
     """
 
-    def __init__(self, prefix: str):
+    def __init__(self, prefix: str, job_timeout=THREE_MINUTES_IN_SECONDS):
         self.long_queue_checker: QueueChecker = QueueChecker(queue_name='long-running')
         self.s3_processor: S3ObjectProcessor = S3ObjectProcessor(prefix=prefix)
+        self.job_timeout = job_timeout
 
     def identify_new_objects(self, ingestion_task_function: callable) -> None:
         """Entry point method to identify new objects and, if valid, schedule their ingestion."""
@@ -91,6 +93,7 @@ class BaseObjectIdentificationTask:
             function_kwargs={
                 'object_key': latest_object_key,
             },
+            job_timeout=self.job_timeout,
             queue_name=self.long_queue_checker.queue.name,
             description=f'Ingest {latest_object_key}',
         )
