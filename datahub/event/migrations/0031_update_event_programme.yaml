@@ -1,0 +1,6 @@
+- model: event.programme
+  pk: 819e049e-d28e-4f55-be97-37ee88023d88
+  fields: { disabled_on: null, name: Export Summit Flagship 2025 }
+- model: event.programme
+  pk: 9570faa5-9bb9-4f03-b09c-0b496aa77313
+  fields: { disabled_on: null, name: Export Summit Roadshows 2025 }
