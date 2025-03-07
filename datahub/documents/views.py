@@ -1,8 +1,13 @@
 """Document views."""
 from django.core.exceptions import PermissionDenied
-from rest_framework import filters
+from rest_framework import (
+    filters,
+    status,
+)
 from rest_framework.decorators import action
+from rest_framework.response import Response
 
+from datahub.core.models import ArchivableModel
 from datahub.core.schemas import StubSchema
 from datahub.core.viewsets import (
     CoreViewSet,
@@ -10,7 +15,11 @@ from datahub.core.viewsets import (
 )
 from datahub.documents.exceptions import TemporarilyUnavailableException
 from datahub.documents.models import GenericDocument
-from datahub.documents.serializers import GenericDocumentRetrieveSerializer
+from datahub.documents.serializers import (
+    GenericDocumentCreateSerializer,
+    GenericDocumentRetrieveSerializer,
+    SharePointDocumentSerializer,
+)
 from datahub.documents.tasks import schedule_delete_document
 
 
@@ -66,7 +75,6 @@ class BaseEntityDocumentModelViewSet(CoreViewSet):
 class GenericDocumentViewSet(SoftDeleteCoreViewSet):
     """Generic document viewset."""
 
-    serializer_class = GenericDocumentRetrieveSerializer
     filter_backends = [filters.OrderingFilter]
     ordering = ['-created_on']
     ordering_fields = ['created_on']
@@ -78,3 +86,90 @@ class GenericDocumentViewSet(SoftDeleteCoreViewSet):
         if related_object_id:
             queryset = queryset.filter(related_object_id=related_object_id)
         return queryset
+
+    def get_serializer_class(self):
+        """Return appropriate serializer class based on the action."""
+        if self.action == 'create':
+            return GenericDocumentCreateSerializer
+        return GenericDocumentRetrieveSerializer
+
+    def get_created_and_modified_by_data(self):
+        """Extracts user from the request and returns a dict with created and modified by info."""
+        user = self.request.user
+        data = {
+            'modified_by': user,
+            'created_by': user,
+        }
+        return data
+
+    def create(self, request, *args, **kwargs):
+        """Create a GenericDocument instance along with a specific-type document instance.
+
+        Example payload to create a SharePointDocument related to a Company:
+
+        ```
+        {
+            "document_type": "documents.sharepointdocument",
+            "document_data": {
+                "title": "Project Proposal",
+                "url": "https://sharepoint.example.com/project-proposal.docx"
+            },
+            "related_object_type": "company.company",
+            "related_object_id": "<uuid of company>"
+        }
+        ```
+        """
+        # Validate incoming data
+        create_serializer = self.get_serializer(data=request.data)
+        create_serializer.is_valid(raise_exception=True)
+        validated_data = create_serializer.validated_data
+
+        # Get user information for created and modified by fields
+        created_and_modified_by_data = self.get_created_and_modified_by_data()
+
+        # Create specific document based on document type
+        document_type = validated_data['document_type']
+        document_data = validated_data['document_data']
+
+        match f'{document_type.app_label}.{document_type.model}':
+            # Unsupported document types will cause the serializer to raise a validation error.
+            # Therefore, it isn't necessary to handle invalid types and return a 400 here.
+            case 'documents.sharepointdocument':
+                document_serializer = SharePointDocumentSerializer(data=document_data)
+                document_serializer.is_valid(raise_exception=True)
+                document = document_serializer.save(**created_and_modified_by_data)
+
+        # Create GenericDocument instance
+        generic_document = GenericDocument.objects.create(
+            document_type=document_type,
+            document_object_id=document.id,
+            related_object_type=validated_data['related_object_type'],
+            related_object_id=validated_data['related_object_id'],
+            **created_and_modified_by_data,
+        )
+
+        # Return the created GenericDocument
+        result_serializer = GenericDocumentRetrieveSerializer(generic_document)
+        return Response(result_serializer.data, status=status.HTTP_201_CREATED)
+
+    def destroy(self, request, *args, **kwargs):
+        """Archive the GenericDocument and specific-type document instance."""
+        generic_document = self.get_object()
+        specific_type_document = generic_document.document
+
+        # Archive specific-type document if archivable
+        if issubclass(type(specific_type_document), ArchivableModel):
+            specific_type_document.archive(
+                request.user,
+                reason='Archived instead of deleting when DELETE request received',
+            )
+        else:
+            # TODO: consider how to call a generic delete method as this could vary between types
+            raise NotImplementedError('Deletion of a non archivable model is not yet implemented.')
+
+        # Archive generic document
+        generic_document.archive(
+            request.user,
+            reason='Archived instead of deleting when DELETE request received',
+        )
+        return Response(status=status.HTTP_204_NO_CONTENT)

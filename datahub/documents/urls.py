@@ -5,9 +5,11 @@ from datahub.documents.views import GenericDocumentViewSet
 
 generic_document_collection = GenericDocumentViewSet.as_view({
     'get': 'list',
+    'post': 'create',
 })
 generic_document_item = GenericDocumentViewSet.as_view({
     'get': 'retrieve',
+    'delete': 'destroy',
 })
 
 urlpatterns = [

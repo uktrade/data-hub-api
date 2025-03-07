@@ -25,6 +25,7 @@ from datahub.core.test_utils import (
 from datahub.documents.models import (
     Document,
     GenericDocument,
+    SharePointDocument,
 )
 from datahub.documents.test.factories import CompanySharePointDocumentFactory
 from datahub.documents.test.my_entity_document.models import MyEntityDocument
@@ -49,6 +50,16 @@ def test_urls():  # noqa: D403
 @pytest.fixture
 def test_user_with_view_permissions():
     return create_test_user(permission_codenames=['view_genericdocument'])
+
+
+@pytest.fixture
+def test_user_with_add_permissions():
+    return create_test_user(permission_codenames=['add_genericdocument'])
+
+
+@pytest.fixture
+def test_user_with_delete_permissions():
+    return create_test_user(permission_codenames=['delete_genericdocument'])
 
 
 class TestDocumentViews(APITestMixin):
@@ -337,3 +348,192 @@ class TestListGenericDocumentView(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 1
         assert response.data['results'][0]['related_object_id'] == str(company.id)
+
+
+class TestCreateGenericDocumentView(APITestMixin):
+    """Tests for creating generic documents."""
+
+    def test_created_and_modified_by_fields_are_set(self, test_user_with_add_permissions):
+        api_client = self.create_api_client(user=test_user_with_add_permissions)
+        payload = {
+            'document_type': 'documents.sharepointdocument',
+            'document_data': {
+                'title': 'Project Proposal',
+                'url': 'https://sharepoint.example.com/project-proposal.docx',
+            },
+            'related_object_type': 'company.company',
+            'related_object_id': str(CompanyFactory().id),
+        }
+        response = api_client.post(DOCUMENT_COLLECTION_URL, data=payload)
+
+        assert response.status_code == status.HTTP_201_CREATED
+        generic_document = GenericDocument.objects.get(pk=response.data['id'])
+        assert generic_document.created_by_id == test_user_with_add_permissions.id
+        assert generic_document.modified_by_id == test_user_with_add_permissions.id
+        assert generic_document.document.created_by.id == test_user_with_add_permissions.id
+        assert generic_document.document.modified_by.id == test_user_with_add_permissions.id
+
+    def test_missing_fields_in_payload_raise_error(self, test_user_with_add_permissions):
+        api_client = self.create_api_client(user=test_user_with_add_permissions)
+        response = api_client.post(DOCUMENT_COLLECTION_URL, data={})
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        fields = ['document_type', 'document_data', 'related_object_type', 'related_object_id']
+        assert set(fields).issubset(set(response.data.keys()))
+
+    def test_invalid_document_type_raises_error(self, test_user_with_add_permissions):
+        api_client = self.create_api_client(user=test_user_with_add_permissions)
+        invalid_document_type = 'invalid.document_type'
+        payload = {
+            'document_type': invalid_document_type,
+            'document_data': {
+                'title': 'Project Proposal',
+                'url': 'https://sharepoint.example.com/project-proposal.docx',
+            },
+            'related_object_type': 'company.company',
+            'related_object_id': str(CompanyFactory().id),
+        }
+        response = api_client.post(DOCUMENT_COLLECTION_URL, data=payload)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data['document_type'][0] == (
+            f'Unsupported document type: {invalid_document_type}.'
+            " Format should be 'app_label.model'."
+        )
+
+    def test_non_existent_related_object_type_raises_error(self, test_user_with_add_permissions):
+        api_client = self.create_api_client(user=test_user_with_add_permissions)
+        non_existent_related_object_type = 'non_existent.related_object_type'
+        payload = {
+            'document_type': 'documents.sharepointdocument',
+            'document_data': {
+                'title': 'Project Proposal',
+                'url': 'https://sharepoint.example.com/project-proposal.docx',
+            },
+            'related_object_type': non_existent_related_object_type,
+            'related_object_id': str(CompanyFactory().id),
+        }
+        response = api_client.post(DOCUMENT_COLLECTION_URL, data=payload)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data['related_object_type'][0] == (
+            f'Invalid related object type: {non_existent_related_object_type}.'
+            " Format should be 'app_label.model'."
+        )
+
+    def test_non_existent_related_object_raises_error(self, test_user_with_add_permissions):
+        api_client = self.create_api_client(user=test_user_with_add_permissions)
+        non_existent_related_object_id = uuid.uuid4()
+        payload = {
+            'document_type': 'documents.sharepointdocument',
+            'document_data': {
+                'title': 'Project Proposal',
+                'url': 'https://sharepoint.example.com/project-proposal.docx',
+            },
+            'related_object_type': 'company.company',
+            'related_object_id': str(non_existent_related_object_id),
+        }
+        response = api_client.post(DOCUMENT_COLLECTION_URL, data=payload)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data['non_field_errors'][0] == \
+            f'Related object with id {non_existent_related_object_id} does not exist.'
+
+
+class TestCreateCompanySharePointDocumentView(APITestMixin):
+    """Tests for creating company sharepoint documents, specifically."""
+
+    def test_generic_document_is_created(self, test_user_with_add_permissions):
+        assert GenericDocument.objects.count() == 0
+
+        api_client = self.create_api_client(user=test_user_with_add_permissions)
+        payload = {
+            'document_type': 'documents.sharepointdocument',
+            'document_data': {
+                'title': 'Project Proposal',
+                'url': 'https://sharepoint.example.com/project-proposal.docx',
+            },
+            'related_object_type': 'company.company',
+            'related_object_id': str(CompanyFactory().id),
+        }
+        response = api_client.post(DOCUMENT_COLLECTION_URL, data=payload)
+
+        assert response.status_code == status.HTTP_201_CREATED
+        assert GenericDocument.objects.count() == 1
+        assert GenericDocument.objects.filter(pk=response.data['id']).exists()
+
+    def test_sharepoint_document_is_also_created(self, test_user_with_add_permissions):
+        assert SharePointDocument.objects.count() == 0
+
+        api_client = self.create_api_client(user=test_user_with_add_permissions)
+        payload = {
+            'document_type': 'documents.sharepointdocument',
+            'document_data': {
+                'title': 'Project Proposal',
+                'url': 'https://sharepoint.example.com/project-proposal.docx',
+            },
+            'related_object_type': 'company.company',
+            'related_object_id': str(CompanyFactory().id),
+        }
+        response = api_client.post(DOCUMENT_COLLECTION_URL, data=payload)
+
+        assert response.status_code == status.HTTP_201_CREATED
+        assert SharePointDocument.objects.count() == 1
+        generic_document = GenericDocument.objects.get(pk=response.data['id'])
+        assert SharePointDocument.objects.filter(pk=generic_document.document_object_id).exists()
+
+        for attribute, value in payload['document_data'].items():
+            assert getattr(generic_document.document, attribute) == value
+
+    def test_company_is_linked(self, test_user_with_add_permissions):
+        company = CompanyFactory()
+
+        api_client = self.create_api_client(user=test_user_with_add_permissions)
+        payload = {
+            'document_type': 'documents.sharepointdocument',
+            'document_data': {
+                'title': 'Project Proposal',
+                'url': 'https://sharepoint.example.com/project-proposal.docx',
+            },
+            'related_object_type': 'company.company',
+            'related_object_id': str(company.id),
+        }
+        response = api_client.post(DOCUMENT_COLLECTION_URL, data=payload)
+
+        assert response.status_code == status.HTTP_201_CREATED
+        generic_document = GenericDocument.objects.get(pk=response.data['id'])
+        assert generic_document.related_object == company
+
+
+class TestDeleteGenericDocumentView(APITestMixin):
+    """Tests for deleting generic documents."""
+
+    def test_generic_document_is_archived(self, test_user_with_delete_permissions):
+        generic_document = CompanySharePointDocumentFactory()
+        assert generic_document.archived is False
+        assert GenericDocument.objects.count() == 1
+
+        api_client = self.create_api_client(user=test_user_with_delete_permissions)
+        url = document_item_url(generic_document.pk)
+        response = api_client.delete(url)
+
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        generic_document.refresh_from_db()
+        assert generic_document.archived is True
+        assert GenericDocument.objects.count() == 1
+
+    def test_specific_type_document_is_also_archived(self, test_user_with_delete_permissions):
+        generic_document = CompanySharePointDocumentFactory()
+        sharepoint_document = generic_document.document
+
+        assert sharepoint_document.archived is False
+        assert SharePointDocument.objects.count() == 1
+
+        api_client = self.create_api_client(user=test_user_with_delete_permissions)
+        url = document_item_url(generic_document.pk)
+        response = api_client.delete(url)
+
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        sharepoint_document.refresh_from_db()
+        assert sharepoint_document.archived is True
+        assert SharePointDocument.objects.count() == 1
