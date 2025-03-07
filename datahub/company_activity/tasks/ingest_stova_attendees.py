@@ -8,6 +8,7 @@ from datahub.company.models import Contact
 from datahub.company_activity.models import StovaAttendee
 from datahub.company_activity.models import StovaEvent
 from datahub.company_activity.tasks.constants import STOVA_ATTENDEE_PREFIX
+from datahub.core.queues.constants import THIRTY_MINUTES_IN_SECONDS
 from datahub.event.models import Event
 from datahub.ingest.boto3 import S3ObjectProcessor
 from datahub.ingest.tasks import BaseObjectIdentificationTask, BaseObjectIngestionTask
@@ -21,7 +22,10 @@ DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
 def stova_attendee_identification_task() -> None:
     """Identifies the most recent file to be ingested and schedules a task to ingest it"""
     logger.info('Stova attendee identification task started.')
-    identification_task = StovaAttendeeIdentificationTask(prefix=STOVA_ATTENDEE_PREFIX)
+    identification_task = StovaAttendeeIdentificationTask(
+        prefix=STOVA_ATTENDEE_PREFIX,
+        job_timeout=THIRTY_MINUTES_IN_SECONDS,
+    )
     identification_task.identify_new_objects(stova_attendee_ingestion_task)
     logger.info('Stova attendee identification task finished.')
 
