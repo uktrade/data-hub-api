@@ -7,6 +7,7 @@ import pytest
 from moto import mock_aws
 from reversion.models import Version
 
+from datahub.core.queues.constants import THREE_MINUTES_IN_SECONDS
 from datahub.ingest.boto3 import S3ObjectProcessor
 from datahub.ingest.constants import (
     AWS_REGION,
@@ -71,6 +72,7 @@ def test_identification_task_schedules_ingestion_task(marketing_object_key, capl
             function_kwargs={
                 'object_key': marketing_object_key,
             },
+            job_timeout=THREE_MINUTES_IN_SECONDS,
             queue_name='long-running',
             description=f'Ingest {marketing_object_key}',
         )
