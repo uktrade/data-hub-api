@@ -222,7 +222,11 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
         methods=['post'],
         detail=True,
         permission_classes=[
-            IsAccountManagerOnCompany,
+            IsAccountManagerOnCompany
+            or HasPermissions(
+                f'company.{CompanyPermission.change_company}',
+                f'company.{CompanyPermission.change_one_list_tier_and_global_account_manager}',
+            ),
         ],
         schema=StubSchema(),
     )
@@ -273,8 +277,15 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
         methods=['patch'],
         detail=True,
         permission_classes=[
-            IsAccountManagerOnCompany,
-        ],
+            IsAccountManagerOnCompany
+            or HasPermissions(
+                f'company.{CompanyPermission.change_company}',
+                f'company.{CompanyPermission.change_one_list_core_team_member}',
+            )
+            or HasPermissions(
+                f'company.{CompanyPermission.change_company}',
+                f'company.{CompanyPermission.change_one_list_tier_and_global_account_manager}',
+            )],
         schema=StubSchema(),
     )
     def update_one_list_core_team(self, request, *args, **kwargs):
