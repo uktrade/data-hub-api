@@ -6,7 +6,7 @@ from datahub.company.models import CompanyPermission
 class IsAccountManagerOnCompany(BasePermission):
     """
     Allows users:
-    - that have change_company permission and are one_list_account_owners (account managers/ITA 
+    - that have change_company permission and are one_list_account_owners (account managers/ITA
       Leads) for the current record.
     """
 
