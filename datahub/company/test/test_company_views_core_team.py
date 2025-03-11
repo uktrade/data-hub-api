@@ -331,11 +331,14 @@ class TestUpdateOneListCoreTeam(APITestMixin):
         """
         Test that an account manager can update core team members.
         """
+        adviser_user = create_test_user(
+            permission_codenames=(CompanyPermission.change_company,),
+        )
         company = CompanyFactory(
-            one_list_account_owner=AdviserFactory(),
+            one_list_account_owner=adviser_user,
             one_list_tier=random_non_ita_one_list_tier(),
         )
-        api_client = self.create_api_client(user=company.one_list_account_owner)
+        api_client = self.create_api_client(user=adviser_user)
 
         self._assert_update_core_team_members(
             company, existing_team_count, new_team_count, api_client)
