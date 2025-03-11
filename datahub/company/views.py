@@ -223,7 +223,7 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
         detail=True,
         permission_classes=[
             IsAccountManagerOnCompany
-            or HasPermissions(
+            | HasPermissions(
                 f'company.{CompanyPermission.change_company}',
                 f'company.{CompanyPermission.change_one_list_tier_and_global_account_manager}',
             ),
@@ -278,11 +278,11 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
         detail=True,
         permission_classes=[
             IsAccountManagerOnCompany
-            or HasPermissions(
+            | HasPermissions(
                 f'company.{CompanyPermission.change_company}',
                 f'company.{CompanyPermission.change_one_list_core_team_member}',
             )
-            or HasPermissions(
+            | HasPermissions(
                 f'company.{CompanyPermission.change_company}',
                 f'company.{CompanyPermission.change_one_list_tier_and_global_account_manager}',
             )],
