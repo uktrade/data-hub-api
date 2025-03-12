@@ -486,6 +486,13 @@ class Company(ArchivableModel, BaseModel):
         return self.address_country.id == united_kingdom_id
 
     @property
+    def has_name(self):
+        """Whether a company is based in the UK or not."""
+        if not self.name or self.name == '':
+            return False
+        return True
+
+    @property
     def is_global_ultimate(self):
         """
         Whether this company is the global ultimate or not.

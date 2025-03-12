@@ -7,6 +7,10 @@ from datahub.search import dict_utils, fields
 from datahub.search.models import BaseSearchModel
 
 
+
+
+
+
 def _adviser_field_with_indexed_id():
     return Object(
         properties={
@@ -38,6 +42,7 @@ class Company(BaseSearchModel):
     future_interest_countries = fields.id_name_field()
     global_headquarters = fields.id_name_field()
     headquarter_type = fields.id_name_field()
+    has_name = Boolean()
     modified_on = Date()
     name = Text(
         fields={
