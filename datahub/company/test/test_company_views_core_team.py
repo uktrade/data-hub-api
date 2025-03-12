@@ -219,6 +219,17 @@ class TestUpdateOneListCoreTeam(APITestMixin):
             },
         )
 
+    def _one_list_account_owner_api_client(self):
+        adviser_user = create_test_user(
+            permission_codenames=(CompanyPermission.change_company,),
+        )
+        company = CompanyFactory(
+            one_list_account_owner=adviser_user,
+            one_list_tier=random_non_ita_one_list_tier(),
+        )
+        api_client = self.create_api_client(user=adviser_user)
+        return api_client, company
+
     def _assert_update_core_team_members(
         self,
         one_list_company,
@@ -330,16 +341,9 @@ class TestUpdateOneListCoreTeam(APITestMixin):
     ):
         """
         Test that an account manager can update core team members.
+        - requires user to also have change_company permission.
         """
-        adviser_user = create_test_user(
-            permission_codenames=(CompanyPermission.change_company,),
-        )
-        company = CompanyFactory(
-            one_list_account_owner=adviser_user,
-            one_list_tier=random_non_ita_one_list_tier(),
-        )
-        api_client = self.create_api_client(user=adviser_user)
-
+        api_client, company = self._one_list_account_owner_api_client()
         self._assert_update_core_team_members(
             company, existing_team_count, new_team_count, api_client)
 
@@ -348,11 +352,7 @@ class TestUpdateOneListCoreTeam(APITestMixin):
         Test that a 403 is returned if an account manager tries to update the core team from
         a company they are not the account manage for.
         """
-        account_managers_company = CompanyFactory(
-            one_list_account_owner=AdviserFactory(),
-            one_list_tier=random_non_ita_one_list_tier(),
-        )
-        api_client = self.create_api_client(user=account_managers_company.one_list_account_owner)
+        api_client, adviser_company = self._one_list_account_owner_api_client()
 
         company = CompanyFactory()
         url = self._get_url(company)
