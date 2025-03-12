@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
-    """Command to schedule the re-ingestion all records from the latest EYB objects.
+    """Command to schedule the re-ingestion of all records from the latest EYB objects.
 
     It does this by removing all EYB IngestedObject instances and then triggering the existing
     eyb_triage_identification_task that usually runs every hour. By removing the record of
