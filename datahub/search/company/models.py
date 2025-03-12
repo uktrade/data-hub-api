@@ -7,10 +7,6 @@ from datahub.search import dict_utils, fields
 from datahub.search.models import BaseSearchModel
 
 
-
-
-
-
 def _adviser_field_with_indexed_id():
     return Object(
         properties={
