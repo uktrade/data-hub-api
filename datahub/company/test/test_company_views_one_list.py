@@ -113,19 +113,31 @@ class TestUpdateOneListTierAndGlobalAccountManager(APITestMixin):
         assert versions[0].field_dict['one_list_tier_id'] == new_one_list_tier.id
         assert versions[0].field_dict['one_list_account_owner_id'] == global_account_manager.id
 
+    @pytest.mark.parametrize(
+        'permission_codenames,allowed',
+        (
+            (None, False),
+            (CompanyPermission.change_company, True),
+        ),
+    )
     @pytest.mark.django_db
     def test_assigns_one_list_tier_by_account_manager(
         self,
+        permission_codenames, allowed,
     ):
         """
         Test that an account manager:
         - can update the One List tier of the company they are managing
+        - AND they have change_company permission.
         """
+        adviser_user = create_test_user(
+            permission_codenames=(permission_codenames,),
+        )
         company = CompanyFactory(
-            one_list_account_owner=AdviserFactory(),
+            one_list_account_owner=adviser_user,
             one_list_tier=random_non_ita_one_list_tier(),
         )
-        api_client = self.create_api_client(user=company.one_list_account_owner)
+        api_client = self.create_api_client(user=adviser_user)
 
         url = self._get_url(company)
 
@@ -140,19 +152,22 @@ class TestUpdateOneListTierAndGlobalAccountManager(APITestMixin):
                 'global_account_manager': company.one_list_account_owner.id,
             },
         )
-        assert response.status_code == status.HTTP_204_NO_CONTENT
+        if (not allowed):
+            assert response.status_code == status.HTTP_403_FORBIDDEN
+        else:
+            assert response.status_code == status.HTTP_204_NO_CONTENT
 
-        company.refresh_from_db()
-        assert company.one_list_account_owner == company.one_list_account_owner
-        assert company.one_list_tier_id == new_one_list_tier.pk
-        assert company.modified_by == company.one_list_account_owner
+            company.refresh_from_db()
+            assert company.one_list_account_owner == company.one_list_account_owner
+            assert company.one_list_tier_id == new_one_list_tier.pk
+            assert company.modified_by == company.one_list_account_owner
 
-        # Check that object version is stored correctly
-        versions = Version.objects.get_for_object(company)
-        assert versions.count() == 1
-        assert versions[0].field_dict['one_list_tier_id'] == new_one_list_tier.id
-        assert versions[0].field_dict['one_list_account_owner_id'] == \
-            company.one_list_account_owner.id
+            # Check that object version is stored correctly
+            versions = Version.objects.get_for_object(company)
+            assert versions.count() == 1
+            assert versions[0].field_dict['one_list_tier_id'] == new_one_list_tier.id
+            assert versions[0].field_dict['one_list_account_owner_id'] == \
+                company.one_list_account_owner.id
 
     @pytest.mark.django_db
     def test_returns_403_on_editing_one_list_tier_by_other_account_manager(
