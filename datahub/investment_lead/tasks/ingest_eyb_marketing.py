@@ -1,5 +1,6 @@
 import logging
 
+from datahub.core.queues.constants import THIRTY_MINUTES_IN_SECONDS
 from datahub.ingest.boto3 import S3ObjectProcessor
 from datahub.ingest.constants import DATA_FLOW_EXPORTS_PREFIX
 from datahub.investment_lead.models import EYBLead
@@ -18,7 +19,10 @@ logger = logging.getLogger(__name__)
 
 def eyb_marketing_identification_task() -> None:
     logger.info('EYB marketing identification task started...')
-    identification_task = EYBMarketingIdentificationTask(prefix=MARKETING_PREFIX)
+    identification_task = EYBMarketingIdentificationTask(
+        prefix=MARKETING_PREFIX,
+        job_timeout=THIRTY_MINUTES_IN_SECONDS,
+    )
     identification_task.identify_new_objects(eyb_marketing_ingestion_task)
     logger.info('EYB marketing identification task finished.')
 
