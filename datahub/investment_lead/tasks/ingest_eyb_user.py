@@ -1,5 +1,6 @@
 import logging
 
+from datahub.core.queues.constants import THIRTY_MINUTES_IN_SECONDS
 from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.ingest.boto3 import S3ObjectProcessor
 from datahub.ingest.constants import DATA_FLOW_EXPORTS_PREFIX
@@ -20,7 +21,10 @@ logger = logging.getLogger(__name__)
 
 def eyb_user_identification_task() -> None:
     logger.info('EYB user identification task started...')
-    identification_task = EYBUserIdentificationTask(prefix=USER_PREFIX)
+    identification_task = EYBUserIdentificationTask(
+        prefix=USER_PREFIX,
+        job_timeout=THIRTY_MINUTES_IN_SECONDS,
+    )
     identification_task.identify_new_objects(eyb_user_ingestion_task)
     logger.info('EYB user identification task finished.')
 
