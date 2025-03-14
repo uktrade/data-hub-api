@@ -492,7 +492,7 @@ class Company(ArchivableModel, BaseModel):
 
         :returns: True if company has a name, False if blank or null.
         """
-        if not self.name or self.name == '':
+        if not self.name:
             return False
         return True
 
