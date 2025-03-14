@@ -486,8 +486,12 @@ class Company(ArchivableModel, BaseModel):
         return self.address_country.id == united_kingdom_id
 
     @property
-    def has_name(self):
-        """Whether a company is based in the UK or not."""
+    def has_name(self) -> bool:
+        """
+        Whether the company name is empty or not.
+
+        :returns: True if company has a name, False if blank or null.
+        """
         if not self.name or self.name == '':
             return False
         return True
