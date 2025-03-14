@@ -425,6 +425,9 @@ def test_mapping(opensearch):
                 'type': 'object',
             },
             'number_of_employees': {'type': 'integer'},
+            'has_name': {
+                'type': 'boolean',
+            },
             'global_ultimate_duns_number': {'type': 'keyword'},
             'is_global_ultimate': {'type': 'boolean'},
         },
@@ -731,6 +734,7 @@ def test_indexed_doc(opensearch):
         'headquarter_type',
         'id',
         'modified_on',
+        'has_name',
         'name',
         'global_headquarters',
         'reference_code',
