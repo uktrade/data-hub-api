@@ -47,6 +47,7 @@ class SearchCompanyAPIViewMixin:
         'id',
         'archived',
         'headquarter_type',
+        'has_name',
         'is_global_ultimate',
         'name',
         'sector_descends',

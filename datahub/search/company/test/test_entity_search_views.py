@@ -364,6 +364,7 @@ class TestSearch(APITestMixin):
                     'export_sub_segment': company.export_sub_segment,
                     'export_to_countries': [],
                     'future_interest_countries': [],
+                    'has_name': True,
                     'headquarter_type': company.headquarter_type,
                     'sector': {
                         'id': str(company.sector.id),

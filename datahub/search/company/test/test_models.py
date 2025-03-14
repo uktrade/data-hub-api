@@ -37,6 +37,7 @@ class TestCompanySearchModel:
             'modified_on',
             'name',
             'global_headquarters',
+            'has_name',
             'reference_code',
             'sector',
             'latest_interaction_date',

@@ -13,6 +13,7 @@ class SearchCompanyQuerySerializer(EntitySearchQuerySerializer):
 
     id = SingleOrListField(child=StringUUIDField(), required=False)
     archived = serializers.BooleanField(required=False)
+    has_name = serializers.BooleanField(required=False)
     headquarter_type = SingleOrListField(
         child=StringUUIDField(allow_null=True),
         required=False,

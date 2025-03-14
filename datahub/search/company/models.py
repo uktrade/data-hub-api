@@ -38,6 +38,7 @@ class Company(BaseSearchModel):
     future_interest_countries = fields.id_name_field()
     global_headquarters = fields.id_name_field()
     headquarter_type = fields.id_name_field()
+    has_name = Boolean()
     modified_on = Date()
     name = Text(
         fields={
