@@ -9,13 +9,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.renderers import JSONOpenAPIRenderer
 
 
-api_docs_urls = []
-api_versions_to_document = ['v1', 'v3', 'v4']
-
-for version in api_versions_to_document:
-    api_docs_urls.extend([
+def get_schema_and_docs_for_api_version(version: str):
+    """Returns OpenAPI schema and Swagger UI for endpoints within a specific API version."""
+    return [
         path(
-            f'{version}/docs/schema',
+            'docs/schema',
             admin.site.admin_view(SpectacularAPIView.as_view(
                 renderer_classes=[JSONOpenAPIRenderer],
                 authentication_classes=[SessionAuthentication],
@@ -25,12 +23,12 @@ for version in api_versions_to_document:
             name=f'openapi-schema-{version}',
         ),
         path(
-            f'{version}/docs',
+            'docs',
             admin.site.admin_view(SpectacularSwaggerSplitView.as_view(
-                url_name=f'api-docs:openapi-schema-{version}',
+                url_name=f'api-{version}:openapi-schema-{version}',
                 authentication_classes=[SessionAuthentication],
                 permission_classes=[IsAuthenticated],
             )),
             name=f'swagger-ui-{version}',
         ),
-    ])
+    ]

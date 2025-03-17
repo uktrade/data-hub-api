@@ -3,6 +3,7 @@
 from django.urls import include, path
 from rest_framework import routers
 
+from config.api_docs_urls import get_schema_and_docs_for_api_version
 from datahub.activity_feed import urls as activity_feed_urls
 from datahub.activity_stream import urls as activity_stream_urls
 from datahub.company import views as company_views
@@ -35,7 +36,7 @@ from datahub.user.company_list import urls as company_list_urls
 router_v1 = routers.SimpleRouter()
 router_v1.register(r'adviser', company_views.AdviserReadOnlyViewSetV1)
 
-v1_urls = router_v1.urls
+v1_urls = router_v1.urls + get_schema_and_docs_for_api_version('v1')
 
 
 # API V3
@@ -62,7 +63,7 @@ v3_urls = [
             namespace='public-omis',
         ),
     ),
-]
+] + get_schema_and_docs_for_api_version('v3')
 
 
 # API V4 - new format for addresses
@@ -112,4 +113,4 @@ v4_urls = [
         ),
     ),
     path('document/', include((document_urls, 'document'), namespace='document')),
-]
+] + get_schema_and_docs_for_api_version('v4')
