@@ -23,8 +23,8 @@ api_docs_urls = [
         'docs/schema',
         admin.site.admin_view(SpectacularAPIView.as_view(
             renderer_classes=[JSONOpenAPIRenderer],
-            authentication_classes=[],
-            permission_classes=[],
+            authentication_classes=[SessionAuthentication],
+            permission_classes=[IsAuthenticated],
             api_version='api-v3',  # TODO: Get working with multiple API versions
         )),
         name='openapi-schema',
