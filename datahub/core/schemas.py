@@ -1,4 +1,4 @@
-from rest_framework.schemas.openapi import AutoSchema
+from drf_spectacular.openapi import AutoSchema
 
 
 class StubSchema(AutoSchema):
@@ -10,15 +10,22 @@ class StubSchema(AutoSchema):
     documentation.
     """
 
-    def get_operation(self, path, method):
+    def get_operation(self, path, path_regex, path_prefix, method, registry):
         """
         Get the operation schema.
 
-        This takes the operationId and parameters that DRF generate, but discards request and
-        response schemas.
+        This takes the operationId and parameters that drf-spectacular generate,
+        but discards request and response schemas.
         """
-        default_schema = super().get_operation(path, method)
+        default_schema = super().get_operation(
+            path=path,
+            path_regex=path_regex,
+            path_prefix=path_prefix,
+            method=method,
+            registry=registry,
+        )
         return {
-            'operationId': default_schema['operationId'],
-            'parameters': default_schema['parameters'],
+            'operationId': default_schema.get('operationId', ''),
+            'parameters': default_schema.get('parameters', []),
+            'description': default_schema.get('description', ''),
         }
