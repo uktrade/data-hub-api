@@ -20,10 +20,6 @@ from datahub.company.tasks.export_potential import update_company_export_potenti
 from datahub.company_activity.tasks.ingest_company_activity import (
     company_activity_identification_task,
 )
-from datahub.company_activity.tasks.ingest_stova_attendees import (
-    stova_attendee_identification_task,
-)
-from datahub.company_activity.tasks.ingest_stova_events import stova_event_identification_task
 from datahub.core.queues.constants import (
     EVERY_EIGHT_AM,
     EVERY_EIGHT_THIRTY_AM_ON_FIRST_EACH_MONTH,
@@ -147,16 +143,6 @@ def schedule_jobs():
         function=eyb_triage_identification_task,
         cron=EVERY_HOUR,
         description='Identify new EYB triage objects and schedule their ingestion',
-    )
-    job_scheduler(
-        function=stova_event_identification_task,
-        cron=EVERY_HOUR,
-        description='Identify new Stova event objects and schedule their ingestion',
-    )
-    job_scheduler(
-        function=stova_attendee_identification_task,
-        cron=EVERY_HOUR,
-        description='Identify new Stova attendee objects and schedule their ingestion',
     )
     job_scheduler(
         function=postcode_data_identification_task,
