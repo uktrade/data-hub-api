@@ -297,7 +297,8 @@ REST_FRAMEWORK = {
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Data Hub API',
     'DESCRIPTION': 'Auto-generated API documentation for Data Hub.',
-    'SERVE_INCLUDE_SCHEMA': False,    
+    'VERSION': None,
+    'SERVE_INCLUDE_SCHEMA': False,
     # Settings for self-contained UI installation (see docs)
     'SWAGGER_UI_DIST': 'SIDECAR', 
     'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
