@@ -1,5 +1,5 @@
 # Django and django related
-django==4.2.19
+django==4.2.20
 djangorestframework==3.15.2
 drf-redesign==0.4.0
 django-axes==7.0.2
