@@ -574,9 +574,54 @@ class TestStovaIngestionTasks:
         ingestion_task = StovaAttendeeIngestionTask(test_file_path, s3_object_processor)
 
         with caplog.at_level(logging.INFO):
-            company = ingestion_task.get_or_create_company(data)
+            company = ingestion_task.get_or_create_company(data, None)
             assert 'No company name available, skipping attendee 1234' in caplog.text
             assert company is None
+
+    @pytest.mark.django_db
+    def test_get_or_create_company__returns_when_stova_event_has_no_datahub_event(
+        self, s3_object_processor, test_file_path, caplog,
+    ):
+        """Tests stova events without datahub events are logged and no company is created."""
+        data = {'stova_attendee_id': 1234, 'company_name': 'a new company'}
+        ingestion_task = StovaAttendeeIngestionTask(test_file_path, s3_object_processor)
+
+        stova_event = StovaEventFactory()
+        stova_event.datahub_event.clear()
+
+        with caplog.at_level(logging.INFO):
+            company = ingestion_task.get_or_create_company(data, stova_event)
+            assert (
+                'No event associated with the StovaEvent. Skipping attendee: 1234' in caplog.text
+            )
+            assert company is None
+
+    @pytest.mark.django_db
+    def test_created_companies_have_country_matching_stova_event_country(
+        self, test_base_stova_attendee, s3_object_processor, test_file_path,
+    ):
+        """
+        The feed from Stova Attendees does not contain a country field which is an issue as this
+        creates companies without countries. This test checks that the country defaults to the
+        Event created from a StovaEvent country.
+        """
+        data = test_base_stova_attendee
+        email = 'attendee_in_interaction@test.com'
+        data['email'] = email
+        object_definition = (test_file_path, compressed_json_faker([data]))
+        upload_objects_to_s3(s3_object_processor, [object_definition])
+
+        ingestion_task = StovaAttendeeIngestionTask(test_file_path, s3_object_processor)
+        ingestion_task.ingest_object()
+
+        stova_attendee = StovaAttendee.objects.get(email=email)
+        contact = Contact.objects.filter(email=stova_attendee.email).first()
+        assert contact is not None
+
+        assert (
+            contact.company.address_country.id
+            == stova_attendee.ingested_stova_event.datahub_event.first().address_country.id
+        )
 
     @pytest.mark.django_db
     @pytest.mark.parametrize(
