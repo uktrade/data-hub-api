@@ -242,7 +242,7 @@ class StovaEventFactory(factory.django.DjangoModelFactory):
     code = 'CodeTest'
     name = factory.Faker('first_name')
     state = 'London'
-    country = 'England'
+    country = 'UK'
     max_reg = 3
     end_date = now()
     timezone = 'Europe/London'

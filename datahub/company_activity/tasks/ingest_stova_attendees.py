@@ -133,7 +133,7 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
         if not event:
             return
 
-        company = self.get_or_create_company(values)
+        company = self.get_or_create_company(values, event)
         if not company:
             return
 
@@ -201,12 +201,19 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
             return
 
     @staticmethod
-    def get_or_create_company(values: dict) -> Company | None:
+    def get_or_create_company(values: dict, stova_event: StovaEvent) -> Company | None:
         """
         Attempts to find an existing `Company` from the attendees company name, if one does not
         exist create a new one.
 
+        Attendees from Stova do not have a country associated with them. Attendees can create
+        companies which should not have an empty country field as the frontend and DNB API requires
+        this field. To ensure companies have countries, the event which an attendee has attended
+        contains a country field which is used when creating a Company.
+
         :param values: A dictionary of cleaned values from an ingested stova attendee record.
+        :param event: A StovaEvent which this attendee has attended, used for the country field
+            when creating a Company.
         :returns: An existing `Company` if found or a newly created `Company`.
         """
         company_name = values['company_name']
@@ -220,8 +227,20 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
         if company:
             return company
 
+        datahub_event = stova_event.datahub_event.first()
+        if not datahub_event:
+            logger.info(
+                'No event associated with the StovaEvent. Skipping attendee: '
+                f'{values["stova_attendee_id"]}',
+            )
+            return
+
         try:
-            return Company.objects.create(name=company_name, source=Company.Source.STOVA)
+            return Company.objects.create(
+                name=company_name,
+                source=Company.Source.STOVA,
+                address_country_id=datahub_event.address_country_id,
+            )
         except IntegrityError as error:
             logger.error(
                 'Error creating company from Stova attendee record, stova_attendee_id: '
