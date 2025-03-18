@@ -227,8 +227,8 @@ class GreatIngestionTask:
             'form_id': form_id,
             'url': str(jsn.get('url', '') or ''),
             'form_created_at': jsn.get('created_at'),
-            'submission_type': jsn.get('submission_action', ''),
-            'submission_action': jsn.get('submission_type', ''),
+            'submission_type': jsn.get('submission_type', ''),
+            'submission_action': jsn.get('submission_action', ''),
             'company': company,
             'contact': contact,
 
