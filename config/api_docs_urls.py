@@ -1,46 +1,34 @@
-from django.conf import settings
 from django.contrib import admin
 from django.urls import path
-from django.views.generic import TemplateView
+from drf_spectacular.views import (
+    SpectacularAPIView,
+    SpectacularSwaggerSplitView,
+)
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.renderers import JSONOpenAPIRenderer
-from rest_framework.schemas import get_schema_view
 
 
-API_DOCUMENTATION_TITLE = 'Data Hub API'
-API_DOCUMENTATION_DESCRIPTION = """Auto-generated API documentation for Data Hub.
-
-There are currently some missing or incorrect details as we are limited by the web framework
-we are using. These should be corrected over time as the relevant features in the framework are
-enhanced.
-"""
-
-
-api_docs_urls = [
-    path(
-        'docs',
-        admin.site.admin_view(
-            TemplateView.as_view(
-                template_name='core/docs/swagger-ui.html',
-                extra_context={
-                    'swagger_ui_css': settings.SWAGGER_UI_CSS,
-                    'swagger_ui_js': settings.SWAGGER_UI_JS,
-                },
-            ),
+def get_schema_and_docs_for_api_version(version: str):
+    """Returns OpenAPI schema and Swagger UI for endpoints within a specific API version."""
+    return [
+        path(
+            'docs/schema',
+            admin.site.admin_view(SpectacularAPIView.as_view(
+                renderer_classes=[JSONOpenAPIRenderer],
+                authentication_classes=[SessionAuthentication],
+                permission_classes=[IsAuthenticated],
+                api_version=f'api-{version}',
+            )),
+            name=f'openapi-schema-{version}',
         ),
-        name='swagger-ui',
-    ),
-    path(
-        'docs/schema',
-        get_schema_view(
-            title=API_DOCUMENTATION_TITLE,
-            description=API_DOCUMENTATION_DESCRIPTION,
-            # JSONOpenAPIRenderer works better with IntEnum, StrEnum etc.
-            renderer_classes=[JSONOpenAPIRenderer],
-            permission_classes=(IsAuthenticated,),
-            authentication_classes=[SessionAuthentication],
+        path(
+            'docs',
+            admin.site.admin_view(SpectacularSwaggerSplitView.as_view(
+                url_name=f'api-{version}:openapi-schema-{version}',
+                authentication_classes=[SessionAuthentication],
+                permission_classes=[IsAuthenticated],
+            )),
+            name=f'swagger-ui-{version}',
         ),
-        name='openapi-schema',
-    ),
-]
+    ]

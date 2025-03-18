@@ -3,7 +3,6 @@ from django.contrib import admin
 from django.urls import include, path
 
 from config import api_urls
-from config.api_docs_urls import api_docs_urls
 from datahub.ping.views import ping
 from datahub.user.views import who_am_i
 
@@ -47,5 +46,4 @@ urlpatterns = [
     path('', include((api_urls.v1_urls, 'api'), namespace='api-v1')),
     path('v3/', include((api_urls.v3_urls, 'api'), namespace='api-v3')),
     path('v4/', include((api_urls.v4_urls, 'api'), namespace='api-v4')),
-    path('', include((api_docs_urls, 'api-docs'), namespace='api-docs')),
 ] + unversioned_urls
