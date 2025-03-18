@@ -48,6 +48,22 @@ class TestDocsSchemaView(AdminTestMixin):
         assert response.status_code == status.HTTP_200_OK
 
     @pytest.mark.parametrize('version', ['v1', 'v3', 'v4'])
+    def test_returns_content_if_logged_in(self, client, version):
+        """Tests that some content is loaded if the user is logged in."""
+        password = 'test-password'
+        user = get_admin_user(password=password)
+        client.login(username=user.email, password=password)
+
+        url = reverse(f'api-{version}:openapi-schema-{version}')
+        response = client.get(url)
+
+        assert len(response.content) > 0
+        lower_case_content = response.content.lower()
+        assert b'openapi' in lower_case_content
+        assert b'info' in lower_case_content
+        assert b'paths' in lower_case_content
+
+    @pytest.mark.parametrize('version', ['v1', 'v3', 'v4'])
     def test_redirects_to_login_page_if_not_logged_in(self, client, version):
         """Test that the view redirects to the login page if the user isn't authenticated."""
         url = reverse(f'api-{version}:openapi-schema-{version}')
