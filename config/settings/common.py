@@ -85,6 +85,8 @@ THIRD_PARTY_APPS = [
     'django_filters',
     'mptt',
     'axes',
+    'drf_spectacular',
+    'drf_spectacular_sidecar',
 ]
 
 LOCAL_APPS = [
@@ -283,6 +285,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'datahub.core.permissions.DjangoCrudPermission',
     ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_THROTTLE_RATES': {
         'payment_gateway_session.create': '5/min',
     },
@@ -290,20 +293,16 @@ REST_FRAMEWORK = {
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
 }
 
-# Swagger UI 5.15.0 resources used in the Swagger UI view
-# (used in config/api_docs_urls.py and datahub/core/templates/core/docs/swagger-ui.html)
-#
-# Downloaded statifiles locally because of Content Security Policy inline violations.
-#
-# To generate a new 'integrity' hash, open your terminal and execute:
-# `openssl dgst -sha384 -binary FILENAME.css | openssl base64 -A`
-SWAGGER_UI_CSS = {
-    'href': os.path.join(STATIC_URL, 'core/css/swagger-ui_5.15.0.css'),
-    'integrity': 'sha384-/hHukNS+XqR9TI4ZSRNiSzG54wwXN/aka60dRJMGVDpSwjL0vkyOwRVR7L3f0xo+',
-}
-SWAGGER_UI_JS = {
-    'src': os.path.join(STATIC_URL, 'core/js/swagger-ui-bundle_5.15.0.js'),
-    'integrity': 'sha384-3T0m2dlv/POl6bmr9ZuK8z2TYZ2zOjRxVAtkOxmYKEaCacswXm6i+BSXpAlstS4p',
+# See https://drf-spectacular.readthedocs.io/en/latest/settings.html for default settings
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Data Hub API',
+    'DESCRIPTION': 'Auto-generated API documentation for Data Hub.',
+    'VERSION': None,
+    'SERVE_INCLUDE_SCHEMA': False,
+    # Settings for self-contained UI installation (see docs)
+    'SWAGGER_UI_DIST': 'SIDECAR', 
+    'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
+    'REDOC_DIST': 'SIDECAR',
 }
 
 # Simplified static file serving.

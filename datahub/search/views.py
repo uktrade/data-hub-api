@@ -8,9 +8,9 @@ from itertools import islice
 from django.conf import settings
 from django.utils.text import capfirst
 from django.utils.timezone import now
+from drf_spectacular.openapi import AutoSchema
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.schemas.openapi import AutoSchema
 from rest_framework.views import APIView
 
 from datahub.core.csv import create_csv_response
@@ -44,11 +44,17 @@ class SearchStubSchema(AutoSchema):
     wrong example in the OpenAPI docs.
     """
 
-    def get_operation(self, path, method):
+    def get_operation(self, path, path_regex, path_prefix, method, registry):
         """
         Supress showing the response in the form of the request body.
         """
-        operation = super().get_operation(path, method)
+        operation = super().get_operation(
+            path=path,
+            path_regex=path_regex,
+            path_prefix=path_prefix,
+            method=method,
+            registry=registry,
+        )
 
         operation['responses'] = {
             '200': {
@@ -70,9 +76,15 @@ class SearchBasicStubSchema(SearchStubSchema):
     docs.
     """
 
-    def get_operation(self, path, method):
+    def get_operation(self, path, path_regex, path_prefix, method, registry):
         """Include parameters to query the basic search endpoint."""
-        operation = super().get_operation(path, method)
+        operation = super().get_operation(
+            path=path,
+            path_regex=path_regex,
+            path_prefix=path_prefix,
+            method=method,
+            registry=registry,
+        )
         operation['parameters'] = [
             {
                 'description': '',
