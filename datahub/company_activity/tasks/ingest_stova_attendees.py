@@ -212,8 +212,8 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
         contains a country field which is used when creating a Company.
 
         :param values: A dictionary of cleaned values from an ingested stova attendee record.
-        :param event: A StovaEvent which this attendee has attended, used for the country field
-            when creating a Company.
+        :param stova_event: A StovaEvent which this attendee has attended, used for the country
+            field when creating a Company.
         :returns: An existing `Company` if found or a newly created `Company`.
         """
         company_name = values['company_name']
