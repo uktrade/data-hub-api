@@ -103,3 +103,22 @@ class TestOneListAccountOwner():
 
         company.save()
         mock_schedule_sync_investment_projects_of_subsidiary_companies.assert_not_called()
+
+
+class TestCompany:
+    """Tests for the Company model"""
+
+    @pytest.mark.parametrize(
+        'name,expected_return',
+        (
+            ('', False),
+            ('This is a company with a name', True),
+            (' ', True),
+        ),
+    )
+    def test_has_name(self, name: str, expected_return: bool) -> None:
+        """
+        Test the has_name property returns the correct response for a variety of scenarios.
+        """
+        company = CompanyFactory(name=name)
+        assert company.has_name == expected_return
