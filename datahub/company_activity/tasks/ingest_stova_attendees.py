@@ -133,7 +133,10 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
         if not event:
             return
 
-        company = self.get_or_create_company(values, event)
+        company = self.find_company(values)
+        if not company:
+            company = self.create_company(values, event)
+
         if not company:
             return
 
@@ -200,11 +203,42 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
             )
             return
 
-    @staticmethod
-    def get_or_create_company(values: dict, stova_event: StovaEvent) -> Company | None:
+    def _find_company_by_attendee_email(self, values: dict) -> Company | None:
         """
-        Attempts to find an existing `Company` from the attendees company name, if one does not
-        exist create a new one.
+        Attempts to find a company using the attendees email address.
+
+        :param values: A dictionary of Stova Attendee values
+        :return: A `Company` from a `Contact` if found, `None` if not.
+        """
+        email = values['email']
+        if not email:
+            return
+        contact = Contact.objects.filter(email=email).first()
+        if contact:
+            return contact.company
+
+    def find_company(self, values: dict):
+        """
+        Attempts to find a company by company name or by an email address.
+
+        :param values: A dictionary of Stova Attendee values
+        :returns: A `Company` if a match is found, `None` if not.
+        """
+        company_name = values['company_name']
+        # For empty names, try matching with attendee email
+        if not company_name:
+            return self._find_company_by_attendee_email(values)
+        # For non empty names, try matching by given company_name
+        company = Company.objects.filter(name__iexact=company_name).first()
+        if company:
+            return company
+        # For no matches by name, try matching by attendee email.
+        return self._find_company_by_attendee_email(values)
+
+    @staticmethod
+    def create_company(values: dict, stova_event: StovaEvent) -> Company | None:
+        """
+        Creates a company from StovaAttendee and StovaEvent data.
 
         Attendees from Stova do not have a country associated with them. Attendees can create
         companies which should not have an empty country field as the frontend and DNB API requires
@@ -217,15 +251,12 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
         :returns: An existing `Company` if found or a newly created `Company`.
         """
         company_name = values['company_name']
-        if company_name == '' or company_name is None:
+        if not company_name:
             logger.info(
-                f'No company name available, skipping attendee {values["stova_attendee_id"]}',
+                'No match found and cannot create company without a name skipping attendee '
+                f'{values["stova_attendee_id"]}',
             )
             return
-
-        company = Company.objects.filter(name__iexact=company_name).first()
-        if company:
-            return company
 
         datahub_event = stova_event.datahub_event.first()
         if not datahub_event:
