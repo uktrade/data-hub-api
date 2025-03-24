@@ -50,6 +50,8 @@ botocore==1.37.13
     #   s3transfer
 build==1.0.3
     # via pip-tools
+bytecode==0.16.1
+    # via ddtrace
 celery==5.4.0
     # via dbt-copilot-python
 certifi==2024.7.4
@@ -88,6 +90,8 @@ cryptography==44.0.1
     # via moto
 dbt-copilot-python==0.2.2
     # via -r requirements.in
+ddtrace==3.2.1
+    # via django-log-formatter-asim
 decorator==5.1.1
     # via ipython
 deprecated==1.2.14
@@ -132,7 +136,7 @@ django-filter==25.1
     # via -r requirements.in
 django-js-asset==2.0.0
     # via django-mptt
-django-log-formatter-asim==0.0.6
+django-log-formatter-asim==1.0.0
     # via -r requirements.in
 django-mptt==0.16.0
     # via -r requirements.in
@@ -159,6 +163,8 @@ ecs-logging==2.0.2
     # via elastic-apm
 elastic-apm==6.23.0
     # via -r requirements.in
+envier==0.6.1
+    # via ddtrace
 events==0.5
     # via opensearch-py
 exceptiongroup==1.2.1
@@ -290,6 +296,7 @@ opensearch-py==2.8.0
     #   opensearch-dsl
 opentelemetry-api==1.22.0
     # via
+    #   ddtrace
     #   opentelemetry-distro
     #   opentelemetry-exporter-otlp-proto-grpc
     #   opentelemetry-exporter-otlp-proto-http
@@ -370,6 +377,7 @@ propcache==0.2.0
     # via yarl
 protobuf==4.25.3
     # via
+    #   ddtrace
     #   googleapis-common-protos
     #   opentelemetry-proto
 psycogreen==1.0.2
@@ -541,6 +549,7 @@ traitlets==5.14.1
 typing-extensions==4.10.0
     # via
     #   astroid
+    #   ddtrace
     #   dj-database-url
     #   ipython
     #   opentelemetry-sdk
@@ -581,6 +590,7 @@ whitenoise==6.9.0
     # via -r requirements.in
 wrapt==1.14.1
     # via
+    #   ddtrace
     #   deprecated
     #   elastic-apm
     #   opentelemetry-instrumentation
@@ -588,7 +598,9 @@ wrapt==1.14.1
 wsgiserver==1.3
     # via -r requirements.in
 xmltodict==0.13.0
-    # via moto
+    # via
+    #   ddtrace
+    #   moto
 yarl==1.17.2
     # via aiohttp
 zipp==3.19.1
