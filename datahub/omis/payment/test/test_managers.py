@@ -1,5 +1,4 @@
 import uuid
-
 from unittest import mock
 
 import factory
@@ -16,10 +15,9 @@ from datahub.omis.order.test.factories import (
     OrderWithAcceptedQuoteFactory,
 )
 from datahub.omis.payment.constants import PaymentGatewaySessionStatus, PaymentMethod
-from datahub.omis.payment.govukpay import govuk_url, GOVUKPayAPIException
+from datahub.omis.payment.govukpay import GOVUKPayAPIException, govuk_url
 from datahub.omis.payment.models import Payment, PaymentGatewaySession
 from datahub.omis.payment.test.factories import PaymentGatewaySessionFactory
-
 
 # mark the whole module for db use
 pytestmark = pytest.mark.django_db
@@ -61,8 +59,7 @@ class TestPaymentGatewaySessionManager:
     """Tests for the Payment Gateway Session Manager."""
 
     def test_create_first_session_from_order(self, requests_mock, monkeypatch):
-        """
-        Test the successful creation of the first payment gateway session for an order.
+        """Test the successful creation of the first payment gateway session for an order.
         """
         monkeypatch.setattr(
             'uuid.uuid4',
@@ -121,8 +118,7 @@ class TestPaymentGatewaySessionManager:
         }
 
     def test_create_cancels_other_sessions(self, requests_mock):
-        """
-        Test that creating a new payment gateway session cancels
+        """Test that creating a new payment gateway session cancels
         the other ongoing sessions and GOV.UK payments.
 
         Given:
@@ -224,17 +220,16 @@ class TestPaymentGatewaySessionManager:
         }
 
     @pytest.mark.parametrize(
-        'disallowed_status', (
+        'disallowed_status', [
             OrderStatus.DRAFT,
             OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
             OrderStatus.PAID,
             OrderStatus.COMPLETE,
             OrderStatus.CANCELLED,
-        ),
+        ],
     )
     def test_exception_if_order_in_disallowed_status(self, disallowed_status):
-        """
-        Test that if the order is not in one of the allowed statuses, the method raises
+        """Test that if the order is not in one of the allowed statuses, the method raises
         APIConflictException.
         """
         assert PaymentGatewaySession.objects.count() == 0
@@ -248,8 +243,7 @@ class TestPaymentGatewaySessionManager:
         assert PaymentGatewaySession.objects.count() == 0
 
     def test_exception_if_refresh_updates_order_status_to_paid(self, requests_mock):
-        """
-        Test that if the system is not up-to-date, the order is in quote_accepted
+        """Test that if the system is not up-to-date, the order is in quote_accepted
         but the GOV.UK payment happens, the method triggers a check on existing
         sessions, realises that one finished successfully and records the payment
         marking the order as 'paid'.
@@ -316,12 +310,11 @@ class TestPaymentGatewaySessionManager:
         assert payment.billing_email == 'email@example.com'
         assert payment.card_brand == 'Visa'
 
-    @pytest.mark.parametrize('govuk_status_code', (400, 401, 422, 500))
+    @pytest.mark.parametrize('govuk_status_code', [400, 401, 422, 500])
     def test_exception_if_govuk_pay_errors_when_creating(
         self, govuk_status_code, requests_mock,
     ):
-        """
-        Test that if GOV.UK Pay errors whilst creating a new payment, the method raises
+        """Test that if GOV.UK Pay errors whilst creating a new payment, the method raises
         GOVUKPayAPIException.
 
         Possible GOV.UK Pay errors:
@@ -344,12 +337,11 @@ class TestPaymentGatewaySessionManager:
 
         assert PaymentGatewaySession.objects.count() == 0
 
-    @pytest.mark.parametrize('govuk_status_code', (400, 401, 404, 409, 500))
+    @pytest.mark.parametrize('govuk_status_code', [400, 401, 404, 409, 500])
     def test_exception_if_govuk_pay_errors_when_cancelling(
         self, govuk_status_code, requests_mock,
     ):
-        """
-        Test that if GOV.UK Pay errors whilst cancelling some other ongoing
+        """Test that if GOV.UK Pay errors whilst cancelling some other ongoing
         sessions/payments, the method raises GOVUKPayAPIException to keep the system consistent.
 
         Possible GOV.UK Pay errors when cancelling:
@@ -388,14 +380,13 @@ class TestPaymentGatewaySessionManager:
         assert PaymentGatewaySession.objects.count() == 1
 
     def test_ongoing(self):
-        """
-        Test that given:
+        """Test that given:
             session 1 - order 1 - status created
             session 2 - order 1 - status submitted
             session 3 - order 1 - status failed
             session 4 - order 2 - status started
             session 5 - order 2 - status success
-            session 6 - order 2 - status cancelled
+            session 6 - order 2 - status cancelled.
 
         the method .ongoing() on the queryset only returns the sessions
         which are considered not finished.

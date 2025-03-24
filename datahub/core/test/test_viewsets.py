@@ -44,11 +44,10 @@ class EmptyModelViewSet(CoreViewSet):
 
 
 class TestCoreViewSet(APITestMixin):
-    """Tests for CoreViewSet"""
+    """Tests for CoreViewSet."""
 
     def test_create_populates_created_modified_by_if_they_exist(self):
-        """
-        Tests that if the view extends CoreViewSet and the model
+        """Tests that if the view extends CoreViewSet and the model
         has created_by and modified_by, they will be set during the creation.
         """
         request = factory.post('/', data={}, content_type='application/json')
@@ -66,8 +65,7 @@ class TestCoreViewSet(APITestMixin):
         assert created_instance.modified_by == self.user
 
     def test_update_updates_modified_by_if_it_exists(self):
-        """
-        Tests that if the view extends CoreViewSet and the model
+        """Tests that if the view extends CoreViewSet and the model
         has modified_by, it will be updated when updating.
         """
         # prepare test
@@ -94,8 +92,7 @@ class TestCoreViewSet(APITestMixin):
         assert inherited_model.modified_by == self.user
 
     def test_create_doesnt_populate_created_modified_by_if_they_dont_exist(self):
-        """
-        Tests that if the view extends CoreViewSet but the model
+        """Tests that if the view extends CoreViewSet but the model
         doesn't have created_by and modified_by, they won't be set during the creation.
         """
         request = factory.post('/', data={}, content_type='application/json')
@@ -113,8 +110,7 @@ class TestCoreViewSet(APITestMixin):
         assert not hasattr(created_instance, 'modified_by')
 
     def test_update_doesnt_update_modified_by_if_it_doesnt_exists(self):
-        """
-        Tests that if the view extends CoreViewSet but the model
+        """Tests that if the view extends CoreViewSet but the model
         doesn't have modified_by, it won't be updated when updating.
         """
         # prepare test

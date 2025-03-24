@@ -12,16 +12,32 @@ from datahub.investment.investor_profile.constants import (
 )
 from datahub.investment.investor_profile.test.constants import (
     AssetClassInterest as AssetClassInterestConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     ConstructionRisk as ConstructionRiskConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     LargeCapitalInvestmentTypes as InvestmentTypesConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     ReturnRate as ReturnRateConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     TimeHorizon as TimeHorizonConstant,
 )
 from datahub.investment.opportunity.test.constants import (
     AbandonmentReason as AbandonmentReasonConstant,
+)
+from datahub.investment.opportunity.test.constants import (
     OpportunityStatus as OpportunityStatusConstant,
+)
+from datahub.investment.opportunity.test.constants import (
     OpportunityType as OpportunityTypeConstant,
+)
+from datahub.investment.opportunity.test.constants import (
     OpportunityValueType as OpportunityValueTypeConstant,
+)
+from datahub.investment.opportunity.test.constants import (
     SourceOfFunding as SourceOfFundingConstant,
 )
 from datahub.investment.project.test.factories import InvestmentProjectFactory

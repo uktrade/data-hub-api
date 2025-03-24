@@ -29,7 +29,7 @@ class CompanyListItemFactory(factory.django.DjangoModelFactory):
 
 
 class PipelineItemFactory(factory.django.DjangoModelFactory):
-    """Factory for a pipeline item"""
+    """Factory for a pipeline item."""
 
     name = factory.Faker('name')
     company = factory.SubFactory(CompanyFactory)
@@ -42,8 +42,7 @@ class PipelineItemFactory(factory.django.DjangoModelFactory):
 
     @to_many_field
     def contacts(self):
-        """
-        Contacts field.
+        """Contacts field.
         """
         return []
 
@@ -52,7 +51,7 @@ class PipelineItemFactory(factory.django.DjangoModelFactory):
 
 
 class ArchivedPipelineItemFactory(PipelineItemFactory):
-    """Factory for an archived pipeline item"""
+    """Factory for an archived pipeline item."""
 
     archived = True
     archived_on = factory.Faker('past_datetime', tzinfo=timezone.utc)

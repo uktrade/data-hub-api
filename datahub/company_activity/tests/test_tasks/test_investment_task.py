@@ -12,13 +12,11 @@ from datahub.investment.project.test.factories import InvestmentProjectFactory
 
 @pytest.mark.django_db
 class TestCompanyActivityInvestmentTasks:
-    """
-    Tests for the schedule_sync_investments_to_company_activity task.
+    """Tests for the schedule_sync_investments_to_company_activity task.
     """
 
     def test_investment_are_copied_to_company_activity(self):
-        """
-        Test that investments are added to the CompanyActivity model.
+        """Test that investments are added to the CompanyActivity model.
         """
         investment = InvestmentProjectFactory()
         InvestmentProjectFactory()
@@ -42,8 +40,7 @@ class TestCompanyActivityInvestmentTasks:
 
     @mock.patch('datahub.company_activity.models.CompanyActivity.objects.bulk_create')
     def test_investment_are_bulk_created_in_batches(self, mocked_bulk_create, caplog):
-        """
-        Test that investment projects are bulk created in batches.
+        """Test that investment projects are bulk created in batches.
         """
         caplog.set_level('INFO')
         batch_size = 5
@@ -72,8 +69,7 @@ class TestCompanyActivityInvestmentTasks:
         )
 
     def test_investment_with_a_company_activity_are_not_added_again(self):
-        """
-        Test that investment projects which are already part of the `CompanyActivity` model
+        """Test that investment projects which are already part of the `CompanyActivity` model
         are not added again.
         """
         InvestmentProjectFactory()

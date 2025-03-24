@@ -3,8 +3,8 @@ from datahub.search.adviser.serializers import (
     SearchAdviserQuerySerializer,
 )
 from datahub.search.views import (
-    register_v4_view,
     SearchAPIView,
+    register_v4_view,
 )
 
 

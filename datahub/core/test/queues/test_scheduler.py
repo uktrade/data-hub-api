@@ -1,6 +1,5 @@
 from datetime import timedelta
-
-from unittest.mock import call, MagicMock, Mock
+from unittest.mock import MagicMock, Mock, call
 
 import pytest
 from django.conf import settings

@@ -18,8 +18,7 @@ pytestmark = pytest.mark.django_db
 
 
 def pytest_generate_tests(metafunc):
-    """
-    Parametrizes the tests that use the `metadata_view_name` fixture
+    """Parametrizes the tests that use the `metadata_view_name` fixture
     by getting all the metadata from the different apps.
 
     Parametrizes the tests that use the `ordered_mapping` fixture
@@ -113,8 +112,7 @@ def test_view_name_generation():
 
 
 def test_ordered_metadata_order_view(ordered_mapping, metadata_client):
-    """
-    Test that views with BaseOrderedConstantModel are ordered by the `order` field.
+    """Test that views with BaseOrderedConstantModel are ordered by the `order` field.
     """
     metadata_view_name, queryset = ordered_mapping
 
@@ -260,8 +258,7 @@ def test_team_view(metadata_client):
 
 
 def test_exchange_rate_view(metadata_client):
-    """
-    Tests exchange rate returns from_currency_code, to_currency_code, exchange_rate & created_on
+    """Tests exchange rate returns from_currency_code, to_currency_code, exchange_rate & created_on.
     """
     url = reverse(viewname='api-v4:metadata:exchange-rate')
     exchange_rate = ExchangeRate.objects.first()
@@ -309,8 +306,7 @@ class TestServiceView:
     """Tests for the /v4/metadata/service view."""
 
     def test_list(self, metadata_client):
-        """
-        Test listing services.
+        """Test listing services.
 
         Services should include a list of contexts.
         """
@@ -336,11 +332,11 @@ class TestServiceView:
 
     @pytest.mark.parametrize(
         'contexts',
-        (
+        [
             [Service.Context.EXPORT_INTERACTION],
             ['non-existent-context'],
             [Service.Context.EXPORT_INTERACTION, Service.Context.EXPORT_SERVICE_DELIVERY],
-        ),
+        ],
     )
     def test_list_filter_by_has_any(self, metadata_client, contexts):
         """Test listing services, filtered by context."""
@@ -413,8 +409,7 @@ class TestSectorView:
     """Tests for the /v4/metadata/sector/ view."""
 
     def test_list(self, metadata_client):
-        """
-        Test listing sectors.
+        """Test listing sectors.
         """
         url = reverse(viewname='api-v4:metadata:sector')
         response = metadata_client.get(url)
@@ -435,7 +430,7 @@ class TestSectorView:
             'disabled_on': disabled_on,
         }
 
-    @pytest.mark.parametrize('level', (0, 1))
+    @pytest.mark.parametrize('level', [0, 1])
     def test_list_filter_by_level(self, metadata_client, level):
         """Test listing sectors, filter by level."""
         url = reverse(viewname='api-v4:metadata:sector')
@@ -447,7 +442,7 @@ class TestSectorView:
         assert len(sectors) == sector_count_for_level
         assert all(sector['level'] <= level for sector in sectors)
 
-    @pytest.mark.parametrize('method', ('POST', 'PATCH', 'PUT'))
+    @pytest.mark.parametrize('method', ['POST', 'PATCH', 'PUT'])
     def test_unsupported_methods(self, metadata_client, method):
         """Test that POST, PATCH and PUT return a 405."""
         url = reverse(viewname='api-v4:metadata:sector')
@@ -460,7 +455,7 @@ class TestInvestmentProjectStageView:
     """Tests for the /v4/metadata/investment-project-stage/ view."""
 
     def test_list(self, metadata_client):
-        """Test listing of investment project stages"""
+        """Test listing of investment project stages."""
         url = reverse(viewname='api-v4:metadata:investment-project-stage')
         response = metadata_client.get(url)
         assert response.status_code == status.HTTP_200_OK

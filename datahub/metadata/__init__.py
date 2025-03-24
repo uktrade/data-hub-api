@@ -1,5 +1,4 @@
-"""
-Generic functionality related to 'metadata'.
+"""Generic functionality related to 'metadata'.
 
 Metadata is used here to mean reference data, such as a list of countries or a list of company
 types (see https://en.wikipedia.org/wiki/Reference_data).

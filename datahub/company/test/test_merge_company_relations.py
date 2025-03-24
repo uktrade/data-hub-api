@@ -12,8 +12,7 @@ class TestDuplicateCompanyMerger:
     """Tests DuplicateCompanyMerger."""
 
     def test_company_fields_are_setup_for_merging(self):
-        """
-        Test all the models related to a company are accounted for when merging
+        """Test all the models related to a company are accounted for when merging
         companies. This is used by support to merge duplicate companies and
         breaks when relations are not accounted for.
 

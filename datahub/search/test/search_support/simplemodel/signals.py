@@ -5,8 +5,7 @@ from datahub.search.test.search_support.models import SimpleModel as DBSimpleMod
 
 
 def dummy_on_delete_callback(instance):
-    """
-    Function called on_delete and deliberately empty.
+    """Function called on_delete and deliberately empty.
     It can be used to check if/when it's called.
     """
 

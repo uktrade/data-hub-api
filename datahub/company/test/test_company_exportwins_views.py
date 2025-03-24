@@ -1,12 +1,9 @@
 import uuid
-
 from datetime import datetime
 
 import pytest
-
 from dateutil.relativedelta import relativedelta
 from freezegun import freeze_time
-
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -34,7 +31,7 @@ from datahub.export_win.test.factories import (
 )
 
 
-@pytest.fixture()
+@pytest.fixture
 def export_wins():
     confirmed = CustomerResponseFactory.create_batch(
         2,
@@ -47,7 +44,7 @@ def export_wins():
         responded_on=datetime.utcnow(),
     )
     awaiting = CustomerResponseFactory(agree_with_win=None)
-    yield [
+    return [
         confirmed,
         unconfirmed,
         awaiting,
@@ -65,11 +62,11 @@ class TestGetCompanyExportWins(APITestMixin):
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     @pytest.mark.parametrize(
-        'permission_codenames,expected_status',
-        (
+        ('permission_codenames', 'expected_status'),
+        [
             ([], status.HTTP_403_FORBIDDEN),
             (['view_company'], status.HTTP_403_FORBIDDEN),
-        ),
+        ],
     )
     def test_permission_checking(self, permission_codenames, expected_status):
         """Test that a 403 is returned if the user has not enough permissions."""
@@ -81,8 +78,7 @@ class TestGetCompanyExportWins(APITestMixin):
         assert response.status_code == expected_status
 
     def test_no_company_with_pk_raises_404(self):
-        """
-        Test if company pk provided in get parameters doesn't match,
+        """Test if company pk provided in get parameters doesn't match,
         404 is raised.
         """
         user = create_test_user(
@@ -98,11 +94,11 @@ class TestGetCompanyExportWins(APITestMixin):
 
     @pytest.mark.parametrize(
         'not_matched',
-        (
+        [
             'adviser',
             'lead_officer',
             'contact',
-        ),
+        ],
     )
     def test_get_export_wins_success(self, not_matched):
         """Test get wins in a successful scenario."""
@@ -295,8 +291,8 @@ class TestGetCompanyExportWins(APITestMixin):
         assert result_ids == [str(win4.id), str(win3.id), str(win2.id), str(win1.id)]
 
     @pytest.mark.parametrize(
-        'confirmed,results_length',
-        (
+        ('confirmed', 'results_length'),
+        [
             (
                 'true',
                 2,
@@ -309,7 +305,7 @@ class TestGetCompanyExportWins(APITestMixin):
                 'null',
                 1,
             ),
-        ),
+        ],
     )
     def test_list_filtered_by_agree_with_win(self, export_wins, confirmed, results_length):
         """Test the export wins view when filtered by confirmation."""

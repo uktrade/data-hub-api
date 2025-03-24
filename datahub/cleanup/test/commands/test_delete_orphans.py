@@ -122,13 +122,12 @@ def _format_iterable(value):
 def cleanup_configs(request):
     """Fixture that parametrises tests for each clean-up command configuration."""
     # Instantiate the command class
-    yield request.param
+    return request.param
 
 
-@pytest.mark.parametrize('model_name,config', delete_orphans.Command.CONFIGS.items())
+@pytest.mark.parametrize(('model_name', 'config'), delete_orphans.Command.CONFIGS.items())
 def test_mappings(model_name, config):
-    """
-    Test that `MAPPINGS` includes all the data necessary for covering all the cases.
+    """Test that `MAPPINGS` includes all the data necessary for covering all the cases.
     This is to avoid missing tests when new fields and models are added or changed.
     """
     model = apps.get_model(model_name)
@@ -164,8 +163,7 @@ def test_mappings(model_name, config):
 
 
 def create_orphanable_model(factory, config, date_value):
-    """
-    Creates an orphanable model to use in tests.
+    """Creates an orphanable model to use in tests.
 
     The value of `date_value` would determine if the object is really an orphan or not.
     """
@@ -175,10 +173,9 @@ def create_orphanable_model(factory, config, date_value):
         )
 
 
-@pytest.mark.parametrize('model_name,config', delete_orphans.Command.CONFIGS.items())
+@pytest.mark.parametrize(('model_name', 'config'), delete_orphans.Command.CONFIGS.items())
 def test_configs(model_name, config):
-    """
-    Test that configs for delete_orphans only specify a single filter, and do not specify any
+    """Test that configs for delete_orphans only specify a single filter, and do not specify any
     relation filters.
 
     These are not allowed as they are not currently needed for delete_orphans, and would
@@ -197,7 +194,7 @@ def test_configs(model_name, config):
 
 @freeze_time(FROZEN_TIME)
 @pytest.mark.parametrize(
-    'model_name,config,mapping,dep_factory,dep_field_name',
+    ('model_name', 'config', 'mapping', 'dep_factory', 'dep_field_name'),
     (
         (
             model_name,
@@ -221,12 +218,11 @@ def test_run(
     opensearch_with_signals,
     opensearch_collector_context_manager,
 ):
-    """
-    Test that:
-        - a record without any objects referencing it but not old enough
-            doesn't get deleted
-        - a record without any objects referencing it and old gets deleted
-        - a record with another object referencing it doesn't get deleted
+    """Test that:
+    - a record without any objects referencing it but not old enough
+        doesn't get deleted
+    - a record without any objects referencing it and old gets deleted
+    - a record with another object referencing it doesn't get deleted.
     """
     # Set up the state before running the command
     command = delete_orphans.Command()
@@ -299,8 +295,7 @@ def test_simulate(
     opensearch_with_signals,
     opensearch_collector_context_manager,
 ):
-    """
-    Test that if --simulate is passed in, the command only simulates the action
+    """Test that if --simulate is passed in, the command only simulates the action
     without making any actual changes.
     """
     # Set up the state before running the command
@@ -350,8 +345,7 @@ def test_simulate(
 @freeze_time(FROZEN_TIME)
 @pytest.mark.django_db
 def test_only_print_queries(cleanup_configs, monkeypatch, caplog):
-    """
-    Test that if --only-print-queries is passed, the SQL query is printed but no deletions or
+    """Test that if --only-print-queries is passed, the SQL query is printed but no deletions or
     simulation occurs.
     """
     caplog.set_level('INFO')
@@ -392,8 +386,7 @@ def test_only_print_queries(cleanup_configs, monkeypatch, caplog):
 @pytest.mark.usefixtures('synchronous_on_commit')
 @pytest.mark.django_db
 def test_with_opensearch_exception(mocked_bulk):
-    """
-    Test that if OpenSearch returns a 5xx error, the command completes but it also
+    """Test that if OpenSearch returns a 5xx error, the command completes but it also
     raises a DataHubError with details of the error.
     """
     mocked_bulk.return_value = (None, [{'delete': {'status': 500}}])

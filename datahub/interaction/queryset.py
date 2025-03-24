@@ -10,8 +10,7 @@ from datahub.interaction.models import (
 
 
 def get_base_interaction_queryset():
-    """
-    Gets the base interaction queryset with the select_related
+    """Gets the base interaction queryset with the select_related
     and prefetch_related sorted out.
     """
     return Interaction.objects.select_related(

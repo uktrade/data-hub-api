@@ -8,16 +8,14 @@ from datahub.investment.project.models import InvestmentProject
 
 
 class IProjectCreatedPagination(ActivityCursorPagination):
-    """
-    Investment Project added CursorPagination for activity stream.
+    """Investment Project added CursorPagination for activity stream.
     """
 
     summary = 'Investment Activities Added'
 
 
 class IProjectCreatedViewSet(ActivityViewSet):
-    """
-    Investment Project added ViewSet for activity stream
+    """Investment Project added ViewSet for activity stream.
     """
 
     pagination_class = IProjectCreatedPagination

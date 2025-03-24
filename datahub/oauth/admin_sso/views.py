@@ -1,12 +1,12 @@
 import logging
 from secrets import token_urlsafe
 from time import time
-from urllib.parse import urlencode
-from urllib.parse import urljoin
+from urllib.parse import urlencode, urljoin
 
 from django.conf import settings
 from django.contrib.admin import site
-from django.contrib.auth import login as django_login, logout as django_logout
+from django.contrib.auth import login as django_login
+from django.contrib.auth import logout as django_logout
 from django.shortcuts import redirect
 from django.template.response import TemplateResponse
 from django.urls import reverse
@@ -28,8 +28,7 @@ ERROR_PAGE_TEMPLATE = 'admin/oauth/error.html'
 
 
 def login(request):
-    """
-    View replacing Django admin login page.
+    """View replacing Django admin login page.
 
     Instead of using standard Django authentication, we use OAuth2 protocol to authenticate user.
     """
@@ -57,8 +56,7 @@ def logout(request):
 
 
 def callback(request):
-    """
-    OAuth2 callback.
+    """OAuth2 callback.
 
     1. Check if given state matches the state stored in session.
     2. Get access token using provided code.

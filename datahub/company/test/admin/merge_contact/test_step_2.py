@@ -1,7 +1,6 @@
 from unittest.mock import patch
 
 import pytest
-
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.test.html import parse_html
@@ -19,7 +18,7 @@ class TestSelectPrimaryContactViewGet(AdminTestMixin):
 
     @pytest.mark.parametrize(
         'data',
-        (
+        [
             {},
             {
                 'contact_1': '12345',
@@ -40,11 +39,10 @@ class TestSelectPrimaryContactViewGet(AdminTestMixin):
                 'contact_1': '13495',
                 'contact_2': lambda: str(ContactFactory().pk),
             },
-        ),
+        ],
     )
     def test_returns_400_if_invalid_contacts_passed(self, data):
-        """
-        Test that a 400 is returned when invalid values are passed for contact_1 or contact_2.
+        """Test that a 400 is returned when invalid values are passed for contact_1 or contact_2.
 
         This could only happen if the query string was manipulated, or one of the referenced
         contacts was deleted.
@@ -60,16 +58,16 @@ class TestSelectPrimaryContactViewGet(AdminTestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     @pytest.mark.parametrize(
-        'swap', (True, False),
+        'swap', [True, False],
     )
     @pytest.mark.parametrize(
-        'contact_1_factory,contact_2_factory',
-        (
+        ('contact_1_factory', 'contact_2_factory'),
+        [
             (
                 ArchivedContactFactory,
                 ContactFactory,
             ),
-        ),
+        ],
         ids=[
             'archived-contact',
         ],
@@ -80,8 +78,7 @@ class TestSelectPrimaryContactViewGet(AdminTestMixin):
         contact_2_factory,
         swap,
     ):
-        """
-        Tests that the radio button to select a contact is disabled if it is archived
+        """Tests that the radio button to select a contact is disabled if it is archived.
         """
         contact_1 = (contact_2_factory if swap else contact_1_factory)()
         contact_2 = (contact_1_factory if swap else contact_2_factory)()
@@ -111,7 +108,7 @@ class TestSelectPrimaryContactViewGet(AdminTestMixin):
 class TestSelectPrimaryContactViewPost(AdminTestMixin):
     """Tests form submission in the 'Select primary contact' view."""
 
-    @pytest.mark.parametrize('selected_contact', ('1', '2'))
+    @pytest.mark.parametrize('selected_contact', ['1', '2'])
     def test_proceeds_if_contact_chosen(self, selected_contact):
         """Test that if a valid selection is made, the user is redirected to the change list."""
         contact_1 = ContactFactory()
@@ -150,17 +147,17 @@ class TestSelectPrimaryContactViewPost(AdminTestMixin):
 
         assert response.redirect_chain[0][0] == confirm_merge_url
 
-    @pytest.mark.parametrize('swap', (False, True))
+    @pytest.mark.parametrize('swap', [False, True])
     @pytest.mark.parametrize(
-        'contact_1_factory, contact_2_factory, expected_error, disallowed_fields',
-        (
+        ('contact_1_factory', 'contact_2_factory', 'expected_error', 'disallowed_fields'),
+        [
             (
                 ArchivedContactFactory,
                 ContactFactory,
                 'The contact selected is archived.',
                 [],
             ),
-        ),
+        ],
     )
     @patch('datahub.company.merge_contact.is_model_a_valid_merge_source')
     def test_error_displayed_if_invalid_selection_made(

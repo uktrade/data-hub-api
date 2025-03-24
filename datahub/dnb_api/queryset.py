@@ -6,8 +6,7 @@ from datahub.interaction.models import Interaction
 
 
 def get_company_queryset():
-    """
-    Returns an annotated query set used by DNBCompanySearchView.
+    """Returns an annotated query set used by DNBCompanySearchView.
 
     The annotations are supported by an index on the Interaction model.
 

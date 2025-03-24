@@ -31,7 +31,7 @@ class TestConfirmMergeViewGet(AdminTestMixin):
 
     @pytest.mark.parametrize(
         'data',
-        (
+        [
             {},
             {
                 'source_contact': '12345',
@@ -52,11 +52,10 @@ class TestConfirmMergeViewGet(AdminTestMixin):
                 'source_contact': '13495',
                 'target_contact': lambda: str(ContactFactory().pk),
             },
-        ),
+        ],
     )
     def test_returns_400_if_invalid_contacts_passed(self, data):
-        """
-        Test that a 400 is returned when invalid values are passed in the query string.
+        """Test that a 400 is returned when invalid values are passed in the query string.
 
         This could only happen if the query string was manipulated, or one of the referenced
         contacts was deleted.
@@ -95,22 +94,21 @@ class TestConfirmMergeViewPost(AdminTestMixin):
 
     @pytest.mark.parametrize(
         'factory_relation_kwarg',
-        (
+        [
             'num_export',
             'num_interactions',
             'num_investment_projects',
             'num_orders',
             'num_referrals',
-        ),
+        ],
     )
-    @pytest.mark.parametrize('num_related_objects', (0, 1, 3))
+    @pytest.mark.parametrize('num_related_objects', [0, 1, 3])
     def test_merge_succeeds(
         self,
         factory_relation_kwarg,
         num_related_objects,
     ):
-        """
-        Test that the merge succeeds and the source contact is marked as a duplicate when the
+        """Test that the merge succeeds and the source contact is marked as a duplicate when the
         source contact interactions, investment projects, referrals, exports and orders.
         """
         creation_time = datetime(2010, 12, 1, 15, 0, 10, tzinfo=timezone.utc)
@@ -235,8 +233,8 @@ class TestConfirmMergeViewPost(AdminTestMixin):
         assert reversion.user == self.user
 
     @pytest.mark.parametrize(
-        'target_contact_factory, disallowed_fields',
-        (
+        ('target_contact_factory', 'disallowed_fields'),
+        [
             (
                 ArchivedContactFactory,
                 [],
@@ -245,19 +243,19 @@ class TestConfirmMergeViewPost(AdminTestMixin):
                 ContactFactory,
                 ['some_disallowed_field_1', 'some_disallowed_field_2'],
             ),
-        ),
+        ],
     )
     @pytest.mark.parametrize(
         'factory_relation_kwarg',
-        (
+        [
             'num_export',
             'num_interactions',
             'num_investment_projects',
             'num_orders',
             'num_referrals',
-        ),
+        ],
     )
-    @pytest.mark.parametrize('num_related_objects', (0, 1, 3))
+    @pytest.mark.parametrize('num_related_objects', [0, 1, 3])
     @patch('datahub.company.merge_contact.is_model_a_valid_merge_source')
     def test_merge_fails(
         self,
@@ -267,8 +265,7 @@ class TestConfirmMergeViewPost(AdminTestMixin):
         factory_relation_kwarg,
         num_related_objects,
     ):
-        """
-        Test that the merge fails when the source contact cannot be merged into the target contact.
+        """Test that the merge fails when the source contact cannot be merged into the target contact.
         """
         creation_time = datetime(2010, 12, 1, 15, 0, 10, tzinfo=timezone.utc)
         with freeze_time(creation_time):
@@ -332,8 +329,7 @@ def _contact_factory(
         num_referrals=0,
         num_export=0,
 ):
-    """
-    Factory for a contact that has company referrals, orders, company
+    """Factory for a contact that has company referrals, orders, company
     exports, interactions and OMIS orders.
     """
     contact = ContactFactory()

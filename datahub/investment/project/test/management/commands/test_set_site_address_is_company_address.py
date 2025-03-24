@@ -1,14 +1,11 @@
 import logging
-
 from unittest import mock
 
 import pytest
-
 from django.core.management import call_command
 
 from datahub.investment.project.models import InvestmentProject
 from datahub.investment.project.test.factories import InvestmentProjectFactory
-
 
 pytestmark = pytest.mark.django_db
 

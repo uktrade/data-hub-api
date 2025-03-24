@@ -6,12 +6,11 @@ from django.urls import reverse
 from datahub.company.test.factories import ContactFactory
 from datahub.core.test_utils import AdminTestMixin
 
-
 pytestmark = pytest.mark.django_db
 
 
 class TestContacts(AdminTestMixin):
-    """Test that Contacts are properly validated"""
+    """Test that Contacts are properly validated."""
 
     @pytest.mark.parametrize(
         'telephone_number',

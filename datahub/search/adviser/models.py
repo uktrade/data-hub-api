@@ -1,12 +1,11 @@
 from opensearch_dsl import Boolean, Keyword, Text
 
-
 from datahub.search import dict_utils, fields
 from datahub.search.models import BaseSearchModel
 
 
 class Adviser(BaseSearchModel):
-    """Adviser model"""
+    """Adviser model."""
 
     id = Keyword()
     first_name = Text(

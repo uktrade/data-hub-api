@@ -10,8 +10,7 @@ from datahub.metadata import models as metadata_models
 
 
 class CompanyList(BaseModel):
-    """
-    A user-created list of companies.
+    """A user-created list of companies.
 
     (List contents are stored in the separate CompanyListItem model.)
     """
@@ -40,8 +39,7 @@ class CompanyListItemPermissionCode(StrEnum):
 
 @reversion.register_base_model()
 class CompanyListItem(BaseModel):
-    """
-    An item on a user's personal list of companies.
+    """An item on a user's personal list of companies.
 
     Each company can appear only once for a particular user.
 
@@ -71,8 +69,7 @@ class CompanyListItem(BaseModel):
 
 @reversion.register_base_model()
 class PipelineItem(ArchivableModel, BaseModel):
-    """
-    Model holding pipeline list items.
+    """Model holding pipeline list items.
     """
 
     class Status(models.TextChoices):

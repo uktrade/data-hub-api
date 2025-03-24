@@ -2,9 +2,9 @@ import io
 from unittest.mock import Mock
 
 import pytest
-
 from django.conf import settings
-from django.contrib import auth, messages as django_messages
+from django.contrib import auth
+from django.contrib import messages as django_messages
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.contrib.auth import get_user_model
 from django.test import Client, override_settings
@@ -14,6 +14,7 @@ from rest_framework import status
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.admin import (
+    RawIdWidget,
     custom_add_permission,
     custom_change_permission,
     custom_delete_permission,
@@ -22,7 +23,6 @@ from datahub.core.admin import (
     get_change_link,
     get_change_url,
     handle_export_wins_admin_permissions,
-    RawIdWidget,
 )
 from datahub.core.test.factories import GroupFactory
 from datahub.core.test.support.factories import BookFactory
@@ -84,7 +84,7 @@ class TestRawIdWidget:
 
     @pytest.mark.parametrize(
         'value',
-        ('123', 'b77ffa2a-bce8-440b-9d8a-b4f247f194dd'),
+        ['123', 'b77ffa2a-bce8-440b-9d8a-b4f247f194dd'],
     )
     @pytest.mark.django_db
     def test_get_context_with_invalid_value(self, value):
@@ -134,17 +134,16 @@ class TestMaxUploadSize:
     """Tests the max_upload_size decorator."""
 
     @pytest.mark.parametrize(
-        'file_size,error_expected',
-        (
+        ('file_size', 'error_expected'),
+        [
             (MAX_UPLOAD_SIZE, False),
             (MAX_UPLOAD_SIZE + 1, True),
-        ),
+        ],
     )
     @pytest.mark.urls('datahub.core.test.support.urls')
     @pytest.mark.django_db
     def test_rejects_large_files(self, file_size, error_expected, client):
-        """
-        Test that the max_upload_size() rejects files above the set limit.
+        """Test that the max_upload_size() rejects files above the set limit.
 
         This test uses the datahub.core.test.support.views.max_upload_size_view view.
         """
@@ -269,8 +268,8 @@ class TestFormatJsonAsHtml:
     """Tests for format_json_as_html()."""
 
     @pytest.mark.parametrize(
-        'value,expected_output',
-        (
+        ('value', 'expected_output'),
+        [
             (
                 None,
                 '<pre>null</pre>',
@@ -281,7 +280,7 @@ class TestFormatJsonAsHtml:
   &quot;1&quot;: &quot;&lt;&quot;
 }</pre>""",
             ),
-        ),
+        ],
     )
     def test_format_json_as_html(self, value, expected_output):
         """Test that various values are serialised and escaped as expected."""
@@ -306,14 +305,14 @@ class TestAdminAccountLockout:
     }
 
     def create_admin_user(self, email=None, password=PASSWORD):
-        """Creates admin user"""
+        """Creates admin user."""
         return get_user_model().objects.create_superuser(
             email=email or Faker().email(), password=password,
         )
 
     @override_settings(**SETTINGS)
     def test_admin_account_lock_out_successful_login(self):
-        """Tests if user account can successfully login"""
+        """Tests if user account can successfully login."""
         user = self.create_admin_user(email=Faker().email())
         client = Client()
 
@@ -329,7 +328,7 @@ class TestAdminAccountLockout:
 
     @override_settings(**SETTINGS)
     def test_admin_account_lock_out_after_too_many_attempts(self):
-        """Tests if user account is locked out after configured number of attempts"""
+        """Tests if user account is locked out after configured number of attempts."""
         user = self.create_admin_user(email=Faker().email())
         client = Client()
         data = {'username': user.email, 'password': self.INVALID_PASSWORD}

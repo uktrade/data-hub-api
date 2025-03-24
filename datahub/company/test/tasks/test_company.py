@@ -18,26 +18,23 @@ from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.omis.order.test.factories import OrderFactory
 
 
-@pytest.fixture()
+@pytest.fixture
 def automatic_company_archive_feature_flag():
+    """Creates the automatic company archive feature flag.
     """
-    Creates the automatic company archive feature flag.
-    """
-    yield FeatureFlagFactory(code=AUTOMATIC_COMPANY_ARCHIVE_FEATURE_FLAG)
+    return FeatureFlagFactory(code=AUTOMATIC_COMPANY_ARCHIVE_FEATURE_FLAG)
 
 
 @pytest.mark.django_db
 class TestAutomaticCompanyArchive:
-    """
-    Tests for the automatic_company_archive task.
+    """Tests for the automatic_company_archive task.
     """
 
     def test_no_feature_flag(
         self,
         caplog,
     ):
-        """
-        Test that if the feature flag is not enabled, the
+        """Test that if the feature flag is not enabled, the
         task will not run.
         """
         caplog.set_level(logging.INFO, logger='datahub.company.tasks.company')
@@ -49,11 +46,11 @@ class TestAutomaticCompanyArchive:
         ]
 
     @pytest.mark.parametrize(
-        'lock_acquired, call_count',
-        (
+        ('lock_acquired', 'call_count'),
+        [
             (False, 0),
             (True, 1),
-        ),
+        ],
     )
     def test_lock(
         self,
@@ -62,8 +59,7 @@ class TestAutomaticCompanyArchive:
         lock_acquired,
         call_count,
     ):
-        """
-        Test that the task doesn't run if it cannot acquire
+        """Test that the task doesn't run if it cannot acquire
         the advisory_lock.
         """
         mock_advisory_lock = mock.MagicMock()
@@ -82,10 +78,10 @@ class TestAutomaticCompanyArchive:
 
     @pytest.mark.parametrize(
         'simulate',
-        (
+        [
             True,
             False,
-        ),
+        ],
     )
     @freeze_time('2020-01-01-12:00:00')
     def test_no_interactions(
@@ -94,8 +90,7 @@ class TestAutomaticCompanyArchive:
         automatic_company_archive_feature_flag,
         simulate,
     ):
-        """
-        Test that a company without interaction that fits
+        """Test that a company without interaction that fits
         all the other criteria is archived.
         """
         caplog.set_level(logging.INFO, logger='datahub.company.tasks.company')
@@ -119,12 +114,12 @@ class TestAutomaticCompanyArchive:
             ]
 
     @pytest.mark.parametrize(
-        'interaction_date_delta, expected_archived',
-        (
+        ('interaction_date_delta', 'expected_archived'),
+        [
             (relativedelta(), False),
             (relativedelta(years=5), False),
             (relativedelta(years=5, days=1), True),
-        ),
+        ],
     )
     @freeze_time('2020-01-01-12:00:00')
     def test_interactions(
@@ -133,8 +128,7 @@ class TestAutomaticCompanyArchive:
         interaction_date_delta,
         expected_archived,
     ):
-        """
-        Test that a company with interactions on various dates
+        """Test that a company with interactions on various dates
         around the 8y boundary are archived or not as expected.
         """
         gt_3m_ago = timezone.now() - relativedelta(months=3, days=1)
@@ -149,12 +143,12 @@ class TestAutomaticCompanyArchive:
         assert company.archived == expected_archived
 
     @pytest.mark.parametrize(
-        'created_on_delta, expected_archived',
-        (
+        ('created_on_delta', 'expected_archived'),
+        [
             (relativedelta(), False),
             (relativedelta(months=3), False),
             (relativedelta(months=3, days=1), True),
-        ),
+        ],
     )
     @freeze_time('2020-01-01-12:00:00')
     def test_created_on(
@@ -163,8 +157,7 @@ class TestAutomaticCompanyArchive:
         created_on_delta,
         expected_archived,
     ):
-        """
-        Test that a company created_on dates around the 3m boundary
+        """Test that a company created_on dates around the 3m boundary
         are archived or not as expected.
         """
         created_on = timezone.now() - created_on_delta
@@ -179,8 +172,8 @@ class TestAutomaticCompanyArchive:
         assert company.archived == expected_archived
 
     @pytest.mark.parametrize(
-        'created_on_delta, companies_to_create, expected_message',
-        (
+        ('created_on_delta', 'companies_to_create', 'expected_message'),
+        [
             (
                 relativedelta(),
                 1,
@@ -196,7 +189,7 @@ class TestAutomaticCompanyArchive:
                 3,
                 'datahub.company.tasks.automatic_company_archive archived: 3',
             ),
-        ),
+        ],
     )
     @freeze_time('2020-01-01-12:00:00')
     def test_realtime_messages_sent(
@@ -207,8 +200,7 @@ class TestAutomaticCompanyArchive:
         companies_to_create,
         expected_message,
     ):
-        """
-        Test that appropriate realtime messaging is sent which reflects the archiving
+        """Test that appropriate realtime messaging is sent which reflects the archiving
         actions.
         """
         created_on = timezone.now() - created_on_delta
@@ -230,12 +222,12 @@ class TestAutomaticCompanyArchive:
         mock_send_realtime_message.assert_called_once_with(expected_message)
 
     @pytest.mark.parametrize(
-        'modified_on_delta, expected_archived',
-        (
+        ('modified_on_delta', 'expected_archived'),
+        [
             (relativedelta(), False),
             (relativedelta(months=3), False),
             (relativedelta(months=3, days=1), True),
-        ),
+        ],
     )
     @freeze_time('2020-01-01-12:00:00')
     def test_modified_on(
@@ -244,8 +236,7 @@ class TestAutomaticCompanyArchive:
         modified_on_delta,
         expected_archived,
     ):
-        """
-        Test that a company modified_on dates around the 3m boundary
+        """Test that a company modified_on dates around the 3m boundary
         are archived or not as expected.
         """
         gt_3m_ago = timezone.now() - relativedelta(months=3, days=1)
@@ -269,8 +260,7 @@ class TestAutomaticCompanyArchive:
         self,
         automatic_company_archive_feature_flag,
     ):
-        """
-        Test that a company with OMIS orders is not archived.
+        """Test that a company with OMIS orders is not archived.
         """
         gt_3m_ago = timezone.now() - relativedelta(months=3, days=1)
         with freeze_time(gt_3m_ago):
@@ -285,8 +275,7 @@ class TestAutomaticCompanyArchive:
         self,
         automatic_company_archive_feature_flag,
     ):
-        """
-        Test that we can set a limit to the number of companies
+        """Test that we can set a limit to the number of companies
         that are automatically archived.
         """
         gt_3m_ago = timezone.now() - relativedelta(months=3, days=1)
@@ -310,8 +299,7 @@ class TestAutomaticCompanyArchive:
         self,
         automatic_company_archive_feature_flag,
     ):
-        """
-        Test that a company with investor profile is not archived.
+        """Test that a company with investor profile is not archived.
         """
         gt_3m_ago = timezone.now() - relativedelta(months=3, days=1)
         with freeze_time(gt_3m_ago):
@@ -328,8 +316,8 @@ class TestAutomaticCompanyArchive:
         assert archived_companies_count == 1
 
     @pytest.mark.parametrize(
-        'investment_projects_status, expected_archived',
-        (
+        ('investment_projects_status', 'expected_archived'),
+        [
             (
                 [InvestmentProject.Status.LOST],
                 True,
@@ -346,7 +334,7 @@ class TestAutomaticCompanyArchive:
                 [],
                 True,
             ),
-        ),
+        ],
     )
     @freeze_time('2020-01-01-12:00:00')
     def test_investment_projects(
@@ -355,8 +343,7 @@ class TestAutomaticCompanyArchive:
         investment_projects_status,
         expected_archived,
     ):
-        """
-        Test that a company with active investment projects is not
+        """Test that a company with active investment projects is not
         archived.
         """
         gt_3m_ago = timezone.now() - relativedelta(months=3, days=1)
@@ -375,9 +362,8 @@ class TestAutomaticCompanyArchive:
         self,
         automatic_company_archive_feature_flag,
     ):
-        """
-        Test companies that share an global_ultimate_duns_number
-        are not archived if any of them are active
+        """Test companies that share an global_ultimate_duns_number
+        are not archived if any of them are active.
         """
         gt_3m_ago = timezone.now() - relativedelta(months=3, days=1)
         global_ultimate_duns_number = '123456789'
@@ -403,9 +389,8 @@ class TestAutomaticCompanyArchive:
         self,
         automatic_company_archive_feature_flag,
     ):
-        """
-        Test companies that share an global_ultimate_duns_number
-        can be archived if none of them are active
+        """Test companies that share an global_ultimate_duns_number
+        can be archived if none of them are active.
         """
         gt_3m_ago = timezone.now() - relativedelta(months=3, days=1)
         global_ultimate_duns_number = '123456789'

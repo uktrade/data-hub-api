@@ -1,11 +1,9 @@
 from datetime import date, datetime, timedelta
 
 import pytest
-
 from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 from factory import Iterator
-
 from freezegun import freeze_time
 
 from datahub.company.test.factories import CompanyFactory, ContactFactory
@@ -20,7 +18,6 @@ from datahub.dataset.export_wins import (
 )
 from datahub.export_win.constants import EXPORT_WINS_LEGACY_ID_START_VALUE
 from datahub.export_win.models import HVC, Win
-
 from datahub.export_win.test.factories import (
     AssociatedProgrammeFactory,
     BreakdownFactory,
@@ -36,13 +33,11 @@ from datahub.feature_flag.test.factories import (
     FeatureFlagFactory,
 )
 
-
 pytestmark = pytest.mark.django_db
 
 
 def get_export_wins_legacy_data_feature_flag():
-    """
-    Creates the Export wins legacy dataset feature flag.
+    """Creates the Export wins legacy dataset feature flag.
     """
     return FeatureFlagFactory(
         code=EXPORT_WINS_LEGACY_DATASET_FEATURE_FLAG_NAME,
@@ -78,10 +73,10 @@ class TestExportWinsAdvisersDatasetView(BaseDatasetViewTest):
 
     @pytest.mark.parametrize(
         'list_legacy_data',
-        (
+        [
             True,
             False,
-        ),
+        ],
     )
     def test_success_with_legacy_data(
         self,
@@ -103,10 +98,10 @@ class TestExportWinsAdvisersDatasetView(BaseDatasetViewTest):
 
     @pytest.mark.parametrize(
         'allow_legacy_data',
-        (
+        [
             True,
             False,
-        ),
+        ],
     )
     def test_success_with_legacy_content_override(
         self,
@@ -181,10 +176,10 @@ class TestExportWinsBreakdownDatasetView(BaseDatasetViewTest):
 
     @pytest.mark.parametrize(
         'list_legacy_data',
-        (
+        [
             True,
             False,
-        ),
+        ],
     )
     def test_success_with_legacy_data(
         self,
@@ -205,10 +200,10 @@ class TestExportWinsBreakdownDatasetView(BaseDatasetViewTest):
 
     @pytest.mark.parametrize(
         'allow_legacy_data',
-        (
+        [
             True,
             False,
-        ),
+        ],
     )
     def test_success_with_legacy_content_override(
         self,
@@ -454,7 +449,7 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
 
     @pytest.mark.parametrize(
         'responded',
-        (True, False),
+        [True, False],
     )
     def test_success(self, data_flow_api_client, responded):
         associated_programmes = AssociatedProgrammeFactory.create_batch(3)
@@ -489,10 +484,10 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
 
     @pytest.mark.parametrize(
         'list_legacy_data',
-        (
+        [
             True,
             False,
-        ),
+        ],
     )
     def test_success_with_legacy_data(
         self,
@@ -520,10 +515,10 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
 
     @pytest.mark.parametrize(
         'allow_legacy_data',
-        (
+        [
             True,
             False,
-        ),
+        ],
     )
     def test_success_with_legacy_content_override(
         self,

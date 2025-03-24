@@ -1,21 +1,24 @@
 import uuid
-
 from datetime import datetime
 from unittest import mock
 
 import pytest
-
 from dateutil.relativedelta import relativedelta
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-
 from datahub.company.test.factories import ContactFactory
 from datahub.core.constants import (
     Experience as ExperienceConstant,
+)
+from datahub.core.constants import (
     MarketingSource as MarketingSourceConstant,
+)
+from datahub.core.constants import (
     Rating as RatingConstant,
+)
+from datahub.core.constants import (
     WithoutOurSupport as WithoutOurSupportConstant,
 )
 from datahub.core.test_utils import (
@@ -39,7 +42,7 @@ class TaskMock(mock.MagicMock):
         return (mock.MagicMock, ())
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_lead_officer_email_receipt_yes(monkeypatch):
     mock_get_all_fields = TaskMock()
     monkeypatch.setattr(
@@ -49,7 +52,7 @@ def mock_lead_officer_email_receipt_yes(monkeypatch):
     return mock_get_all_fields
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_lead_officer_email_receipt_no(monkeypatch):
     mock_get_all_fields = TaskMock()
     monkeypatch.setattr(
@@ -63,7 +66,7 @@ class TestGetCustomerResponseView(APITestMixin):
     """Get single customer response view tests."""
 
     def test_win_details_no_permissions(self):
-        """Should return 404"""
+        """Should return 404."""
         CustomerResponseTokenFactory()
         api_client = self.create_api_client(user=None)
         url = reverse('api-v4:export-win:customer-response', kwargs={'token_pk': uuid.uuid4()})
@@ -194,10 +197,10 @@ class TestUpdateCustomerResponseView(APITestMixin):
 
     @pytest.mark.parametrize(
         'agree_with_win',
-        (
+        [
             True,
             False,
-        ),
+        ],
     )
     def test_update_customer_response(
         self,

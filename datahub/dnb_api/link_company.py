@@ -5,8 +5,7 @@ from datahub.dnb_api.tasks import sync_company_with_dnb
 
 
 class CompanyAlreadyDNBLinkedError(Exception):
-    """
-    An exception to raise when a Data Hub company has already been linked with
+    """An exception to raise when a Data Hub company has already been linked with
     a DNB company record.
     """
 
@@ -18,8 +17,7 @@ def link_company_with_dnb(
     modified_by,
     update_descriptor='admin:link_company_with_dnb',
 ):
-    """
-    Given a Data Hub company ID and a duns number, save the company with this
+    """Given a Data Hub company ID and a duns number, save the company with this
     duns number and update it's record from D&B.
     """
     company = Company.objects.get(id=dh_company_id)

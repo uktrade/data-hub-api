@@ -2,7 +2,6 @@ from io import BytesIO
 
 import pytest
 from django.core.management import call_command
-
 from faker import Faker
 from reversion.models import Version
 
@@ -57,7 +56,7 @@ def test_run(s3_stubber, caplog):
         line_manager_names,
         customer_names,
         customer_job_titles,
-        customer_email_addresses,
+        customer_email_addresses, strict=False,
     ):
         csv_contents.append(f'{uuid},"{company_name}",{lead_officer_name},'
                             f'{lead_officer_email_address},{user_name},'
@@ -99,7 +98,7 @@ def test_run(s3_stubber, caplog):
         line_manager_names,
         customer_names,
         customer_job_titles,
-        customer_email_addresses,
+        customer_email_addresses, strict=False,
     ):
         win = Win.objects.get(id=uuid)
         assert win.company_name == company_name
@@ -165,7 +164,7 @@ def test_simulate(s3_stubber, caplog):
         line_manager_names,
         customer_names,
         customer_job_titles,
-        customer_email_addresses,
+        customer_email_addresses, strict=False,
     ):
         csv_contents.append(f'{uuid},"{company_name}",{lead_officer_name},'
                             f'{lead_officer_email_address},{user_name},'
@@ -207,7 +206,7 @@ def test_simulate(s3_stubber, caplog):
         line_manager_names,
         customer_names,
         customer_job_titles,
-        customer_email_addresses,
+        customer_email_addresses, strict=False,
     ):
         win = Win.objects.get(id=uuid)
         assert win.company_name != company_name

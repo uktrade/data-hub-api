@@ -9,9 +9,9 @@ from rest_framework.exceptions import AuthenticationFailed
 from datahub.company.models import Advisor
 from datahub.oauth.cache import add_token_data_to_cache, get_token_data_from_cache
 from datahub.oauth.sso_api_client import (
-    introspect_token,
     SSOInvalidTokenError,
     SSORequestError,
+    introspect_token,
 )
 from datahub.user_event_log.constants import UserEventType
 from datahub.user_event_log.utils import record_user_event
@@ -29,16 +29,14 @@ class SSOIntrospectionAuthentication(BaseAuthentication):
     """OAuth token introspection (RFC 7662) authentication class, with Staff SSO extensions."""
 
     def authenticate_header(self, request):
-        """
-        The value for the WWW-Authenticate for when credentials aren't provided.
+        """The value for the WWW-Authenticate for when credentials aren't provided.
 
         This returns the same value as django-oauth-toolkit.
         """
         return 'Bearer realm="api"'
 
     def authenticate(self, request):
-        """
-        Authenticate the user using token introspection.
+        """Authenticate the user using token introspection.
 
         This first checks if the token is cached. If it's not cached, the token is looked
         up in Staff SSO. An adviser is then looked up using the retrieved token data.
@@ -73,8 +71,7 @@ class SSOIntrospectionAuthentication(BaseAuthentication):
 
 
 def _look_up_token(token, request) -> Tuple[Optional[dict], bool]:
-    """
-    Look up data about an access token.
+    """Look up data about an access token.
 
     This first checks the cache, and falls back to querying Staff SSO if the token isn't cached.
 
@@ -110,8 +107,7 @@ def _look_up_token(token, request) -> Tuple[Optional[dict], bool]:
 
 
 def _look_up_adviser(cached_token_data):
-    """
-    Look up the adviser using data about an access token.
+    """Look up the adviser using data about an access token.
 
     The adviser is looked up using its SSO email user ID.
     """

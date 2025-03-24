@@ -1,5 +1,4 @@
 import logging
-
 from datetime import timedelta
 
 from django.db import transaction
@@ -12,8 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 def schedule_refresh_payment_gateway_session(session_id, time_delta):
-    """
-    Note: there's no retry setting as we don't want to retry in case of
+    """Note: there's no retry setting as we don't want to retry in case of
     exceptions. This is because the next periodic run of
     `refresh_pending_payment_gateway_sessions` will trigger this task
     again and in the meantime sentry errors can be analysed.
@@ -35,8 +33,7 @@ def schedule_refresh_payment_gateway_session(session_id, time_delta):
 
 
 def refresh_payment_gateway_session(session_id):
-    """
-    RQ task that refreshes the session with id `session_id`.
+    """RQ task that refreshes the session with id `session_id`.
 
     :param session_id: id of the payment gateway session to refresh.
     """
@@ -51,8 +48,7 @@ def refresh_payment_gateway_session(session_id):
 
 
 def refresh_pending_payment_gateway_sessions(age_check=60, refresh_rate=0.5):
-    """
-    RQ task that refreshes old ongoing payments in case something
+    """RQ task that refreshes old ongoing payments in case something
     happens during the payment journey or the user abandons the payment
     session.
 

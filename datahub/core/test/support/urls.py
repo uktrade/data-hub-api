@@ -3,10 +3,10 @@ from django.urls import path
 from datahub.core.test.support.views import (
     HawkViewWithoutScope,
     HawkViewWithScope,
-    max_upload_size_view,
     MultiAddressModelViewset,
     MyDisableableModelViewset,
     PaasIPView,
+    max_upload_size_view,
 )
 
 urlpatterns = [

@@ -2,7 +2,6 @@ from typing import Any, Optional
 
 from django.contrib.auth import get_user_model
 from django.db import models
-
 from rest_framework import serializers
 from rest_framework.generics import get_object_or_404
 from rest_framework.pagination import (
@@ -14,7 +13,6 @@ from rest_framework.viewsets import ViewSet
 from reversion.models import Version
 
 from datahub.core.audit_utils import diff_versions
-
 
 User = get_user_model()
 
@@ -91,6 +89,7 @@ class AuditLog:
 
         Returns:
             List of audit log entries, optionally paginated
+
         """
         versions = Version.objects.get_for_object(instance)
         proxied_versions = VersionQuerySetProxy(versions)
@@ -106,8 +105,7 @@ class AuditLog:
 
 
 class VersionQuerySetProxy:
-    """
-    Proxies a VersionQuerySet, modifying slicing behaviour to return an extra item.
+    """Proxies a VersionQuerySet, modifying slicing behaviour to return an extra item.
 
     This is allows N+1 versions to produce N audit log entires.
     """
@@ -131,8 +129,7 @@ class VersionQuerySetProxy:
         return self.queryset[item]
 
     def count(self):
-        """
-        Gets the count of the query set, minus 1. This is due to N audit log entries
+        """Gets the count of the query set, minus 1. This is due to N audit log entries
         being generated from N+1 query set results.
 
         The return value is always non-negative.

@@ -10,8 +10,8 @@ from datahub.investment.validate import (
 
 
 @pytest.mark.parametrize(
-    'data_date,expected_result',
-    (
+    ('data_date', 'expected_result'),
+    [
         (
             date(2019, 2, 2),
             False,
@@ -28,7 +28,7 @@ from datahub.investment.validate import (
             None,
             False,
         ),
-    ),
+    ],
 
 )
 @freeze_time('2019-02-01')
@@ -38,8 +38,8 @@ def test_is_date_in_the_past(data_date, expected_result):
 
 
 @pytest.mark.parametrize(
-    'post_data,expected_result',
-    (
+    ('post_data', 'expected_result'),
+    [
         (
             date(2019, 2, 1),
             True,
@@ -64,7 +64,7 @@ def test_is_date_in_the_past(data_date, expected_result):
             {},
             False,
         ),
-    ),
+    ],
 
 )
 @freeze_time('2019-02-01')

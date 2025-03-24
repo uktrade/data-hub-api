@@ -8,4 +8,4 @@ def public_omis_api_client(hawk_api_client):
         'omis-public-id',
         'omis-public-key',
     )
-    yield hawk_api_client
+    return hawk_api_client

@@ -13,7 +13,7 @@ from datahub.search.large_investor_profile import LargeInvestorProfileSearchApp
 from datahub.search.large_investor_profile.serializers import (
     SearchLargeInvestorProfileQuerySerializer,
 )
-from datahub.search.views import register_v4_view, SearchAPIView, SearchExportAPIView
+from datahub.search.views import SearchAPIView, SearchExportAPIView, register_v4_view
 
 
 class SearchInvestorProfileAPIViewMixin:

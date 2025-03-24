@@ -17,7 +17,6 @@ from datahub.omis.notification.constants import (
 )
 from datahub.omis.region.models import UKRegionalSettings
 
-
 logger = getLogger(__name__)
 
 
@@ -27,8 +26,7 @@ def send_email(client, **kwargs):
 
 
 class Notify:
-    """
-    Used to send notifications when something happens to an order.
+    """Used to send notifications when something happens to an order.
 
     The GOV.UK notification key can be set in settings.OMIS_NOTIFICATION_API_KEY,
     if empty, the client will be mocked and no notification will be sent.
@@ -89,8 +87,7 @@ class Notify:
         }
 
     def _get_all_advisers(self, order):
-        """
-        :returns: all advisers on the order
+        """:returns: all advisers on the order
         """
         return itertools.chain(
             (item.adviser for item in order.assignees.all()),
@@ -98,8 +95,7 @@ class Notify:
         )
 
     def order_info(self, order, what_happened, why, to_email=None, to_name=None):
-        """
-        Send a notification of type info related to the order `order`
+        """Send a notification of type info related to the order `order`
         specifying what happened, the reason and optionally who to send it to.
         """
         receipient_email = to_email or settings.OMIS_NOTIFICATION_ADMIN_EMAIL
@@ -118,8 +114,7 @@ class Notify:
         )
 
     def _order_created_for_post_managers(self, order):
-        """
-        Notify the related overseas manager that a new order has been created
+        """Notify the related overseas manager that a new order has been created
         if that manager exists or fall back to notifying the OMIS admin
         that something is not right.
         """
@@ -162,8 +157,7 @@ class Notify:
             self.order_info(**data)
 
     def _order_created_for_regional_managers(self, order):
-        """
-        Notify the related regional managers that a new order has been created.
+        """Notify the related regional managers that a new order has been created.
         """
         # no UK region specified for this order => skip
         if not order.uk_region:
@@ -193,8 +187,7 @@ class Notify:
             )
 
     def order_created(self, order):
-        """
-        Notify post managers and regional managers that a new order has been created.
+        """Notify post managers and regional managers that a new order has been created.
         """
         self._order_created_for_post_managers(order)
         self._order_created_for_regional_managers(order)
@@ -225,8 +218,7 @@ class Notify:
         )
 
     def order_paid(self, order):
-        """
-        Send a notification to the customer and the advisers
+        """Send a notification to the customer and the advisers
         that the order has just been marked as paid.
         """
         #  notify customer
@@ -253,8 +245,7 @@ class Notify:
             )
 
     def order_completed(self, order):
-        """
-        Send a notification to the advisers that the order has
+        """Send a notification to the advisers that the order has
         just been marked as completed.
         """
         for adviser in self._get_all_advisers(order):
@@ -267,8 +258,7 @@ class Notify:
             )
 
     def order_cancelled(self, order):
-        """
-        Send a notification to the customer and the advisers
+        """Send a notification to the customer and the advisers
         that the order has just been cancelled.
         """
         #  notify customer
@@ -295,8 +285,7 @@ class Notify:
             )
 
     def quote_generated(self, order):
-        """
-        Send a notification to the customer and the advisers
+        """Send a notification to the customer and the advisers
         that a quote has just been created and needs to be accepted.
         """
         #  notify customer
@@ -323,8 +312,7 @@ class Notify:
             )
 
     def quote_accepted(self, order):
-        """
-        Send a notification to the customer and the advisers
+        """Send a notification to the customer and the advisers
         that a quote has just been accepted.
         """
         #  notify customer
@@ -351,8 +339,7 @@ class Notify:
             )
 
     def quote_cancelled(self, order, by):
-        """
-        Send a notification to the customer and the advisers
+        """Send a notification to the customer and the advisers
         that a quote has just been cancelled.
         """
         #  notify customer

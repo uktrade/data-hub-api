@@ -13,8 +13,7 @@ class TestGetUnreferencedObjectsQuery:
     """Tests get_unreferenced_objects_query()."""
 
     def test_raises_value_error_on_invalid_relation_exclusion_filter_mapping(self):
-        """
-        Test that ValueError is raised if relation_exclusion_filter_mapping contains invalid keys.
+        """Test that ValueError is raised if relation_exclusion_filter_mapping contains invalid keys.
         """
         relation_exclusion_filter_mapping = {
             Mock(): Mock(),

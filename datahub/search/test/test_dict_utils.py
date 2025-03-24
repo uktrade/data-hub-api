@@ -21,7 +21,7 @@ def test_id_name_dict():
 
 
 def test_interaction_dict():
-    """Interaction dict should serialize id, date and subject"""
+    """Interaction dict should serialize id, date and subject."""
     obj = construct_mock(
         id=1234,
         date='2018-01-01',
@@ -36,7 +36,7 @@ def test_interaction_dict():
 
 
 def test_interaction_dict_none():
-    """Interaction dict should return none for none input"""
+    """Interaction dict should return none for none input."""
     res = dict_utils.interaction_dict(None)
     assert res is None
 
@@ -81,8 +81,8 @@ def test_id_uri_dict():
 
 
 @pytest.mark.parametrize(
-    'obj,expected_dict',
-    (
+    ('obj', 'expected_dict'),
+    [
         # complete object
         (
             construct_mock(
@@ -114,7 +114,7 @@ def test_id_uri_dict():
             None,
             None,
         ),
-    ),
+    ],
 )
 def test_company_dict(obj, expected_dict):
     """Tests for the company_dict function."""
@@ -124,8 +124,8 @@ def test_company_dict(obj, expected_dict):
 
 
 @pytest.mark.parametrize(
-    'obj,fields_prefix,expected_address_dict',
-    (
+    ('obj', 'fields_prefix', 'expected_address_dict'),
+    [
         # returns None in case of empty address fields values
         (
             construct_mock(
@@ -202,7 +202,7 @@ def test_company_dict(obj, expected_dict):
                 'area': None,
             },
         ),
-    ),
+    ],
 )
 def test_address_dict(obj, fields_prefix, expected_address_dict):
     """Tests for address_dict."""
@@ -212,8 +212,7 @@ def test_address_dict(obj, fields_prefix, expected_address_dict):
 
 
 def test_address_dict_raises_error_with_invalid_prefix():
-    """
-    Tests that if address_dict is called with a prefix that
+    """Tests that if address_dict is called with a prefix that
     cannot be found on the object, an AttributeError is raised.
     """
     obj = construct_mock(
@@ -273,8 +272,8 @@ def test_contact_job_dict():
 
 
 @pytest.mark.parametrize(
-    'obj,expected_dict',
-    (
+    ('obj', 'expected_dict'),
+    [
         # with dit_team != None
         (
             construct_mock(
@@ -315,7 +314,7 @@ def test_contact_job_dict():
                 'dit_team': {},
             },
         ),
-    ),
+    ],
 )
 def test_contact_or_adviser_dict_include_dit_team(obj, expected_dict):
     """Tests contact_or_adviser_dict including its team."""
@@ -326,8 +325,7 @@ def test_contact_or_adviser_dict_include_dit_team(obj, expected_dict):
 
 @pytest.mark.django_db
 def test_core_team_advisers_list_of_dicts():
-    """
-    Test that core_team_advisers_list_of_dicts returns a list of advisers if
+    """Test that core_team_advisers_list_of_dicts returns a list of advisers if
     they are not global account managers.
     """
     adviser_1 = AdviserFactory()
@@ -377,8 +375,8 @@ def test_ch_company_dict():
 
 
 @pytest.mark.parametrize(
-    'obj,expected_dict',
-    (
+    ('obj', 'expected_dict'),
+    [
         # complete object
         (
             construct_mock(
@@ -410,7 +408,7 @@ def test_ch_company_dict():
             ),
             None,
         ),
-    ),
+    ],
 )
 def test_nested_id_name_dict(obj, expected_dict):
     """Tests nested id name dict."""

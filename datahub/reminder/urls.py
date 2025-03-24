@@ -7,8 +7,6 @@ from datahub.reminder.views import (
     NoRecentExportInteractionSubscriptionViewset,
     NoRecentInvestmentInteractionReminderViewset,
     NoRecentInvestmentInteractionSubscriptionViewset,
-    reminder_subscription_summary_view,
-    reminder_summary_view,
     TaskAmendedByOthersReminderViewset,
     TaskAmendedByOthersSubscriptionViewset,
     TaskAssignedToMeFromOthersReminderViewset,
@@ -23,6 +21,8 @@ from datahub.reminder.views import (
     UpcomingEstimatedLandDateSubscriptionViewset,
     UpcomingTaskReminderSubscriptionViewset,
     UpcomingTaskReminderViewset,
+    reminder_subscription_summary_view,
+    reminder_summary_view,
 )
 
 urlpatterns = [

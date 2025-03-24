@@ -6,8 +6,7 @@ from datahub.search.apps import get_search_apps
 
 @pytest.fixture
 def disconnect_delete_search_signal_receivers(opensearch_with_signals):
-    """
-    Fixture that disables signal receivers that delete documents in OpenSearch.
+    """Fixture that disables signal receivers that delete documents in OpenSearch.
 
     This is used in tests targeting rollback behaviour. This is because search tests typically
     use the synchronous_on_commit fixture, which doesn't model rollback behaviour correctly.

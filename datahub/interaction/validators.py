@@ -120,8 +120,7 @@ class ContactsBelongToCompanyValidator:
     requires_context = True
 
     def __call__(self, data, serializer):
-        """
-        Performs validation.
+        """Performs validation.
 
         TODO: this method has do be simplified once `company` field is removed.
         """
@@ -157,8 +156,7 @@ class ContactsBelongToCompanyValidator:
 
 
 class StatusChangeValidator:
-    """
-    Validates that an interaction's status cannot change from complete back to
+    """Validates that an interaction's status cannot change from complete back to
     draft.  An interaction with status='complete' means that the interaction
     occurred successfully and any extra details for it have been logged.
     """
@@ -166,8 +164,7 @@ class StatusChangeValidator:
     requires_context = True
 
     def __call__(self, data, serializer):
-        """
-        Performs validation.
+        """Performs validation.
         """
         instance = serializer.instance
         if not instance:
@@ -184,8 +181,7 @@ class StatusChangeValidator:
 
 
 class DuplicateExportCountryValidator:
-    """
-    Validates that same country is not supplied more than once
+    """Validates that same country is not supplied more than once
     within list of export_countries.
     """
 

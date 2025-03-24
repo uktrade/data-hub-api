@@ -1,15 +1,12 @@
 import importlib
 import logging
 import sys
-
 from unittest.mock import MagicMock, patch
 
 import boto3
 import pytest
-
 from django.conf import settings
 from moto import mock_aws
-
 from redis import Redis
 from rq import Queue, Worker
 from rq.job import Job
@@ -19,7 +16,8 @@ from datahub.company_activity.models import IngestedFile
 from datahub.company_activity.tasks import ingest_great_data
 from datahub.company_activity.tasks.constants import BUCKET, GREAT_PREFIX, REGION
 from datahub.company_activity.tasks.ingest_company_activity import (
-    company_activity_identification_task, TWO_HOURS_IN_SECONDS,
+    TWO_HOURS_IN_SECONDS,
+    company_activity_identification_task,
 )
 from datahub.core.queues.constants import EVERY_HOUR
 from datahub.core.queues.job_scheduler import job_scheduler
@@ -52,8 +50,7 @@ def setup_s3_bucket(bucket_name, test_files):
 class TestCompanyActivityIngestionTasks:
     @patch('os.system')
     def test_company_activity_ingestion_task_schedule(self, mock_system):
-        """
-        Test that a task is scheduled to check for new Company Activity data
+        """Test that a task is scheduled to check for new Company Activity data.
         """
         # Import inside test to prevent the os.system call from running before the patch
         cron = importlib.import_module('cron-scheduler')
@@ -78,9 +75,8 @@ class TestCompanyActivityIngestionTasks:
     )
     @mock_aws
     def test_ingestion_job_is_queued_for_new_files(self, mock, test_files, caplog):
-        """
-        Test that when a new file is found a job is queued to ingest it
-        and no jobs are created for files not the most recent
+        """Test that when a new file is found a job is queued to ingest it
+        and no jobs are created for files not the most recent.
         """
         new_file = GREAT_PREFIX + '20240920T000000/full_ingestion.jsonl.gz'
         setup_s3_bucket(BUCKET, test_files)
@@ -115,8 +111,7 @@ class TestCompanyActivityIngestionTasks:
     )
     @mock_aws
     def test_ingestion_job_is_not_queued_for_already_ingested_file(self, mock, test_files, caplog):
-        """
-        Test that when the latest file found has already been ingested no job is queued
+        """Test that when the latest file found has already been ingested no job is queued.
         """
         new_file = GREAT_PREFIX + '20240920T000000/full_ingestion.jsonl.gz'
         setup_s3_bucket(BUCKET, test_files)
@@ -141,10 +136,9 @@ class TestCompanyActivityIngestionTasks:
     )
     @mock_aws
     def test_job_not_queued_when_already_on_queue(self, mock, test_files, caplog):
-        """
-        Test that when, the job has run and queued an ingestion job for a file
+        """Test that when, the job has run and queued an ingestion job for a file
         but that child job hasn't completed yet, this job does not queue a duplicate
-        when running again
+        when running again.
         """
         new_file = GREAT_PREFIX + '20240920T000000/full_ingestion.jsonl.gz'
         setup_s3_bucket(BUCKET, test_files)
@@ -173,8 +167,7 @@ class TestCompanyActivityIngestionTasks:
     @patch('datahub.company_activity.tasks.ingest_company_activity.Worker')
     @mock_aws
     def test_job_not_queued_when_already_running(self, mock_worker, mock_scheduler, test_files):
-        """
-        Test that we don't queue a job to ingest a file when a job is already running for it
+        """Test that we don't queue a job to ingest a file when a job is already running for it.
         """
         new_file = GREAT_PREFIX + '20240920T000000/full_ingestion.jsonl.gz'
         setup_s3_bucket(BUCKET, test_files)
@@ -201,9 +194,8 @@ class TestCompanyActivityIngestionTasks:
     @patch('datahub.company_activity.tasks.ingest_company_activity.Worker')
     @mock_aws
     def test_no_running_job(self, mock_worker, mock_scheduler, test_files):
-        """
-        Test that the check for an already running ingestion job succeeds
-        when there are no jobs currently running
+        """Test that the check for an already running ingestion job succeeds
+        when there are no jobs currently running.
         """
         setup_s3_bucket(BUCKET, test_files)
         redis = Redis.from_url(settings.REDIS_BASE_URL)
@@ -219,8 +211,7 @@ class TestCompanyActivityIngestionTasks:
     @pytest.mark.django_db
     @mock_aws
     def test_child_job(self, caplog, test_files):
-        """
-        Test that scheduled child job is run successfully
+        """Test that scheduled child job is run successfully.
         """
         new_file = GREAT_PREFIX + '20240920T000000/full_ingestion.jsonl.gz'
         setup_s3_bucket(BUCKET, test_files)
@@ -237,8 +228,7 @@ class TestCompanyActivityIngestionTasks:
 
     @mock_aws
     def test_empty_s3_bucket(self, caplog):
-        """
-        Test that the task can handle an empty S3 bucket
+        """Test that the task can handle an empty S3 bucket.
         """
         setup_s3_bucket(BUCKET, [])
         with caplog.at_level(logging.INFO):

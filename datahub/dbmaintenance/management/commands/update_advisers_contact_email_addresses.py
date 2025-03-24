@@ -9,7 +9,7 @@ class Command(CSVBaseCommand):
     """Command to update the email for contacts that have @trade in it."""
 
     def _process_row(self, row, simulate=False, **options):
-        """Process one row"""
+        """Process one row."""
         pk = parse_uuid(row['id'])
         contact_email = parse_email(row['new_email'])
         adviser = Advisor.objects.get(pk=pk)

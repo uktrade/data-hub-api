@@ -75,8 +75,7 @@ def test_delete_documents_with_errors(opensearch_bulk, mock_opensearch_client):
 @pytest.mark.django_db
 @pytest.mark.usefixtures('synchronous_thread_pool')
 def test_collector(monkeypatch, opensearch_with_signals):
-    """
-    Test that the collector collects and deletes all the django objects deleted.
+    """Test that the collector collects and deletes all the django objects deleted.
     """
     obj = SimpleModel.objects.create()
     sync_object(SimpleModelSearchApp, str(obj.pk))
@@ -136,8 +135,7 @@ def test_collector(monkeypatch, opensearch_with_signals):
 @pytest.mark.django_db
 @pytest.mark.usefixtures('synchronous_thread_pool')
 def test_update_opensearch_after_deletions(opensearch_with_signals):
-    """
-    Test that the context manager update_opensearch_after_deletions collects and deletes
+    """Test that the context manager update_opensearch_after_deletions collects and deletes
     all the django objects deleted.
     """
     assert SimpleModel.objects.count() == 0

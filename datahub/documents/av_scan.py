@@ -35,8 +35,7 @@ class StreamWrapper:
 
 
 def perform_virus_scan(document_pk: str, download_url: str):
-    """
-    Virus scans an uploaded document.
+    """Virus scans an uploaded document.
 
     :param document_pk: pk of a document to be scanned
     :param download_url: URL to a file to be scanned

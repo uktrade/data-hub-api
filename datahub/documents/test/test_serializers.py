@@ -1,5 +1,4 @@
 import pytest
-
 from django.contrib.contenttypes.models import ContentType
 
 from datahub.company.test.factories import CompanyFactory
@@ -18,12 +17,11 @@ from datahub.documents.test.test_utils import (
 )
 from datahub.investment.project.test.factories import InvestmentProjectFactory
 
-
 pytestmark = pytest.mark.django_db
 
 
 class TestSharePointDocumentSerializer:
-    """Tests for SharePointDocumentSerializer"""
+    """Tests for SharePointDocumentSerializer."""
 
     def test_serializing_instance_returns_expected_fields(self):
         sharepoint_document = SharePointDocumentFactory()
@@ -32,7 +30,7 @@ class TestSharePointDocumentSerializer:
 
 
 class TestGenericDocumentRetrieveSerializer:
-    """Tests for GenericDocumentRetrieveSerializer"""
+    """Tests for GenericDocumentRetrieveSerializer."""
 
     def test_serializing_instance_returns_expected_fields(self):
         generic_document = CompanySharePointDocumentFactory()

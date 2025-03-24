@@ -13,7 +13,7 @@ from datahub.search.large_capital_opportunity import LargeCapitalOpportunitySear
 from datahub.search.large_capital_opportunity.serializers import (
     SearchLargeCapitalOpportunityQuerySerializer,
 )
-from datahub.search.views import register_v4_view, SearchAPIView, SearchExportAPIView
+from datahub.search.views import SearchAPIView, SearchExportAPIView, register_v4_view
 
 
 class SearchOpportunityAPIViewMixin:

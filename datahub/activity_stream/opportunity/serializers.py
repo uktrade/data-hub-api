@@ -36,9 +36,8 @@ class LargeCapitalOpportunityActivitySerializer(ActivitySerializer):
         return attributed_to
 
     def to_representation(self, instance):
-        """
-        Serialize the interaction as per Activity Stream spec:
-        https://www.w3.org/TR/activitystreams-core/
+        """Serialize the interaction as per Activity Stream spec:
+        https://www.w3.org/TR/activitystreams-core/.
         """
         investment_opportunity_id = f'dit:DataHubLargeCapitalOpportunity:{instance.pk}'
         investment_opportunity = {

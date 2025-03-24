@@ -2,6 +2,8 @@ from django.db.models import Prefetch
 
 from datahub.interaction.models import (
     Interaction as DBInteraction,
+)
+from datahub.interaction.models import (
     InteractionDITParticipant,
     InteractionExportCountry,
     InteractionPermission,

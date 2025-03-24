@@ -21,7 +21,7 @@ def random_communication_channel(disabled=False):
 def make_csv_file(fieldnames, *rows, encoding='utf-8-sig', filename='test.csv'):
     """Make a CSV file from a number of sequences."""
     row_dicts = [
-        {field_name: field_value for field_name, field_value in zip(fieldnames, row)}
+        {field_name: field_value for field_name, field_value in zip(fieldnames, row, strict=False)}
         for row in rows
     ]
 

@@ -11,9 +11,9 @@ from datahub.core.queues.health_check import (
 )
 from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.core.queues.scheduler import (
-    DataHubScheduler,
     LONG_RUNNING_QUEUE,
     SHORT_RUNNING_QUEUE,
+    DataHubScheduler,
 )
 
 logger = getLogger(__name__)

@@ -24,10 +24,10 @@ from datahub.company.test.factories import (
 from datahub.core.constants import Country, Sector, UKRegion
 from datahub.core.test_utils import (
     APITestMixin,
+    HawkMockJSONResponse,
     create_test_user,
     format_csv_data,
     get_attr_or_none,
-    HawkMockJSONResponse,
     random_obj_for_queryset,
 )
 from datahub.interaction.test.factories import (
@@ -59,7 +59,7 @@ def setup_data():
         ),
         ContactFactory(first_name='first', last_name='last'),
     ]
-    yield contacts
+    return contacts
 
 
 def generate_hawk_response(payload):
@@ -75,7 +75,7 @@ class TestSearch(APITestMixin):
     """Tests search views."""
 
     def test_company_search_no_permissions(self):
-        """Should return 403"""
+        """Should return 403."""
         user = create_test_user(dit_team=TeamFactory())
         api_client = self.create_api_client(user=user)
         url = reverse('api-v3:search:contact')
@@ -174,7 +174,7 @@ class TestSearch(APITestMixin):
 
     @pytest.mark.parametrize(
         'sector_level',
-        (0, 1, 2),
+        [0, 1, 2],
     )
     def test_company_sector_descends_filter(
         self,
@@ -225,8 +225,8 @@ class TestSearch(APITestMixin):
         assert actual_ids == expected_ids
 
     @pytest.mark.parametrize(
-        'name_term,matched_company_name',
-        (
+        ('name_term', 'matched_company_name'),
+        [
             # name
             ('whiskers', 'whiskers and tabby'),
             ('whi', 'whiskers and tabby'),
@@ -247,7 +247,7 @@ class TestSearch(APITestMixin):
             ('tiger', None),
             ('panda', None),
             ('moine', None),
-        ),
+        ],
     )
     def test_filter_by_company_name(
         self,
@@ -315,10 +315,10 @@ class TestSearch(APITestMixin):
 
     @pytest.mark.parametrize(
         'archived',
-        (
+        [
             True,
             False,
-        ),
+        ],
     )
     def test_search_contact_by_archived(self, opensearch_with_collector, setup_data, archived):
         """Tests filtering by archived."""
@@ -341,7 +341,7 @@ class TestSearch(APITestMixin):
 
     @pytest.mark.parametrize(
         'created_on_exists',
-        (True, False),
+        [True, False],
     )
     def test_filter_by_created_on_exists(self, opensearch_with_collector, created_on_exists):
         """Tests filtering contact by created_on exists."""
@@ -429,8 +429,8 @@ class TestSearch(APITestMixin):
         assert len(response.data['results']) == 0
 
     @pytest.mark.parametrize(
-        'contacts,filter_,expected',
-        (
+        ('contacts', 'filter_', 'expected'),
+        [
             (
                 ('aaa@aaa.aaa', 'bbb@bbb.bbb', 'ccc@ccc.ccc'),
                 'bbb@bbb.bbb',
@@ -446,10 +446,10 @@ class TestSearch(APITestMixin):
                 'xxx@xxx.xxx',
                 set(),
             ),
-        ),
+        ],
     )
     def test_email_filter(self, opensearch_with_collector, contacts, filter_, expected):
-        """Tests the email filter"""
+        """Tests the email filter."""
         ContactFactory.create_batch(len(contacts), email=factory.Iterator(contacts))
 
         opensearch_with_collector.flush_and_refresh()
@@ -507,11 +507,11 @@ class TestContactExportView(APITestMixin):
 
     @pytest.mark.parametrize(
         'permissions',
-        (
+        [
             (),
             (ContactPermission.view_contact,),
             (ContactPermission.export_contact,),
-        ),
+        ],
     )
     def test_user_without_permission_cannot_export(self, opensearch_with_collector, permissions):
         """Test that a user without the correct permissions cannot export data."""
@@ -523,8 +523,8 @@ class TestContactExportView(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     @pytest.mark.parametrize(
-        'request_sortby,orm_ordering',
-        (
+        ('request_sortby', 'orm_ordering'),
+        [
             ('modified_on', 'modified_on'),
             ('modified_on:desc', '-modified_on'),
             ('created_on', 'created_on'),
@@ -532,7 +532,7 @@ class TestContactExportView(APITestMixin):
             ('last_name', 'last_name'),
             ('company.name', 'company__name'),
             ('address_country.name', 'computed_address_country_name'),
-        ),
+        ],
     )
     def test_export(
         self,

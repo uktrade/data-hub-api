@@ -11,7 +11,7 @@ from datahub.interaction.test.factories import InteractionExportCountryFactory
 
 
 def get_expected_data_from_interaction_export_country(interaction_export_country):
-    """Returns expected API response dictionary for an interaction_export_country"""
+    """Returns expected API response dictionary for an interaction_export_country."""
     return {
         'country__iso_alpha2_code': interaction_export_country.country.iso_alpha2_code,
         'country__name': interaction_export_country.country.name,
@@ -25,15 +25,14 @@ def get_expected_data_from_interaction_export_country(interaction_export_country
 
 @pytest.mark.django_db
 class TestInteractionsExportCountryDatasetViewSet(BaseDatasetViewTest):
-    """
-    Tests for InteractionsExportCountryDatasetView
+    """Tests for InteractionsExportCountryDatasetView.
     """
 
     view_url = reverse('api-v4:dataset:interactions-export-country-dataset')
     factory = InteractionExportCountryFactory
 
     def test_success(self, data_flow_api_client):
-        """Test that endpoint returns with expected data for a single interaction"""
+        """Test that endpoint returns with expected data for a single interaction."""
         interaction_export_country = self.factory()
         response = data_flow_api_client.get(self.view_url)
         assert response.status_code == status.HTTP_200_OK
@@ -46,7 +45,7 @@ class TestInteractionsExportCountryDatasetViewSet(BaseDatasetViewTest):
         assert result == expected_result
 
     def test_with_multiple_interactions(self, data_flow_api_client):
-        """Test that the correct number of records are returned in the right order"""
+        """Test that the correct number of records are returned in the right order."""
         with freeze_time('2019-01-01 12:30:00'):
             interaction_export_country_1 = self.factory()
         with freeze_time('2019-01-03 12:00:00'):

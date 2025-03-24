@@ -1,7 +1,6 @@
 from django import forms
 from django.contrib import admin
 from django.core.exceptions import ValidationError
-
 from reversion.admin import VersionAdmin
 
 from datahub.core.admin import BaseModelAdminMixin
@@ -27,7 +26,7 @@ class TaskAdminForm(forms.ModelForm):
 
 @admin.register(Task)
 class TaskAdmin(BaseModelAdminMixin, VersionAdmin):
-    """Admin form for tasks"""
+    """Admin form for tasks."""
 
     search_fields = (
         'pk',

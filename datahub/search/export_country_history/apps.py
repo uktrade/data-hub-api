@@ -6,7 +6,7 @@ from datahub.search.export_country_history.models import ExportCountryHistory
 
 
 class ExportCountryHistoryApp(SearchApp):
-    """SearchApp for export countries history timeline"""
+    """SearchApp for export countries history timeline."""
 
     name = 'export-country-history'
     search_model = ExportCountryHistory

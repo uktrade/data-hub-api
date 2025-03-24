@@ -6,7 +6,6 @@ from datahub.investment.opportunity.test.factories import (
     LargeCapitalOpportunityFactory,
 )
 
-
 pytestmark = pytest.mark.django_db
 
 

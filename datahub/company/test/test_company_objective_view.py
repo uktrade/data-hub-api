@@ -1,5 +1,4 @@
 import pytest
-
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -14,7 +13,7 @@ from datahub.core.test_utils import (
 
 class BaseObjectivesTests(APITestMixin):
     def user_api_client(self):
-        """Create an api client where the user is the authenticated user"""
+        """Create an api client where the user is the authenticated user."""
         user = create_test_user(
             permission_codenames=(
                 'view_company',
@@ -24,7 +23,7 @@ class BaseObjectivesTests(APITestMixin):
         return self.create_api_client(user)
 
     def adviser_api_client(self, adviser):
-        """Create an api client where the adviser is the authenticated user"""
+        """Create an api client where the adviser is the authenticated user."""
         return self.create_api_client(user=adviser)
 
 
@@ -81,7 +80,7 @@ class TestGettingObjectivesForCompany(BaseObjectivesTests):
         assert expected_ids == actual_ids
         assert response.status_code == status.HTTP_200_OK
 
-    @pytest.mark.parametrize('archived', ((True), (False), (None)))
+    @pytest.mark.parametrize('archived', [(True), (False), (None)])
     def test_company_objectives_archived_filtering(self, archived):
         archived_objective = ObjectiveFactory(archived=True)
         not_archived_objective = ObjectiveFactory(
@@ -199,7 +198,7 @@ class TestGettingASingleObjective(BaseObjectivesTests):
 
 
 class TestGettingObjectivesArchivedCountForCompany(BaseObjectivesTests):
-    """Tests to retrieve the archived count of objectives"""
+    """Tests to retrieve the archived count of objectives."""
 
     def test_company_has_no_objectives(self):
         company = CompanyFactory()
@@ -225,7 +224,7 @@ class TestGettingObjectivesArchivedCountForCompany(BaseObjectivesTests):
 
 
 class TestArchiveObjective(BaseObjectivesTests):
-    """Test the archive POST endpoint for objective"""
+    """Test the archive POST endpoint for objective."""
 
     def test_archive_objective_without_reason_returns_bad_request(self):
         objective = ObjectiveFactory()

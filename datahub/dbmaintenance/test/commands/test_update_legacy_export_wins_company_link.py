@@ -3,13 +3,11 @@ from uuid import uuid4
 
 import pytest
 from django.core.management import call_command
-
 from reversion.models import Version
 
 from datahub.company.test.factories import CompanyFactory
 from datahub.export_win.models import Win
 from datahub.export_win.test.factories import WinFactory
-
 
 pytestmark = pytest.mark.django_db
 
@@ -26,7 +24,7 @@ def test_run(s3_stubber, caplog):
     bucket = 'test_bucket'
     object_key = 'test_key'
     csv_contents = ['export_win_id,data_hub_id']
-    for uuid, company_uuid in zip(uuids, company_uuids):
+    for uuid, company_uuid in zip(uuids, company_uuids, strict=False):
         csv_contents.append(f'{uuid},{company_uuid}')
 
     bad_company_id = uuid4()
@@ -47,7 +45,7 @@ def test_run(s3_stubber, caplog):
 
     call_command('update_legacy_export_wins_company_link', bucket, object_key)
 
-    for uuid, company in zip(uuids, companies):
+    for uuid, company in zip(uuids, companies, strict=False):
         win = Win.objects.get(id=uuid)
         assert win.company_id == company.id
 
@@ -73,7 +71,7 @@ def test_simulate(s3_stubber, caplog):
     bucket = 'test_bucket'
     object_key = 'test_key'
     csv_contents = ['export_win_id,data_hub_id']
-    for uuid, company_uuid in zip(uuids, company_uuids):
+    for uuid, company_uuid in zip(uuids, company_uuids, strict=False):
         csv_contents.append(f'{uuid},{company_uuid}')
 
     bad_company_id = uuid4()

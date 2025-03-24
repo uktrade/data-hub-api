@@ -2,7 +2,6 @@ import json
 import logging
 
 import smart_open
-
 from dateutil import parser
 from django.conf import settings
 from redis import Redis
@@ -13,7 +12,6 @@ from datahub.core.queues.constants import THREE_MINUTES_IN_SECONDS
 from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.ingest.boto3 import S3ObjectProcessor
 from datahub.ingest.models import IngestedObject
-
 
 logger = logging.getLogger(__name__)
 

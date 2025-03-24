@@ -6,8 +6,14 @@ import pytest
 
 from datahub.core.constants import (
     FDIType as FDITypeConstant,
+)
+from datahub.core.constants import (
     InvestmentBusinessActivity as InvestmentBusinessActivityConstant,
+)
+from datahub.core.constants import (
     InvestmentType as InvestmentTypeConstant,
+)
+from datahub.core.constants import (
     Sector as SectorConstant,
 )
 from datahub.investment.project.constants import FDISICGrouping as FDISICGroupingConstant
@@ -19,7 +25,6 @@ from datahub.investment.project.test.factories import (
 )
 from datahub.metadata.models import Sector
 from datahub.metadata.test.factories import SectorFactory
-
 
 CAPITAL = GVAMultiplier.SectorClassificationChoices.CAPITAL
 LABOUR = GVAMultiplier.SectorClassificationChoices.LABOUR
@@ -34,7 +39,7 @@ class TestGrossValueAddedCalculator:
     """Test for Gross Value Added Calculator."""
 
     @pytest.mark.parametrize(
-        'business_activities,fdi_type,investment_type,sector',
+        ('business_activities', 'fdi_type', 'investment_type', 'sector'),
         [
             # Non-FDI investment type
             (
@@ -82,7 +87,7 @@ class TestGrossValueAddedCalculator:
         assert project.gva_multiplier is None
 
     @pytest.mark.parametrize(
-        'investment_type,sector,business_activities,expected_multiplier_value',
+        ('investment_type', 'sector', 'business_activities', 'expected_multiplier_value'),
         [
             #  FDI investment project with retail business activity
             (
@@ -163,8 +168,7 @@ class TestGrossValueAddedCalculator:
         assert project.gva_multiplier is None
 
     def test_multiple_gva_multipliers_for_sector_returns_most_recent_multiplier(self):
-        """
-        Test when multiple GVA multipliers are present for a sector, it returns the
+        """Test when multiple GVA multipliers are present for a sector, it returns the
         most recent multiplier.
         """
         sector_id = SectorConstant.renewable_energy_wind.value.id
@@ -188,8 +192,7 @@ class TestGrossValueAddedCalculator:
         assert project.gva_multiplier.financial_year == 2040
 
     def test_no_gva_multiplier_found_for_sector_returns_none(self, caplog):
-        """
-        Test when a GVA Multiplier is not present for the given sector.
+        """Test when a GVA Multiplier is not present for the given sector.
         Checks an exception is added to the log to flag that data is missing.
         """
         caplog.set_level('WARNING')
@@ -208,8 +211,7 @@ class TestGrossValueAddedCalculator:
         )
 
     def test_no_investment_project_sector_returns_none(self):
-        """
-        Tests when an investment project has no sector that the GVA multiplier returned is none.
+        """Tests when an investment project has no sector that the GVA multiplier returned is none.
         """
         project = InvestmentProjectFactory(
             business_activities=[],
@@ -219,7 +221,7 @@ class TestGrossValueAddedCalculator:
         assert project.gva_multiplier is None
 
     @pytest.mark.parametrize(
-        'sector_classification, foreign_equity_investment, number_new_jobs',
+        ('sector_classification', 'foreign_equity_investment', 'number_new_jobs'),
         [
             (
                 CAPITAL,
@@ -277,7 +279,7 @@ class TestGrossValueAddedCalculator:
         assert project.gross_value_added is None
 
     @pytest.mark.parametrize(
-        'sector_classification, foreign_equity_investment, number_new_jobs, expected_gva_value',
+        ('sector_classification', 'foreign_equity_investment', 'number_new_jobs', 'expected_gva_value'),
         [
             (
                 CAPITAL,
@@ -324,15 +326,14 @@ class TestGrossValueAddedCalculator:
         assert project.gross_value_added == expected_gva_value
 
     def test_no_gva_multiplier_returns_none(self):
-        """
-        Tests if a project's GVA multiplier is none, that it returns a GVA value of none.
+        """Tests if a project's GVA multiplier is none, that it returns a GVA value of none.
         """
         project = InvestmentProjectFactory()
         project.gva_multiplier = None
         assert project.gross_value_added is None
 
     @pytest.mark.parametrize(
-        'sector_classification, multiplier_value, foreign_equity_investment, number_new_jobs',
+        ('sector_classification', 'multiplier_value', 'foreign_equity_investment', 'number_new_jobs'),
         [
             (CAPITAL, Decimal('0.5'), None, 200),  # Capital intensive, no FEI
             (LABOUR, Decimal('0.5'), 1200, None),  # Labour intensive, no jobs
@@ -348,8 +349,7 @@ class TestGrossValueAddedCalculator:
         foreign_equity_investment,
         number_new_jobs,
     ):
-        """
-        Test various scenarios for correct GVA calculation when gva value is expected to be none
+        """Test various scenarios for correct GVA calculation when gva value is expected to be none.
         """
         sector = SectorFactory()
         if multiplier_value is None:
@@ -400,8 +400,7 @@ class TestGrossValueAddedCalculator:
         number_new_jobs,
         expected_gva_value: Decimal | None,
     ):
-        """
-        Test various scenarios for correct calculation when GVA value is expected not to be none.
+        """Test various scenarios for correct calculation when GVA value is expected not to be none.
         """
         sector = SectorFactory()
         if multiplier_value is None:
@@ -428,8 +427,7 @@ class TestGrossValueAddedCalculator:
             assert calculated_gva_value == expected_gva_value
 
     def test_presence_of_gva_multipliers_for_each_sector(self):
-        """
-        Tests that all sectors have an associated GVA multiplier.
+        """Tests that all sectors have an associated GVA multiplier.
         """
         sector_ids = [
             sector.id for sector

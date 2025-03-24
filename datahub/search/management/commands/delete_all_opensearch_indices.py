@@ -25,8 +25,7 @@ Are you sure you want to do this?
     Type 'yes' to continue, or 'no' to cancel: """
 
     def add_arguments(self, parser):
-        """
-        Add no-input argument to the command.
+        """Add no-input argument to the command.
         """
         parser.add_argument(
             '--noinput', '--no-input', action='store_false', dest='interactive',

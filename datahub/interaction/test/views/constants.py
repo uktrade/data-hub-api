@@ -23,7 +23,7 @@ class ServiceAnswerOptionID(Enum):
 
 
 class TradeAgreement(Enum):
-    """Trade agreement constants"""
+    """Trade agreement constants."""
 
     uk_australia = Constant(
         'UK-Australia Mutual Recognition Agreement',

@@ -10,7 +10,6 @@ from datahub.activity_stream.investor_profile.views import (
 from datahub.activity_stream.omis.views import OMISOrderAddedViewSet
 from datahub.activity_stream.opportunity.views import LargeCapitalOpportunityActivityViewSet
 
-
 activity_stream_urls = [
     path(
         'activity-stream/investment/large-capital-opportunity',

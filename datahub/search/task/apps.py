@@ -1,6 +1,7 @@
 from datahub.search.apps import SearchApp
 from datahub.search.task.models import Task
-from datahub.task.models import Task as DBTask, TaskPermission
+from datahub.task.models import Task as DBTask
+from datahub.task.models import TaskPermission
 
 
 class TaskSearchApp(SearchApp):

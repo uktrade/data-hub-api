@@ -5,8 +5,8 @@ from datahub.search.contact import dict_utils
 
 
 @pytest.mark.parametrize(
-    'obj,field_name,expected_output',
-    (
+    ('obj', 'field_name', 'expected_output'),
+    [
         # address_same_as_company = False and char field
         (
             construct_mock(
@@ -78,7 +78,7 @@ from datahub.search.contact import dict_utils
                 'name': 'United States',
             },
         ),
-    ),
+    ],
 )
 def test_computed_address_field(obj, field_name, expected_output):
     """Tests for computed_address_field."""

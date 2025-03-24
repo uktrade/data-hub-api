@@ -58,11 +58,11 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
 
     @pytest.mark.parametrize(
         'verb_kwargs',
-        (
+        [
             ('get', {}),
             ('patch', {'json_': {}}),
             ('delete', {'json_': {}}),
-        ),
+        ],
     )
     def test_verbs_not_allowed(self, verb_kwargs, public_omis_api_client):
         """Test that makes sure the other verbs are not allowed."""
@@ -85,8 +85,7 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
         )
 
     def test_create_first_session(self, requests_mock, public_omis_api_client):
-        """
-        Test a successful call to create a payment gateway session.
+        """Test a successful call to create a payment gateway session.
 
         This starts a GOV.UK payment and creates an OMIS payment gateway session
         object tracking it.
@@ -141,8 +140,7 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
         }
 
     def test_create_cancels_other_ongoing_sessions(self, requests_mock, public_omis_api_client):
-        """
-        Test that creating a new payment gateway session cancels
+        """Test that creating a new payment gateway session cancels
         the other ongoing sessions and GOV.UK payments.
 
         Given:
@@ -246,15 +244,14 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
             'payment_url': next_url,
         }
 
-    @pytest.mark.parametrize('govuk_status_code', (400, 401, 404, 409, 500))
+    @pytest.mark.parametrize('govuk_status_code', [400, 401, 404, 409, 500])
     def test_500_if_govuk_pay_errors_when_cancelling(
         self,
         govuk_status_code,
         requests_mock,
         public_omis_api_client,
     ):
-        """
-        Test that if GOV.UK Pay errors whilst cancelling some other ongoing
+        """Test that if GOV.UK Pay errors whilst cancelling some other ongoing
         sessions/payments, the endpoint returns 500 to keep the system consistent.
 
         Possible GOV.UK errors when cancelling:
@@ -300,15 +297,14 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
         # check no session created
         assert PaymentGatewaySession.objects.count() == 1
 
-    @pytest.mark.parametrize('govuk_status_code', (400, 401, 422, 500))
+    @pytest.mark.parametrize('govuk_status_code', [400, 401, 422, 500])
     def test_500_if_govuk_pay_errors_when_creating(
         self,
         govuk_status_code,
         requests_mock,
         public_omis_api_client,
     ):
-        """
-        Test that if GOV.UK Pay errors whilst creating a new payment, the endpoint returns 500.
+        """Test that if GOV.UK Pay errors whilst creating a new payment, the endpoint returns 500.
 
         Possible GOV.UK errors:
         - 400 - BAD REQUEST
@@ -339,14 +335,13 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
         assert PaymentGatewaySession.objects.count() == 0
 
     @pytest.mark.parametrize(
-        'disallowed_status', (
+        'disallowed_status', [
             OrderStatus.PAID,
             OrderStatus.COMPLETE,
-        ),
+        ],
     )
     def test_409_if_order_in_disallowed_status(self, disallowed_status, public_omis_api_client):
-        """
-        Test that if the order is not in one of the allowed statuses, the endpoint
+        """Test that if the order is not in one of the allowed statuses, the endpoint
         returns 409.
         """
         assert PaymentGatewaySession.objects.count() == 0
@@ -373,8 +368,7 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
         requests_mock,
         public_omis_api_client,
     ):
-        """
-        Test that if the system is not up-to-date, the order is in quote_accepted
+        """Test that if the system is not up-to-date, the order is in quote_accepted
         but the GOV.UK payment happens, the endpoint triggers a check on existing
         sessions, realises that one finished successfully and records the payment
         marking the order as 'paid'.
@@ -435,11 +429,11 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
 
     @pytest.mark.parametrize(
         'order_status',
-        (
+        [
             OrderStatus.DRAFT,
             OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
             OrderStatus.CANCELLED,
-        ),
+        ],
     )
     def test_404_if_order_not_accessible(self, order_status, public_omis_api_client):
         """Test that if the order is not publicly accessible, the endpoint returns 404."""
@@ -575,7 +569,7 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    @pytest.mark.parametrize('verb', ('post', 'patch', 'delete'))
+    @pytest.mark.parametrize('verb', ['post', 'patch', 'delete'])
     def test_verbs_not_allowed(self, verb, public_omis_api_client):
         """Test that makes sure the other verbs are not allowed."""
         order = OrderWithAcceptedQuoteFactory()
@@ -589,19 +583,19 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
         assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
 
     @pytest.mark.parametrize(
-        'order_status', (
+        'order_status', [
             OrderStatus.QUOTE_ACCEPTED,
             OrderStatus.PAID,
             OrderStatus.COMPLETE,
-        ),
+        ],
     )
     @pytest.mark.parametrize(
         'session_status',
-        (
+        [
             PaymentGatewaySessionStatus.CREATED,
             PaymentGatewaySessionStatus.STARTED,
             PaymentGatewaySessionStatus.SUBMITTED,
-        ),
+        ],
     )
     def test_get(self, order_status, session_status, requests_mock, public_omis_api_client):
         """Test a successful call to get a payment gateway session."""
@@ -646,12 +640,12 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
 
     @pytest.mark.parametrize(
         'session_status',
-        (
+        [
             PaymentGatewaySessionStatus.SUCCESS,
             PaymentGatewaySessionStatus.FAILED,
             PaymentGatewaySessionStatus.CANCELLED,
             PaymentGatewaySessionStatus.ERROR,
-        ),
+        ],
     )
     def test_doesnt_call_govuk_pay_if_session_finished(
         self,
@@ -659,8 +653,7 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
         requests_mock,
         public_omis_api_client,
     ):
-        """
-        Test a successful call to get a payment gateway session when the session is finished.
+        """Test a successful call to get a payment gateway session when the session is finished.
         The system does not call GOV.UK Pay as the record is up-to-date.
         """
         session = PaymentGatewaySessionFactory(status=session_status)
@@ -683,15 +676,15 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
         assert not requests_mock.called
 
     @pytest.mark.parametrize(
-        'govuk_status,payment_url',
-        (
+        ('govuk_status', 'payment_url'),
+        [
             (PaymentGatewaySessionStatus.CREATED, 'https://payment.example.com/123abc'),
             (PaymentGatewaySessionStatus.STARTED, 'https://payment.example.com/123abc'),
             (PaymentGatewaySessionStatus.SUBMITTED, 'https://payment.example.com/123abc'),
             (PaymentGatewaySessionStatus.FAILED, ''),
             (PaymentGatewaySessionStatus.CANCELLED, ''),
             (PaymentGatewaySessionStatus.ERROR, ''),
-        ),
+        ],
     )
     def test_with_different_govuk_payment_status_updates_session(
         self,
@@ -700,8 +693,7 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
         requests_mock,
         public_omis_api_client,
     ):
-        """
-        Test that if the GOV.UK payment status is not the same as the payment gateway session one,
+        """Test that if the GOV.UK payment status is not the same as the payment gateway session one,
         the record is updated.
         """
         # choose an initial status != from the govuk one to test the update
@@ -745,8 +737,7 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
         }
 
     def test_with_govuk_payment_success_updates_order(self, requests_mock, public_omis_api_client):
-        """
-        Test that if the GOV.UK payment status is `success` and the payment gateway session is
+        """Test that if the GOV.UK payment status is `success` and the payment gateway session is
         out of date, the record is updated, the related order marked as `paid` and an OMIS
         `payment.Payment` record created from the GOV.UK response data one.
         """
@@ -811,15 +802,14 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
         assert order.status == OrderStatus.PAID
         assert Payment.objects.filter(order=order).count() == 1
 
-    @pytest.mark.parametrize('govuk_status_code', (401, 404, 500))
+    @pytest.mark.parametrize('govuk_status_code', [401, 404, 500])
     def test_500_if_govuk_pay_errors(
         self,
         govuk_status_code,
         requests_mock,
         public_omis_api_client,
     ):
-        """
-        Test that if GOV.UK Pay errors whilst getting a payment, the endpoint returns 500.
+        """Test that if GOV.UK Pay errors whilst getting a payment, the endpoint returns 500.
 
         Possible GOV.UK errors:
         - 401 - UNAUTHORIZED
@@ -847,11 +837,11 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
 
     @pytest.mark.parametrize(
         'order_status',
-        (
+        [
             OrderStatus.DRAFT,
             OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
             OrderStatus.CANCELLED,
-        ),
+        ],
     )
     def test_404_if_in_disallowed_status(self, order_status, public_omis_api_client):
         """Test that if the order is not in an allowed state, the endpoint returns 404."""
@@ -892,8 +882,7 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     def test_404_if_session_belongs_to_another_order(self, public_omis_api_client):
-        """
-        Test that if the payment gateway session belongs to another order,
+        """Test that if the payment gateway session belongs to another order,
         the endpoint returns 404.
         """
         orders = OrderWithAcceptedQuoteFactory.create_batch(2)

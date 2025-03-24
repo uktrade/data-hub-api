@@ -5,8 +5,7 @@ from datahub.dataset.utils import filter_data_by_modified_date
 
 
 class ContactsDatasetView(BaseFilterDatasetView):
-    """
-    An APIView that provides 'get' action which queries and returns desired fields for
+    """An APIView that provides 'get' action which queries and returns desired fields for
     Contacts Dataset to be consumed by Data-flow periodically. Data-flow uses response result
     to insert data into Dataworkspace through its defined API endpoints. The goal is presenting
     various reports to the users out of flattened table and let analyst to work on denormalized
@@ -14,7 +13,7 @@ class ContactsDatasetView(BaseFilterDatasetView):
     """
 
     def get_dataset(self, request):
-        """Returns list of Contacts Dataset records"""
+        """Returns list of Contacts Dataset records."""
         queryset = Contact.objects.annotate(
             name=get_full_name_expression(),
         ).values(

@@ -4,13 +4,12 @@ from datahub.interaction.models import InteractionExportCountry
 
 
 class InteractionsExportCountryDatasetView(BaseFilterDatasetView):
-    """
-    A GET API view to return all interaction data related to export country
-     as required for syncing by Data-flow periodically.
+    """A GET API view to return all interaction data related to export country
+    as required for syncing by Data-flow periodically.
     """
 
     def get_dataset(self, request):
-        """Returns list of company_export_country_history records"""
+        """Returns list of company_export_country_history records."""
         queryset = InteractionExportCountry.objects.values(
             'country__name',
             'country__iso_alpha2_code',

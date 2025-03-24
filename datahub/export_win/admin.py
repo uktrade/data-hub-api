@@ -9,16 +9,15 @@ from django.forms import BaseInlineFormSet, ModelForm, ValidationError
 from django.urls import reverse
 from reversion.admin import VersionAdmin
 
-from datahub.core.admin import BaseModelAdminMixin, EXPORT_WIN_GROUP_NAME
-
+from datahub.core.admin import EXPORT_WIN_GROUP_NAME, BaseModelAdminMixin
 from datahub.export_win.models import (
     AnonymousWin,
     Breakdown,
     CustomerResponse,
     DeletedWin,
     Win,
-    WinAdviser)
-
+    WinAdviser,
+)
 from datahub.export_win.tasks import (
     create_token_for_contact,
     get_all_fields_for_client_email_receipt,
@@ -36,10 +35,10 @@ class BaseTabularInline(admin.TabularInline):
 
 
 class RequiredInLineFormSet(BaseInlineFormSet):
-    """Generates an inline formset that is required"""
+    """Generates an inline formset that is required."""
 
     def clean(self):
-        """Clean and sanitise form array"""
+        """Clean and sanitise form array."""
         super().clean()
         if any(self.errors):
             return
@@ -111,9 +110,8 @@ class BaseStackedInline(admin.StackedInline):
 
 
 class CustomerResponseInlineForm(ModelForm):
-    """
-    Customer Response in line form.
-    Field name is not required and field id should be read-only
+    """Customer Response in line form.
+    Field name is not required and field id should be read-only.
     """
 
     class Meta:
@@ -360,7 +358,7 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
 
 
 class WinSoftDeletedAdminForm(ModelForm):
-    """Win soft deleted admin form"""
+    """Win soft deleted admin form."""
 
     class Meta:
         model = DeletedWin
@@ -388,7 +386,7 @@ class DeletedWinAdmin(WinAdmin):
         return self.model.objects.soft_deleted()
 
     def undelete(self, request, queryset):
-        """Perform undelete action in django admin"""
+        """Perform undelete action in django admin."""
         for win in queryset.all():
             with reversion.create_revision():
                 win.is_deleted = False
@@ -403,7 +401,7 @@ class DeletedWinAdmin(WinAdmin):
         return False
 
     def has_view_permission(self, request, obj=None):
-        """Set the desired user group to access view deleted win"""
+        """Set the desired user group to access view deleted win."""
         return True if (
             request.user.is_superuser
             or request.user.groups.filter(name=EXPORT_WIN_GROUP_NAME).exists()
@@ -495,7 +493,7 @@ class AnonymousWinAdmin(WinAdmin):
         return False
 
     def has_view_permission(self, request, obj=None):
-        """Set the desired user group to access view anonymous win"""
+        """Set the desired user group to access view anonymous win."""
         return True if (
             request.user.is_superuser
             or request.user.groups.filter(name=EXPORT_WIN_GROUP_NAME).exists()
@@ -505,7 +503,7 @@ class AnonymousWinAdmin(WinAdmin):
         return True
 
     def notify_anonymous_wins_adviser_as_contact(self, adviser, customer_response):
-        """Notify anonymous wins adviser as contact"""
+        """Notify anonymous wins adviser as contact."""
         token = create_token_for_contact(
             None,
             customer_response,
@@ -564,8 +562,7 @@ class WinAdviserAdmin(BaseModelAdminMixin):
         return obj.adviser.name if obj.adviser else obj.name
 
     def delete_view(self, request, object_id, extra_context=None):
-        """
-        Redirect to the winadviser list view after successful deletion.
+        """Redirect to the winadviser list view after successful deletion.
         """
         response = super().delete_view(request, object_id, extra_context=extra_context)
         if response.status_code == 302:  # Redirect status code

@@ -8,11 +8,11 @@ pytestmark = pytest.mark.django_db
 
 
 @pytest.mark.parametrize(
-    'permission_codenames,expected_result',
-    (
+    ('permission_codenames', 'expected_result'),
+    [
         ((), {}),
         (('change_metadatamodel',), {'MetadataModel': ['MetadataReport']}),
-    ),
+    ],
 )
 def test_get_reports_by_model(permission_codenames, expected_result):
     """Test get_reports_by_model() for various cases."""
@@ -25,11 +25,11 @@ def test_get_reports_by_model(permission_codenames, expected_result):
 
 
 @pytest.mark.parametrize(
-    'permission_codenames,should_raise',
-    (
+    ('permission_codenames', 'should_raise'),
+    [
         ((), True),
         (('change_metadatamodel',), False),
-    ),
+    ],
 )
 def test_get_report_by_id(permission_codenames, should_raise):
     """Test get_report_by_id() for various cases."""

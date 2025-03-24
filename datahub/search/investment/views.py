@@ -1,9 +1,7 @@
 import datetime
 
-from django.db.models import Case, Max, When
-from django.db.models import CharField
+from django.db.models import Case, CharField, Max, When
 from django.db.models.functions import Cast
-
 from opensearch_dsl.query import (
     Bool,
     Exists,
@@ -23,13 +21,13 @@ from datahub.core.query_utils import (
 from datahub.dnb_api.utils import (
     get_datahub_ids_for_dnb_service_company_hierarchy,
 )
-from datahub.investment.project.models import InvestmentProject as DBInvestmentProject
 from datahub.investment.project.models import InvestmentProject, InvestmentProjectStageLog
+from datahub.investment.project.models import InvestmentProject as DBInvestmentProject
 from datahub.investment.project.query_utils import get_project_code_expression
 from datahub.metadata.query_utils import get_sector_name_subquery
 from datahub.search.investment import InvestmentSearchApp
 from datahub.search.investment.serializers import SearchInvestmentProjectQuerySerializer
-from datahub.search.views import register_v3_view, SearchAPIView, SearchExportAPIView
+from datahub.search.views import SearchAPIView, SearchExportAPIView, register_v3_view
 
 
 class SearchInvestmentProjectAPIViewMixin:
@@ -226,7 +224,7 @@ class SearchInvestmentProjectAPIView(SearchInvestmentProjectAPIViewMixin, Search
         return base_query
 
     def get_sibling_company_ids(self, investor_companies):
-        """Get a list of all sibling company id's"""
+        """Get a list of all sibling company id's."""
         # get all company id's where the global ultimate duns number is equal to this
         # companies duns number
         sibling_company_ids = []
@@ -248,7 +246,7 @@ class SearchInvestmentProjectAPIView(SearchInvestmentProjectAPIViewMixin, Search
         return sibling_company_ids
 
     def get_parent_company_ids(self, investor_companies):
-        """Get a list of all parent company id's"""
+        """Get a list of all parent company id's."""
         parent_company_ids = []
         global_headquarters_ids = []
         global_ultimate_duns_numbers = []
@@ -432,8 +430,7 @@ class SearchInvestmentExportAPIView(SearchInvestmentProjectAPIViewMixin, SearchE
 
     @property
     def field_titles(self):
-        """
-        Returns field titles for CSV export
+        """Returns field titles for CSV export.
 
         There is implicit ordering here, guaranteed for python >= 3.7 to be insertion order
         This is a property because we don't want it to evaluate prior to database instantiation

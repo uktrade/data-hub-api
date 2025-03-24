@@ -26,21 +26,21 @@ class TestForceUUID:
     """Tests for force_uuid()."""
 
     @pytest.mark.parametrize(
-        'value,expected_result',
-        (
+        ('value', 'expected_result'),
+        [
             (None, None),
             ('b3eb3eb2-9b83-4253-b77c-f3eca5a6a660', UUID('b3eb3eb2-9b83-4253-b77c-f3eca5a6a660')),
             (
                 UUID('b3eb3eb2-9b83-4253-b77c-f3eca5a6a660'),
                 UUID('b3eb3eb2-9b83-4253-b77c-f3eca5a6a660'),
             ),
-        ),
+        ],
     )
     def test_converts_values(self, value, expected_result):
         """Test that values are converted to UUIDs as necessary."""
         assert force_uuid(value) == expected_result
 
-    @pytest.mark.parametrize('value', (b'', []))
+    @pytest.mark.parametrize('value', [b'', []])
     def test_raises_error_on_unexpected_type(self, value):
         """Test that an error is raised on unexpected types."""
         with pytest.raises(TypeError):
@@ -48,15 +48,15 @@ class TestForceUUID:
 
 
 @pytest.mark.parametrize(
-    'args,sep,res',
-    (
+    ('args', 'sep', 'res'),
+    [
         (('abc', 'def', 'ghi'), ',', 'abc,def,ghi'),
         (('abc', 'def'), ' ', 'abc def'),
         (('abc', ''), ' ', 'abc'),
         (('abc', None), ' ', 'abc'),
         ((None, ''), ' ', ''),
         ((), ' ', ''),
-    ),
+    ],
 )
 def test_join_truthy_strings(args, sep, res):
     """Tests joining turthy strings."""
@@ -64,34 +64,34 @@ def test_join_truthy_strings(args, sep, res):
 
 
 @pytest.mark.parametrize(
-    'string,glue,expected',
-    (
+    ('string', 'glue', 'expected'),
+    [
         ('UPPER_SNAKE_CASE', '+', 'Upper snake case'),
         (['UPPER_SNAKE_CASE', 'LINE_2'], '+', 'Upper snake case+Line 2'),
         (['UPPER_SNAKE_CASE', 'LINE_2'], '\n', 'Upper snake case\nLine 2'),
         (['UPPER_SNAKE_CASE', 'LINE_2'], '. ', 'Upper snake case. Line 2'),
-    ),
+    ],
 )
 def test_upper_snake_case_to_sentence_case(string, glue, expected):
-    """Test formatting currency"""
+    """Test formatting currency."""
     assert upper_snake_case_to_sentence_case(string, glue) == expected
 
 
 @pytest.mark.parametrize(
-    'string,expected',
-    (
+    ('string', 'expected'),
+    [
         ('UPPER_SNAKE_CASE', 'Upper snake case'),
         (['UPPER_SNAKE_CASE', 'LINE_2'], 'Upper snake case Line 2'),
-    ),
+    ],
 )
 def test_default_glue_upper_snake_case_to_sentence_case(string, expected):
-    """Test formatting currency"""
+    """Test formatting currency."""
     assert upper_snake_case_to_sentence_case(string) == expected
 
 
 @pytest.mark.parametrize(
-    'value,expected',
-    (
+    ('value', 'expected'),
+    [
         (0, '£0'),
         (1, '£1'),
         (1.5, '£1.50'),
@@ -108,10 +108,10 @@ def test_default_glue_upper_snake_case_to_sentence_case(string, expected):
         (123000000000, '£123 billion'),
         (1234000000000, '£1,234 billion'),
         (1234500000000, '£1,234.5 billion'),
-    ),
+    ],
 )
 def test_format_currency(value, expected):
-    """Test formatting currency"""
+    """Test formatting currency."""
     assert format_currency(str(value)) == expected
     assert format_currency(value) == expected
 
@@ -125,14 +125,14 @@ def test_format_currency(value, expected):
 
 
 @pytest.mark.parametrize(
-    'values,expected',
-    (
+    ('values', 'expected'),
+    [
         ([0, 1.5], '£0 to £1.50'),
         ([999999, 1000000], '£999,999 to £1 million'),
         ([1234567, 7000000], '£1.23 million to £7 million'),
         ([999990000, 999999999], '£999.99 million to £1 billion'),
         ([1200000000, 0.01], '£1.2 billion to £0.01'),
-    ),
+    ],
 )
 def test_format_currency_range(values, expected):
     assert format_currency_range(values) == expected
@@ -141,8 +141,8 @@ def test_format_currency_range(values, expected):
 
 
 @pytest.mark.parametrize(
-    'string,expected',
-    (
+    ('string', 'expected'),
+    [
         ('0-9999', 'Less than £10,000'),
         ('0-10000', 'Less than £10,000'),
         ('0-1000000', 'Less than £1 million'),
@@ -153,11 +153,10 @@ def test_format_currency_range(values, expected):
         ('5000001-10000000', '£5 million to £10 million'),
         ('10000001+', 'More than £10 million'),
         ('SPECIFIC_AMOUNT', 'Specific amount'),
-    ),
+    ],
 )
 def test_format_currency_range_string(string, expected):
-    """
-    Test range with and without currency symbol.
+    """Test range with and without currency symbol.
     """
     assert format_currency_range_string(string) == expected
     assert format_currency_range_string(string, symbol='') == expected.replace('£', '')
@@ -165,8 +164,8 @@ def test_format_currency_range_string(string, expected):
 
 
 @pytest.mark.parametrize(
-    'string,expected',
-    (
+    ('string', 'expected'),
+    [
         ('0...9999', 'Less than £10,000'),
         ('0...10000', 'Less than £10,000'),
         ('0...1000000', 'Less than £1 million'),
@@ -177,18 +176,17 @@ def test_format_currency_range_string(string, expected):
         ('5000001...10000000', '£5 million to £10 million'),
         ('10000001+', 'More than £10 million'),
         ('SPECIFIC_AMOUNT', 'Specific amount'),
-    ),
+    ],
 )
 def test_format_currency_range_string_separator(string, expected):
-    """
-    Test range with separator symbol.
+    """Test range with separator symbol.
     """
     assert format_currency_range_string(string, separator='...') == expected
 
 
 @pytest.mark.parametrize(
-    'string,more_or_less,smart_more_or_less,expected',
-    (
+    ('string', 'more_or_less', 'smart_more_or_less', 'expected'),
+    [
         ('', True, True, ''),
         ('0-9999', True, True, 'Less than £10,000'),
         ('0-10000', True, True, 'Less than £10,000'),
@@ -208,7 +206,7 @@ def test_format_currency_range_string_separator(string, expected):
         ('', False, False, ''),
         # Return string as Sentence case for invalid numbers
         ('SPECIFIC_AMOUNT', False, False, 'Specific amount'),
-    ),
+    ],
 )
 def test_format_currency_range_string_more_or_less_parameters(
         string,
@@ -216,8 +214,7 @@ def test_format_currency_range_string_more_or_less_parameters(
         smart_more_or_less,
         expected,
 ):
-    """
-    Test range with and without currency symbol.
+    """Test range with and without currency symbol.
     """
     assert format_currency_range_string(
         string, more_or_less=more_or_less, smart_more_or_less=smart_more_or_less) == expected
@@ -246,8 +243,7 @@ class _MetadataModelConstant(Enum):
 
 @pytest.mark.django_db
 def test_load_constants_to_database():
-    """
-    Test loading constants to the database.
+    """Test loading constants to the database.
 
     Makes sure that new values are created, existing ones are updated and none are deleted.
     """
@@ -286,12 +282,12 @@ def test_load_constants_to_database():
 
 
 @pytest.mark.parametrize(
-    'query_args,expected_url',
-    (
+    ('query_args', 'expected_url'),
+    [
         ({}, '/test-disableable/?'),
         ({'123': 'abc'}, '/test-disableable/?123=abc'),
         ({'ab': ['1', '2']}, '/test-disableable/?ab=1&ab=2'),
-    ),
+    ],
 )
 @pytest.mark.urls('datahub.core.test.support.urls')
 def test_reverse_with_query_string(query_args, expected_url):
@@ -300,8 +296,8 @@ def test_reverse_with_query_string(query_args, expected_url):
 
 
 @pytest.mark.parametrize(
-    'date_obj,expected_financial_year',
-    (
+    ('date_obj', 'expected_financial_year'),
+    [
         (None, None),
         (date(1980, 1, 1), 1979),
         (date(2018, 1, 1), 2017),
@@ -310,32 +306,31 @@ def test_reverse_with_query_string(query_args, expected_url):
         (date(2025, 3, 1), 2024),
         (date(2025, 4, 1), 2025),
         (date(2025, 3, 31), 2024),
-    ),
+    ],
 )
 def test_get_financial_year(date_obj, expected_financial_year):
-    """Test for get financial year"""
+    """Test for get financial year."""
     assert get_financial_year(date_obj) == expected_financial_year
 
 
 @pytest.mark.parametrize(
     'extra',
-    (
+    [
         None,
         {'bar': 'baz', 'a': 'b'},
-    ),
+    ],
 )
 @pytest.mark.parametrize(
     'level',
-    (
+    [
         None,
         'warning',
-    ),
+    ],
 )
 @mock.patch('datahub.core.utils.sentry_sdk.push_scope')
 @mock.patch('datahub.core.utils.sentry_sdk.capture_message')
 def test_log_to_sentry(mocked_capture_message, mocked_push_scope, level, extra):
-    """
-    Test log_to_sentry utility.
+    """Test log_to_sentry utility.
     """
     kwargs = {}
     expected_extra = {}

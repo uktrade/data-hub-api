@@ -13,16 +13,16 @@ MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
 class ExportExperience(BaseOrderedConstantModel):
-    """Export experience"""
+    """Export experience."""
 
 
 class ExportYear(BaseOrderedConstantModel):
-    """Export year"""
+    """Export year."""
 
 
 @reversion.register_base_model()
 class CompanyExport(ArchivableModel, BaseModel):
-    """An export item for a company"""
+    """An export item for a company."""
 
     class ExportPotential(models.TextChoices):
         HIGH = ('high', 'High')

@@ -19,8 +19,7 @@ from datahub.interaction.email_processors.parsers import (
 
 @pytest.mark.django_db
 class TestCalendarInteractionEmailParser:
-    """
-    Test the CalendarInteractionEmailParser class.
+    """Test the CalendarInteractionEmailParser class.
     """
 
     def _get_parser_for_email_file(self, relative_email_file_path):
@@ -29,8 +28,8 @@ class TestCalendarInteractionEmailParser:
         return CalendarInteractionEmailParser(message)
 
     @pytest.mark.parametrize(
-        'email_file,expected_event_details',
-        (
+        ('email_file', 'expected_event_details'),
+        [
             (
                 'email_samples/valid/outlook_online/sample.eml',
                 {
@@ -96,15 +95,14 @@ class TestCalendarInteractionEmailParser:
                     ),
                 },
             ),
-        ),
+        ],
     )
     def test_extract_and_vailidate_calendar_event_metadata(
         self,
         email_file,
         expected_event_details,
     ):
-        """
-        Verify that the get_calendar_event_metadata method extracts the expected
+        """Verify that the get_calendar_event_metadata method extracts the expected
         data from a given email message.
         """
         parser = self._get_parser_for_email_file(email_file)
@@ -112,8 +110,8 @@ class TestCalendarInteractionEmailParser:
         assert calendar_event == expected_event_details
 
     @pytest.mark.parametrize(
-        'email_file,expected_interaction_data',
-        (
+        ('email_file', 'expected_interaction_data'),
+        [
             # Test that interaction data can be extracted for a simple case
             (
                 'email_samples/valid/outlook_online/sample.eml',
@@ -148,7 +146,7 @@ class TestCalendarInteractionEmailParser:
                     'subject': 'initial',
                 },
             ),
-        ),
+        ],
     )
     def test_extract_interaction_data_from_email(
         self,
@@ -156,8 +154,7 @@ class TestCalendarInteractionEmailParser:
         expected_interaction_data,
         interaction_email_fixture,
     ):
-        """
-        Functional test to ensure that interaction data is extracted as expected
+        """Functional test to ensure that interaction data is extracted as expected
         from an email.
         """
         parser = self._get_parser_for_email_file(email_file)
@@ -180,8 +177,8 @@ class TestCalendarInteractionEmailParser:
         assert interaction_data['subject'] == expected_interaction_data['subject']
 
     @pytest.mark.parametrize(
-        'email_file,expected_error',
-        (
+        ('email_file', 'expected_error'),
+        [
             (
                 'email_samples/invalid/email_not_sent_by_dit.eml',
                 SenderUnverifiedError(
@@ -250,7 +247,7 @@ class TestCalendarInteractionEmailParser:
                     'The calendar event was not status: CONFIRMED.',
                 ),
             ),
-        ),
+        ],
     )
     def test_extract_interaction_data_from_email_raises_error(
         self,
@@ -258,8 +255,7 @@ class TestCalendarInteractionEmailParser:
         expected_error,
         interaction_email_fixture,
     ):
-        """
-        Functional test to ensure that the extract_interaction_data_from_email method
+        """Functional test to ensure that the extract_interaction_data_from_email method
         raises ValidationErrors as expected in a number of situations.
         """
         parser = self._get_parser_for_email_file(email_file)
@@ -270,8 +266,7 @@ class TestCalendarInteractionEmailParser:
 
 @pytest.mark.django_db
 class TestInteractionEmailParser:
-    """
-    Test the InteractionPlainEmailParser class.
+    """Test the InteractionPlainEmailParser class.
     """
 
     def _get_parser_for_email_file(self, relative_email_file_path):
@@ -280,8 +275,8 @@ class TestInteractionEmailParser:
         return InteractionEmailParser(message)
 
     @pytest.mark.parametrize(
-        'email_file,expected_interaction_data',
-        (
+        ('email_file', 'expected_interaction_data'),
+        [
             # Test that interaction data can be extracted for a simple case
             (
                 'email_samples/valid/outlook_online/sample.eml',
@@ -325,7 +320,7 @@ class TestInteractionEmailParser:
                     'body': 'You have been invited',
                 },
             ),
-        ),
+        ],
     )
     def test_extract_interaction_data_from_email(
         self,
@@ -333,8 +328,7 @@ class TestInteractionEmailParser:
         expected_interaction_data,
         interaction_email_fixture,
     ):
-        """
-        Functional test to ensure that interaction data is extracted as expected
+        """Functional test to ensure that interaction data is extracted as expected
         from an email.
         """
         parser = self._get_parser_for_email_file(email_file)
@@ -359,8 +353,8 @@ class TestInteractionEmailParser:
         assert interaction_data['body'].startswith(expected_interaction_data['body'])
 
     @pytest.mark.parametrize(
-        'email_file,expected_error',
-        (
+        ('email_file', 'expected_error'),
+        [
             (
                 'email_samples/invalid/email_not_sent_by_dit.eml',
                 SenderUnverifiedError(
@@ -390,7 +384,7 @@ class TestInteractionEmailParser:
                     ),
                 ),
             ),
-        ),
+        ],
     )
     def test_extract_interaction_data_from_email_raises_error(
         self,
@@ -398,8 +392,7 @@ class TestInteractionEmailParser:
         expected_error,
         interaction_email_fixture,
     ):
-        """
-        Functional test to ensure that the extract_interaction_data_from_email method
+        """Functional test to ensure that the extract_interaction_data_from_email method
         raises ValidationErrors as expected in a number of situations.
         """
         parser = self._get_parser_for_email_file(email_file)

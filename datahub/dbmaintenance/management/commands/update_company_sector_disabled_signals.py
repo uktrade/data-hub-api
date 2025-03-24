@@ -16,10 +16,9 @@ class Command(CSVBaseCommand):
 
     @disable_search_signal_receivers(Company)
     def _handle(self, *args, **options):
-        """
-        Disables search signal receivers for companies.
+        """Disables search signal receivers for companies.
         Avoid queuing a huge number of RQ scheduled tasks for syncing companies to OpenSearch.
-        (Syncing can be manually performed afterwards using sync_search if required.)
+        (Syncing can be manually performed afterwards using sync_search if required.).
         """
         return super()._handle(*args, **options)
 

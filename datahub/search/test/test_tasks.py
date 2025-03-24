@@ -58,10 +58,10 @@ def test_sync_object_task_syncs(opensearch):
 
 @pytest.mark.parametrize(
     'related_obj_filter',
-    (
+    [
         None,
         {'simpleton__name': 'hello'},
-    ),
+    ],
 )
 @pytest.mark.django_db
 def test_sync_related_objects_task_syncs(related_obj_filter, opensearch):
@@ -85,10 +85,10 @@ def test_sync_related_objects_task_syncs(related_obj_filter, opensearch):
 
 @pytest.mark.parametrize(
     'related_obj_filter',
-    (
+    [
         None,
         {'simpleton__name': 'hello'},
-    ),
+    ],
 )
 @pytest.mark.django_db
 def test_sync_related_objects_task_syncs_for_given_search_app(related_obj_filter, opensearch):
@@ -134,8 +134,7 @@ def test_complete_model_migration(monkeypatch):
 
 @pytest.mark.django_db
 def test_complete_model_migration_aborts_when_already_in_progress(monkeypatch):
-    """
-    Test that the complete_model_migration task aborts when the lock for the same search app is
+    """Test that the complete_model_migration task aborts when the lock for the same search app is
     already held.
     """
     resync_after_migrate_mock = Mock()
@@ -164,8 +163,7 @@ class MockRetryError(Exception):
 
 @pytest.mark.django_db
 def test_complete_model_migration_with_mapping_hash_mismatch(monkeypatch):
-    """
-    Test that the complete_model_migration task calls self.retry() when the target mapping hash is
+    """Test that the complete_model_migration task calls self.retry() when the target mapping hash is
     not the expected one.
 
     This is to catch cases where the complete_model_migration task is received by an old app

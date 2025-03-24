@@ -3,11 +3,11 @@ import logging
 import reversion
 
 from datahub.company.merge import (
+    MergeConfiguration,
+    MergeNotAllowedError,
     get_planned_changes,
     is_model_a_valid_merge_source,
     is_model_a_valid_merge_target,
-    MergeConfiguration,
-    MergeNotAllowedError,
     update_objects,
 )
 from datahub.company.merge_utils.merge_relations import (
@@ -130,8 +130,7 @@ MERGE_CONFIGURATION = [
 
 
 def merge_companies(source_company: Company, target_company: Company, user):
-    """
-    Merges the source company into the target company.
+    """Merges the source company into the target company.
     MergeNotAllowedError will be raised if the merge is not allowed.
     """
     is_source_valid, invalid_obj = is_model_a_valid_merge_source(
@@ -188,8 +187,7 @@ def merge_companies(source_company: Company, target_company: Company, user):
 
 
 def rollback_merge_companies(former_source_company: Company):
-    """
-    Rolls back a company merge of what was the "source_company" passed to merge_companies
+    """Rolls back a company merge of what was the "source_company" passed to merge_companies.
     """
     rollback_version = _get_rollback_version(former_source_company, 'Company merged')
     rollback_version.revision.revert()

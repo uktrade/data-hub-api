@@ -11,8 +11,8 @@ from datahub.search.utils import get_model_field_names
 class TestBaseSearchModel:
     """Tests for BaseSearchModel."""
 
-    @pytest.mark.parametrize('include_index', (False, True))
-    @pytest.mark.parametrize('include_source', (False, True))
+    @pytest.mark.parametrize('include_index', [False, True])
+    @pytest.mark.parametrize('include_source', [False, True])
     def test_to_document(self, include_index, include_source):
         """Test that to_document() creates a dict with the expected keys and values."""
         obj = SimpleModel(id=5, name='test-name', address='123 Fake Street', country='uk')

@@ -8,14 +8,12 @@ from datahub.company.models.contact import Contact
 from datahub.company_activity.models.stova_event import StovaEvent
 from datahub.core import reversion
 
-
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
 @reversion.register_base_model()
 class StovaAttendee(models.Model):
-    """
-    Stova can also be known as Aventri.
+    """Stova can also be known as Aventri.
     This model is filled and based off data from the S3 bucket: ExportAventriAttendees.
     """
 

@@ -54,7 +54,7 @@ class TestPublicGetInvoice(APITestMixin):
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    @pytest.mark.parametrize('verb', ('post', 'patch', 'delete'))
+    @pytest.mark.parametrize('verb', ['post', 'patch', 'delete'])
     def test_verbs_not_allowed(self, verb, public_omis_api_client):
         """Test that makes sure the other verbs are not allowed."""
         order = OrderWithAcceptedQuoteFactory()
@@ -68,11 +68,11 @@ class TestPublicGetInvoice(APITestMixin):
 
     @pytest.mark.parametrize(
         'order_factory',
-        (
+        [
             OrderWithAcceptedQuoteFactory,
             OrderPaidFactory,
             OrderCompleteFactory,
-        ),
+        ],
     )
     def test_get(self, order_factory, public_omis_api_client):
         """Test a successful call to get a invoice."""
@@ -150,7 +150,7 @@ class TestPublicGetInvoice(APITestMixin):
 
     @pytest.mark.parametrize(
         'order_status',
-        (OrderStatus.DRAFT, OrderStatus.QUOTE_AWAITING_ACCEPTANCE, OrderStatus.CANCELLED),
+        [OrderStatus.DRAFT, OrderStatus.QUOTE_AWAITING_ACCEPTANCE, OrderStatus.CANCELLED],
     )
     def test_404_if_in_disallowed_status(self, order_status, public_omis_api_client):
         """Test that if the order is not in an allowed state, the endpoint returns 404."""

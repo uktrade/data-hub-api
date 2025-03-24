@@ -10,13 +10,11 @@ from datahub.core.utils import reverse_with_query_string
 
 
 class TestLinkCompanyLink(AdminTestMixin):
-    """
-    Tests the 'Link Company with D&B' link on the change list.
+    """Tests the 'Link Company with D&B' link on the change list.
     """
 
     def test_link_exists(self):
-        """
-        Test that the link exists for a user with the change company permission.
+        """Test that the link exists for a user with the change company permission.
         """
         list_route_name = admin_urlname(Company._meta, 'changelist')
         list_url = reverse(list_route_name)
@@ -30,8 +28,7 @@ class TestLinkCompanyLink(AdminTestMixin):
         assert company_link_url in response.rendered_content
 
     def test_link_does_not_exist_with_only_view_permission(self):
-        """
-        Test that the link does not exist for a user with only the view company permission.
+        """Test that the link does not exist for a user with only the view company permission.
         """
         list_route_name = admin_urlname(Company._meta, 'changelist')
         list_url = reverse(list_route_name)
@@ -52,13 +49,11 @@ class TestLinkCompanyLink(AdminTestMixin):
 
 
 class TestSelectIDsViewGet(AdminTestMixin):
-    """
-    Test response for GET requests on the select IDs view.
+    """Test response for GET requests on the select IDs view.
     """
 
     def test_returns_200(self):
-        """
-        Tests that a 200 is returned through a GET to the view.
+        """Tests that a 200 is returned through a GET to the view.
         """
         company_link_route_name = admin_urlname(Company._meta, 'dnb-link-select-ids')
         company_link_url = reverse(company_link_route_name)
@@ -68,8 +63,7 @@ class TestSelectIDsViewGet(AdminTestMixin):
         assert response.status_code == status.HTTP_200_OK
 
     def test_permission_required(self):
-        """
-        Tests that a 403 is returned when a user does not have the necessary permissions.
+        """Tests that a 403 is returned when a user does not have the necessary permissions.
         """
         company_link_route_name = admin_urlname(Company._meta, 'dnb-link-select-ids')
         company_link_url = reverse(company_link_route_name)
@@ -86,13 +80,11 @@ class TestSelectIDsViewGet(AdminTestMixin):
 
 
 class TestSelectIDsViewPost(AdminTestMixin):
-    """
-    Test response for POST requests on the select IDs view.
+    """Test response for POST requests on the select IDs view.
     """
 
     def test_valid_input_redirects_to_confirmation(self):
-        """
-        Test that valid POST input responds with a redirect to the confirmation
+        """Test that valid POST input responds with a redirect to the confirmation
         page.
         """
         company_link_route_name = admin_urlname(Company._meta, 'dnb-link-select-ids')
@@ -117,8 +109,8 @@ class TestSelectIDsViewPost(AdminTestMixin):
         assert response['location'] == company_link_confirmation_url
 
     @pytest.mark.parametrize(
-        'data_overrides,expected_error',
-        (
+        ('data_overrides', 'expected_error'),
+        [
             (
                 # No data
                 {
@@ -139,11 +131,10 @@ class TestSelectIDsViewPost(AdminTestMixin):
                 },
                 'Ensure this value has at least 9 characters (it has 1).',
             ),
-        ),
+        ],
     )
     def test_invalid_input_responds_error(self, data_overrides, expected_error):
-        """
-        Test that some invalid POST input responds with an expected error in rendered content.
+        """Test that some invalid POST input responds with an expected error in rendered content.
         """
         data = {
             'company': CompanyFactory().id,
@@ -159,8 +150,7 @@ class TestSelectIDsViewPost(AdminTestMixin):
         assert expected_error in response.rendered_content
 
     def test_company_already_linked_responds_error(self):
-        """
-        Test that when a company has already been D&B linked, the view responds with an error.
+        """Test that when a company has already been D&B linked, the view responds with an error.
         """
         data = {
             'company': CompanyFactory(duns_number='999999999').id,
@@ -176,8 +166,7 @@ class TestSelectIDsViewPost(AdminTestMixin):
         assert expected_error in response.rendered_content
 
     def test_duns_number_already_linked_responds_error(self):
-        """
-        Test that when a duns number has already been linked to a Data Hub company, the view
+        """Test that when a duns number has already been linked to a Data Hub company, the view
         responds with an error.
         """
         CompanyFactory(duns_number='123456789')

@@ -3,10 +3,10 @@ import logging
 import reversion
 
 from datahub.company.merge import (
-    is_model_a_valid_merge_source,
-    is_model_a_valid_merge_target,
     MergeConfiguration,
     MergeNotAllowedError,
+    is_model_a_valid_merge_source,
+    is_model_a_valid_merge_target,
     update_objects,
 )
 from datahub.company.models import CompanyExport, Contact
@@ -44,8 +44,7 @@ MERGE_CONFIGURATION = [
 
 
 def merge_contacts(source_contact: Contact, target_contact: Contact, user):
-    """
-    Merges the source contact into the target contact.
+    """Merges the source contact into the target contact.
 
     MergeNotAllowedError will be raised if the merge is not allowed.
     """

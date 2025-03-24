@@ -3,7 +3,7 @@ import logging
 import uuid
 from operator import attrgetter
 from unittest import mock
-from unittest.mock import ANY, call, Mock
+from unittest.mock import ANY, Mock, call
 
 import factory
 import pytest
@@ -81,59 +81,54 @@ from datahub.reminder.test.factories import (
 )
 
 
-@pytest.fixture()
+@pytest.fixture
 def no_recent_export_interaction_reminders_user_feature_flag():
+    """Creates the no recent export interaction reminders user feature flag.
     """
-    Creates the no recent export interaction reminders user feature flag.
-    """
-    yield UserFeatureFlagFactory(
+    return UserFeatureFlagFactory(
         code=EXPORT_NO_RECENT_INTERACTION_REMINDERS_FEATURE_FLAG_NAME,
         is_active=True,
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def new_export_interaction_reminders_user_feature_flag():
+    """Creates the new export interaction reminders user feature flag.
     """
-    Creates the new export interaction reminders user feature flag.
-    """
-    yield UserFeatureFlagFactory(
+    return UserFeatureFlagFactory(
         code=EXPORT_NEW_INTERACTION_REMINDERS_FEATURE_FLAG_NAME,
         is_active=True,
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def estimated_land_date_reminders_user_feature_flag():
+    """Creates the estimated land date reminders user feature flag.
     """
-    Creates the estimated land date reminders user feature flag.
-    """
-    yield UserFeatureFlagFactory(
+    return UserFeatureFlagFactory(
         code=INVESTMENT_ESTIMATED_LAND_DATE_REMINDERS_FEATURE_FLAG_NAME,
         is_active=True,
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def no_recent_interaction_reminders_user_feature_flag():
+    """Creates the no recent interaction reminders user feature flag.
     """
-    Creates the no recent interaction reminders user feature flag.
-    """
-    yield UserFeatureFlagFactory(
+    return UserFeatureFlagFactory(
         code=INVESTMENT_NO_RECENT_INTERACTION_REMINDERS_FEATURE_FLAG_NAME,
         is_active=True,
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def adviser(
     new_export_interaction_reminders_user_feature_flag,
     no_recent_export_interaction_reminders_user_feature_flag,
     no_recent_interaction_reminders_user_feature_flag,
     estimated_land_date_reminders_user_feature_flag,
 ):
-    """
-    An adviser with the relevant feature flags enabled
+    """An adviser with the relevant feature flags enabled.
     """
     adviser = AdviserFactory()
     adviser.features.set(
@@ -147,15 +142,14 @@ def adviser(
     return adviser
 
 
-@pytest.fixture()
+@pytest.fixture
 def inactive_adviser(
     new_export_interaction_reminders_user_feature_flag,
     no_recent_export_interaction_reminders_user_feature_flag,
     no_recent_interaction_reminders_user_feature_flag,
     estimated_land_date_reminders_user_feature_flag,
 ):
-    """
-    An inactive adviser with the relevant feature flags enabled
+    """An inactive adviser with the relevant feature flags enabled.
     """
     inactive_adviser = AdviserFactory(is_active=False)
     inactive_adviser.features.set(
@@ -169,7 +163,7 @@ def inactive_adviser(
     return inactive_adviser
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_create_estimated_land_date_reminder(monkeypatch):
     mock_create_estimated_land_date_reminder = mock.Mock()
     monkeypatch.setattr(
@@ -179,7 +173,7 @@ def mock_create_estimated_land_date_reminder(monkeypatch):
     return mock_create_estimated_land_date_reminder
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_send_estimated_land_date_summary(monkeypatch):
     mock_send_estimated_land_date_summary = mock.Mock()
     monkeypatch.setattr(
@@ -189,7 +183,7 @@ def mock_send_estimated_land_date_summary(monkeypatch):
     return mock_send_estimated_land_date_summary
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_send_estimated_land_date_reminder(monkeypatch):
     mock_send_estimated_land_date_reminder = mock.Mock()
     monkeypatch.setattr(
@@ -199,7 +193,7 @@ def mock_send_estimated_land_date_reminder(monkeypatch):
     return mock_send_estimated_land_date_reminder
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_generate_estimated_land_date_reminders(monkeypatch):
     mock_generate_estimated_land_date_reminders = mock.Mock()
     monkeypatch.setattr(
@@ -209,7 +203,7 @@ def mock_generate_estimated_land_date_reminders(monkeypatch):
     return mock_generate_estimated_land_date_reminders
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_schedule_generate_estimated_land_date_reminders_for_subscription(monkeypatch):
     mock_schedule_generate_estimated_land_date_reminders_for_subscription = mock.Mock()
     monkeypatch.setattr(
@@ -219,7 +213,7 @@ def mock_schedule_generate_estimated_land_date_reminders_for_subscription(monkey
     return mock_schedule_generate_estimated_land_date_reminders_for_subscription
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_create_no_recent_export_interaction_reminder(monkeypatch):
     mock_create_no_recent_export_interaction_reminder = mock.Mock()
     monkeypatch.setattr(
@@ -229,7 +223,7 @@ def mock_create_no_recent_export_interaction_reminder(monkeypatch):
     return mock_create_no_recent_export_interaction_reminder
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_send_no_recent_export_interaction_reminder(monkeypatch):
     mock_send_no_recent_export_interaction_reminder = mock.Mock()
     monkeypatch.setattr(
@@ -239,7 +233,7 @@ def mock_send_no_recent_export_interaction_reminder(monkeypatch):
     return mock_send_no_recent_export_interaction_reminder
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_generate_no_recent_export_interaction_reminders_for_subscription(monkeypatch):
     mock_generate_no_recent_export_interaction_reminders_for_subscription = mock.Mock()
     monkeypatch.setattr(
@@ -249,7 +243,7 @@ def mock_generate_no_recent_export_interaction_reminders_for_subscription(monkey
     return mock_generate_no_recent_export_interaction_reminders_for_subscription
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_create_new_export_interaction_reminder(monkeypatch):
     mock_create_new_export_interaction_reminder = mock.Mock()
     monkeypatch.setattr(
@@ -259,7 +253,7 @@ def mock_create_new_export_interaction_reminder(monkeypatch):
     return mock_create_new_export_interaction_reminder
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_send_new_export_interaction_reminder(monkeypatch):
     mock_send_new_export_interaction_reminder = mock.Mock()
     monkeypatch.setattr(
@@ -269,7 +263,7 @@ def mock_send_new_export_interaction_reminder(monkeypatch):
     return mock_send_new_export_interaction_reminder
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_generate_new_export_interaction_reminders_for_subscription(monkeypatch):
     mock_generate_new_export_interaction_reminders_for_subscription = mock.Mock()
     monkeypatch.setattr(
@@ -279,7 +273,7 @@ def mock_generate_new_export_interaction_reminders_for_subscription(monkeypatch)
     return mock_generate_new_export_interaction_reminders_for_subscription
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_create_no_recent_interaction_reminder(monkeypatch):
     mock_create_no_recent_interaction_reminder = mock.Mock()
     monkeypatch.setattr(
@@ -289,7 +283,7 @@ def mock_create_no_recent_interaction_reminder(monkeypatch):
     return mock_create_no_recent_interaction_reminder
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_send_no_recent_interaction_reminder(monkeypatch):
     mock_send_no_recent_interaction_reminder = mock.Mock()
     monkeypatch.setattr(
@@ -299,7 +293,7 @@ def mock_send_no_recent_interaction_reminder(monkeypatch):
     return mock_send_no_recent_interaction_reminder
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_generate_no_recent_interaction_reminders_for_subscription(monkeypatch):
     mock_generate_no_recent_interaction_reminders_for_subscription = mock.Mock()
     monkeypatch.setattr(
@@ -309,7 +303,7 @@ def mock_generate_no_recent_interaction_reminders_for_subscription(monkeypatch):
     return mock_generate_no_recent_interaction_reminders_for_subscription
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_notification_tasks_notify_gateway(monkeypatch):
     mock_notify_gateway = mock.Mock()
     monkeypatch.setattr(
@@ -319,7 +313,7 @@ def mock_notification_tasks_notify_gateway(monkeypatch):
     return mock_notify_gateway
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_reminder_tasks_notify_gateway(monkeypatch):
     mock_notify_gateway = mock.Mock()
     monkeypatch.setattr(
@@ -329,7 +323,7 @@ def mock_reminder_tasks_notify_gateway(monkeypatch):
     return mock_notify_gateway
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_job_scheduler(monkeypatch):
     mock_job_scheduler = mock.Mock()
     monkeypatch.setattr(
@@ -339,34 +333,33 @@ def mock_job_scheduler(monkeypatch):
     return mock_job_scheduler
 
 
-@pytest.fixture()
+@pytest.fixture
 def no_recent_export_interaction_email_status_feature_flag():
     """Creates the no recent interaction email status feature flag."""
-    yield FeatureFlagFactory(
+    return FeatureFlagFactory(
         code=EXPORT_NO_RECENT_INTERACTION_REMINDERS_EMAIL_STATUS_FLAG_NAME,
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def estimated_land_date_email_status_feature_flag():
     """Creates the estimated land date email status feature flag."""
-    yield FeatureFlagFactory(code=INVESTMENT_ESTIMATED_LAND_DATE_EMAIL_STATUS_FEATURE_FLAG_NAME)
+    return FeatureFlagFactory(code=INVESTMENT_ESTIMATED_LAND_DATE_EMAIL_STATUS_FEATURE_FLAG_NAME)
 
 
-@pytest.fixture()
+@pytest.fixture
 def no_recent_interaction_email_status_feature_flag():
     """Creates the investment no recent interaction email status feature flag."""
-    yield FeatureFlagFactory(
+    return FeatureFlagFactory(
         code=INVESTMENT_NO_RECENT_INTERACTION_REMINDERS_EMAIL_STATUS_FLAG_NAME,
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def new_export_interaction_email_status_feature_flag():
+    """Creates the new export interaction email status feature flag.
     """
-    Creates the new export interaction email status feature flag.
-    """
-    yield FeatureFlagFactory(code=EXPORT_NEW_INTERACTION_REMINDERS_EMAIL_STATUS_FLAG_NAME)
+    return FeatureFlagFactory(code=EXPORT_NEW_INTERACTION_REMINDERS_EMAIL_STATUS_FLAG_NAME)
 
 
 @pytest.mark.django_db
@@ -379,8 +372,7 @@ class TestCreateEstimatedLandDateReminder:
         mock_send_estimated_land_date_reminder,
         adviser,
     ):
-        """
-        Create reminder should create a model instance and send an email.
+        """Create reminder should create a model instance and send an email.
         """
         days_left = 30
         estimated_land_date = self.current_date + relativedelta(months=1)
@@ -414,8 +406,7 @@ class TestCreateEstimatedLandDateReminder:
         mock_send_estimated_land_date_reminder,
         adviser,
     ):
-        """
-        Create reminder should create a model instance and not send an email.
+        """Create reminder should create a model instance and not send an email.
         """
         estimated_land_date = self.current_date + relativedelta(months=1)
         project = ActiveInvestmentProjectFactory(
@@ -442,8 +433,7 @@ class TestCreateEstimatedLandDateReminder:
         mock_send_estimated_land_date_reminder,
         adviser,
     ):
-        """
-        If a reminder was already made today then do not send an email.
+        """If a reminder was already made today then do not send an email.
         """
         days_left = 30
         estimated_land_date = self.current_date + relativedelta(months=1)
@@ -478,8 +468,7 @@ class TestCreateEstimatedLandDateReminder:
         mock_send_estimated_land_date_reminder,
         adviser,
     ):
-        """
-        If the queue is still processing tasks from yesterday and a reminder
+        """If the queue is still processing tasks from yesterday and a reminder
         was already sent, do not send another one.
         """
         days_left = 30
@@ -515,8 +504,7 @@ class TestCreateEstimatedLandDateReminder:
         mock_send_estimated_land_date_reminder,
         adviser,
     ):
-        """
-        If the estimated land date is changed and a reminder has already been sent out,
+        """If the estimated land date is changed and a reminder has already been sent out,
         a new reminder should be created and a new email sent.
         """
         days_left = 30
@@ -558,8 +546,7 @@ class TestGenerateEstimatedLandDateReminderTask:
         caplog,
         mock_job_scheduler,
     ):
-        """
-        Generate estimated land date reminders should be called from
+        """Generate estimated land date reminders should be called from
         scheduler.
         """
         caplog.set_level(logging.INFO)
@@ -576,8 +563,7 @@ class TestGenerateEstimatedLandDateReminderTask:
         self,
         mock_schedule_generate_estimated_land_date_reminders_for_subscription,
     ):
-        """
-        Reminders should be generated for all subscriptions.
+        """Reminders should be generated for all subscriptions.
         """
         subscription_count = 2
         subscriptions = UpcomingEstimatedLandDateSubscriptionFactory.create_batch(
@@ -594,21 +580,21 @@ class TestGenerateEstimatedLandDateReminderTask:
 
     @pytest.mark.parametrize(
         'role',
-        (
+        [
             'project_manager',
             'project_assurance_adviser',
             'client_relationship_manager',
             'referral_source_adviser',
-        ),
+        ],
     )
     @pytest.mark.parametrize(
-        'days,email_reminders_enabled',
-        (
+        ('days', 'email_reminders_enabled'),
+        [
             (30, True),
             (60, True),
             (30, False),
             (60, False),
-        ),
+        ],
     )
     def test_generate_estimated_land_date_reminders_for_subscription(
         self,
@@ -618,8 +604,7 @@ class TestGenerateEstimatedLandDateReminderTask:
         email_reminders_enabled,
         role,
     ):
-        """
-        Estimated Land Date reminders should be created for relevant subscriptions.
+        """Estimated Land Date reminders should be created for relevant subscriptions.
         """
         subscription = UpcomingEstimatedLandDateSubscriptionFactory(
             adviser=adviser,
@@ -660,21 +645,21 @@ class TestGenerateEstimatedLandDateReminderTask:
 
     @pytest.mark.parametrize(
         'role',
-        (
+        [
             'project_manager',
             'project_assurance_adviser',
             'client_relationship_manager',
             'referral_source_adviser',
-        ),
+        ],
     )
     @pytest.mark.parametrize(
-        'days,email_reminders_enabled',
-        (
+        ('days', 'email_reminders_enabled'),
+        [
             (30, True),
             (60, True),
             (30, False),
             (60, False),
-        ),
+        ],
     )
     def test_sends_estimated_land_date_summary_notification_for_subscription(
         self,
@@ -685,8 +670,7 @@ class TestGenerateEstimatedLandDateReminderTask:
         email_reminders_enabled,
         role,
     ):
-        """
-        Estimated Land Date summary notification should be sent when number of reminders reaches a
+        """Estimated Land Date summary notification should be sent when number of reminders reaches a
         threshold.
         """
         subscription = UpcomingEstimatedLandDateSubscriptionFactory(
@@ -740,8 +724,7 @@ class TestGenerateEstimatedLandDateReminderTask:
         adviser,
         mock_create_estimated_land_date_reminder,
     ):
-        """
-        A reminder should only be sent for active ongoing or active delayed projects.
+        """A reminder should only be sent for active ongoing or active delayed projects.
         """
         days = 30
         subscription = UpcomingEstimatedLandDateSubscriptionFactory(
@@ -801,8 +784,7 @@ class TestGenerateEstimatedLandDateReminderTask:
         adviser,
         mock_create_estimated_land_date_reminder,
     ):
-        """
-        A reminder should not be sent if adviser has no projects.
+        """A reminder should not be sent if adviser has no projects.
         """
         days = 30
         subscription = UpcomingEstimatedLandDateSubscriptionFactory(
@@ -821,8 +803,7 @@ class TestGenerateEstimatedLandDateReminderTask:
         mock_create_estimated_land_date_reminder,
         estimated_land_date_reminders_user_feature_flag,
     ):
-        """
-        Reminders should not be created if the user does not have the feature flag enabled.
+        """Reminders should not be created if the user does not have the feature flag enabled.
         """
         days = 30
         adviser = AdviserFactory()
@@ -847,8 +828,7 @@ class TestGenerateEstimatedLandDateReminderTask:
         self,
         mock_create_estimated_land_date_reminder,
     ):
-        """
-        Reminders should not be created if the user feature flag is inactive.
+        """Reminders should not be created if the user feature flag is inactive.
         """
         feature_flag = UserFeatureFlagFactory(
             code=INVESTMENT_ESTIMATED_LAND_DATE_REMINDERS_FEATURE_FLAG_NAME,
@@ -879,8 +859,7 @@ class TestGenerateEstimatedLandDateReminderTask:
         inactive_adviser,
         mock_create_estimated_land_date_reminder,
     ):
-        """
-        Reminders should not be created if the user is inactive.
+        """Reminders should not be created if the user is inactive.
         """
         days = 30
         UpcomingEstimatedLandDateSubscriptionFactory(
@@ -902,8 +881,7 @@ class TestGenerateEstimatedLandDateReminderTask:
         mock_send_estimated_land_date_reminder,
         adviser,
     ):
-        """
-        Only one reminder should be created.
+        """Only one reminder should be created.
 
         Even after calling the generate function multiple times, only one reminder
         should be created and one email sent.
@@ -944,8 +922,7 @@ class TestGenerateEstimatedLandDateReminderTask:
         mock_reminder_tasks_notify_gateway,
         adviser,
     ):
-        """
-        Test if a notification id is being stored against the reminder.
+        """Test if a notification id is being stored against the reminder.
         """
         caplog.set_level(logging.INFO, logger='datahub.reminder.tasks')
         notification_id = uuid.uuid4()
@@ -977,8 +954,7 @@ class TestGenerateEstimatedLandDateReminderTask:
         mock_reminder_tasks_notify_gateway,
         adviser,
     ):
-        """
-        Test if a notification id is being stored against the reminders from summary email.
+        """Test if a notification id is being stored against the reminders from summary email.
         """
         notification_id = uuid.uuid4()
         mock_reminder_tasks_notify_gateway.send_email_notification = mock.Mock(
@@ -1015,8 +991,7 @@ class TestGenerateEstimatedLandDateReminderTask:
         mock_send_estimated_land_date_summary,
         adviser,
     ):
-        """
-        Even after calling the generate function multiple times, only one summary email
+        """Even after calling the generate function multiple times, only one summary email
         should be sent.
         """
         days = 30
@@ -1058,8 +1033,7 @@ class TestCreateNoRecentExportInteractionReminder:
         mock_send_no_recent_export_interaction_reminder,
         adviser,
     ):
-        """
-        Create reminder should create a model instance and send an email.
+        """Create reminder should create a model instance and send an email.
         """
         reminder_days = 5
         company = OneListCoreTeamMemberFactory(
@@ -1119,8 +1093,7 @@ class TestCreateNoRecentExportInteractionReminder:
         mock_send_no_recent_export_interaction_reminder,
         adviser,
     ):
-        """
-        If a reminder was already made today then do not send an email.
+        """If a reminder was already made today then do not send an email.
         """
         reminder_days = 5
         company = OneListCoreTeamMemberFactory(
@@ -1157,8 +1130,7 @@ class TestCreateNoRecentExportInteractionReminder:
         mock_send_no_recent_export_interaction_reminder,
         adviser,
     ):
-        """
-        If the queue is still processing tasks from yesterday and a reminder
+        """If the queue is still processing tasks from yesterday and a reminder
         was already sent, do not send another one.
         """
         reminder_days = 5
@@ -1200,7 +1172,7 @@ class TestGenerateNoRecentExportInteractionReminderTask:
 
     @pytest.mark.parametrize(
         'lock_acquired',
-        (False, True),
+        [False, True],
     )
     def test_lock(
         self,
@@ -1209,8 +1181,7 @@ class TestGenerateNoRecentExportInteractionReminderTask:
         lock_acquired,
         mock_job_scheduler,
     ):
-        """
-        Test that the task doesn't run if it cannot acquire
+        """Test that the task doesn't run if it cannot acquire
         the advisory_lock.
         """
         caplog.set_level(logging.INFO, logger='datahub.reminder.tasks')
@@ -1248,8 +1219,7 @@ class TestGenerateNoRecentExportInteractionReminderTask:
         self,
         mock_job_scheduler,
     ):
-        """
-        Reminders should be generated for all subscriptions.
+        """Reminders should be generated for all subscriptions.
         """
         subscription_count = 2
         subscriptions = NoRecentExportInteractionSubscriptionFactory.create_batch(
@@ -1275,13 +1245,13 @@ class TestGenerateNoRecentExportInteractionReminderTask:
         )
 
     @pytest.mark.parametrize(
-        'days,email_reminders_enabled, one_list_tier',
-        (
+        ('days', 'email_reminders_enabled', 'one_list_tier'),
+        [
             (5, True, OneListTierID.tier_d_international_trade_advisers.value),
             (10, True, OneListTierID.tier_d_overseas_post_accounts.value),
             (3, False, OneListTierID.tier_d_international_trade_advisers.value),
             (15, False, OneListTierID.tier_d_overseas_post_accounts.value),
-        ),
+        ],
     )
     def test_generate_no_recent_export_interaction_reminders_for_subscription(
         self,
@@ -1291,8 +1261,7 @@ class TestGenerateNoRecentExportInteractionReminderTask:
         email_reminders_enabled,
         one_list_tier,
     ):
-        """
-        No Recent Export Interaction reminders should be created for relevant subscriptions.
+        """No Recent Export Interaction reminders should be created for relevant subscriptions.
         """
         subscription = NoRecentExportInteractionSubscriptionFactory(
             adviser=adviser,
@@ -1327,10 +1296,10 @@ class TestGenerateNoRecentExportInteractionReminderTask:
 
     @pytest.mark.parametrize(
         'one_list_tier',
-        (
+        [
             (OneListTierID.tier_d_international_trade_advisers.value),
             (OneListTierID.tier_d_overseas_post_accounts.value),
-        ),
+        ],
     )
     def test_generate_no_recent_export_interaction_reminders_for_subscription_for_core_member(
         self,
@@ -1338,8 +1307,7 @@ class TestGenerateNoRecentExportInteractionReminderTask:
         mock_create_no_recent_export_interaction_reminder,
         one_list_tier,
     ):
-        """
-        No Recent Export Interaction reminders should be created for relevant subscriptions.
+        """No Recent Export Interaction reminders should be created for relevant subscriptions.
         """
         subscription = NoRecentExportInteractionSubscriptionFactory(
             adviser=adviser,
@@ -1379,8 +1347,7 @@ class TestGenerateNoRecentExportInteractionReminderTask:
         adviser,
         mock_create_no_recent_export_interaction_reminder,
     ):
-        """
-        No Recent Export Interaction reminders should be created for relevant subscriptions.
+        """No Recent Export Interaction reminders should be created for relevant subscriptions.
         """
         subscription = NoRecentExportInteractionSubscriptionFactory(
             adviser=adviser,
@@ -1408,8 +1375,7 @@ class TestGenerateNoRecentExportInteractionReminderTask:
         adviser,
         mock_create_no_recent_export_interaction_reminder,
     ):
-        """
-        A reminder should be sent if no interactions at all in given timeframe
+        """A reminder should be sent if no interactions at all in given timeframe.
         """
         day = 15
         subscription = NoRecentExportInteractionSubscriptionFactory(
@@ -1445,15 +1411,14 @@ class TestGenerateNoRecentExportInteractionReminderTask:
         )
         mock_create_no_recent_export_interaction_reminder.assert_not_called()
 
-    @pytest.mark.parametrize('day_offset', (0, 1))
+    @pytest.mark.parametrize('day_offset', [0, 1])
     def test_dont_send_reminder_if_recent_interaction_exists(
         self,
         adviser,
         mock_create_no_recent_export_interaction_reminder,
         day_offset,
     ):
-        """
-        A reminder should only be sent if there is no recent interaction.
+        """A reminder should only be sent if there is no recent interaction.
         """
         day = 15
         subscription = NoRecentExportInteractionSubscriptionFactory(
@@ -1484,8 +1449,7 @@ class TestGenerateNoRecentExportInteractionReminderTask:
         self,
         mock_create_no_recent_export_interaction_reminder,
     ):
-        """
-        Reminders should not be created if the user does not have the feature flag enabled.
+        """Reminders should not be created if the user does not have the feature flag enabled.
         """
         days = 15
         adviser = AdviserFactory()
@@ -1514,8 +1478,7 @@ class TestGenerateNoRecentExportInteractionReminderTask:
         self,
         mock_create_no_recent_export_interaction_reminder,
     ):
-        """
-        Reminders should not be created if the user feature flag is inactive.
+        """Reminders should not be created if the user feature flag is inactive.
         """
         feature_flag = UserFeatureFlagFactory(
             code=EXPORT_NO_RECENT_INTERACTION_REMINDERS_FEATURE_FLAG_NAME,
@@ -1548,8 +1511,7 @@ class TestGenerateNoRecentExportInteractionReminderTask:
         mock_create_no_recent_export_interaction_reminder,
         inactive_adviser,
     ):
-        """
-        Reminders should not be created if the user is inactive.
+        """Reminders should not be created if the user is inactive.
         """
         days = 15
         NoRecentExportInteractionSubscriptionFactory(
@@ -1573,8 +1535,7 @@ class TestGenerateNoRecentExportInteractionReminderTask:
         mock_reminder_tasks_notify_gateway,
         adviser,
     ):
-        """
-        Test if a notification id is being stored against the reminder.
+        """Test if a notification id is being stored against the reminder.
         """
         notification_id = uuid.uuid4()
         mock_reminder_tasks_notify_gateway.send_email_notification = mock.Mock(
@@ -1624,8 +1585,7 @@ class TestCreateNewExportInteractionReminder:
         mock_send_new_export_interaction_reminder,
         adviser,
     ):
-        """
-        Create reminder should create a model instance and send an email.
+        """Create reminder should create a model instance and send an email.
         """
         reminder_days = 5
         company = OneListCoreTeamMemberFactory(
@@ -1682,12 +1642,12 @@ class TestCreateNewExportInteractionReminder:
 
     @pytest.mark.parametrize(
         'when',
-        (
+        [
             '2022-11-22T16:00:00',
             # If the queue is still processing tasks from yesterday and a reminder
             # was already sent, do not send another one.
             '2022-11-23T16:00:00',
-        ),
+        ],
     )
     def test_create_existing_reminder(
         self,
@@ -1695,8 +1655,7 @@ class TestCreateNewExportInteractionReminder:
         adviser,
         when,
     ):
-        """
-        If a reminder was already sent then do not send one again.
+        """If a reminder was already sent then do not send one again.
         """
         reminder_days = 5
         company = OneListCoreTeamMemberFactory(
@@ -1736,7 +1695,7 @@ class TestGenerateNewExportInteractionReminderTask:
 
     @pytest.mark.parametrize(
         'lock_acquired',
-        (False, True),
+        [False, True],
     )
     def test_lock(
         self,
@@ -1745,8 +1704,7 @@ class TestGenerateNewExportInteractionReminderTask:
         lock_acquired,
         mock_job_scheduler,
     ):
-        """
-        Test that the task doesn't run if it cannot acquire
+        """Test that the task doesn't run if it cannot acquire
         the advisory_lock.
         """
         caplog.set_level(logging.INFO, logger='datahub.reminder.tasks')
@@ -1784,8 +1742,7 @@ class TestGenerateNewExportInteractionReminderTask:
         self,
         mock_job_scheduler,
     ):
-        """
-        Reminders should be generated for all subscriptions.
+        """Reminders should be generated for all subscriptions.
         """
         subscription_count = 2
         subscriptions = NewExportInteractionSubscriptionFactory.create_batch(
@@ -1811,13 +1768,13 @@ class TestGenerateNewExportInteractionReminderTask:
         )
 
     @pytest.mark.parametrize(
-        'days,email_reminders_enabled',
-        (
+        ('days', 'email_reminders_enabled'),
+        [
             (5, True),
             (10, True),
             (3, False),
             (15, False),
-        ),
+        ],
     )
     def test_generate_new_export_interaction_reminders_for_subscription(
         self,
@@ -1826,8 +1783,7 @@ class TestGenerateNewExportInteractionReminderTask:
         days,
         email_reminders_enabled,
     ):
-        """
-        New Export Interaction reminders should be created for relevant subscriptions.
+        """New Export Interaction reminders should be created for relevant subscriptions.
         """
         subscription = NewExportInteractionSubscriptionFactory(
             adviser=adviser,
@@ -1865,9 +1821,8 @@ class TestGenerateNewExportInteractionReminderTask:
         new_export_interaction_reminders_user_feature_flag,
         mock_create_new_export_interaction_reminder,
     ):
-        """
-        New Export Interaction reminders should not be sent to the advisor who created the
-        interaction, they should only go to an advisor when they did not create the interaction
+        """New Export Interaction reminders should not be sent to the advisor who created the
+        interaction, they should only go to an advisor when they did not create the interaction.
         """
 
         def _export_interaction_advisor(day):
@@ -1973,9 +1928,8 @@ class TestGenerateNewExportInteractionReminderTask:
         new_export_interaction_reminders_user_feature_flag,
         mock_create_new_export_interaction_reminder,
     ):
-        """
-        New Export Interaction reminders should not be sent to the advisor who modified the
-        interaction
+        """New Export Interaction reminders should not be sent to the advisor who modified the
+        interaction.
         """
         creator_advisor = AdviserFactory()
         creator_advisor.features.set(
@@ -2020,15 +1974,14 @@ class TestGenerateNewExportInteractionReminderTask:
 
         assert mock_create_new_export_interaction_reminder.call_count == 0
 
-    @pytest.mark.parametrize('day_offset', (0, 1))
+    @pytest.mark.parametrize('day_offset', [0, 1])
     def test_dont_send_reminder_if_no_new_interactions(
         self,
         adviser,
         mock_create_no_recent_export_interaction_reminder,
         day_offset,
     ):
-        """
-        A reminder should only be sent if there is an interaction on set date.
+        """A reminder should only be sent if there is an interaction on set date.
         """
         day = 15
         subscription = NewExportInteractionSubscriptionFactory(
@@ -2058,8 +2011,7 @@ class TestGenerateNewExportInteractionReminderTask:
         self,
         mock_create_new_export_interaction_reminder,
     ):
-        """
-        Reminders should not be created if the user does not have the feature flag enabled.
+        """Reminders should not be created if the user does not have the feature flag enabled.
         """
         days = 15
         adviser = AdviserFactory()
@@ -2088,8 +2040,7 @@ class TestGenerateNewExportInteractionReminderTask:
         self,
         mock_create_new_export_interaction_reminder,
     ):
-        """
-        Reminders should not be created if the user feature flag is inactive.
+        """Reminders should not be created if the user feature flag is inactive.
         """
         feature_flag = UserFeatureFlagFactory(
             code=EXPORT_NEW_INTERACTION_REMINDERS_FEATURE_FLAG_NAME,
@@ -2122,8 +2073,7 @@ class TestGenerateNewExportInteractionReminderTask:
         mock_create_new_export_interaction_reminder,
         inactive_adviser,
     ):
-        """
-        Reminders should not be created if the user is inactive.
+        """Reminders should not be created if the user is inactive.
         """
         days = 15
         NewExportInteractionSubscriptionFactory(
@@ -2147,8 +2097,7 @@ class TestGenerateNewExportInteractionReminderTask:
         mock_reminder_tasks_notify_gateway,
         adviser,
     ):
-        """
-        Test if a notification id is being stored against the reminder.
+        """Test if a notification id is being stored against the reminder.
         """
         notification_id = uuid.uuid4()
         mock_reminder_tasks_notify_gateway.send_email_notification = mock.Mock(
@@ -2198,8 +2147,7 @@ class TestCreateNoRecentInteractionReminder:
         mock_send_no_recent_interaction_reminder,
         adviser,
     ):
-        """
-        Create reminder should create a model instance and send an email.
+        """Create reminder should create a model instance and send an email.
         """
         reminder_days = 5
         project = ActiveInvestmentProjectFactory(
@@ -2234,8 +2182,7 @@ class TestCreateNoRecentInteractionReminder:
         mock_send_no_recent_interaction_reminder,
         adviser,
     ):
-        """
-        Create reminder should create a model instance and not send an email.
+        """Create reminder should create a model instance and not send an email.
         """
         reminder_days = 5
         project = ActiveInvestmentProjectFactory(
@@ -2262,8 +2209,7 @@ class TestCreateNoRecentInteractionReminder:
         mock_send_no_recent_interaction_reminder,
         adviser,
     ):
-        """
-        If a reminder was already made today then do not send an email.
+        """If a reminder was already made today then do not send an email.
         """
         reminder_days = 5
         project = ActiveInvestmentProjectFactory(
@@ -2298,8 +2244,7 @@ class TestCreateNoRecentInteractionReminder:
         mock_send_no_recent_interaction_reminder,
         adviser,
     ):
-        """
-        If the queue is still processing tasks from yesterday and a reminder
+        """If the queue is still processing tasks from yesterday and a reminder
         was already sent, do not send another one.
         """
         reminder_days = 5
@@ -2340,8 +2285,7 @@ class TestGenerateNoRecentInteractionReminderTask:
         self,
         mock_job_scheduler,
     ):
-        """
-        Reminders should be generated for all subscriptions.
+        """Reminders should be generated for all subscriptions.
         """
         subscription_count = 2
         subscriptions = NoRecentInvestmentInteractionSubscriptionFactory.create_batch(
@@ -2371,21 +2315,21 @@ class TestGenerateNoRecentInteractionReminderTask:
 
     @pytest.mark.parametrize(
         'role',
-        (
+        [
             'project_manager',
             'project_assurance_adviser',
             'client_relationship_manager',
             'referral_source_adviser',
-        ),
+        ],
     )
     @pytest.mark.parametrize(
-        'days,email_reminders_enabled',
-        (
+        ('days', 'email_reminders_enabled'),
+        [
             (5, True),
             (10, True),
             (3, False),
             (15, False),
-        ),
+        ],
     )
     def test_generate_no_recent_interaction_reminders_for_subscription(
         self,
@@ -2395,8 +2339,7 @@ class TestGenerateNoRecentInteractionReminderTask:
         email_reminders_enabled,
         role,
     ):
-        """
-        No Recent Interaction reminders should be created for relevant subscriptions.
+        """No Recent Interaction reminders should be created for relevant subscriptions.
         """
         subscription = NoRecentInvestmentInteractionSubscriptionFactory(
             adviser=adviser,
@@ -2430,8 +2373,7 @@ class TestGenerateNoRecentInteractionReminderTask:
         adviser,
         mock_create_no_recent_interaction_reminder,
     ):
-        """
-        A reminder should only be sent for active ongoing or active delayed projects.
+        """A reminder should only be sent for active ongoing or active delayed projects.
         """
         day = 15
         subscription = NoRecentInvestmentInteractionSubscriptionFactory(
@@ -2500,8 +2442,7 @@ class TestGenerateNoRecentInteractionReminderTask:
         adviser,
         mock_create_no_recent_interaction_reminder,
     ):
-        """
-        A reminder should be sent if no interactions at all in given timeframe
+        """A reminder should be sent if no interactions at all in given timeframe.
         """
         day = 15
         subscription = NoRecentInvestmentInteractionSubscriptionFactory(
@@ -2536,15 +2477,14 @@ class TestGenerateNoRecentInteractionReminderTask:
         )
         mock_create_no_recent_interaction_reminder.assert_not_called()
 
-    @pytest.mark.parametrize('day_offset', (0, 1))
+    @pytest.mark.parametrize('day_offset', [0, 1])
     def test_dont_send_reminder_if_recent_interaction_exists(
         self,
         adviser,
         mock_create_no_recent_interaction_reminder,
         day_offset,
     ):
-        """
-        A reminder should only be sent if there is no recent interaction.
+        """A reminder should only be sent if there is no recent interaction.
         """
         day = 15
         subscription = NoRecentInvestmentInteractionSubscriptionFactory(
@@ -2577,8 +2517,7 @@ class TestGenerateNoRecentInteractionReminderTask:
         mock_create_no_recent_interaction_reminder,
         no_recent_interaction_reminders_user_feature_flag,
     ):
-        """
-        Reminders should not be created if the user does not have the feature flag enabled.
+        """Reminders should not be created if the user does not have the feature flag enabled.
         """
         days = 15
         adviser = AdviserFactory()
@@ -2606,8 +2545,7 @@ class TestGenerateNoRecentInteractionReminderTask:
         self,
         mock_create_no_recent_interaction_reminder,
     ):
-        """
-        Reminders should not be created if the user feature flag is inactive.
+        """Reminders should not be created if the user feature flag is inactive.
         """
         feature_flag = UserFeatureFlagFactory(
             code=INVESTMENT_NO_RECENT_INTERACTION_REMINDERS_FEATURE_FLAG_NAME,
@@ -2640,8 +2578,7 @@ class TestGenerateNoRecentInteractionReminderTask:
         mock_create_no_recent_interaction_reminder,
         inactive_adviser,
     ):
-        """
-        Reminders should not be created if the user is inactive.
+        """Reminders should not be created if the user is inactive.
         """
         days = 15
         NoRecentInvestmentInteractionSubscriptionFactory(
@@ -2667,8 +2604,7 @@ class TestGenerateNoRecentInteractionReminderTask:
         mock_reminder_tasks_notify_gateway,
         adviser,
     ):
-        """
-        Test if a notification id is being stored against the reminder.
+        """Test if a notification id is being stored against the reminder.
         """
         caplog.set_level(logging.INFO, logger='datahub.reminder.tasks')
         notification_id = uuid.uuid4()
@@ -2711,8 +2647,7 @@ class TestGenerateNoRecentInteractionReminderTask:
         mock_reminder_tasks_notify_gateway,
         adviser,
     ):
-        """
-        Only one reminder should be created.
+        """Only one reminder should be created.
 
         Even after calling the generate function multiple times, only one reminder
         should be created and one email sent.
@@ -2757,8 +2692,7 @@ class TestUpdateEmailDeliveryStatusTask:
     current_date = datetime.date(year=2022, month=7, day=17)
 
     def test_doesnt_update_estimated_land_date_status_without_feature_flag(self, caplog):
-        """
-        Test that if the feature flag is not enabled, the
+        """Test that if the feature flag is not enabled, the
         task will not run.
         """
         caplog.set_level(logging.INFO, logger='datahub.reminder.tasks')
@@ -2774,8 +2708,7 @@ class TestUpdateEmailDeliveryStatusTask:
         mock_reminder_tasks_notify_gateway,
         adviser,
     ):
-        """
-        Test if email delivery status is being updated.
+        """Test if email delivery status is being updated.
         """
         mock_reminder_tasks_notify_gateway.get_notification_by_id = mock.Mock(
             return_value={'status': 'delivered'},
@@ -2824,8 +2757,7 @@ class TestUpdateEmailDeliveryStatusTask:
         )
 
     def test_doesnt_update_no_recent_interaction_status_without_feature_flag(self, caplog):
-        """
-        Test that if the feature flag is not enabled, the
+        """Test that if the feature flag is not enabled, the
         task will not run.
         """
         caplog.set_level(logging.INFO, logger='datahub.reminder.tasks')
@@ -2841,8 +2773,7 @@ class TestUpdateEmailDeliveryStatusTask:
         mock_reminder_tasks_notify_gateway,
         adviser,
     ):
-        """
-        Test if email delivery status is being updated.
+        """Test if email delivery status is being updated.
         """
         mock_reminder_tasks_notify_gateway.get_notification_by_id = mock.Mock(
             return_value={'status': 'delivered'},
@@ -2884,7 +2815,7 @@ class TestUpdateEmailDeliveryStatusTask:
 
     @pytest.mark.parametrize(
         'lock_acquired',
-        (False, True),
+        [False, True],
     )
     def test_lock_for_no_recent_export_interaction_status(
         self,
@@ -2896,8 +2827,7 @@ class TestUpdateEmailDeliveryStatusTask:
         mock_job_scheduler,
         adviser,
     ):
-        """
-        Test that the task doesn't run if it cannot acquire
+        """Test that the task doesn't run if it cannot acquire
         the advisory_lock.
         """
         mock_reminder_tasks_notify_gateway.get_notification_by_id = mock.Mock(
@@ -2936,8 +2866,7 @@ class TestUpdateEmailDeliveryStatusTask:
             mock_reminder_tasks_notify_gateway.get_notification_by_id.assert_not_called()
 
     def test_doesnt_update_no_recent_export_interaction_status_without_feature_flag(self, caplog):
-        """
-        Test that if the feature flag is not enabled, the task will not run.
+        """Test that if the feature flag is not enabled, the task will not run.
         """
         caplog.set_level(logging.INFO, logger='datahub.reminder.tasks')
         update_notify_email_delivery_status_for_no_recent_export_interaction()
@@ -2952,8 +2881,7 @@ class TestUpdateEmailDeliveryStatusTask:
         mock_reminder_tasks_notify_gateway,
         adviser,
     ):
-        """
-        Test if email delivery status is being updated.
+        """Test if email delivery status is being updated.
         """
         mock_reminder_tasks_notify_gateway.get_notification_by_id = mock.Mock(
             return_value={'status': 'delivered'},
@@ -2993,8 +2921,7 @@ class TestUpdateEmailDeliveryStatusTask:
         )
 
     def test_doesnt_update_new_export_interaction_status_without_feature_flag(self, caplog):
-        """
-        Test that if the feature flag is not enabled, the task will not run.
+        """Test that if the feature flag is not enabled, the task will not run.
         """
         caplog.set_level(logging.INFO, logger='datahub.reminder.tasks')
         update_notify_email_delivery_status_for_new_export_interaction()
@@ -3005,7 +2932,7 @@ class TestUpdateEmailDeliveryStatusTask:
 
     @pytest.mark.parametrize(
         'lock_acquired',
-        (False, True),
+        [False, True],
     )
     def test_lock_for_new_export_interaction_status(
         self,
@@ -3017,8 +2944,7 @@ class TestUpdateEmailDeliveryStatusTask:
         mock_job_scheduler,
         adviser,
     ):
-        """
-        Test that the task doesn't run if it cannot acquire
+        """Test that the task doesn't run if it cannot acquire
         the advisory_lock.
         """
         mock_reminder_tasks_notify_gateway.get_notification_by_id = mock.Mock(
@@ -3063,8 +2989,7 @@ class TestUpdateEmailDeliveryStatusTask:
         mock_reminder_tasks_notify_gateway,
         adviser,
     ):
-        """
-        Test if email delivery status is being updated.
+        """Test if email delivery status is being updated.
         """
         mock_reminder_tasks_notify_gateway.get_notification_by_id = mock.Mock(
             return_value={'status': 'delivered'},

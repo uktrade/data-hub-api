@@ -27,7 +27,7 @@ job_defaults: &job_defaults
     ACTIVITY_STREAM_ACCESS_KEY_ID: some-id
     ACTIVITY_STREAM_SECRET_ACCESS_KEY: some-secret
     DATABASE_CREDENTIALS: '{"username": "postgres", "password": "datahub", "engine": "postgres", "port": 5432, "dbname": "datahub", "host": "postgres", "dbInstanceIdentifier": "db-instance"}'
-    DEBUG: 'True'
+    DEBUG: "True"
     DJANGO_SECRET_KEY: changeme
     DJANGO_SETTINGS_MODULE: config.settings.local
     ES_INDEX_PREFIX: test_index
@@ -91,8 +91,8 @@ job_defaults: &job_defaults
           - ~/cache/pip
 
     - run:
-        name: Run Flake8
-        command: python -m flake8
+        name: Run Ruff
+        command: ruff check
 
     - run:
         name: Run collectstatic

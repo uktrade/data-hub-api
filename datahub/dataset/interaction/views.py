@@ -13,13 +13,12 @@ from datahub.metadata.query_utils import get_sector_name_subquery, get_service_n
 
 
 class InteractionsDatasetView(BaseFilterDatasetView):
-    """
-    A GET API view to return all interaction data as required for syncing by
+    """A GET API view to return all interaction data as required for syncing by
     Data-flow periodically.
     """
 
     def get_dataset(self, request):
-        """Returns a list of all interaction records"""
+        """Returns a list of all interaction records."""
         queryset = get_base_interaction_queryset().annotate(
             adviser_ids=get_aggregate_subquery(
                 Interaction,

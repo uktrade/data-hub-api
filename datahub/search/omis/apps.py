@@ -2,6 +2,8 @@ from django.db.models import Prefetch
 
 from datahub.omis.order.models import (
     Order as DBOrder,
+)
+from datahub.omis.order.models import (
     OrderAssignee,
     OrderPermission,
     OrderSubscriber,
@@ -11,7 +13,7 @@ from datahub.search.omis.models import Order
 
 
 class OrderSearchApp(SearchApp):
-    """SearchApp for order"""
+    """SearchApp for order."""
 
     name = 'order'
     search_model = Order

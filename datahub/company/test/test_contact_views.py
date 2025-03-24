@@ -17,9 +17,9 @@ from datahub.core import constants
 from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
 from datahub.core.test_utils import (
     APITestMixin,
+    HawkMockJSONResponse,
     create_test_user,
     format_date_or_datetime,
-    HawkMockJSONResponse,
 )
 from datahub.metadata.test.factories import TeamFactory
 
@@ -326,13 +326,13 @@ class AddContactBase(APITestMixin):
 
 
 class TestAddContactV3(AddContactBase):
-    """Test v3 of the contact adding endpoint"""
+    """Test v3 of the contact adding endpoint."""
 
     endpoint_namespace = 'api-v3'
 
 
 class TestAddContactV4(AddContactBase):
-    """Test v4 of the contact adding endpoint"""
+    """Test v4 of the contact adding endpoint."""
 
     endpoint_namespace = 'api-v4'
 
@@ -651,13 +651,13 @@ class EditContactBase(APITestMixin):
 
 
 class TestEditContactV3(EditContactBase):
-    """Test case for v3 of the edit contacts endpoint"""
+    """Test case for v3 of the edit contacts endpoint."""
 
     endpoint_namespace = 'api-v3'
 
 
 class TestEditContactV4(EditContactBase):
-    """Test case for v4 of the edit contacts endpoint"""
+    """Test case for v4 of the edit contacts endpoint."""
 
     endpoint_namespace = 'api-v4'
 
@@ -964,13 +964,13 @@ class ViewContactBase(APITestMixin):
 
 
 class TestViewContactV3(ViewContactBase):
-    """Tests for v3 view contacts endpoint"""
+    """Tests for v3 view contacts endpoint."""
 
     endpoint_namespace = 'api-v3'
 
 
 class TestViewContactV4(ViewContactBase):
-    """Tests for v4 view contacts endpoint"""
+    """Tests for v4 view contacts endpoint."""
 
     endpoint_namespace = 'api-v4'
 
@@ -981,7 +981,7 @@ class ContactListBase(APITestMixin):
     endpoint_namespace = None
 
     def test_contact_list_no_permissions(self):
-        """Should return 403"""
+        """Should return 403."""
         user = create_test_user(dit_team=TeamFactory())
         api_client = self.create_api_client(user=user)
         url = reverse(f'{self.endpoint_namespace}:contact:list')
@@ -989,7 +989,7 @@ class ContactListBase(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_all(self):
-        """Test getting all contacts"""
+        """Test getting all contacts."""
         ContactFactory.create_batch(5)
 
         url = reverse(f'{self.endpoint_namespace}:contact:list')
@@ -1147,7 +1147,7 @@ class ContactListBase(APITestMixin):
         assert [contact['id'] for contact in response_data] == contact_ids
 
     def test_filter_by_company(self):
-        """Test getting contacts by company id"""
+        """Test getting contacts by company id."""
         company1 = CompanyFactory()
         company2 = CompanyFactory()
 
@@ -1163,8 +1163,8 @@ class ContactListBase(APITestMixin):
         assert {contact['id'] for contact in response.data['results']} == expected_contacts
 
     @pytest.mark.parametrize(
-        'contacts,filter_,expected',
-        (
+        ('contacts', 'filter_', 'expected'),
+        [
             (
                 ('aaa@aaa.aaa', 'bbb@bbb.bbb', 'ccc@ccc.ccc'),
                 'bbb@bbb.bbb',
@@ -1180,10 +1180,10 @@ class ContactListBase(APITestMixin):
                 'xxx@xxx.xxx',
                 set(),
             ),
-        ),
+        ],
     )
     def test_filter_by_email(self, contacts, filter_, expected):
-        """Test getting contacts by email"""
+        """Test getting contacts by email."""
         ContactFactory.create_batch(len(contacts), email=factory.Iterator(contacts))
 
         response = self.api_client.get(
@@ -1195,8 +1195,8 @@ class ContactListBase(APITestMixin):
         assert {res['email'] for res in response.data['results']} == expected
 
     @pytest.mark.parametrize(
-        'contacts,filter_,expected',
-        (
+        ('contacts', 'filter_', 'expected'),
+        [
             (
                 (True, False),
                 True,
@@ -1212,10 +1212,10 @@ class ContactListBase(APITestMixin):
                 None,
                 {True, False},
             ),
-        ),
+        ],
     )
     def test_filter_by_archived(self, contacts, filter_, expected):
-        """Test getting contacts by archived"""
+        """Test getting contacts by archived."""
         ContactFactory.create_batch(len(contacts), archived=factory.Iterator(contacts))
 
         response = self.api_client.get(
@@ -1228,20 +1228,19 @@ class ContactListBase(APITestMixin):
 
 
 class TestContactListV3(ContactListBase):
-    """Tests for v3 list contacts endpoint"""
+    """Tests for v3 list contacts endpoint."""
 
     endpoint_namespace = 'api-v3'
 
 
 class TestContactListV4(ContactListBase):
-    """Tests for v4 list contacts endpoint"""
+    """Tests for v4 list contacts endpoint."""
 
     endpoint_namespace = 'api-v4'
 
 
 class ContactVersioningBase(APITestMixin):
-    """
-    Tests for versions created when interacting with the contact endpoints.
+    """Tests for versions created when interacting with the contact endpoints.
     """
 
     endpoint_namespace = None
@@ -1329,7 +1328,7 @@ class ContactVersioningBase(APITestMixin):
 
 
 class TestContactV3Versioning(ContactVersioningBase):
-    """Tests the V3 contacts versioning endpoint"""
+    """Tests the V3 contacts versioning endpoint."""
 
     endpoint_namespace = 'api-v3'
 
@@ -1387,7 +1386,7 @@ class TestContactV3Versioning(ContactVersioningBase):
 
 
 class TestContactV4Versioning(ContactVersioningBase):
-    """Tests the V4 contacts versioning endpoint"""
+    """Tests the V4 contacts versioning endpoint."""
 
     endpoint_namespace = 'api-v4'
 

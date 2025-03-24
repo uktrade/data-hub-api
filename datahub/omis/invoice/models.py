@@ -92,5 +92,5 @@ class Invoice(BaseModel):
         db_table = 'omis-invoice_invoice'
 
     def __str__(self):
-        """Human-readable representation"""
+        """Human-readable representation."""
         return self.invoice_number

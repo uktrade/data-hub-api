@@ -1,11 +1,8 @@
 from datetime import datetime, timezone
 
 import pytest
-
 from django.urls import reverse
-
 from freezegun import freeze_time
-
 from rest_framework import status
 
 from datahub.company_referral.test.factories import (
@@ -17,7 +14,7 @@ from datahub.dataset.core.test import BaseDatasetViewTest
 
 
 def get_expected_data_from_company_referral(referral):
-    """Returns company referral data as a dictionary"""
+    """Returns company referral data as a dictionary."""
     return {
         'company_id': str(referral.company_id),
         'completed_by_id': get_attr_or_none(referral, 'completed_by_id'),
@@ -40,21 +37,20 @@ def get_expected_data_from_company_referral(referral):
 
 @pytest.mark.django_db
 class TestCompanyReferralDatasetView(BaseDatasetViewTest):
-    """
-    Tests for CompanyReferralDatasetView
+    """Tests for CompanyReferralDatasetView.
     """
 
     view_url = reverse('api-v4:dataset:company-referrals-dataset')
     factory = CompanyReferralFactory
 
     @pytest.mark.parametrize(
-        'referral_factory', (
+        'referral_factory', [
             CompanyReferralFactory,
             ClosedCompanyReferralFactory,
-        ),
+        ],
     )
     def test_success(self, data_flow_api_client, referral_factory):
-        """Test that endpoint returns with expected data for a single referral"""
+        """Test that endpoint returns with expected data for a single referral."""
         referral = referral_factory()
         response = data_flow_api_client.get(self.view_url)
         assert response.status_code == status.HTTP_200_OK
@@ -65,7 +61,7 @@ class TestCompanyReferralDatasetView(BaseDatasetViewTest):
         assert result == expected_result
 
     def test_with_multiple_records(self, data_flow_api_client):
-        """Test that endpoint returns correct number of records"""
+        """Test that endpoint returns correct number of records."""
         with freeze_time('2019-01-01 12:30:00'):
             referral1 = CompanyReferralFactory()
         with freeze_time('2019-01-03 12:00:00'):

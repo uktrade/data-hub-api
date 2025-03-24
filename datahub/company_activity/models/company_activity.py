@@ -10,8 +10,7 @@ MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 @reversion.register_base_model()
 class CompanyActivity(models.Model):
-    """
-    Representation of a company and its related activities (interactions, events,
+    """Representation of a company and its related activities (interactions, events,
     investments, referrals etc).
 
     This is to be used with OpenSearch so we can view, filter and sort all activities
@@ -22,7 +21,7 @@ class CompanyActivity(models.Model):
     """
 
     class ActivitySource(models.TextChoices):
-        """The type of activity, whether its an interaction, referral, event, investment etc"""
+        """The type of activity, whether its an interaction, referral, event, investment etc."""
 
         interaction = ('interaction', 'interaction')
         referral = ('referral', 'referral')
@@ -129,5 +128,5 @@ class CompanyActivity(models.Model):
     )
 
     def __str__(self):
-        """Readable name for CompanyActivity"""
+        """Readable name for CompanyActivity."""
         return f'Activity from "{self.activity_source}" for company: {self.company.name}'

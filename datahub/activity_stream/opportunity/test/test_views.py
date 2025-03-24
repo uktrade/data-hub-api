@@ -15,9 +15,8 @@ from datahub.investment.opportunity.test.factories import (
 
 @pytest.mark.django_db
 def test_large_capital_opportunity_activity(api_client):
-    """
-    Get a list of large capital opportunities and test the returned JSON is valid as per:
-    https://www.w3.org/TR/activitystreams-core/
+    """Get a list of large capital opportunities and test the returned JSON is valid as per:
+    https://www.w3.org/TR/activitystreams-core/.
     """
     start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
     with freeze_time(start) as frozen_datetime:
@@ -70,9 +69,8 @@ def test_large_capital_opportunity_activity(api_client):
 
 @pytest.mark.django_db
 def test_complete_large_capital_opportunity_activity(api_client):
-    """
-    Get a list of large capital opportunities and test the returned JSON is valid as per:
-    https://www.w3.org/TR/activitystreams-core/
+    """Get a list of large capital opportunities and test the returned JSON is valid as per:
+    https://www.w3.org/TR/activitystreams-core/.
     """
     start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
     with freeze_time(start) as frozen_datetime:

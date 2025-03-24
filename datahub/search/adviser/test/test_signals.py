@@ -1,6 +1,5 @@
 import pytest
 
-
 from datahub.company.test.factories import AdviserFactory
 from datahub.search.adviser.apps import AdviserSearchApp
 

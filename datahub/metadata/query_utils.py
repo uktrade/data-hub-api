@@ -9,8 +9,7 @@ class _StringAgg(Func):
 
 
 def _get_name_from_mptt_model(model, relation_name=None):
-    """
-    Generates a subquery that can be used to add mptt model names to a query set as an annotation.
+    """Generates a subquery that can be used to add mptt model names to a query set as an annotation.
 
     The generated SQL expression for the column (in the first example) will be similar to:
 
@@ -39,8 +38,7 @@ def _get_name_from_mptt_model(model, relation_name=None):
 
 
 def get_sector_name_subquery(relation_name=None):
-    """
-    Generates a subquery that can be used to add sector names to a query set as an annotation.
+    """Generates a subquery that can be used to add sector names to a query set as an annotation.
 
     Usage examples:
 
@@ -52,8 +50,7 @@ def get_sector_name_subquery(relation_name=None):
 
 
 def get_service_name_subquery(relation_name=None):
-    """
-    Generates a subquery that can be used to add service names to a query set as an annotation.
+    """Generates a subquery that can be used to add service names to a query set as an annotation.
 
     Usage examples:
 

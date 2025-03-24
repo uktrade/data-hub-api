@@ -1,6 +1,5 @@
 from rest_framework import serializers
 
-
 from datahub.search.serializers import (
     EntitySearchQuerySerializer,
     SingleOrListField,

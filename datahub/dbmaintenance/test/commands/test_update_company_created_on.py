@@ -15,14 +15,13 @@ pytestmark = pytest.mark.django_db
 
 @pytest.mark.parametrize(
     'simulate',
-    (
+    [
         True,
         False,
-    ),
+    ],
 )
 def test_run(s3_stubber, caplog, simulate):
-    """
-    Test that the command:
+    """Test that the command:
 
     - updates records only if simulate=False is passed
     - does not update records if simulate=True is passed

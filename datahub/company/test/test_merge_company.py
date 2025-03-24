@@ -6,14 +6,14 @@ import reversion
 from freezegun import freeze_time
 
 from datahub.company.merge import (
-    get_planned_changes,
     MergeNotAllowedError,
+    get_planned_changes,
 )
 from datahub.company.merge_company import (
     ALLOWED_RELATIONS_FOR_MERGING,
     INVESTMENT_PROJECT_COMPANY_FIELDS,
-    merge_companies,
     MERGE_CONFIGURATION,
+    merge_companies,
     rollback_merge_companies,
 )
 from datahub.company.models import (
@@ -73,8 +73,7 @@ from datahub.user.company_list.test.factories import (
 
 @pytest.fixture
 def unrelated_objects():
-    """
-    Create some objects not related to a known company.
+    """Create some objects not related to a known company.
 
     This is used in tests below to make sure objects unrelated to the company being merged
     do not affect the counts of objects that will be affected by the merge.
@@ -87,8 +86,7 @@ def unrelated_objects():
 
 
 def company_with_interactions_and_contacts_factory():
-    """
-    Factory for a company with interactions (and hence contacts, as interactions have contacts).
+    """Factory for a company with interactions (and hence contacts, as interactions have contacts).
     """
     company = CompanyFactory()
     CompanyInteractionFactory.create_batch(3, company=company)
@@ -117,8 +115,7 @@ def company_with_contacts_factory():
 
 
 def company_with_referrals_factory():
-    """
-    Factory for a company with referrals.
+    """Factory for a company with referrals.
 
     No company contacts are created to simplify testing.
     """
@@ -155,8 +152,8 @@ class TestDuplicateCompanyMerger:
     }
 
     @pytest.mark.parametrize(
-        'source_company_factory,expected_result,expected_should_archive',
-        (
+        ('source_company_factory', 'expected_result', 'expected_should_archive'),
+        [
             (
                 CompanyFactory,
                 base_expected_results,
@@ -235,7 +232,7 @@ class TestDuplicateCompanyMerger:
                 },
                 False,
             ),
-        ),
+        ],
     )
     @pytest.mark.usefixtures('unrelated_objects')
     def test_get_planned_changes(
@@ -244,8 +241,7 @@ class TestDuplicateCompanyMerger:
         expected_result,
         expected_should_archive,
     ):
-        """
-        Tests that get_planned_changes() returns the correct planned changes for various
+        """Tests that get_planned_changes() returns the correct planned changes for various
         cases.
         """
         source_company = source_company_factory()
@@ -255,17 +251,17 @@ class TestDuplicateCompanyMerger:
         assert merge_results == expected_planned_merge_results
 
     @pytest.mark.parametrize(
-        'factory_relation_kwarg,creates_contacts',
-        (
+        ('factory_relation_kwarg', 'creates_contacts'),
+        [
             ('num_company_list_items', False),
             ('num_contacts', True),
             ('num_interactions', True),
             ('num_orders', True),
             ('num_referrals', False),
             ('num_pipeline_items', False),
-        ),
+        ],
     )
-    @pytest.mark.parametrize('num_related_objects', (0, 1, 3))
+    @pytest.mark.parametrize('num_related_objects', [0, 1, 3])
     @pytest.mark.usefixtures('unrelated_objects')
     def test_merge_interactions_contacts_succeeds(
             self,
@@ -273,8 +269,7 @@ class TestDuplicateCompanyMerger:
             creates_contacts,
             num_related_objects,
     ):
-        """
-        Tests that perform_merge() moves contacts and interactions to the target company,
+        """Tests that perform_merge() moves contacts and interactions to the target company,
         and marks the source company as archived and transferred.
         """
         creation_time = datetime(2010, 12, 1, 15, 0, 10, tzinfo=timezone.utc)
@@ -349,7 +344,7 @@ class TestDuplicateCompanyMerger:
 
     @pytest.mark.parametrize(
         'fields',
-        (
+        [
             (),
             ('investor_company',),
             ('intermediate_company',),
@@ -358,12 +353,11 @@ class TestDuplicateCompanyMerger:
             ('investor_company', 'uk_company'),
             ('intermediate_company', 'uk_company'),
             ('investor_company', 'intermediate_company', 'uk_company'),
-        ),
+        ],
     )
     @pytest.mark.usefixtures('unrelated_objects')
     def test_merge_investment_projects_succeeds(self, fields):
-        """
-        Tests that perform_merge() moves investment projects to the target company and marks the
+        """Tests that perform_merge() moves investment projects to the target company and marks the
         source company as archived and transferred.
         """
         creation_time = datetime(2010, 12, 1, 15, 0, 10, tzinfo=timezone.utc)
@@ -432,8 +426,7 @@ class TestDuplicateCompanyMerger:
         assert source_company.transferred_to == target_company
 
     def test_merge_when_both_companies_on_same_company_list(self):
-        """
-        Test that if both the source and target company are on the same company list,
+        """Test that if both the source and target company are on the same company list,
         the merge is successful and the two list items are also merged.
         """
         source_company = CompanyFactory()
@@ -454,19 +447,18 @@ class TestDuplicateCompanyMerger:
         assert CompanyListItem.objects.filter(list=company_list, company=target_company).exists()
 
     @pytest.mark.parametrize(
-        'source_status,target_status',
-        (
+        ('source_status', 'target_status'),
+        [
             (PipelineItem.Status.LEADS, PipelineItem.Status.LEADS),
             (PipelineItem.Status.LEADS, PipelineItem.Status.IN_PROGRESS),
-        ),
+        ],
     )
     def test_merge_when_both_companies_are_on_pipeline_for_same_adviser(
         self,
         source_status,
         target_status,
     ):
-        """
-        Test that both source and target company are on pipeline for the same adviser
+        """Test that both source and target company are on pipeline for the same adviser
         and same status. And the merge is successful.
         """
         adviser = AdviserFactory()
@@ -497,8 +489,7 @@ class TestDuplicateCompanyMerger:
         ).exists()
 
     def test_merge_when_both_companies_are_on_pipeline_diff_adviser(self):
-        """
-        Test that both source and target company are on pipeline with different advisers.
+        """Test that both source and target company are on pipeline with different advisers.
         Merge is successful and both items are migrated to the target company.
         """
         adviser_1 = AdviserFactory()
@@ -564,12 +555,12 @@ class TestDuplicateCompanyMerger:
         assert source_company.transferred_to == target_company
 
     @pytest.mark.parametrize(
-        'valid_source_return_value, valid_target',
-        (
+        ('valid_source_return_value', 'valid_target'),
+        [
             ((False, ['field1', 'field2']), True),
             ((True, []), False),
             ((False, ['field1']), False),
-        ),
+        ],
     )
     @patch('datahub.company.merge_company.is_model_a_valid_merge_target')
     @patch('datahub.company.merge_company.is_model_a_valid_merge_source')
@@ -580,8 +571,7 @@ class TestDuplicateCompanyMerger:
         valid_source_return_value,
         valid_target,
     ):
-        """
-        Test that perform_merge() raises MergeNotAllowedError when the merge is not
+        """Test that perform_merge() raises MergeNotAllowedError when the merge is not
         allowed.
         """
         is_company_a_valid_merge_source_mock.return_value = valid_source_return_value
@@ -594,8 +584,7 @@ class TestDuplicateCompanyMerger:
             merge_companies(source_company, target_company, user)
 
     def test_rollback(self):
-        """
-        Test that rollback_merge_companies() rolls back a merge of companies
+        """Test that rollback_merge_companies() rolls back a merge of companies.
         """
         with reversion.create_revision():
             source_company = _company_factory(2, 2, 2, 2, 2, 2)
@@ -650,8 +639,7 @@ class TestDuplicateCompanyMerger:
                 f'{relation.model} is not registered with reversion'
 
     def test_one_list_core_team_member_merges_successfully(self):
-        """
-        Test merge is successful.
+        """Test merge is successful.
         If both the source and target company have the same adviser for the
         one_list_core_team_member relationship that it is not copied as duplicates
         are not allowed for the same company.
@@ -684,8 +672,7 @@ class TestDuplicateCompanyMerger:
         ).count() == 1
 
     def test_company_export_merges_successfully(self):
-        """
-        Test company merge successfully merges company `CompanyExport`s.
+        """Test company merge successfully merges company `CompanyExport`s.
         """
         adviser = AdviserFactory()
         source_company = CompanyFactory()
@@ -705,8 +692,7 @@ class TestDuplicateCompanyMerger:
         ).count() == 2
 
     def test_company_objective_merges_successfully(self):
-        """
-        Test company merge successfully merges company `Objective`s.
+        """Test company merge successfully merges company `Objective`s.
         """
         adviser = AdviserFactory()
         source_company = CompanyFactory()
@@ -731,8 +717,7 @@ class TestDuplicateCompanyMerger:
         ).count() == 2
 
     def test_company_eyb_lead_merges_successfully(self):
-        """
-        Test company merge successfully merges company `EYBLead`s.
+        """Test company merge successfully merges company `EYBLead`s.
         """
         adviser = AdviserFactory()
         source_company = CompanyFactory()
@@ -753,8 +738,7 @@ class TestDuplicateCompanyMerger:
         ).count() == 2
 
     def test_company_large_capital_investor_profile_merges_successfully(self):
-        """
-        Test company merge successfully merges company `LargeCapitalInvestorProfile`s.
+        """Test company merge successfully merges company `LargeCapitalInvestorProfile`s.
         """
         adviser = AdviserFactory()
         source_company = CompanyFactory()
@@ -775,8 +759,7 @@ class TestDuplicateCompanyMerger:
         ).count() == 2
 
     def test_company_large_capital_opportunity_merges_successfully(self):
-        """
-        Test company merge successfully merges company `LargeCapitalOpportunity`s.
+        """Test company merge successfully merges company `LargeCapitalOpportunity`s.
         """
         adviser = AdviserFactory()
         source_company = CompanyFactory()
@@ -799,8 +782,7 @@ class TestDuplicateCompanyMerger:
         ).count() == 3
 
     def test_company_new_export_interaction_reminder_merges_successfully(self):
-        """
-        Test company merge successfully merges company `NewExportInteractionReminder`s.
+        """Test company merge successfully merges company `NewExportInteractionReminder`s.
         """
         adviser = AdviserFactory()
         source_company = CompanyFactory()
@@ -821,8 +803,7 @@ class TestDuplicateCompanyMerger:
         ).count() == 2
 
     def test_company_no_recent_export_interaction_reminder_merges_successfully(self):
-        """
-        Test company merge successfully merges company `NoRecentExportInteractionReminder`s.
+        """Test company merge successfully merges company `NoRecentExportInteractionReminder`s.
         """
         adviser = AdviserFactory()
         source_company = CompanyFactory()
@@ -843,8 +824,7 @@ class TestDuplicateCompanyMerger:
         ).count() == 2
 
     def test_company_task_merges_successfully(self):
-        """
-        Test company merge successfully merges company `Task`s.
+        """Test company merge successfully merges company `Task`s.
         """
         adviser = AdviserFactory()
         source_company = CompanyFactory()
@@ -865,8 +845,7 @@ class TestDuplicateCompanyMerger:
         ).count() == 2
 
     def test_company_legacy_export_wins_merges_successfully(self):
-        """
-        Test company merge successfully merges company `LegacyExportWinsToDataHubCompany`s.
+        """Test company merge successfully merges company `LegacyExportWinsToDataHubCompany`s.
         """
         adviser = AdviserFactory()
         source_company = CompanyFactory()
@@ -1041,8 +1020,7 @@ class TestDuplicateCompanyMerger:
 class TestCompanyMerge:
 
     def test_merge_logs_source_and_target_relations(self, caplog):
-        """
-        Tests before we merge companies that the counts of each models relations are logged.
+        """Tests before we merge companies that the counts of each models relations are logged.
         """
         adviser = AdviserFactory()
         source_company = CompanyFactory()

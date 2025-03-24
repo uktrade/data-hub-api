@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from datahub.core.admin import BaseModelAdminMixin, get_change_link, ViewOnlyAdmin
+from datahub.core.admin import BaseModelAdminMixin, ViewOnlyAdmin, get_change_link
 from datahub.omis.invoice.models import Invoice
 from datahub.omis.order.models import Order
 

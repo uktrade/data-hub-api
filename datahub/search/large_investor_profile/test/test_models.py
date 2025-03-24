@@ -9,7 +9,7 @@ pytestmark = pytest.mark.django_db
 
 
 class TestLargeInvestorProfileSearchModel:
-    """Test for the large investor profile OpenSearch model"""
+    """Test for the large investor profile OpenSearch model."""
 
     def test_large_investor_profile_dbmodel_to_dict(self, opensearch):
         """Tests conversion of db model to dict."""

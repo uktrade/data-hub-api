@@ -120,8 +120,7 @@ def setup_data(opensearch_with_collector):
 
 @pytest.fixture
 def setup_subtotal_cost_data(opensearch_with_collector):
-    """
-    Setup Order data for total subtotal cost test.
+    """Setup Order data for total subtotal cost test.
 
     Order will have a reference that is a string representation of the resulting subtotal_cost.
     Subtotal cost must be three-digit because the test is choosing orders by their
@@ -148,7 +147,7 @@ class TestSearchOrder(APITestMixin):
     """Test specific search for orders."""
 
     def test_no_permissions(self):
-        """Should return 403"""
+        """Should return 403."""
         user = create_test_user(dit_team=TeamFactory())
         api_client = self.create_api_client(user=user)
         url = reverse('api-v3:search:order')
@@ -156,8 +155,8 @@ class TestSearchOrder(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     @pytest.mark.parametrize(
-        'data,results',
-        (
+        ('data', 'results'),
+        [
             (  # no filter => return all records
                 {},
                 ['efgh', 'abcd'],
@@ -345,7 +344,7 @@ class TestSearchOrder(APITestMixin):
                 {'sortby': 'payment_due_date:desc'},
                 ['efgh', 'abcd'],
             ),
-        ),
+        ],
     )
     def test_search(self, setup_data, data, results):
         """Test search results."""
@@ -360,8 +359,8 @@ class TestSearchOrder(APITestMixin):
         ] == results
 
     @pytest.mark.parametrize(
-        'post_data,expected_total_subtotal_cost',
-        (
+        ('post_data', 'expected_total_subtotal_cost'),
+        [
             (  # no filter => return all records
                 {},
                 1500,
@@ -386,7 +385,7 @@ class TestSearchOrder(APITestMixin):
                 {'reference': '900'},
                 0,
             ),
-        ),
+        ],
     )
     def test_search_orders_total_net_cost_value(
         self,
@@ -433,8 +432,7 @@ class TestSearchOrder(APITestMixin):
         assert response.json() == {'created_on_before': ['Date is in incorrect format.']}
 
     def test_incorrect_primary_market_raise_validation_error(self, setup_data):
-        """
-        Test that if the primary_market is not in a valid format,
+        """Test that if the primary_market is not in a valid format,
         then the API return a validation error.
         """
         url = reverse('api-v3:search:order')
@@ -451,7 +449,7 @@ class TestSearchOrder(APITestMixin):
 
     @pytest.mark.parametrize(
         'sector_level',
-        (0, 1, 2),
+        [0, 1, 2],
     )
     def test_sector_descends_filter(
         self, hierarchical_sectors, opensearch_with_collector, sector_level,
@@ -526,11 +524,11 @@ class TestOrderExportView(APITestMixin):
     """Tests the OMIS order export view."""
 
     @pytest.mark.parametrize(
-        'permissions', (
+        'permissions', [
             (),
             (f'order.{OrderPermission.view}',),
             (f'order.{OrderPermission.export}',),
-        ),
+        ],
     )
     def test_user_without_permission_cannot_export(self, opensearch, permissions):
         """Test that a user without the correct permissions cannot export data."""
@@ -542,15 +540,15 @@ class TestOrderExportView(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     @pytest.mark.parametrize(
-        'request_sortby,orm_ordering',
-        (
+        ('request_sortby', 'orm_ordering'),
+        [
             ('created_on', 'created_on'),
             ('created_on:desc', '-created_on'),
             ('modified_on', 'modified_on'),
             ('modified_on:desc', '-modified_on'),
             ('delivery_date', 'delivery_date'),
             ('delivery_date:desc', '-delivery_date'),
-        ),
+        ],
     )
     def test_export(
         self,
@@ -660,8 +658,8 @@ class TestGlobalSearch(APITestMixin):
     """Test global search for orders."""
 
     @pytest.mark.parametrize(
-        'term,expected_results',
-        (
+        ('term', 'expected_results'),
+        [
             (  # no filter => return all records
                 '',
                 ['abcd', 'efgh'],
@@ -698,7 +696,7 @@ class TestGlobalSearch(APITestMixin):
                 '2400',
                 ['efgh'],
             ),
-        ),
+        ],
     )
     def test_search(self, setup_data, term, expected_results):
         """Test search results."""

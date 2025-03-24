@@ -11,7 +11,6 @@ from datahub.investment_lead.tasks.ingest_eyb_common import (
 )
 from datahub.investment_lead.tasks.ingest_eyb_user import eyb_user_identification_task
 
-
 TRIAGE_PREFIX = f'{DATA_FLOW_EXPORTS_PREFIX}DirectoryExpandYourBusinessTriageDataPipeline/'
 
 

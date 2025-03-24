@@ -85,14 +85,13 @@ class InvestmentProjectAdmin(BaseModelAdminMixin, VersionAdmin):
         description='EYB Leads',
     )
     def get_eyb_leads(self, obj):
-        """EYB Leads associated with this Investment Project"""
+        """EYB Leads associated with this Investment Project."""
         return '\n'.join(
             [str(eyb.id) for eyb in obj.eyb_leads.all()],
         )
 
     def save_model(self, request, obj, form, change):
-        """
-        Populate who and when assigned a project manager for the first time.
+        """Populate who and when assigned a project manager for the first time.
         """
         first_assigned = not change or form.initial['project_manager'] is None
 

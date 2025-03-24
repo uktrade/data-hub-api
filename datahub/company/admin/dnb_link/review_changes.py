@@ -67,8 +67,7 @@ def _get_company(duns_number, error_url, request=None):
 @redirect_with_messages
 @method_decorator(csrf_protect)
 def dnb_link_review_changes(model_admin, request):
-    """
-    View to allow users to review changes that would be applied to a record before linking it.
+    """View to allow users to review changes that would be applied to a record before linking it.
     POSTs make the link and redirect the user to view the updated record.
     """
     if not model_admin.has_change_permission(request):

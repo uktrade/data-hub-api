@@ -7,8 +7,7 @@ from datahub.omis.invoice.constants import (
 
 
 def calculate_payment_due_date(order):
-    """
-    :returns: the calculated payment due date value.
+    """:returns: the calculated payment due date value.
         At the moment it's whichever is earliest of
         [delivery date - x days] OR [date quote accepted + y days]
 

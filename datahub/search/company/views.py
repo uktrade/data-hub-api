@@ -5,7 +5,8 @@ from django.db.models.fields import CharField
 from django.db.models.functions import Cast, Concat, Upper
 
 from config.settings.types import HawkScope
-from datahub.company.models import Company as DBCompany, CompanyExportCountry
+from datahub.company.models import Company as DBCompany
+from datahub.company.models import CompanyExportCountry
 from datahub.core.auth import PaaSIPAuthentication
 from datahub.core.constants import HeadquarterType
 from datahub.core.hawk_receiver import (
@@ -24,9 +25,9 @@ from datahub.search.company.serializers import (
     SearchCompanyQuerySerializer,
 )
 from datahub.search.views import (
-    register_v4_view,
     SearchAPIView,
     SearchExportAPIView,
+    register_v4_view,
 )
 
 
@@ -110,8 +111,7 @@ class SearchCompanyAPIView(SearchCompanyAPIViewMixin, SearchAPIView):
     """Filtered company search view."""
 
     def deep_get(self, dictionary, keys, default=None):
-        """
-        Perform a deep search on a dictionary to find the item at the location provided in the keys
+        """Perform a deep search on a dictionary to find the item at the location provided in the keys.
         """
         return reduce(
             lambda d, key: d.get(key, default) if isinstance(d, dict) else default,
@@ -170,8 +170,7 @@ class SearchCompanyAPIView(SearchCompanyAPIViewMixin, SearchAPIView):
 
 @register_v4_view(is_public=True)
 class PublicSearchCompanyAPIView(HawkResponseSigningMixin, SearchAPIView):
-    """
-    Company search view using Hawk authentication.
+    """Company search view using Hawk authentication.
 
     This is a slightly stripped down version of the company search view, intended for use by the
     Market Access service using Hawk authentication and without a user context in requests.
@@ -280,8 +279,7 @@ class SearchCompanyExportAPIView(SearchCompanyAPIViewMixin, SearchExportAPIView)
 
     @property
     def field_titles(self):
-        """
-        Returns field titles for CSV export
+        """Returns field titles for CSV export.
 
         There is implicit ordering here, guaranteed for python >= 3.7 to be insertion order
         This is a property because we don't want it to evaluate prior to database instantiation

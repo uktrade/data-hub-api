@@ -4,13 +4,11 @@ from datahub.cleanup.cleanup_config import DatetimeLessThanCleanupFilter, ModelC
 from datahub.cleanup.management.commands._base_command import BaseCleanupCommand
 from datahub.company.models import Company, Contact
 
-
 ORPHAN_AGE_THRESHOLD = relativedelta(months=6)
 
 
 class Command(BaseCleanupCommand):
-    """
-    Django command to delete orphaned records for `model`.
+    """Django command to delete orphaned records for `model`.
     Orphans are `days_before_orphaning` old records without any objects referencing them.
 
     If the argument `simulate=True` is passed in, the command only simulates the action.

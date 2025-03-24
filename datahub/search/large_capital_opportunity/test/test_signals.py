@@ -34,8 +34,7 @@ def test_updated_large_capital_opportunity_synced(opensearch_with_signals):
 
 
 def test_delete_from_opensearch(opensearch_with_signals):
-    """
-    Test that when a large capital opportunity is deleted from db it also
+    """Test that when a large capital opportunity is deleted from db it also
     calls delete document to delete from OpenSearch.
     """
     opportunity = LargeCapitalOpportunityFactory()
@@ -52,8 +51,7 @@ def test_delete_from_opensearch(opensearch_with_signals):
 
 
 def test_edit_promoter_syncs_large_capital_opportunity_in_opensearch(opensearch_with_signals):
-    """
-    Tests that updating promoter company details also updated the relevant
+    """Tests that updating promoter company details also updated the relevant
     large capital opportunity.
     """
     new_company_name = 'SYNC TEST'

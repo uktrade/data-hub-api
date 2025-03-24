@@ -13,8 +13,7 @@ logger = getLogger(__name__)
 
 
 def _get_company_ids(one_list_tier_ids, account_manager_ids):
-    """
-    Get an iterable of duns-linked company ids that match the one list tier and account manager
+    """Get an iterable of duns-linked company ids that match the one list tier and account manager
     arguments. Matching companies will be determined by those that meet these filters
     themselves, or those whose global headquarters do.
     """
@@ -39,14 +38,12 @@ def _get_company_ids(one_list_tier_ids, account_manager_ids):
 
 
 class Command(BaseCommand):
-    """
-    Command to query for the ids of duns-linked companies for a particular set of
+    """Command to query for the ids of duns-linked companies for a particular set of
     one list tiers and (optionally) particular set of account managers.
     """
 
     def add_arguments(self, parser):
-        """
-        Set arguments for the management command.
+        """Set arguments for the management command.
         """
         parser.add_argument(
             '--one-list-tier-ids',
@@ -62,8 +59,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        """
-        Run the query and output the results as an info message to the log file.
+        """Run the query and output the results as an info message to the log file.
         """
         one_list_tier_ids = options['one_list_tier_ids']
         account_manager_ids = options.get('account_manager_ids') or []

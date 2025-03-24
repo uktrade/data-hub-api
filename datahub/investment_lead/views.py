@@ -1,7 +1,6 @@
 import logging
 
 from django.db.models import Q
-
 from rest_framework import filters
 
 from datahub.core.audit import AuditViewSet
@@ -9,7 +8,6 @@ from datahub.core.viewsets import SoftDeleteCoreViewSet
 from datahub.investment_lead.models import EYBLead
 from datahub.investment_lead.serializers import RetrieveEYBLeadSerializer
 from datahub.metadata.models import Sector
-
 
 logger = logging.getLogger(__name__)
 

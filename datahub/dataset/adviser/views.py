@@ -4,8 +4,7 @@ from datahub.dataset.core.views import BaseDatasetView
 
 
 class AdvisersDatasetView(BaseDatasetView):
-    """
-    An APIView that provides 'get' action which queries and returns desired fields for
+    """An APIView that provides 'get' action which queries and returns desired fields for
     Advisers Dataset to be consumed by Data-flow periodically. Data-flow uses response result
     to insert data into Dataworkspace through its defined API endpoints.
     """
@@ -13,7 +12,7 @@ class AdvisersDatasetView(BaseDatasetView):
     pagination_class = AdvisersDatasetViewCursorPagination
 
     def get_dataset(self):
-        """Returns list of Advisers Dataset records"""
+        """Returns list of Advisers Dataset records."""
         return Adviser.objects.values(
             'id',
             'date_joined',

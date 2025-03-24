@@ -8,15 +8,13 @@ from datahub.company.models import Advisor, Company, OneListTier
 from datahub.dbmaintenance.management.base import CSVBaseCommand
 from datahub.dbmaintenance.utils import parse_uuid
 
-
 logger = getLogger(__name__)
 
 
 class Command(CSVBaseCommand):
-    """
-    Command to update:
+    """Command to update:
     - Company.one_list_tier
-    - Company.one_list_account_owner
+    - Company.one_list_account_owner.
 
     If --reset-unmatched=true, all the records not in the CSV will have
     the fields above set to None.
@@ -36,8 +34,7 @@ class Command(CSVBaseCommand):
         )
 
     def _handle(self, *args, simulate=False, reset_unmatched=False, **options):
-        """
-        Same as the super class but it adds some logic before and after it.
+        """Same as the super class but it adds some logic before and after it.
 
         This is because we want to reset all the records that are not found in the CSV if
         reset-unmatched is speficied.
@@ -69,8 +66,7 @@ class Command(CSVBaseCommand):
         return result
 
     def reset_unmatched(self, company, simulate):
-        """
-        Reset one list fields for `company`.
+        """Reset one list fields for `company`.
 
         :param company: the Company to update
         :param simulate: True if the change should not be committed to the database
@@ -92,8 +88,7 @@ class Command(CSVBaseCommand):
 
     @lru_cache(maxsize=None)
     def get_one_list_tier(self, pk):
-        """
-        :param pk: primary key of the instance to get
+        """:param pk: primary key of the instance to get
         :returns: OneListTier with id == `pk`
         """
         if not pk:
@@ -102,8 +97,7 @@ class Command(CSVBaseCommand):
 
     @lru_cache(maxsize=None)
     def get_adviser(self, pk):
-        """
-        :param pk: primary key of the instance to get
+        """:param pk: primary key of the instance to get
         :returns: Advisor with id == `pk`
         """
         if not pk:
@@ -113,8 +107,7 @@ class Command(CSVBaseCommand):
     def _update_company(
         self, company, new_one_list_tier_id, new_one_list_account_owner_id, simulate,
     ):
-        """
-        Update `company` with the new values.
+        """Update `company` with the new values.
 
         :param new_one_list_tier_id: new OneListTier value
         :param new_one_list_account_owner_id: new Advisor value
@@ -136,8 +129,7 @@ class Command(CSVBaseCommand):
             reversion.set_comment('One List tier and One List account owner correction.')
 
     def _should_update(self, company, one_list_tier_id, one_list_account_owner_id):
-        """
-        Check if `company` should be updated.
+        """Check if `company` should be updated.
 
         :param company: Company to update
         :param one_list_tier_id: new OneListTier value

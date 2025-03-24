@@ -93,8 +93,7 @@ class AdviserAdmin(ExportWinsAdminMixin, VersionAdmin, UserAdmin):
     ordering = ('email',)
 
     def features_info(self, obj):
-        """
-        Shows if any individual user feature flag already exists in user feature flag group
+        """Shows if any individual user feature flag already exists in user feature flag group
         assigned to the adviser.
         """
         info = []
@@ -113,8 +112,7 @@ class AdviserAdmin(ExportWinsAdminMixin, VersionAdmin, UserAdmin):
         return '\n'.join(info)
 
     def get_urls(self):
-        """
-        Gets the admin URLs for this model.
+        """Gets the admin URLs for this model.
 
         This adds an additional route for the add adviser from SSO view.
         """
@@ -134,8 +132,7 @@ class AdviserAdmin(ExportWinsAdminMixin, VersionAdmin, UserAdmin):
 
 
 class AddAdviserFromSSOAdmin(AdviserAdmin):
-    """
-    Variant of AdviserAdmin with a different add form.
+    """Variant of AdviserAdmin with a different add form.
 
     This is used as part of simple workaround to enable us to have two different
     add adviser forms without reimplementing the entire view.

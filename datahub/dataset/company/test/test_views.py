@@ -18,7 +18,7 @@ from datahub.metadata.utils import convert_usd_to_gbp
 
 
 def get_expected_data_from_company(company):
-    """Returns company data as a dictionary"""
+    """Returns company data as a dictionary."""
     data = {
         'address_1': company.address_1,
         'address_2': company.address_2,
@@ -101,8 +101,7 @@ def get_expected_data_from_company(company):
 
 @pytest.mark.django_db
 class TestCompaniesDatasetViewSet(BaseDatasetViewTest):
-    """
-    Tests for CompaniesDatasetView
+    """Tests for CompaniesDatasetView.
     """
 
     view_url = reverse('api-v4:dataset:companies-dataset')
@@ -110,13 +109,13 @@ class TestCompaniesDatasetViewSet(BaseDatasetViewTest):
 
     @pytest.mark.parametrize(
         'company_factory',
-        (
+        [
             CompanyWithAreaFactory,
             ArchivedCompanyFactory,
-        ),
+        ],
     )
     def test_success(self, data_flow_api_client, company_factory):
-        """Test that endpoint returns with expected data for a single company"""
+        """Test that endpoint returns with expected data for a single company."""
         company = company_factory()
         company.created_by = None
         company.created_on = None
@@ -131,13 +130,13 @@ class TestCompaniesDatasetViewSet(BaseDatasetViewTest):
 
     @pytest.mark.parametrize(
         'company_factory',
-        (
+        [
             CompanyWithAreaFactory,
             ArchivedCompanyFactory,
-        ),
+        ],
     )
     def test_core_team_member(self, data_flow_api_client, company_factory):
-        """Test that endpoint returns with advisers on the core team"""
+        """Test that endpoint returns with advisers on the core team."""
         company = company_factory()
         company.one_list_core_team_advisers = [
             str(o.adviser.id)
@@ -157,13 +156,13 @@ class TestCompaniesDatasetViewSet(BaseDatasetViewTest):
 
     @pytest.mark.parametrize(
         'company_factory',
-        (
+        [
             CompanyWithAreaFactory,
             ArchivedCompanyFactory,
-        ),
+        ],
     )
     def test_turnover_null(self, data_flow_api_client, company_factory):
-        """Test that endpoint returns with expected data for a null turnover value"""
+        """Test that endpoint returns with expected data for a null turnover value."""
         company = company_factory()
         company.created_by = None
         company.created_on = None
@@ -182,13 +181,13 @@ class TestCompaniesDatasetViewSet(BaseDatasetViewTest):
 
     @pytest.mark.parametrize(
         'company_factory',
-        (
+        [
             CompanyWithAreaFactory,
             ArchivedCompanyFactory,
-        ),
+        ],
     )
     def test_turnover_negative(self, data_flow_api_client, company_factory):
-        """Test that endpoint returns with expected data for a null turnover value"""
+        """Test that endpoint returns with expected data for a null turnover value."""
         company = company_factory()
         company.created_by = None
         company.created_on = None
@@ -206,7 +205,7 @@ class TestCompaniesDatasetViewSet(BaseDatasetViewTest):
         assert result == expected_result
 
     def test_success_subsidiary(self, data_flow_api_client):
-        """Test that for a company and it's subsidiary two companies are returned"""
+        """Test that for a company and it's subsidiary two companies are returned."""
         company = SubsidiaryFactory()
         response = data_flow_api_client.get(self.view_url)
         assert response.status_code == status.HTTP_200_OK
@@ -215,7 +214,7 @@ class TestCompaniesDatasetViewSet(BaseDatasetViewTest):
         assert result == get_expected_data_from_company(company)
 
     def test_with_multiple_records(self, data_flow_api_client):
-        """Test that endpoint returns correct number of records"""
+        """Test that endpoint returns correct number of records."""
         with freeze_time('2019-01-01 12:30:00'):
             company1 = CompanyFactory()
         with freeze_time('2019-01-03 12:00:00'):
@@ -232,7 +231,7 @@ class TestCompaniesDatasetViewSet(BaseDatasetViewTest):
             assert str(company.id) == response_results[index]['id']
 
     def test_with_updated_since_filter(self, data_flow_api_client):
-        """Test that the endpoint returns only companies created after a certain date"""
+        """Test that the endpoint returns only companies created after a certain date."""
         # Create companies with different `created_on` dates
         with freeze_time('2021-01-01 12:30:00'):
             CompanyFactory()

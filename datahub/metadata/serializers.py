@@ -7,9 +7,13 @@ from datahub.core.serializers import ConstantModelSerializer, NestedRelatedField
 from datahub.export_win.models import TeamType
 from datahub.interaction.models import ServiceAnswerOption, ServiceQuestion
 from datahub.metadata.models import (
-    Country, ExchangeRate, OverseasRegion, Service, TeamRole, UKRegion,
+    Country,
+    ExchangeRate,
+    OverseasRegion,
+    Service,
+    TeamRole,
+    UKRegion,
 )
-
 
 SERVICE_LEAF_NODE_NOT_SELECTED_MESSAGE = gettext_lazy(
     'This field is valid for services without children services.',

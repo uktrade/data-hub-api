@@ -2,7 +2,6 @@ import pytest
 
 from datahub.interaction.test.factories import InteractionFactoryBase
 from datahub.investment.project.test.factories import InvestmentProjectFactory
-
 from datahub.search.task.apps import TaskSearchApp
 from datahub.search.task.models import Task
 from datahub.task.models import Task as TaskModel
@@ -12,7 +11,7 @@ pytestmark = pytest.mark.django_db
 
 
 def test_task_to_dict(opensearch):
-    """Test for generic task search model"""
+    """Test for generic task search model."""
     task = TaskFactory()
     result = Task.db_object_to_dict(task)
 
@@ -50,7 +49,7 @@ def test_task_to_dict(opensearch):
 
 
 def test_investment_project_task_to_dict(opensearch):
-    """Test for investment project task fields to search model"""
+    """Test for investment project task fields to search model."""
     investment_project = InvestmentProjectFactory()
 
     task = TaskFactory(
@@ -69,7 +68,7 @@ def test_investment_project_task_to_dict(opensearch):
 
 
 def test_interaction_task_to_dict(opensearch):
-    """Test for interaction task fields to search model"""
+    """Test for interaction task fields to search model."""
     interaction = InteractionFactoryBase()
 
     task = TaskFactory(

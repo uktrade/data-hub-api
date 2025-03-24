@@ -1,13 +1,10 @@
 import logging
 
-
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from django.utils.decorators import method_decorator
 from django.utils.timezone import now
 from django.views.decorators.cache import cache_page
-
-
 from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -20,7 +17,6 @@ from datahub.core.exceptions import (
 )
 from datahub.core.permissions import HasPermissions
 from datahub.core.view_utils import enforce_request_content_type
-
 from datahub.dnb_api.link_company import CompanyAlreadyDNBLinkedError, link_company_with_dnb
 from datahub.dnb_api.models import HierarchyData
 from datahub.dnb_api.queryset import get_company_queryset
@@ -36,13 +32,13 @@ from datahub.dnb_api.serializers import (
 )
 from datahub.dnb_api.utils import (
     COMPANY_TREE_TIMEOUT,
-    create_company_tree,
-    create_investigation,
     DNBServiceConnectionError,
     DNBServiceError,
     DNBServiceInvalidRequestError,
     DNBServiceInvalidResponseError,
     DNBServiceTimeoutError,
+    create_company_tree,
+    create_investigation,
     get_change_request,
     get_company,
     get_company_hierarchy_count,
@@ -54,13 +50,11 @@ from datahub.dnb_api.utils import (
     validate_company_id,
 )
 
-
 logger = logging.getLogger(__name__)
 
 
 class DNBCompanySearchView(APIView):
-    """
-    View for searching DNB companies.
+    """View for searching DNB companies.
     """
 
     permission_classes = (
@@ -71,8 +65,7 @@ class DNBCompanySearchView(APIView):
 
     @method_decorator(enforce_request_content_type('application/json'))
     def post(self, request):
-        """
-        Proxy to DNB search API for POST requests.  This will also hydrate results
+        """Proxy to DNB search API for POST requests.  This will also hydrate results
         with Data Hub company details if the company exists (and can be matched)
         on Data Hub.
         """
@@ -130,8 +123,7 @@ class DNBCompanySearchView(APIView):
         ]
 
     def _format_and_hydrate(self, dnb_results):
-        """
-        Format each result from DNB such that there is a "dnb_company" key and
+        """Format each result from DNB such that there is a "dnb_company" key and
         a "datahub_company" key.  The value for "datahub_company" represents
         the corresponding Company entry on Data Hub for the DNB result, if it
         exists.
@@ -171,8 +163,7 @@ class DNBCompanySearchView(APIView):
 
 
 class DNBCompanyCreateView(APIView):
-    """
-    View for creating datahub company from DNB data.
+    """View for creating datahub company from DNB data.
     """
 
     permission_classes = (
@@ -183,8 +174,7 @@ class DNBCompanyCreateView(APIView):
     )
 
     def post(self, request):
-        """
-        Given a duns_number, get the data for the company from dnb-service
+        """Given a duns_number, get the data for the company from dnb-service
         and create a record in DataHub.
         """
         duns_serializer = DUNSNumberSerializer(data=request.data)
@@ -231,8 +221,7 @@ class DNBCompanyCreateView(APIView):
 
 
 class DNBCompanyLinkView(APIView):
-    """
-    View for linking a company to a DNB record.
+    """View for linking a company to a DNB record.
     """
 
     permission_classes = (
@@ -244,8 +233,7 @@ class DNBCompanyLinkView(APIView):
 
     @method_decorator(enforce_request_content_type('application/json'))
     def post(self, request):
-        """
-        Given a Data Hub Company ID and a duns-number, link the Data Hub
+        """Given a Data Hub Company ID and a duns-number, link the Data Hub
         Company to the D&B record.
         """
         link_serializer = DNBCompanyLinkSerializer(data=request.data)
@@ -280,8 +268,7 @@ class DNBCompanyLinkView(APIView):
 
 
 class DNBCompanyChangeRequestView(APIView):
-    """
-    View for requesting change/s to DNB companies.
+    """View for requesting change/s to DNB companies.
     """
 
     permission_classes = (
@@ -293,8 +280,7 @@ class DNBCompanyChangeRequestView(APIView):
 
     @method_decorator(enforce_request_content_type('application/json'))
     def post(self, request):
-        """
-        A thin wrapper around the dnb-service change request API.
+        """A thin wrapper around the dnb-service change request API.
         """
         change_request_serializer = DNBCompanyChangeRequestSerializer(data=request.data)
         change_request_serializer.is_valid(raise_exception=True)
@@ -312,8 +298,7 @@ class DNBCompanyChangeRequestView(APIView):
         return Response(response)
 
     def get(self, request):
-        """
-        A thin wrapper around the dnb-service change request API.
+        """A thin wrapper around the dnb-service change request API.
         """
         duns_number = request.query_params.get('duns_number', None)
         status = request.query_params.get('status', None)
@@ -338,8 +323,7 @@ class DNBCompanyChangeRequestView(APIView):
 
 
 class DNBCompanyInvestigationView(APIView):
-    """
-    View for creating a new investigation to get D&B to investigate and create a company record.
+    """View for creating a new investigation to get D&B to investigate and create a company record.
     """
 
     permission_classes = (
@@ -351,8 +335,7 @@ class DNBCompanyInvestigationView(APIView):
 
     @method_decorator(enforce_request_content_type('application/json'))
     def post(self, request):
-        """
-        A wrapper around the investigation API endpoint for dnb-service.
+        """A wrapper around the investigation API endpoint for dnb-service.
         """
         investigation_serializer = DNBCompanyInvestigationSerializer(data=request.data)
         investigation_serializer.is_valid(raise_exception=True)
@@ -386,8 +369,7 @@ class DNBCompanyHierarchyView(APIView):
 
     @method_decorator(cache_page(COMPANY_TREE_TIMEOUT, key_prefix='company_hierarchy'))
     def get(self, request, company_id):
-        """
-        Given a Company Id, get the data for the company hierarchy from dnb-service.
+        """Given a Company Id, get the data for the company hierarchy from dnb-service.
         """
         duns_number = validate_company_id(company_id)
 
@@ -456,8 +438,7 @@ class DNBCompanyHierarchyView(APIView):
 
 
 class DNBCompanyHierarchyReducedView(DNBCompanyHierarchyView):
-    """
-    View for receiving a reduced datahub hierarchy consisting of only immediate parents of
+    """View for receiving a reduced datahub hierarchy consisting of only immediate parents of
     a company from DNB data.
     """
 
@@ -466,8 +447,7 @@ class DNBCompanyHierarchyReducedView(DNBCompanyHierarchyView):
 
 
 class DNBCompanyHierarchyFullView(DNBCompanyHierarchyView):
-    """
-    View for receiving datahub hierarchy of a company from DNB data.
+    """View for receiving datahub hierarchy of a company from DNB data.
     """
 
     def get_data(self, duns_number, companies_count):
@@ -475,8 +455,7 @@ class DNBCompanyHierarchyFullView(DNBCompanyHierarchyView):
 
 
 class DNBRelatedCompaniesView(APIView):
-    """
-    View for receiving datahub hierarchy of a company from DNB data and return Data Hub IDs.
+    """View for receiving datahub hierarchy of a company from DNB data and return Data Hub IDs.
     """
 
     permission_classes = (
@@ -488,9 +467,8 @@ class DNBRelatedCompaniesView(APIView):
 
     @method_decorator(cache_page(COMPANY_TREE_TIMEOUT, key_prefix='related_companies'))
     def get(self, request, company_id):
-        """
-        Given a Company Id, get the data for the company hierarchy from dnb-service
-        then find the related companies to create a list of IDs
+        """Given a Company Id, get the data for the company hierarchy from dnb-service
+        then find the related companies to create a list of IDs.
         """
         company_ids = get_datahub_ids_for_dnb_service_company_hierarchy(
             include_parent_companies=(
@@ -506,8 +484,7 @@ class DNBRelatedCompaniesView(APIView):
 
 
 class DNBRelatedCompaniesCountView(APIView):
-    """
-    View for returning the count of related companies a company has
+    """View for returning the count of related companies a company has.
     """
 
     permission_classes = (

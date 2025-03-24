@@ -9,8 +9,7 @@ logger = getLogger(__name__)
 
 
 class Command(CSVBaseCommand):
-    """
-    Command to company merges.
+    """Command to company merges.
     """
 
     help = """
@@ -47,8 +46,7 @@ class Command(CSVBaseCommand):
         merge_companies(source_company, target_company, None)
 
     def handle(self, *args, **options):
-        """
-        Process the CSV file and logs some additional logging to help with companies merging
+        """Process the CSV file and logs some additional logging to help with companies merging.
         """
         super().handle(*args, **options)
         logger.info(

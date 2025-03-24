@@ -3,8 +3,7 @@ from datahub.investment.project.test.factories import InvestmentProjectFactory
 
 
 class ShallowInvestmentProjectFactory(InvestmentProjectFactory):
-    """
-    Same as InvestmentProjectFactory but with reduced dependencies
+    """Same as InvestmentProjectFactory but with reduced dependencies
     so that we can test specific references without extra noise.
     """
 

@@ -41,7 +41,7 @@ from datahub.core.queues.constants import (
 )
 from datahub.core.queues.health_check import queue_health_check
 from datahub.core.queues.job_scheduler import job_scheduler
-from datahub.core.queues.scheduler import DataHubScheduler, LONG_RUNNING_QUEUE
+from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE, DataHubScheduler
 from datahub.dnb_api.tasks.sync import schedule_sync_outdated_companies_with_dnb
 from datahub.dnb_api.tasks.update import schedule_get_company_updates
 from datahub.email_ingestion.tasks import process_mailbox_emails
@@ -348,7 +348,7 @@ def schedule_export_win_customer_response_token_jobs():
 
 
 def schedule_export_win_auto_resend_client_email():
-    """Schedule auto resend client email from unconfirmed win"""
+    """Schedule auto resend client email from unconfirmed win."""
     job_scheduler(
         function=auto_resend_client_email_from_unconfirmed_win,
         max_retries=5,
@@ -361,7 +361,7 @@ def schedule_export_win_auto_resend_client_email():
 
 
 def schedule_update_company_export_potential_from_csv():
-    """Schedule ingestion of export potential data"""
+    """Schedule ingestion of export potential data."""
     job_scheduler(
         function=update_company_export_potential_from_csv,
         function_kwargs={

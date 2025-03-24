@@ -14,13 +14,11 @@ from datahub.core.utils import reverse_with_query_string
 
 
 class TestUnarchiveCompanyLink(AdminTestMixin):
-    """
-    Tests the 'unarchive' link on the change form.
+    """Tests the 'unarchive' link on the change form.
     """
 
     def test_link_exists(self):
-        """
-        Test that the link exists for a user with the change company permission.
+        """Test that the link exists for a user with the change company permission.
         """
         company = ArchivedCompanyFactory()
 
@@ -42,8 +40,7 @@ class TestUnarchiveCompanyLink(AdminTestMixin):
         assert unarchive_url in response.rendered_content
 
     def test_link_does_not_exist_with_only_view_permission(self):
-        """
-        Test that the link does not exist for a user with only the view company permission.
+        """Test that the link does not exist for a user with only the view company permission.
         """
         company = ArchivedCompanyFactory()
 
@@ -66,16 +63,15 @@ class TestUnarchiveCompanyLink(AdminTestMixin):
 
     @pytest.mark.parametrize(
         'company_creator',
-        (
+        [
             # A company that has not been archived
             CompanyFactory,
             # A company that was archived as part of the merge process
             DuplicateCompanyFactory,
-        ),
+        ],
     )
     def test_link_does_not_exist_company_not_unarchivable(self, company_creator):
-        """
-        Test that the link does not exist when the company is not unarchivable.
+        """Test that the link does not exist when the company is not unarchivable.
         """
         company = company_creator()
 
@@ -95,8 +91,8 @@ class TestUnarchiveCompanyViewGet(AdminTestMixin):
     """Tests GET requests for the 'unarchive company' view."""
 
     @pytest.mark.parametrize(
-        'company_callable,expected_status_code,expected_archived_value',
-        (
+        ('company_callable', 'expected_status_code', 'expected_archived_value'),
+        [
             # Unarchive of an archived company is successful
             (
                 ArchivedCompanyFactory,
@@ -116,7 +112,7 @@ class TestUnarchiveCompanyViewGet(AdminTestMixin):
                 status.HTTP_302_FOUND,
                 True,
             ),
-        ),
+        ],
     )
     def test_unarchive_view(
         self,
@@ -124,8 +120,7 @@ class TestUnarchiveCompanyViewGet(AdminTestMixin):
         expected_status_code,
         expected_archived_value,
     ):
-        """
-        Test the unarchive view when called on companies in different states.
+        """Test the unarchive view when called on companies in different states.
         """
         company = company_callable()
         unarchive_route_name = admin_urlname(Company._meta, 'unarchive-company')
@@ -148,8 +143,7 @@ class TestUnarchiveCompanyViewGet(AdminTestMixin):
             assert not company.archived_reason
 
     def test_unarchive_company_does_not_exist(self):
-        """
-        Test that a 400 is returned when an invalid value is passed in the query string.
+        """Test that a 400 is returned when an invalid value is passed in the query string.
 
         This could only happen if the query string was manipulated, or the referenced company
         was deleted.
@@ -167,8 +161,7 @@ class TestUnarchiveCompanyViewGet(AdminTestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_unarchive_permission_denied(self):
-        """
-        Test the unarchive view when the user does not have sufficient permissions
+        """Test the unarchive view when the user does not have sufficient permissions
         to unarchive a company.
         """
         company = ArchivedCompanyFactory()

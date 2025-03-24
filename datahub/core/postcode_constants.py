@@ -942,7 +942,7 @@ US_ZIP_STATES = (
 
 
 class CountryPostcodeReplacement(Enum):
-    """Country Postcode Replacement Format"""
+    """Country Postcode Replacement Format."""
 
     # https://regex101.com/r/4XUuax/2 full explanation and examples of the regex
     united_states = CountryPostcodeReplacementConstant(

@@ -1,11 +1,8 @@
 """General mixins."""
 from django.conf import settings
-from rest_framework import mixins
-from rest_framework import serializers
-from rest_framework import status
+from rest_framework import mixins, serializers, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-
 
 from datahub.core.models import ArchivableModel
 from datahub.core.schemas import StubSchema
@@ -73,7 +70,7 @@ class ArchivableViewSetMixin:
 
 
 class SoftDeleteViaArchiveMixin(mixins.DestroyModelMixin):
-    """To be used with models that should be archived instead of deleted"""
+    """To be used with models that should be archived instead of deleted."""
 
     def destroy(self, request, *args, **kwargs):
         """Archive instead of deleting."""

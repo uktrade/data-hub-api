@@ -1,7 +1,5 @@
 import django.contrib.messages as django_messages
-
 import reversion
-
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.core.exceptions import PermissionDenied, SuspiciousOperation
 from django.http import HttpResponseRedirect
@@ -13,19 +11,22 @@ from django.utils.translation import gettext_lazy
 from django.views.decorators.csrf import csrf_protect
 
 from datahub.company.merge import (
-    get_planned_changes,
     MergeNotAllowedError,
+    get_planned_changes,
     transform_merge_results_to_merge_entry_summaries,
 )
 from datahub.company.merge_company import (
-    merge_companies,
     MERGE_CONFIGURATION as COMPANY_MERGE_CONFIGURATION,
+)
+from datahub.company.merge_company import (
+    merge_companies,
 )
 from datahub.company.merge_contact import (
     MERGE_CONFIGURATION as CONTACT_MERGE_CONFIGURATION,
+)
+from datahub.company.merge_contact import (
     merge_contacts,
 )
-
 from datahub.core.templatetags.datahub_extras import verbose_name_for_count
 
 COMPANY_REVERSION_REVISION_COMMENT = """
@@ -71,8 +72,7 @@ def confirm_merge_companies(model_admin, request):
 
 @method_decorator(csrf_protect)
 def confirm_merge(model_admin, request, dict):
-    """
-    View for confirming the merge before it is actually performed.
+    """View for confirming the merge before it is actually performed.
 
     This view displays the changes that would be made if the merge proceeds, and asks
     the user to confirm if they want to go ahead.

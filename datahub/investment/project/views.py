@@ -33,12 +33,11 @@ from datahub.investment.project.serializers import (
     IProjectTeamMemberSerializer,
 )
 
-
 _team_member_queryset = InvestmentProjectTeamMember.objects.select_related('adviser')
 
 
 class InvestmentFilter(FilterSet):
-    """Investment project filter that allows autocomplete"""
+    """Investment project filter that allows autocomplete."""
 
     autocomplete = AutocompleteFilter(
         search_fields=('name',),
@@ -64,8 +63,7 @@ class IProjectAuditViewSet(AuditViewSet):
 
     @classmethod
     def _get_additional_change_information(cls, v_new):
-        """
-        Gets any investment activity associated with a change for the a change log entry.
+        """Gets any investment activity associated with a change for the a change log entry.
         If a note is not present then returns a None for a note to follow
         the same behaviour as DRF.
         """
@@ -158,7 +156,7 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSet):
         schema=StubSchema(),
     )
     def change_stage(self, request, *args, **kwargs):
-        """Change the stage of an investment project"""
+        """Change the stage of an investment project."""
         instance = self.get_object()
         serializer = IProjectChangeStageSerializer(
             instance,
@@ -238,8 +236,7 @@ class IProjectTeamMembersViewSet(CoreViewSet):
         return 'Investment project team members'
 
     def get_project(self):
-        """
-        Gets the investment project object referred to in the URL path.
+        """Gets the investment project object referred to in the URL path.
 
         This is used by IsAssociatedToInvestmentProjectTeamMemberPermission (which handles a
         non-existent project correctly).

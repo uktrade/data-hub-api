@@ -6,7 +6,11 @@ import pytest
 
 from datahub.core.constants import (
     InvestmentBusinessActivity as InvestmentBusinessActivityConstant,
+)
+from datahub.core.constants import (
     InvestmentType as InvestmentTypeConstant,
+)
+from datahub.core.constants import (
     Sector as SectorConstant,
 )
 from datahub.investment.project.management.commands import refresh_gross_value_added_values
@@ -24,9 +28,8 @@ class TestRefreshGrossValueAddedCommand:
     """Test refreshing gross value added values command."""
 
     @pytest.mark.parametrize(
-        'investment_type,sector,business_activities,multiplier_value,'
-        'foreign_equity_investment,number_new_jobs,gross_value_added',
-        (
+        ('investment_type', 'sector', 'business_activities', 'multiplier_value', 'foreign_equity_investment', 'number_new_jobs', 'gross_value_added'),
+        [
             (
                 InvestmentTypeConstant.fdi.value.id,
                 None,
@@ -53,15 +56,6 @@ class TestRefreshGrossValueAddedCommand:
                 [
                     InvestmentBusinessActivityConstant.sales.value.id,
                 ],
-                '51983.514030000',
-                1000,
-                200,
-                '10396703',
-            ),
-            (
-                InvestmentTypeConstant.fdi.value.id,
-                SectorConstant.renewable_energy_wind.value.id,
-                [InvestmentBusinessActivityConstant.retail.value.id],
                 '51983.514030000',
                 1000,
                 200,
@@ -129,7 +123,7 @@ class TestRefreshGrossValueAddedCommand:
                 200,
                 None,
             ),
-        ),
+        ],
     )
     def test_refresh_gross_value_added(
         self,

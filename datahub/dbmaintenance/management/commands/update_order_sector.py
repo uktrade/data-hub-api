@@ -16,10 +16,9 @@ class Command(CSVBaseCommand):
 
     @disable_search_signal_receivers(Order)
     def _handle(self, *args, **options):
-        """
-        Disables search signal receivers for orders.
+        """Disables search signal receivers for orders.
         Avoid queuing huge number of RQ scheduled tasks for syncing orders to OpenSearch.
-        (Syncing can be manually performed afterwards using sync_search if required.)
+        (Syncing can be manually performed afterwards using sync_search if required.).
         """
         return super()._handle(*args, **options)
 

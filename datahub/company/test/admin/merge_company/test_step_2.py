@@ -1,7 +1,6 @@
 from unittest.mock import patch
 
 import pytest
-
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.test.html import parse_html
@@ -25,7 +24,7 @@ class TestSelectPrimaryCompanyViewGet(AdminTestMixin):
 
     @pytest.mark.parametrize(
         'data',
-        (
+        [
             {},
             {
                 'company_1': '12345',
@@ -46,11 +45,10 @@ class TestSelectPrimaryCompanyViewGet(AdminTestMixin):
                 'company_1': '13495',
                 'company_2': lambda: str(CompanyFactory().pk),
             },
-        ),
+        ],
     )
     def test_returns_400_if_invalid_companies_passed(self, data):
-        """
-        Test that a 400 is returned when invalid values are passed for company_1 or company_2.
+        """Test that a 400 is returned when invalid values are passed for company_1 or company_2.
 
         This could only happen if the query string was manipulated, or one of the referenced
         companies was deleted.
@@ -66,11 +64,11 @@ class TestSelectPrimaryCompanyViewGet(AdminTestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     @pytest.mark.parametrize(
-        'swap', (True, False),
+        'swap', [True, False],
     )
     @pytest.mark.parametrize(
-        'company_1_factory,company_2_factory',
-        (
+        ('company_1_factory', 'company_2_factory'),
+        [
             (
                 ArchivedCompanyFactory,
                 CompanyFactory,
@@ -83,7 +81,7 @@ class TestSelectPrimaryCompanyViewGet(AdminTestMixin):
                 CompanyFactory,
                 lambda: SubsidiaryFactory().global_headquarters,
             ),
-        ),
+        ],
         ids=[
             'archived-company',
             'subsidiary',
@@ -96,8 +94,7 @@ class TestSelectPrimaryCompanyViewGet(AdminTestMixin):
         company_2_factory,
         swap,
     ):
-        """
-        Tests that the radio button to select a company is disabled if it is archived,
+        """Tests that the radio button to select a company is disabled if it is archived,
         or the other company has an OMIS order or other related object
         (other than an interaction, contact or investment project).
         """
@@ -129,7 +126,7 @@ class TestSelectPrimaryCompanyViewGet(AdminTestMixin):
 class TestSelectPrimaryCompanyViewPost(AdminTestMixin):
     """Tests form submission in the 'Select primary company' view."""
 
-    @pytest.mark.parametrize('selected_company', ('1', '2'))
+    @pytest.mark.parametrize('selected_company', ['1', '2'])
     def test_proceeds_if_company_chosen(self, selected_company):
         """Test that if a valid selection is made, the user is redirected to the change list."""
         company_1 = CompanyFactory()
@@ -168,10 +165,10 @@ class TestSelectPrimaryCompanyViewPost(AdminTestMixin):
 
         assert response.redirect_chain[0][0] == confirm_merge_url
 
-    @pytest.mark.parametrize('swap', (False, True))
+    @pytest.mark.parametrize('swap', [False, True])
     @pytest.mark.parametrize(
-        'company_1_factory, company_2_factory, expected_error, disallowed_fields',
-        (
+        ('company_1_factory', 'company_2_factory', 'expected_error', 'disallowed_fields'),
+        [
             (
                 ArchivedCompanyFactory,
                 CompanyFactory,
@@ -190,7 +187,7 @@ class TestSelectPrimaryCompanyViewPost(AdminTestMixin):
                 msg,
                 ['subsidiaries'],
             ),
-        ),
+        ],
     )
     @patch('datahub.company.merge_company.is_model_a_valid_merge_source')
     def test_error_displayed_if_invalid_selection_made(

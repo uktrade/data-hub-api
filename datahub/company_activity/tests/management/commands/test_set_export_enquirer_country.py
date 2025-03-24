@@ -1,16 +1,13 @@
 import logging
-
 from unittest.mock import patch
 
 import pytest
-
 from django.core.management import call_command
 
 from datahub.company.test.factories import CompanyFactory
 from datahub.company_activity.models import GreatExportEnquiry
 from datahub.company_activity.tests.factories import GreatExportEnquiryFactory
 from datahub.metadata.models import Country
-
 
 pytestmark = pytest.mark.django_db
 

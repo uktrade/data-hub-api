@@ -5,7 +5,7 @@ from datahub.interaction.models import InteractionPermission
 from datahub.search.export_country_history import ExportCountryHistoryApp
 from datahub.search.export_country_history.serializers import SearchExportCountryHistorySerializer
 from datahub.search.interaction.models import Interaction
-from datahub.search.views import register_v4_view, SearchAPIView
+from datahub.search.views import SearchAPIView, register_v4_view
 
 
 @register_v4_view()
@@ -64,14 +64,12 @@ class ExportCountryHistoryView(SearchAPIView):
     serializer_class = SearchExportCountryHistorySerializer
 
     def get_entities(self):
-        """
-        Overriding to provide multiple entities
+        """Overriding to provide multiple entities.
         """
         return [self.search_app.search_model, Interaction]
 
     def get_base_query(self, request, validated_data):
-        """
-        Get the base query.
+        """Get the base query.
 
         This is overridden to exclude UPDATE history items and interactions
         without export countries.

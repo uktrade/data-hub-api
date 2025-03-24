@@ -8,7 +8,6 @@ from datahub.company.models import Advisor
 from datahub.core.admin import RawIdWidget
 from datahub.oauth.cache import add_token_data_to_cache
 
-
 NO_SSO_EMAIL_USER_ID_MESSAGE = gettext_lazy('The adviser must have an SSO email user ID.')
 
 

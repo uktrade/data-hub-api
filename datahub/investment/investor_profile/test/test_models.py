@@ -3,7 +3,6 @@ from django.db.utils import IntegrityError
 
 from datahub.investment.investor_profile.test.factories import LargeCapitalInvestorProfileFactory
 
-
 pytestmark = pytest.mark.django_db
 
 

@@ -1,4 +1,4 @@
-from unittest.mock import call, Mock
+from unittest.mock import Mock, call
 
 import pytest
 
@@ -12,8 +12,7 @@ from datahub.interaction.email_processors.notify import (
 
 @pytest.fixture
 def mock_logger(monkeypatch):
-    """
-    Returns a mock logger client instance.
+    """Returns a mock logger client instance.
     """
     mock_logger = Mock()
     monkeypatch.setattr(
@@ -24,14 +23,13 @@ def mock_logger(monkeypatch):
 
 
 @pytest.mark.parametrize(
-    'domain, label',
-    (
+    ('domain', 'label'),
+    [
         ('dit.gov.uk', 'dit_gov_uk'),
-    ),
+    ],
 )
 def test_get_domain_label(domain, label):
-    """
-    Test if the `get_domain_label` function converts
+    """Test if the `get_domain_label` function converts
     a given domain (with "." characters) to a Prometheus
     label (without "." characters).
     """
@@ -40,8 +38,7 @@ def test_get_domain_label(domain, label):
 
 @pytest.mark.django_db
 def test_notify_email_ingest_failure(mock_logger):
-    """
-    Test that the `notify_email_ingest_failure` logs failures
+    """Test that the `notify_email_ingest_failure` logs failures.
     """
     adviser = AdviserFactory(contact_email='adviser@dit.gov.uk')
     notify_meeting_ingest_failure(adviser, (), ())
@@ -54,8 +51,7 @@ def test_notify_email_ingest_failure(mock_logger):
 
 @pytest.mark.django_db
 def test_notify_email_ingest_success(mock_logger):
-    """
-    Test that the `notify_email_ingest_success` logs success
+    """Test that the `notify_email_ingest_success` logs success.
     """
     adviser = AdviserFactory(contact_email='adviser@dit.gov.uk')
     notify_meeting_ingest_success(adviser, Mock(), ())

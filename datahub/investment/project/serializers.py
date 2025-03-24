@@ -16,6 +16,8 @@ from datahub.core.serializers import NestedRelatedField, PermittedFieldsModelSer
 from datahub.core.validate_utils import DataCombiner
 from datahub.investment.project.constants import (
     InvestmentActivityType as InvestmentActivityTypeValue,
+)
+from datahub.investment.project.constants import (
     ProjectManagerRequestStatus as ProjectManagerRequestStatusValue,
 )
 from datahub.investment.project.models import (
@@ -254,8 +256,7 @@ class NoteAwareModelSerializer(serializers.ModelSerializer):
 
     @atomic
     def create(self, validated_data):
-        """
-        Overrides the create to remove the investment note from the data if one is present.
+        """Overrides the create to remove the investment note from the data if one is present.
         The note is then created using the reversion add meta method. This creates the
         InvestmentActivity and associates it with the relevant revision.
         """
@@ -267,8 +268,7 @@ class NoteAwareModelSerializer(serializers.ModelSerializer):
 
     @atomic
     def update(self, instance, validated_data):
-        """
-        Overrides the update to remove the investment note from the data if one is present.
+        """Overrides the update to remove the investment note from the data if one is present.
         The note is then created using the reversion add meta method. This creates the
         InvestmentActivity and associates it with the relevant revision.
         """
@@ -278,8 +278,7 @@ class NoteAwareModelSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
     def _create_investment_activity(self, instance, note):
-        """
-        Creates the InvestmentActivity and associates it with the relevant revision.
+        """Creates the InvestmentActivity and associates it with the relevant revision.
 
         TODO: Remove the need to associate the note with a revision when the audit history
         is deprecated and replaced with an activity stream using the InvestmentActivity table.
@@ -294,8 +293,7 @@ class NoteAwareModelSerializer(serializers.ModelSerializer):
         )
 
     def validate_note(self, value):
-        """
-        Validates the note field to make sure it is a dictionary and that the required text
+        """Validates the note field to make sure it is a dictionary and that the required text
         field is provided. Supports an optional activity_type field.
         If activity_type is not set then the default type of change is set.
         """
@@ -484,8 +482,7 @@ class IProjectSerializer(PermittedFieldsModelSerializer, NoteAwareModelSerialize
         return data
 
     def _track_project_manager_request(self, data):
-        """
-        If a project manager has been requested track the request by
+        """If a project manager has been requested track the request by
         setting the project_manager_requested_on timestamp.
         """
         pm_requested = ProjectManagerRequestStatusValue.requested.value.id
@@ -631,8 +628,7 @@ class IProjectTeamMemberListSerializer(serializers.ListSerializer):
     }
 
     def update(self, instances, validated_data):
-        """
-        Performs an update i.e. replaces all team members.
+        """Performs an update i.e. replaces all team members.
 
         Based on example code in DRF documentation for ListSerializer.
         """
@@ -657,8 +653,7 @@ class IProjectTeamMemberListSerializer(serializers.ListSerializer):
         return ret
 
     def run_validation(self, data=serializers.empty):
-        """
-        Validates that there are no duplicate advisers (to avoid a 500 error).
+        """Validates that there are no duplicate advisers (to avoid a 500 error).
 
         Unfortunately, overriding validate() results in a error dict being returned and the errors
         being placed in non_field_errors. Hence, run_validation() is overridden instead (to get
@@ -688,8 +683,7 @@ class IProjectTeamMemberSerializer(serializers.ModelSerializer):
 
     @classmethod
     def many_init(cls, *args, **kwargs):
-        """
-        Initialises a many-item instance of the serialiser using custom logic.
+        """Initialises a many-item instance of the serialiser using custom logic.
 
         This disables the unique together validator in the child serialiser, as it's incompatible
         with many-item update operations (as it mistakenly fails existing rows).
@@ -708,8 +702,7 @@ class IProjectChangeStageSerializer(serializers.Serializer):
     stage = NestedRelatedField(meta_models.InvestmentProjectStage)
 
     def change_stage(self, user):
-        """
-        Change the stage of a project and update the status if moving from
+        """Change the stage of a project and update the status if moving from
         or to 'won'.
         """
         data = self.validated_data

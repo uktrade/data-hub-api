@@ -9,6 +9,8 @@ from rest_framework.reverse import reverse
 from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.core.constants import (
     Country as CountryConstant,
+)
+from datahub.core.constants import (
     UKRegion as UKRegionConstant,
 )
 from datahub.core.test_utils import APITestMixin, create_test_user
@@ -17,18 +19,35 @@ from datahub.investment.investor_profile.constants import (
 )
 from datahub.investment.investor_profile.test.constants import (
     AssetClassInterest as AssetClassInterestConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     ConstructionRisk as ConstructionRiskConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     DealTicketSize as DealTicketSizeConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     DesiredDealRole as DesiredDealRoleConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     EquityPercentage as EquityPercentageConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     InvestorType as InvestorTypeConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     LargeCapitalInvestmentTypes as LargeCapitalInvestmentTypesConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     Restriction as RestrictionConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     ReturnRate as ReturnRateConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     TimeHorizon as TimeHorizonConstant,
 )
 from datahub.investment.investor_profile.test.factories import LargeCapitalInvestorProfileFactory
-
 
 INVALID_CHOICE_ERROR_MESSAGE = (
     'Select a valid choice. That choice is not one of the available choices.'
@@ -43,14 +62,14 @@ def get_large_capital_profile_for_search():
     large_capital_profile = LargeCapitalInvestorProfileFactory(
         investor_company=investor_company,
     )
-    yield large_capital_profile
+    return large_capital_profile
 
 
 class TestCreateLargeCapitalProfileView(APITestMixin):
     """Test creating a large capital profile."""
 
     def test_large_capital_unauthorized_user(self, api_client):
-        """Should return 401"""
+        """Should return 401."""
         url = reverse('api-v4:large-investor-profile:collection')
         user = create_test_user()
         response = api_client.get(url, user=user)
@@ -153,8 +172,8 @@ class TestLargeCapitalProfileListView(APITestMixin):
         assert response_data['results'] == []
 
     @pytest.mark.parametrize(
-        'search_parameter,expected_response',
-        (
+        ('search_parameter', 'expected_response'),
+        [
             (
                 uuid.uuid4(),
                 {'investor_company_id': [INVALID_CHOICE_ERROR_MESSAGE]},
@@ -167,7 +186,7 @@ class TestLargeCapitalProfileListView(APITestMixin):
                 1,
                 {'investor_company_id': ['“1” is not a valid UUID.']},
             ),
-        ),
+        ],
     )
     def test_large_capital_profile_list_view_invalid_search(
         self, search_parameter, expected_response,
@@ -228,9 +247,8 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
         assert 'investor_description' not in response_data['incomplete_details_fields']
 
     def test_patch_large_capital_profile_with_a_different_company_returns_validation_error(self):
-        """
-        Test updating a large capital profile with a different investor company
-        does return a validation error
+        """Test updating a large capital profile with a different investor company
+        does return a validation error.
         """
         investor_company = CompanyFactory()
         new_investor_company = CompanyFactory()
@@ -253,7 +271,7 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
 
     @freeze_time('2019-05-01')
     def test_patch_large_capital_profile_all_details_fields(self):
-        """Test updating the details fields for a large capital profile"""
+        """Test updating the details fields for a large capital profile."""
         investor_company = CompanyFactory()
         required_checks_conducted_by = AdviserFactory()
         investor_profile = LargeCapitalInvestorProfileFactory(
@@ -443,8 +461,8 @@ class TestUpdateLargeCapitalProfileConditionalFields(APITestMixin):
     """Tests for conditional field checks when updating a large capital profile."""
 
     @pytest.mark.parametrize(
-        'request_data,expected_status,expected_error_response',
-        (
+        ('request_data', 'expected_status', 'expected_error_response'),
+        [
             (
                 {
                     'required_checks_conducted': {
@@ -538,7 +556,7 @@ class TestUpdateLargeCapitalProfileConditionalFields(APITestMixin):
                 status.HTTP_200_OK,
                 None,
             ),
-        ),
+        ],
     )
     @freeze_time('2011-01-01')
     def test_patch_large_capital_conditional_required_checks_fields(
@@ -564,10 +582,10 @@ class TestUpdateLargeCapitalProfileConditionalFields(APITestMixin):
 
     @pytest.mark.parametrize(
         'required_checks_conducted',
-        (
+        [
             RequiredChecksConductedConstant.not_yet_checked.value.id,
             RequiredChecksConductedConstant.checks_not_required.value.id,
-        ),
+        ],
     )
     def test_patch_large_capital_conditional_required_checks_fields_removes_old_data(
         self, required_checks_conducted,
@@ -600,8 +618,7 @@ class TestUpdateLargeCapitalProfileConditionalFields(APITestMixin):
         assert not response_data['required_checks_conducted_on']
 
     def test_patch_large_capital_required_checks_conducted_by_error(self):
-        """
-        Test updating required checks conducted by cannot be set when required checks
+        """Test updating required checks conducted by cannot be set when required checks
         conducted is blank.
         """
         investor_company = CompanyFactory()
@@ -621,8 +638,8 @@ class TestUpdateLargeCapitalProfileConditionalFields(APITestMixin):
         }
 
     @pytest.mark.parametrize(
-        'request_data,expected_error_response',
-        (
+        ('request_data', 'expected_error_response'),
+        [
             (
                 {
                     'required_checks_conducted': {
@@ -654,7 +671,7 @@ class TestUpdateLargeCapitalProfileConditionalFields(APITestMixin):
                     ],
                 },
             ),
-        ),
+        ],
     )
     @freeze_time('2011-01-01')
     def test_patch_large_capital_required_checks_conducted_by_error_update(
@@ -662,8 +679,7 @@ class TestUpdateLargeCapitalProfileConditionalFields(APITestMixin):
         request_data,
         expected_error_response,
     ):
-        """
-        Test updating required checks conducted errors.
+        """Test updating required checks conducted errors.
 
         If the value of required_checks_conducted_id is already set to a value in
         constants.REQUIRED_CHECKS_THAT_NEED_ADDITIONAL_INFORMATION and is then updated to another

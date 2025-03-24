@@ -12,7 +12,7 @@ class EYBLeadsDatasetView(BaseFilterDatasetView):
     pagination_class = EYBDatasetViewCursorPagination
 
     def get_dataset(self, request):
-        """Returns queryset of EYB lead records"""
+        """Returns queryset of EYB lead records."""
         return EYBLead.objects.select_related(
             'sector',
             'proposed_investment_region',

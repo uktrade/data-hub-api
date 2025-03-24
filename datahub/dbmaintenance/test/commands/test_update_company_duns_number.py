@@ -146,7 +146,7 @@ def test_audit_log(s3_stubber):
 
 
 def test_companies_which_already_have_the_target_duns_are_logged(s3_stubber, caplog):
-    """Tests log contains company error for company which already has duns"""
+    """Tests log contains company error for company which already has duns."""
     caplog.set_level('INFO')
     company_with_duns = CompanyFactory(
         duns_number='132589',
@@ -180,8 +180,7 @@ def test_companies_which_already_have_the_target_duns_are_logged(s3_stubber, cap
 
 
 def test_companies_which_are_already_merged_into_target_are_logged(s3_stubber, caplog):
-    """
-    Tests log contains error if the source company has already been merged into a company which
+    """Tests log contains error if the source company has already been merged into a company which
     has the target duns number.
     """
     caplog.set_level('INFO')
@@ -215,8 +214,7 @@ def test_companies_which_are_already_merged_into_target_are_logged(s3_stubber, c
 
 
 def test_companies_which_are_already_merged_but_not_into_target_are_logged(s3_stubber, caplog):
-    """
-    Tests log contains error if the source company has already been merged into another company.
+    """Tests log contains error if the source company has already been merged into another company.
     """
     caplog.set_level('INFO')
     company_with_duns = CompanyFactory(
@@ -257,8 +255,7 @@ def test_unexpected_errors_are_logged(
     s3_stubber,
     caplog,
 ):
-    """
-    Tests log contains error if the source company has already been merged into another company.
+    """Tests log contains error if the source company has already been merged into another company.
     """
     mocked_func.return_value = False
     caplog.set_level('INFO')

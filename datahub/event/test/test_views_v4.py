@@ -24,7 +24,7 @@ class TestGetEventView(APITestMixin):
     """Get single event view tests."""
 
     def test_event_details_no_permissions(self):
-        """Should return 403"""
+        """Should return 403."""
         event = EventFactory()
         user = create_test_user(dit_team=TeamFactory())
         api_client = self.create_api_client(user=user)
@@ -112,7 +112,7 @@ class TestListEventView(APITestMixin):
     """List events view tests."""
 
     def test_event_list_no_permissions(self):
-        """Should return 403"""
+        """Should return 403."""
         user = create_test_user(dit_team=TeamFactory())
         api_client = self.create_api_client(user=user)
         url = reverse('api-v4:event:collection')
@@ -360,8 +360,7 @@ class TestCreateEventView(APITestMixin):
         }
 
     def test_has_no_trade_agreements_but_should(self):
-        """
-        Tests for validation failure when there are no related
+        """Tests for validation failure when there are no related
         trade agreements but has_related_trade_agreements is true.
         """
         url = reverse('api-v4:event:collection')
@@ -393,8 +392,7 @@ class TestCreateEventView(APITestMixin):
         }
 
     def test_trade_agreements_but_shouldnt(self):
-        """
-        Tests for validation failure when there are no related
+        """Tests for validation failure when there are no related
         trade agreements but has_related_trade_agreements is true.
         """
         url = reverse('api-v4:event:collection')
@@ -756,8 +754,7 @@ class TestUpdateEventView(APITestMixin):
 
 
 class TestEventVersioning(APITestMixin):
-    """
-    Tests for versions created when interacting with the event endpoints.
+    """Tests for versions created when interacting with the event endpoints.
     """
 
     def test_add_creates_a_new_version(self):

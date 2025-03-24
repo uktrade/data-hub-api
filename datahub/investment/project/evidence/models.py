@@ -13,8 +13,7 @@ class EvidenceTag(BaseConstantModel):
 
 
 class EvidenceDocumentPermission(StrEnum):
-    """
-    Permission codename constants.
+    """Permission codename constants.
 
     (Defined here rather than in permissions to avoid an import of that module.)
 

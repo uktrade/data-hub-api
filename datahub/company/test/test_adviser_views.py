@@ -101,14 +101,14 @@ def advisers():
         },
     )
 
-    yield [AdviserFactory(**kwargs) for kwargs in factory_kwarg_list]
+    return [AdviserFactory(**kwargs) for kwargs in factory_kwarg_list]
 
 
 class TestAdviser(APITestMixin):
     """Adviser test case."""
 
     def test_adviser_list_no_permissions(self):
-        """Should return 403"""
+        """Should return 403."""
         user = create_test_user(dit_team=TeamFactory())
         api_client = self.create_api_client(user=user)
         url = reverse('api-v1:advisor-list')
@@ -143,7 +143,7 @@ class TestAdviser(APITestMixin):
             'z sorted adviser',
         ]
 
-    @pytest.mark.parametrize('filter_value', (False, True))
+    @pytest.mark.parametrize('filter_value', [False, True])
     def test_can_filter_by_is_active(self, filter_value):
         """Test filtering by is_active."""
         AdviserFactory.create_batch(5, is_active=not filter_value)
@@ -166,7 +166,7 @@ class TestAdviser(APITestMixin):
         assert actual_ids == expected_ids
 
     def test_filter_by_dit_team__role(self):
-        """Test the `dit_team__role` filter"""
+        """Test the `dit_team__role` filter."""
         role = TeamRoleFactory(name='Role')
         adviser = AdviserFactory(dit_team=TeamFactory(role=role))
 
@@ -194,8 +194,8 @@ class TestAdviser(APITestMixin):
         assert result['id'] == str(adviser.pk)
 
     @pytest.mark.parametrize(
-        'terms,expected_results',
-        (
+        ('terms', 'expected_results'),
+        [
             (
                 # passing an empty string is the same as omitting the parameter
                 # (returns all advisers)
@@ -413,7 +413,7 @@ class TestAdviser(APITestMixin):
                 'zzz',
                 [],
             ),
-        ),
+        ],
     )
     def test_adviser_autocomplete(self, terms, expected_results, advisers):
         """Tests the adviser autocomplete feature."""
@@ -436,8 +436,8 @@ class TestAdviser(APITestMixin):
         assert response_data['count'] == len(expected_results)
 
     @pytest.mark.parametrize(
-        'permission_config,filter_by_permission,should_match',
-        (
+        ('permission_config', 'filter_by_permission', 'should_match'),
+        [
             (
                 AdviserPermissionConfig(user_permission='support.add_permissionmodel'),
                 'support.add_permissionmodel',
@@ -485,7 +485,7 @@ class TestAdviser(APITestMixin):
                 'non-existent.permission',
                 False,
             ),
-        ),
+        ],
     )
     def test_filter_by_permission(
         self,

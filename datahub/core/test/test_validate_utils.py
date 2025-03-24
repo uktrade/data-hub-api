@@ -11,8 +11,8 @@ from datahub.core.validate_utils import (
 
 
 @pytest.mark.parametrize(
-    'value,blank',
-    (
+    ('value', 'blank'),
+    [
         (None, True),
         ('', True),
         ([], True),
@@ -20,7 +20,7 @@ from datahub.core.validate_utils import (
         (2323, False),
         ('dfdf', False),
         ([1234], False),
-    ),
+    ],
 )
 def test_is_blank(value, blank):
     """Tests is_blank() for various values."""
@@ -28,8 +28,8 @@ def test_is_blank(value, blank):
 
 
 @pytest.mark.parametrize(
-    'value,blank',
-    (
+    ('value', 'blank'),
+    [
         (None, False),
         ('', False),
         ([], False),
@@ -37,7 +37,7 @@ def test_is_blank(value, blank):
         (2323, True),
         ('dfdf', True),
         ([1234], True),
-    ),
+    ],
 )
 def test_is_not_blank(value, blank):
     """Tests is_not_blank() for various values."""

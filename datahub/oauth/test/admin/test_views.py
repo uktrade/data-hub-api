@@ -11,7 +11,7 @@ from rest_framework import status
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.test_utils import AdminTestMixin, create_test_user
-from datahub.oauth.admin.forms import AddAccessTokenForm, NO_SSO_EMAIL_USER_ID_MESSAGE
+from datahub.oauth.admin.forms import NO_SSO_EMAIL_USER_ID_MESSAGE, AddAccessTokenForm
 
 admin_index_url = reverse('admin:index')
 add_access_token_url = reverse('admin_oauth:add-access-token')
@@ -21,7 +21,7 @@ add_access_token_url = reverse('admin_oauth:add-access-token')
 class TestAddAccessTokenAdminView(AdminTestMixin):
     """Tests for the add access token admin view."""
 
-    @pytest.mark.parametrize('http_method', ('get', 'post'))
+    @pytest.mark.parametrize('http_method', ['get', 'post'])
     def test_redirects_to_login_page_if_not_logged_in(self, http_method):
         """The view should redirect to the login page if the user isn't authenticated."""
         client = Client()
@@ -29,7 +29,7 @@ class TestAddAccessTokenAdminView(AdminTestMixin):
         assert response.status_code == status.HTTP_302_FOUND
         assert response['Location'] == self.login_url_with_redirect(add_access_token_url)
 
-    @pytest.mark.parametrize('http_method', ('get', 'post'))
+    @pytest.mark.parametrize('http_method', ['get', 'post'])
     def test_redirects_to_login_page_if_not_staff(self, http_method):
         """The view should redirect to the login page if the user isn't a member of staff."""
         user = create_test_user(is_staff=False, password=self.PASSWORD)
@@ -39,10 +39,9 @@ class TestAddAccessTokenAdminView(AdminTestMixin):
         assert response.status_code == status.HTTP_302_FOUND
         assert response['Location'] == self.login_url_with_redirect(add_access_token_url)
 
-    @pytest.mark.parametrize('http_method', ('get', 'post'))
+    @pytest.mark.parametrize('http_method', ['get', 'post'])
     def test_permission_denied_if_staff_and_not_superuser(self, http_method):
-        """
-        The view should return a 403 response if the staff user does not have the add adviser
+        """The view should return a 403 response if the staff user does not have the add adviser
         permission.
         """
         user = create_test_user(is_staff=True, password=self.PASSWORD)
@@ -89,7 +88,7 @@ class TestAddAccessTokenAdminView(AdminTestMixin):
             'adviser': [NO_SSO_EMAIL_USER_ID_MESSAGE],
         }
 
-    @pytest.mark.parametrize('expires_in_hours', (1, 10))
+    @pytest.mark.parametrize('expires_in_hours', [1, 10])
     def test_adds_access_token_on_success(self, expires_in_hours):
         """The generated access token should be stored in the cache."""
         user = create_test_user(is_staff=True, is_superuser=True, password=self.PASSWORD)

@@ -10,8 +10,7 @@ logger = getLogger(__name__)
 
 
 def execute_search_query(query):
-    """
-    Executes an OpenSearch query using the globally configured request timeout.
+    """Executes an OpenSearch query using the globally configured request timeout.
 
     (A warning is also logged if the query takes longer than a set threshold.)
     """

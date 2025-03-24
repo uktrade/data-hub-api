@@ -1,12 +1,10 @@
 from datetime import datetime
 
 import pytest
-
 from django.contrib.contenttypes.models import ContentType
 
 from datahub.documents.models import GenericDocument
 from datahub.documents.utils import format_content_type
-
 
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
 

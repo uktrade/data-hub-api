@@ -11,8 +11,7 @@ class TestReconcilablePaymentsSubValidator:
     """Tests for the ReconcilablePaymentsSubValidator."""
 
     def test_ok_with_amounts_equal_total_cost(self):
-        """
-        Test that the validation succeeds when the sum of the amounts = order.total_cost.
+        """Test that the validation succeeds when the sum of the amounts = order.total_cost.
         """
         validator = ReconcilablePaymentsSubValidator()
         order = mock.MagicMock(total_cost=1000)
@@ -28,8 +27,7 @@ class TestReconcilablePaymentsSubValidator:
             pytest.fail('Should not raise a validator error.')
 
     def test_ok_with_amounts_greater_than_total_cost(self):
-        """
-        Test that the validation succeeds when the sum of the amounts > order.total_cost.
+        """Test that the validation succeeds when the sum of the amounts > order.total_cost.
         """
         validator = ReconcilablePaymentsSubValidator()
         order = mock.MagicMock(total_cost=1000)
@@ -44,8 +42,7 @@ class TestReconcilablePaymentsSubValidator:
             pytest.fail('Should not raise a validator error.')
 
     def test_fails_with_amounts_less_than_total_cost(self):
-        """
-        Test that the validation fails when the sum of the amounts < order.total_cost.
+        """Test that the validation fails when the sum of the amounts < order.total_cost.
         """
         validator = ReconcilablePaymentsSubValidator()
         order = mock.MagicMock(total_cost=1000)

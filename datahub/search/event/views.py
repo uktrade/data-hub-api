@@ -1,6 +1,6 @@
 from datahub.search.event import EventSearchApp
 from datahub.search.event.serializers import SearchEventQuerySerializer
-from datahub.search.views import register_v3_view, SearchAPIView
+from datahub.search.views import SearchAPIView, register_v3_view
 
 
 class SearchEventAPIViewMixin:

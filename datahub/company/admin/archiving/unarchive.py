@@ -8,8 +8,7 @@ from django.views.decorators.csrf import csrf_protect
 
 @method_decorator(csrf_protect)
 def unarchive_company(model_admin, request):
-    """
-    Admin tool to unarchive a company.
+    """Admin tool to unarchive a company.
     """
     if not model_admin.has_change_permission(request):
         raise PermissionDenied

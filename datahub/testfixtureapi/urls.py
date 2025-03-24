@@ -2,7 +2,6 @@ from django.urls import path
 
 from datahub.testfixtureapi.views import create_user, load_fixture, reset_fixtures
 
-
 app_name = 'testfixtureapi'
 
 urlpatterns = [

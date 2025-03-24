@@ -1,6 +1,5 @@
 import boto3
 import pytest
-
 from moto import mock_aws
 
 from datahub.core import constants
@@ -12,10 +11,10 @@ from datahub.ingest.constants import (
 from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.investment_lead.models import EYBLead
 from datahub.investment_lead.test.factories import (
+    EYBLeadFactory,
     eyb_lead_marketing_record_faker,
     eyb_lead_triage_record_faker,
     eyb_lead_user_record_faker,
-    EYBLeadFactory,
 )
 from datahub.metadata.models import (
     Country,

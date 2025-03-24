@@ -35,8 +35,7 @@ def has_no_invalid_company_number_characters(value):
 
 
 def validate_team_member_max_count(team_members, exception_class, wrapper_obj_name=None):
-    """
-    Checks if the number of entries in team_members is above the maximum allowed.
+    """Checks if the number of entries in team_members is above the maximum allowed.
     Throws an exception of type {exception_class} when above the maximum.
     """
     if team_members is not None and len(team_members) > _MAX_TEAM_MEMBER_COUNT:

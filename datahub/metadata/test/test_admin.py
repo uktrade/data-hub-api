@@ -14,7 +14,7 @@ from datahub.metadata.test.factories import ServiceFactory
 class TestServiceAdmin:
     """Tests for ServiceAdmin."""
 
-    @pytest.mark.parametrize('context', (Service.Context.INTERACTION, Service.Context.EVENT))
+    @pytest.mark.parametrize('context', [Service.Context.INTERACTION, Service.Context.EVENT])
     def test_context_filter(self, context):
         """Tests filtering by context."""
         test_data_contexts = (

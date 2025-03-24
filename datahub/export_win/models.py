@@ -23,9 +23,7 @@ from datahub.metadata.models import (
     Sector,
     UKRegion,
 )
-
 from datahub.reminder.models import EmailDeliveryStatus
-
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -207,9 +205,8 @@ class HVC(BaseExportWinOrderedConstantModel, BaseLegacyModel):
 
     @property
     def campaign(self):
-        """
-        The name of the campaign alone without the code
-        e.g. Africa Agritech or Italy Automotive
+        """The name of the campaign alone without the code
+        e.g. Africa Agritech or Italy Automotive.
         """
         # names are always <Name of HVC: HVC code>
         return self.name.split(':')[0]
@@ -745,7 +742,7 @@ class CustomerResponse(BaseModel):
 
 
 class CustomerResponseToken(models.Model):
-    """Customer Response Token"""
+    """Customer Response Token."""
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     expires_on = models.DateTimeField()
@@ -813,7 +810,7 @@ class LegacyExportWinsToDataHubAdminUser(models.Model):
 
 
 class DeletedWin(Win):
-    """Deleted win"""
+    """Deleted win."""
 
     class Meta:
         proxy = True
@@ -821,7 +818,7 @@ class DeletedWin(Win):
 
 @receiver(post_save, sender=Breakdown)
 def update_total_values(sender, instance, **kwargs):
-    """Save the right total values"""
+    """Save the right total values."""
     win = instance.win
 
     calc_total = calculate_totals_for_export_win(win)
@@ -832,7 +829,7 @@ def update_total_values(sender, instance, **kwargs):
 
 
 class AnonymousWin(Win):
-    """Anonymous win"""
+    """Anonymous win."""
 
     class Meta:
         proxy = True

@@ -7,7 +7,6 @@ from datahub.dbmaintenance.management.base import CSVBaseCommand
 from datahub.dbmaintenance.utils import parse_bool, parse_uuid
 from datahub.search.signals import disable_search_signal_receivers
 
-
 logger = getLogger(__name__)
 
 
@@ -16,16 +15,14 @@ class Command(CSVBaseCommand):
 
     @disable_search_signal_receivers(Company)
     def _handle(self, *args, **options):
-        """
-        Disables search signal receivers for companies.
+        """Disables search signal receivers for companies.
         Avoid queuing huge number of RQ scheduled tasks for syncing companies to OpenSearch.
-        (Syncing can be manually performed afterwards using sync_search if required.)
+        (Syncing can be manually performed afterwards using sync_search if required.).
         """
         return super()._handle(*args, **options)
 
     def _process_row(self, row, simulate=False, **options):
-        """
-        Process one single row.
+        """Process one single row.
         """
         pk = parse_uuid(row['datahub_company_id'])
         company = Company.objects.get(pk=pk)

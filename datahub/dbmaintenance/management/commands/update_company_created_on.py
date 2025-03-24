@@ -7,13 +7,11 @@ from datahub.company.models import Company
 from datahub.dbmaintenance.management.base import CSVBaseCommand
 from datahub.dbmaintenance.utils import parse_uuid
 
-
 logger = getLogger(__name__)
 
 
 class Command(CSVBaseCommand):
-    """
-    Command to set Company.created_on where missing.
+    """Command to set Company.created_on where missing.
 
     Some Company records have missing created_on values which
     besides being inconsistent with the parent BaseModel

@@ -5,7 +5,6 @@ from datahub.dbmaintenance.management.base import CSVBaseCommand
 from datahub.dbmaintenance.utils import parse_uuid
 from datahub.metadata.models import Sector
 
-
 logger = getLogger(__name__)
 
 
@@ -13,8 +12,7 @@ class Command(CSVBaseCommand):
     """Command to delete Sector."""
 
     def _handle(self, *args, **options):
-        """
-        Get unreferenced sectors and store in variable for use in _process_row.
+        """Get unreferenced sectors and store in variable for use in _process_row.
         This avoids having to call the same query for each row in the csv.
         """
         self.unreferenced_sectors = get_unreferenced_objects_query(Sector).all()

@@ -5,7 +5,7 @@ from datahub.metadata.serializers import TeamSerializer
 
 
 class WhoAmISerializer(serializers.ModelSerializer):
-    """Adviser serializer for that includes a permissions"""
+    """Adviser serializer for that includes a permissions."""
 
     permissions = serializers.SerializerMethodField()
     active_features = serializers.ListField(child=serializers.CharField(), read_only=True)
@@ -32,8 +32,7 @@ class WhoAmISerializer(serializers.ModelSerializer):
         depth = 2
 
     def get_permissions(self, obj):
-        """
-        Get all of the user's permissions.
+        """Get all of the user's permissions.
 
         To keep backwards compatibility, permissions with codenames that start with view_ are
         replicated as permissions with codenames that start with read_. (Once the front end has

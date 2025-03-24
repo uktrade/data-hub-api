@@ -18,8 +18,7 @@ class Fixture:
 
     @classmethod
     def all(cls):
-        """
-        Returns a list of all registered fixtures.
+        """Returns a list of all registered fixtures.
 
         Should only be called after apps have loaded the metadata app's ready() method has been
         called.

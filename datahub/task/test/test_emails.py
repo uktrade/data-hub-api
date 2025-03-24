@@ -14,7 +14,6 @@ from datahub.task.emails import (
     TaskOverdueEmailTemplate,
     UpcomingTaskEmailTemplate,
 )
-
 from datahub.task.test.factories import TaskFactory
 
 

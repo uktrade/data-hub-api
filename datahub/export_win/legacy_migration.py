@@ -1,16 +1,13 @@
 from datetime import datetime
-
 from functools import lru_cache
 from logging import getLogger
 
 from dateutil.parser import parse
-
 from django.contrib.admin.models import LogEntry
 from django.contrib.contenttypes.models import ContentType
 from django.db import router
 from django.db.models import Q
 from django.db.models.functions import Lower
-
 from reversion.models import Revision, Version
 
 from datahub.company.models import (
@@ -22,6 +19,7 @@ from datahub.core.utils import get_financial_year
 from datahub.export_win.constants import EXPORT_WINS_LEGACY_ID_START_VALUE
 from datahub.export_win.export_wins_api import get_legacy_export_wins_dataset
 from datahub.export_win.models import (
+    HVC,
     AssociatedProgramme,
     Breakdown,
     BreakdownType,
@@ -31,7 +29,6 @@ from datahub.export_win.models import (
     ExpectedValueRelation,
     Experience,
     HQTeamRegionOrPost,
-    HVC,
     HVOProgrammes,
     LegacyExportWinsToDataHubAdminUser,
     LegacyExportWinsToDataHubCompany,
@@ -50,7 +47,6 @@ from datahub.metadata.models import (
     Sector,
 )
 from datahub.metadata.query_utils import get_sector_name_subquery
-
 
 logger = getLogger(__name__)
 
@@ -649,7 +645,6 @@ def migrate_legacy_notifications(legacy_notification):
         logger.warning(f'Legacy Win {legacy_notification["win_id"]} does not exist.')
         pass
 
-    return None
 
 
 def migrate_notifications(soft_deleted=False):

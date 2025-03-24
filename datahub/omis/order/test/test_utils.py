@@ -19,8 +19,8 @@ class TestPopulateBillingData:
     """Tests for the populate_billing_data logic."""
 
     @pytest.mark.parametrize(
-        'initial_model_values,expected_billing_address_fields',
-        (
+        ('initial_model_values', 'expected_billing_address_fields'),
+        [
             # registered address
             (
                 {
@@ -101,11 +101,10 @@ class TestPopulateBillingData:
                     'billing_address_country': None,
                 },
             ),
-        ),
+        ],
     )
     def test_with_empty_order(self, initial_model_values, expected_billing_address_fields):
-        """
-        Test that an order without any of the billing fields filled in is populated
+        """Test that an order without any of the billing fields filled in is populated
         with the company/contact details.
         """
         company = CompanyFactory.build(**initial_model_values)
@@ -139,8 +138,7 @@ class TestPopulateBillingData:
         assert actual_billing_address == expected_billing_address_fields
 
     def test_with_already_populated_billing_company_name(self):
-        """
-        Test that if the billing company name for an order is already set,
+        """Test that if the billing company name for an order is already set,
         it does not get overridden.
         """
         billing_company_name = 'My Corp'
@@ -156,7 +154,7 @@ class TestPopulateBillingData:
 
     @pytest.mark.parametrize(
         'billing_address',
-        (
+        [
             {
                 'billing_address_1': 'Populated address 1',
                 'billing_address_2': 'Populated address 2',
@@ -173,11 +171,10 @@ class TestPopulateBillingData:
                 'billing_address_postcode': '',
                 'billing_address_country_id': uuid.UUID(constants.Country.italy.value.id),
             },
-        ),
+        ],
     )
     def test_with_already_populated_billing_address(self, billing_address):
-        """
-        Test that if the order has some billing address fields already populated,
+        """Test that if the order has some billing address fields already populated,
         none of the address fields get overridden.
         """
         company = CompanyFactory.build(
@@ -207,8 +204,8 @@ class TestComposeOfficialAddress:
     """Tests for the compose_official_address function."""
 
     @pytest.mark.parametrize(
-        'initial_model_values,expected_address_values',
-        (
+        ('initial_model_values', 'expected_address_values'),
+        [
             # registered address
             (
                 {
@@ -289,11 +286,10 @@ class TestComposeOfficialAddress:
                     'country': None,
                 },
             ),
-        ),
+        ],
     )
     def test(self, initial_model_values, expected_address_values):
-        """
-        Test that registered address is used if defined or address otherwise.
+        """Test that registered address is used if defined or address otherwise.
         """
         company = CompanyFactory.build(**initial_model_values)
         address = compose_official_address(company)

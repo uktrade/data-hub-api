@@ -1,5 +1,4 @@
 import pytest
-
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -43,31 +42,28 @@ from datahub.reminder.test.factories import (
 from datahub.task.test.factories import TaskFactory
 
 
-@pytest.fixture()
+@pytest.fixture
 def investment_notifications_user_feature_group():
+    """Creates the investment notifications user feature group.
     """
-    Creates the investment notifications user feature group.
-    """
-    yield UserFeatureFlagGroupFactory(
+    return UserFeatureFlagGroupFactory(
         code=INVESTMENT_NOTIFICATIONS_FEATURE_GROUP_NAME,
         is_active=True,
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def export_notifications_user_feature_group():
+    """Creates the export notifications user feature group.
     """
-    Creates the export notifications user feature group.
-    """
-    yield UserFeatureFlagGroupFactory(
+    return UserFeatureFlagGroupFactory(
         code=EXPORT_NOTIFICATIONS_FEATURE_GROUP_NAME,
         is_active=True,
     )
 
 
 class ReminderTestMixin:
-    """
-    Common tests for the reminder views.
+    """Common tests for the reminder views.
     """
 
     @property
@@ -76,7 +72,7 @@ class ReminderTestMixin:
         return self.api_client.get(f'{url}?offset=0&limit=2')
 
     def create_reminders(self):
-        """Creates some mock reminders"""
+        """Creates some mock reminders."""
         with freeze_time('2022-11-07T17:00:00.000000Z'):
             reminder_1 = self.factory(
                 adviser=self.user,
@@ -88,14 +84,14 @@ class ReminderTestMixin:
         return [reminder_1, reminder_2]
 
     def test_not_authed(self):
-        """Should return Unauthorised"""
+        """Should return Unauthorised."""
         url = reverse(self.url_name)
         api_client = APIClient()
         response = api_client.get(url)
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     def test_get_reminders_only_includes_current(self):
-        """Only the reminders belonging to the current user should be returned"""
+        """Only the reminders belonging to the current user should be returned."""
         reminder_count = 3
         self.factory.create_batch(
             reminder_count,
@@ -108,7 +104,7 @@ class ReminderTestMixin:
         assert data.get('count') == reminder_count
 
     def test_default_sort_by(self):
-        """Default sort should be in reverse date order"""
+        """Default sort should be in reverse date order."""
         reminder_1, reminder_2 = self.create_reminders()
         response = self.get_response
         assert response.status_code == status.HTTP_200_OK
@@ -119,7 +115,7 @@ class ReminderTestMixin:
         assert results[1]['id'] == str(reminder_1.id)
 
     def test_sort_by_created(self):
-        """Should sort in date order"""
+        """Should sort in date order."""
         reminder_1, reminder_2 = self.create_reminders()
         url = reverse(self.url_name)
         response = self.api_client.get(f'{url}?offset=0&limit=2&sortby=created_on')
@@ -131,7 +127,7 @@ class ReminderTestMixin:
         assert results[1]['id'] == str(reminder_2.id)
 
     def test_sort_by_created_descending(self):
-        """Should sort in reverse date order"""
+        """Should sort in reverse date order."""
         reminder_1, reminder_2 = self.create_reminders()
         url = reverse(self.url_name)
         response = self.api_client.get(f'{url}?offset=0&limit=2&sortby=-created_on')
@@ -143,7 +139,7 @@ class ReminderTestMixin:
         assert results[1]['id'] == str(reminder_1.id)
 
     def test_delete(self):
-        """Deleting should remove the model instance"""
+        """Deleting should remove the model instance."""
         reminder_count = 3
         reminder = self.factory.create_batch(
             reminder_count,
@@ -162,9 +158,8 @@ class ReminderTestMixin:
 
 class TaskReminderMixin:
     def test_get_generic_task_reminders(self):
-        """
-        Given some reminders for generic tasks, these should be returned without any references to
-        other task types
+        """Given some reminders for generic tasks, these should be returned without any references to
+        other task types.
         """
         reminder_count = 3
         reminders = self.factory.create_batch(
@@ -196,9 +191,8 @@ class TaskReminderMixin:
         }
 
     def test_get_investment_project_task_reminders(self):
-        """
-        Given some reminders for tasks with an investment project, these should be returned with
-        the correct investment project data
+        """Given some reminders for tasks with an investment project, these should be returned with
+        the correct investment project data.
         """
         investment_project = InvestmentProjectFactory()
         task = TaskFactory(investment_project=investment_project)
@@ -243,9 +237,8 @@ class TaskReminderMixin:
         }
 
     def test_get_company_task_reminders(self):
-        """
-        Given some reminders for tasks with a company, these should be returned with
-        the correct company data
+        """Given some reminders for tasks with a company, these should be returned with
+        the correct company data.
         """
         company = CompanyFactory()
         task = TaskFactory(company=company)
@@ -280,9 +273,8 @@ class TaskReminderMixin:
         }
 
     def test_get_interaction_task_reminders(self):
-        """
-        Given some reminders for tasks with an interaction, these should be returned with
-        the correct interaction data
+        """Given some reminders for tasks with an interaction, these should be returned with
+        the correct interaction data.
         """
         interaction = InteractionFactoryBase()
         task = TaskFactory(interaction=interaction)
@@ -319,8 +311,7 @@ class TaskReminderMixin:
 
 @freeze_time('2022-12-15T17:00:00.000000Z')
 class TestNewExportInteractionReminderViewset(APITestMixin, ReminderTestMixin):
-    """
-    Tests for the new export interaction reminder view.
+    """Tests for the new export interaction reminder view.
     """
 
     url_name = 'api-v4:reminder:new-export-interaction-reminder'
@@ -329,7 +320,7 @@ class TestNewExportInteractionReminderViewset(APITestMixin, ReminderTestMixin):
     tested_model = NewExportInteractionReminder
 
     def test_get_reminders(self):
-        """Given some reminders, these should be returned"""
+        """Given some reminders, these should be returned."""
         reminder_count = 3
         export_company = CompanyFactory()
         export_interaction = CompaniesInteractionFactory()
@@ -404,7 +395,7 @@ class TestNewExportInteractionReminderViewset(APITestMixin, ReminderTestMixin):
         }
 
     def test_get_reminders_no_team(self):
-        """Should be returning reminders of interactions created by users with no DIT team"""
+        """Should be returning reminders of interactions created by users with no DIT team."""
         interaction_adviser = AdviserFactory(dit_team=None)
         export_interaction = CompaniesInteractionFactory(created_by=interaction_adviser)
 
@@ -422,8 +413,7 @@ class TestNewExportInteractionReminderViewset(APITestMixin, ReminderTestMixin):
 
 @freeze_time('2022-11-07T17:00:00.000000Z')
 class TestNoRecentExportInteractionReminderViewset(APITestMixin, ReminderTestMixin):
-    """
-    Tests for the no recent export interaction reminder view.
+    """Tests for the no recent export interaction reminder view.
     """
 
     url_name = 'api-v4:reminder:no-recent-export-interaction-reminder'
@@ -432,7 +422,7 @@ class TestNoRecentExportInteractionReminderViewset(APITestMixin, ReminderTestMix
     tested_model = NoRecentExportInteractionReminder
 
     def test_get_reminders(self):
-        """Given some reminders, these should be returned"""
+        """Given some reminders, these should be returned."""
         reminder_count = 3
         export_company = CompanyFactory()
         export_interaction = CompaniesInteractionFactory()
@@ -507,7 +497,7 @@ class TestNoRecentExportInteractionReminderViewset(APITestMixin, ReminderTestMix
         }
 
     def test_get_reminders_no_interaction(self):
-        """Should return reminders for companies with no interactions"""
+        """Should return reminders for companies with no interactions."""
         reminder_count = 3
         export_company = CompanyFactory()
         reminders = NoRecentExportInteractionReminderFactory.create_batch(
@@ -552,7 +542,7 @@ class TestNoRecentExportInteractionReminderViewset(APITestMixin, ReminderTestMix
         }
 
     def test_get_reminders_no_team(self):
-        """Should be returning reminders of interactions created by users with no DIT team"""
+        """Should be returning reminders of interactions created by users with no DIT team."""
         interaction_adviser = AdviserFactory(dit_team=None)
         export_interaction = CompaniesInteractionFactory(created_by=interaction_adviser)
 
@@ -570,8 +560,7 @@ class TestNoRecentExportInteractionReminderViewset(APITestMixin, ReminderTestMix
 
 @freeze_time('2022-05-05T17:00:00.000000Z')
 class TestNoRecentInvestmentInteractionReminderViewset(APITestMixin, ReminderTestMixin):
-    """
-    Tests for the no recent investment interaction reminder view.
+    """Tests for the no recent investment interaction reminder view.
     """
 
     url_name = 'api-v4:reminder:no-recent-investment-interaction-reminder'
@@ -580,7 +569,7 @@ class TestNoRecentInvestmentInteractionReminderViewset(APITestMixin, ReminderTes
     tested_model = NoRecentInvestmentInteractionReminder
 
     def test_get_reminders(self):
-        """Given some reminders, these should be returned"""
+        """Given some reminders, these should be returned."""
         reminder_count = 3
         reminders = NoRecentInvestmentInteractionReminderFactory.create_batch(
             reminder_count,
@@ -609,8 +598,7 @@ class TestNoRecentInvestmentInteractionReminderViewset(APITestMixin, ReminderTes
 
 @freeze_time('2022-05-05T17:00:00.000000Z')
 class TestUpcomingEstimatedLandDateReminderViewset(APITestMixin, ReminderTestMixin):
-    """
-    Tests for the upcoming estimated land date reminder view.
+    """Tests for the upcoming estimated land date reminder view.
     """
 
     url_name = 'api-v4:reminder:estimated-land-date-reminder'
@@ -619,7 +607,7 @@ class TestUpcomingEstimatedLandDateReminderViewset(APITestMixin, ReminderTestMix
     tested_model = UpcomingEstimatedLandDateReminder
 
     def test_get_reminders(self):
-        """Given some reminders, these should be returned"""
+        """Given some reminders, these should be returned."""
         reminder_count = 3
         reminders = UpcomingEstimatedLandDateReminderFactory.create_batch(
             reminder_count,
@@ -648,8 +636,7 @@ class TestUpcomingEstimatedLandDateReminderViewset(APITestMixin, ReminderTestMix
 
 @freeze_time('2022-05-05T17:00:00.000000Z')
 class TestUpcomingTaskDueDateReminderViewset(APITestMixin, ReminderTestMixin, TaskReminderMixin):
-    """
-    Tests for the upcoming task due date reminder view.
+    """Tests for the upcoming task due date reminder view.
     """
 
     url_name = 'api-v4:reminder:my-tasks-due-date-approaching-reminder'
@@ -664,8 +651,7 @@ class TestTaskAssignedToMeFromOthersReminderViewset(
     ReminderTestMixin,
     TaskReminderMixin,
 ):
-    """
-    Tests for the task assigned to me from others reminder view.
+    """Tests for the task assigned to me from others reminder view.
     """
 
     url_name = 'api-v4:reminder:my-tasks-task-assigned-to-me-from-others-reminder'
@@ -676,8 +662,7 @@ class TestTaskAssignedToMeFromOthersReminderViewset(
 
 @freeze_time('2022-05-05T17:00:00.000000Z')
 class TestTaskOverdueReminderViewset(APITestMixin, ReminderTestMixin, TaskReminderMixin):
-    """
-    Tests for the task overdue view.
+    """Tests for the task overdue view.
     """
 
     url_name = 'api-v4:reminder:my-tasks-task-overdue-reminder'
@@ -692,8 +677,7 @@ class TestTaskCompletedReminderViewset(
     ReminderTestMixin,
     TaskReminderMixin,
 ):
-    """
-    Tests for the task completed reminder view.
+    """Tests for the task completed reminder view.
     """
 
     url_name = 'api-v4:reminder:my-tasks-task-completed-reminder'
@@ -708,8 +692,7 @@ class TestTaskAmendedByOthersReminderViewset(
     ReminderTestMixin,
     TaskReminderMixin,
 ):
-    """
-    Tests for the task amended by others reminder view.
+    """Tests for the task amended by others reminder view.
     """
 
     url_name = 'api-v4:reminder:my-tasks-task-amended-by-others-reminder'
@@ -724,8 +707,7 @@ class TestTaskDeletedByOthersReminderViewset(
     ReminderTestMixin,
     TaskReminderMixin,
 ):
-    """
-    Tests for the task deleted by others reminder view.
+    """Tests for the task deleted by others reminder view.
     """
 
     url_name = 'api-v4:reminder:my-tasks-task-deleted-by-others-reminder'
@@ -735,14 +717,13 @@ class TestTaskDeletedByOthersReminderViewset(
 
 
 class TestGetReminderSummaryView(APITestMixin):
-    """
-    Tests for the reminder summary view.
+    """Tests for the reminder summary view.
     """
 
     url_name = 'api-v4:reminder:summary'
 
     def test_not_authed(self):
-        """Should return Unauthorised"""
+        """Should return Unauthorised."""
         url = reverse(self.url_name)
         api_client = APIClient()
         response = api_client.get(url)
@@ -875,13 +856,13 @@ class TestGetReminderSummaryView(APITestMixin):
         }
 
     @pytest.mark.parametrize(
-        'investment,export',
-        (
+        ('investment', 'export'),
+        [
             (False, False),
             (False, True),
             (True, False),
             (True, True),
-        ),
+        ],
     )
     def test_get_summary_of_reminders_with_feature_groups(
         self,
@@ -890,8 +871,7 @@ class TestGetReminderSummaryView(APITestMixin):
         investment_notifications_user_feature_group,
         export_notifications_user_feature_group,
     ):
-        """
-        Should return a summary of reminders.
+        """Should return a summary of reminders.
 
         It should return 0 for reminder category that does not have relevant feature group.
         """

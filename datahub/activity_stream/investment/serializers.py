@@ -3,17 +3,15 @@ from datahub.investment.project.models import InvestmentProject
 
 
 class IProjectCreatedSerializer(ActivitySerializer):
-    """
-    Investment Projects added serializer for activity stream.
+    """Investment Projects added serializer for activity stream.
     """
 
     class Meta:
         model = InvestmentProject
 
     def to_representation(self, instance):
-        """
-        Serialize the investment project as per Activity Stream spec:
-        https://www.w3.org/TR/activitystreams-core/
+        """Serialize the investment project as per Activity Stream spec:
+        https://www.w3.org/TR/activitystreams-core/.
         """
         project_id = f'dit:DataHubInvestmentProject:{instance.pk}'
         project = {

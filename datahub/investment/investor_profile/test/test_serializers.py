@@ -13,8 +13,8 @@ class TestLargeCapitalInvestorProfileSerializer:
     """Tests for LargeCapitalInvestorProfileSerializer."""
 
     @pytest.mark.parametrize(
-        'field,empty_value,expected_value',
-        (
+        ('field', 'empty_value', 'expected_value'),
+        [
             ('global_assets_under_management', None, None),
             ('investable_capital', None, None),
             ('investor_type', '', None),
@@ -31,7 +31,7 @@ class TestLargeCapitalInvestorProfileSerializer:
             ('other_countries_being_considered', [], []),
             ('asset_classes_of_interest', [], []),
             ('notes_on_locations', '', ''),
-        ),
+        ],
     )
     def test_validate_fields_allow_null(self, field, empty_value, expected_value):
         """Test validates fields allow null or empty values."""
@@ -45,8 +45,8 @@ class TestLargeCapitalInvestorProfileSerializer:
         assert serializer.validated_data[field] == expected_value
 
     @pytest.mark.parametrize(
-        'field,empty_value,expected_value',
-        (
+        ('field', 'empty_value', 'expected_value'),
+        [
             ('global_assets_under_management', None, None),
             ('investable_capital', None, None),
             ('investor_type', '', None),
@@ -65,7 +65,7 @@ class TestLargeCapitalInvestorProfileSerializer:
             ('notes_on_locations', '', ''),
             ('required_checks_conducted_on', None, None),
             ('required_checks_conducted_by', None, None),
-        ),
+        ],
     )
     def test_validate_fields_allow_null_when_no_data_pre_saved(
         self,
@@ -73,8 +73,7 @@ class TestLargeCapitalInvestorProfileSerializer:
         empty_value,
         expected_value,
     ):
-        """
-        Test validates fields allow null or empty values when the profile
+        """Test validates fields allow null or empty values when the profile
         only has an investor company.
         """
         profile = LargeCapitalInvestorProfileFactory()

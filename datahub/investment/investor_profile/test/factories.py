@@ -5,6 +5,8 @@ import factory
 from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.core.constants import (
     Country as CountryConstant,
+)
+from datahub.core.constants import (
     UKRegion as UKRegionConstant,
 )
 from datahub.core.test.factories import to_many_field
@@ -13,14 +15,32 @@ from datahub.investment.investor_profile.constants import (
 )
 from datahub.investment.investor_profile.test.constants import (
     AssetClassInterest as AssetClassInterestConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     ConstructionRisk as ConstructionRiskConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     DealTicketSize as DealTicketSizeConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     DesiredDealRole as DesiredDealRoleConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     EquityPercentage as EquityPercentageConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     InvestorType as InvestorTypeConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     LargeCapitalInvestmentTypes as InvestmentTypesConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     Restriction as RestrictionConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     ReturnRate as ReturnRateConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     TimeHorizon as TimeHorizonConstant,
 )
 

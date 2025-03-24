@@ -13,15 +13,15 @@ from datahub.company.contact_matching import ContactMatchingStatus
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.exceptions import DataHubError
 from datahub.interaction.admin_csv_import import file_form
-from datahub.interaction.admin_csv_import.cache_utils import _cache_key_for_token, CacheKeyType
+from datahub.interaction.admin_csv_import.cache_utils import CacheKeyType, _cache_key_for_token
 from datahub.interaction.admin_csv_import.file_form import (
-    InteractionCSVForm,
     REVISION_COMMENT,
+    InteractionCSVForm,
     UnmatchedRowCollector,
 )
 from datahub.interaction.admin_csv_import.row_form import (
-    CSVRowError,
     DUPLICATE_OF_ANOTHER_ROW_MESSAGE,
+    CSVRowError,
 )
 from datahub.interaction.models import Interaction
 from datahub.interaction.test.admin_csv_import.utils import (
@@ -119,15 +119,15 @@ class TestInteractionCSVForm:
         ]
 
     @pytest.mark.parametrize(
-        'num_matching,num_unmatched,num_multiple_matches,max_returned_rows',
-        (
+        ('num_matching', 'num_unmatched', 'num_multiple_matches', 'max_returned_rows'),
+        [
             (4, 3, 2, 4),
             (4, 3, 2, 2),
             (4, 3, 2, 8),
             (4, 0, 0, 4),
             (0, 2, 2, 4),
             (0, 0, 2, 4),
-        ),
+        ],
     )
     def test_get_matching_summary(
         self,
@@ -174,8 +174,7 @@ class TestInteractionCSVForm:
         assert expected_contact_emails == actual_contact_emails
 
     def test_get_matching_summary_with_invalid_rows(self):
-        """
-        Test that get_matching_summary() raises an exception if one of the CSV rows fails
+        """Test that get_matching_summary() raises an exception if one of the CSV rows fails
         validation.
         """
         file = make_csv_file_from_dicts(
@@ -202,8 +201,8 @@ class TestInteractionCSVForm:
         with pytest.raises(DataHubError):
             form.get_matching_summary(50)
 
-    @pytest.mark.parametrize('num_unmatched', (0, 2))
-    @pytest.mark.parametrize('num_multiple_matches', (0, 2))
+    @pytest.mark.parametrize('num_unmatched', [0, 2])
+    @pytest.mark.parametrize('num_multiple_matches', [0, 2])
     @pytest.mark.usefixtures('local_memory_cache')
     def test_save_returns_correct_counts(self, num_unmatched, num_multiple_matches):
         """Test that save() returns the expected counts for each matching status."""
@@ -236,8 +235,8 @@ class TestInteractionCSVForm:
             ContactMatchingStatus.multiple_matches: num_multiple_matches,
         }
 
-    @pytest.mark.parametrize('num_unmatched', (0, 2))
-    @pytest.mark.parametrize('num_multiple_matches', (0, 2))
+    @pytest.mark.parametrize('num_unmatched', [0, 2])
+    @pytest.mark.parametrize('num_multiple_matches', [0, 2])
     @pytest.mark.usefixtures('local_memory_cache')
     def test_save_returns_unmatched_rows(self, num_unmatched, num_multiple_matches):
         """Test that save() returns an UnmatchedRowCollector with the expected rows."""
@@ -269,8 +268,8 @@ class TestInteractionCSVForm:
             *multiple_matches_rows,
         ]
 
-    @pytest.mark.parametrize('num_unmatched', (0, 2))
-    @pytest.mark.parametrize('num_multiple_matches', (0, 2))
+    @pytest.mark.parametrize('num_unmatched', [0, 2])
+    @pytest.mark.parametrize('num_multiple_matches', [0, 2])
     def test_save_creates_interactions(self, num_unmatched, num_multiple_matches):
         """Test that save() creates interactions."""
         num_matching = 3
@@ -429,18 +428,17 @@ class TestInteractionCSVForm:
     @pytest.mark.usefixtures('local_memory_cache')
     @pytest.mark.parametrize(
         'cache_data',
-        (
+        [
             # only the file contents
             {_cache_key_for_token('test-token', CacheKeyType.file_contents): b'data'},
             # only the file name
             {_cache_key_for_token('test-token', CacheKeyType.file_name): 'name'},
             # nothing
             {},
-        ),
+        ],
     )
     def test_from_token_with_invalid_token(self, cache_data):
-        """
-        Test that from_token() returns None if there is incomplete data for the token in
+        """Test that from_token() returns None if there is incomplete data for the token in
         the cache.
         """
         cache.set_many(cache_data)

@@ -3,7 +3,7 @@ from datetime import timedelta
 
 import pytest
 from django.core.cache import cache
-from django.core.management import call_command, CommandError
+from django.core.management import CommandError, call_command
 from django.utils.timezone import now
 from freezegun import freeze_time
 
@@ -26,13 +26,13 @@ class TestAddAccessTokenCommand:
         assert str(excinfo.value) == 'No adviser with SSO email user ID test@test.invalid found.'
 
     @pytest.mark.parametrize(
-        'command_kwargs,expected_timeout',
-        (
+        ('command_kwargs', 'expected_timeout'),
+        [
             # Default timeout
             ({}, timedelta(hours=10)),
             # With custom timeout
             ({'hours': 1}, timedelta(hours=1)),
-        ),
+        ],
     )
     def test_adds_access_token_to_cache(self, command_kwargs, expected_timeout):
         """The command should add the generated access token to the cache."""
@@ -61,8 +61,7 @@ class TestAddAccessTokenCommand:
             assert cache.get(f'access_token:{token}') is None
 
     def test_can_use_custom_token(self):
-        """
-        It should be possible to use a custom access token (instead of an auto-generated
+        """It should be possible to use a custom access token (instead of an auto-generated
         one).
         """
         sso_email_user_id = 'id@datahub.test'

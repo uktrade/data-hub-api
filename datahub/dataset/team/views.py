@@ -4,8 +4,7 @@ from datahub.metadata.models import Team
 
 
 class TeamsDatasetView(BaseDatasetView):
-    """
-    An APIView that provides 'get' action which queries and returns desired fields for
+    """An APIView that provides 'get' action which queries and returns desired fields for
     Teams Dataset to be consumed by Data-flow periodically. Data-flow uses response result
     to insert data into Dataworkspace through its defined API endpoints.
     """
@@ -13,7 +12,7 @@ class TeamsDatasetView(BaseDatasetView):
     pagination_class = TeamsDatasetViewCursorPagination
 
     def get_dataset(self):
-        """Returns list of Teams Dataset records"""
+        """Returns list of Teams Dataset records."""
         return Team.objects.values(
             'country__name',
             'disabled_on',

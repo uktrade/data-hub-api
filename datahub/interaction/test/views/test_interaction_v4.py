@@ -61,7 +61,7 @@ class TestAddInteraction(APITestMixin):
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_ADD_PERMISSIONS)
     @pytest.mark.parametrize(
         'extra_data',
-        (
+        [
             # company interaction
             {},
             # company interaction with investment theme
@@ -99,7 +99,7 @@ class TestAddInteraction(APITestMixin):
                 'theme': Interaction.Theme.EXPORT,
                 'company_export': ExportFactory,
             },
-        ),
+        ],
     )
     def test_add(self, extra_data, permissions):
         """Test add a new interaction."""
@@ -232,7 +232,7 @@ class TestAddInteraction(APITestMixin):
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_ADD_PERMISSIONS)
     @pytest.mark.parametrize(
         'extra_data',
-        (
+        [
             # company interaction
             {},
             # company interaction with investment theme
@@ -265,7 +265,7 @@ class TestAddInteraction(APITestMixin):
                 'was_policy_feedback_provided': True,
                 'policy_feedback_notes': 'Policy feedback notes',
             },
-        ),
+        ],
     )
     def test_add_with_companies(self, extra_data, permissions):
         """Test add a new interaction with companies."""
@@ -310,7 +310,7 @@ class TestAddInteraction(APITestMixin):
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_ADD_PERMISSIONS)
     @pytest.mark.parametrize(
         'extra_data',
-        (
+        [
             # company interaction with export theme
             {
                 'theme': Interaction.Theme.EXPORT,
@@ -348,7 +348,7 @@ class TestAddInteraction(APITestMixin):
                 'were_countries_discussed': False,
                 'export_countries': [],
             },
-        ),
+        ],
     )
     def test_add_new_interaction(
         self, extra_data, permissions,
@@ -481,8 +481,7 @@ class TestAddInteraction(APITestMixin):
     @freeze_time('2017-04-18 13:25:30.986208')
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_ADD_PERMISSIONS)
     def test_add_interaction_add_company_export_country(self, permissions):
-        """
-        Test add a new interaction with export country
+        """Test add a new interaction with export country
         make sure it syncs across to company as a new entry.
         """
         adviser = create_test_user(
@@ -534,8 +533,8 @@ class TestAddInteraction(APITestMixin):
     @freeze_time('2017-04-18 13:25:30.986208')
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_ADD_PERMISSIONS)
     @pytest.mark.parametrize(
-        'export_country_date,interaction_date,expected_status',
-        (
+        ('export_country_date', 'interaction_date', 'expected_status'),
+        [
             # current dated interaction overriding existing older status
             (
                 '2017-01-18',
@@ -562,7 +561,7 @@ class TestAddInteraction(APITestMixin):
                 '2018-02-18',
                 CompanyExportCountry.Status.CURRENTLY_EXPORTING,
             ),
-        ),
+        ],
     )
     def test_add_interaction_update_company_export_country(
         self,
@@ -571,8 +570,7 @@ class TestAddInteraction(APITestMixin):
         interaction_date,
         expected_status,
     ):
-        """
-        Test add a new interaction with export country
+        """Test add a new interaction with export country
         consolidates to company export countries.
         """
         adviser = create_test_user(
@@ -633,8 +631,8 @@ class TestAddInteraction(APITestMixin):
         assert export_countries[0].status == expected_status
 
     @pytest.mark.parametrize(
-        'data,errors',
-        (
+        ('data', 'errors'),
+        [
             # required fields
             (
                 {
@@ -1701,7 +1699,7 @@ class TestAddInteraction(APITestMixin):
                     ],
                 },
             ),
-        ),
+        ],
     )
     def test_validation(self, data, errors):
         """Test validation errors."""
@@ -1714,8 +1712,7 @@ class TestAddInteraction(APITestMixin):
 
     @freeze_time('2017-04-18 13:25:30.986208')
     def test_restricted_user_can_add_associated_investment_project_interaction(self):
-        """
-        Test that a restricted user can add an interaction for an associated investment project.
+        """Test that a restricted user can add an interaction for an associated investment project.
         """
         project_creator = AdviserFactory()
         project = InvestmentProjectFactory(created_by=project_creator)
@@ -1762,8 +1759,7 @@ class TestAddInteraction(APITestMixin):
     def test_restricted_user_cannot_add_non_associated_investment_project_interaction(
         self,
     ):
-        """
-        Test that a restricted user cannot add an interaction for a non-associated investment
+        """Test that a restricted user cannot add an interaction for a non-associated investment
         project.
         """
         project_creator = AdviserFactory()
@@ -1842,9 +1838,8 @@ class TestAddInteraction(APITestMixin):
     @freeze_time('2017-04-18 13:25:30.986208')
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_ADD_PERMISSIONS)
     def test_add_export_countries_interaction_without_existing_country_mapping(self, permissions):
-        """
-        Test that a user can update the interaction
-        when the interaction without existing export country set
+        """Test that a user can update the interaction
+        when the interaction without existing export country set.
         """
         adviser = create_test_user(
             permission_codenames=permissions, dit_team=TeamFactory(),
@@ -1918,14 +1913,14 @@ class TestGetInteraction(APITestMixin):
 
     @pytest.mark.parametrize(
         'factory',
-        (
+        [
             CompanyExportInteractionFactory,
             CompanyInteractionFactory,
             CompanyInteractionFactoryWithPolicyFeedback,
             InvestmentProjectInteractionFactory,
             ExportCountriesInteractionFactory,
             CompanyReferralInteractionFactory,
-        ),
+        ],
     )
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_VIEW_PERMISSIONS)
     @freeze_time('2017-04-18 13:25:30.986208')
@@ -2189,8 +2184,7 @@ class TestGetInteraction(APITestMixin):
     def test_restricted_user_cannot_get_non_associated_investment_project_interaction(
         self,
     ):
-        """
-        Test that a restricted user cannot get a non-associated investment project
+        """Test that a restricted user cannot get a non-associated investment project
         interaction.
         """
         interaction = InvestmentProjectInteractionFactory()
@@ -2266,8 +2260,7 @@ class TestUpdateInteraction(APITestMixin):
     def test_restricted_user_cannot_update_non_associated_investment_project_interaction(
         self,
     ):
-        """
-        Test that a restricted user cannot update a non-associated investment project interaction.
+        """Test that a restricted user cannot update a non-associated investment project interaction.
         """
         interaction = InvestmentProjectInteractionFactory(
             subject='I am a subject',
@@ -2290,8 +2283,7 @@ class TestUpdateInteraction(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_restricted_user_can_update_associated_investment_project_interaction(self):
-        """
-        Test that a restricted user can update an interaction for an associated investment project.
+        """Test that a restricted user can update an interaction for an associated investment project.
         """
         project_creator = AdviserFactory()
         project = InvestmentProjectFactory(created_by=project_creator)
@@ -2319,8 +2311,8 @@ class TestUpdateInteraction(APITestMixin):
         assert response.data['subject'] == 'I am another subject'
 
     @pytest.mark.parametrize(
-        'initial_value,new_value',
-        (
+        ('initial_value', 'new_value'),
+        [
             (
                 None,
                 Interaction.Theme.EXPORT,
@@ -2329,7 +2321,7 @@ class TestUpdateInteraction(APITestMixin):
                 None,
                 None,
             ),
-        ),
+        ],
     )
     def test_update_theme(self, initial_value, new_value):
         """Test that the theme field can be updated."""
@@ -2364,8 +2356,8 @@ class TestUpdateInteraction(APITestMixin):
         }
 
     @pytest.mark.parametrize(
-        'data,error_response',
-        (
+        ('data', 'error_response'),
+        [
             (
                 {
                     'status': Interaction.Status.COMPLETE,
@@ -2387,15 +2379,14 @@ class TestUpdateInteraction(APITestMixin):
                     'service': ['This field is required.'],
                 },
             ),
-        ),
+        ],
     )
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_CHANGE_PERMISSIONS)
     @freeze_time('2017-04-18 13:25:30.986208')
     def test_draft_update_enforces_required_fields(
         self, permissions, data, error_response,
     ):
-        """
-        Test that changing a draft to completed will enforce service and
+        """Test that changing a draft to completed will enforce service and
         communication_channel to be set.
         """
         requester = create_test_user(permission_codenames=permissions)
@@ -2416,9 +2407,8 @@ class TestUpdateInteraction(APITestMixin):
     @freeze_time('2017-04-18 13:25:30.986208')
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_CHANGE_PERMISSIONS)
     def test_update_export_countries_interaction_with_existing_country_mapping(self, permissions):
-        """
-        Test that a user can update the interaction
-        when the interaction with existing export country
+        """Test that a user can update the interaction
+        when the interaction with existing export country.
         """
         adviser = create_test_user(
             permission_codenames=permissions, dit_team=TeamFactory(),
@@ -2465,9 +2455,8 @@ class TestUpdateInteraction(APITestMixin):
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_CHANGE_PERMISSIONS)
     @freeze_time('2017-04-18 13:25:30.986208')
     def test_update_interaction_when_export_countries_set(self, permissions):
-        """
-        Test that a user can update the interaction otherwise
-        when the interaction already has export countries set
+        """Test that a user can update the interaction otherwise
+        when the interaction already has export countries set.
         """
         requester = create_test_user(permission_codenames=permissions)
         interaction = ExportCountriesInteractionFactory()
@@ -2491,8 +2480,7 @@ class TestUpdateInteraction(APITestMixin):
     def test_add_interaction_with_company_export_country_check_history(
         self, permissions,
     ):
-        """
-        Test add a new interaction with export country
+        """Test add a new interaction with export country
         check to make sure it is not tracked in company export country history.
         """
         adviser = create_test_user(
@@ -2550,7 +2538,7 @@ class TestListInteractions(APITestMixin):
 
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_VIEW_PERMISSIONS)
     def test_non_restricted_user_can_only_list_relevant_interactions(self, permissions):
-        """Test that a non-restricted user can list all interactions"""
+        """Test that a non-restricted user can list all interactions."""
         requester = create_test_user(permission_codenames=permissions)
         api_client = self.create_api_client(user=requester)
 
@@ -2578,8 +2566,7 @@ class TestListInteractions(APITestMixin):
         assert actual_ids == expected_ids
 
     def test_restricted_user_can_only_list_associated_interactions(self):
-        """
-        Test that a restricted user can only list interactions for associated investment
+        """Test that a restricted user can only list interactions for associated investment
         projects.
         """
         creator = AdviserFactory()
@@ -2651,7 +2638,7 @@ class TestListInteractions(APITestMixin):
 
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_VIEW_PERMISSIONS)
     def test_filtered_by_company_export(self, permissions):
-        """List of interactions filtered by company export"""
+        """List of interactions filtered by company export."""
         requester = create_test_user(permission_codenames=permissions)
         api_client = self.create_api_client(user=requester)
 

@@ -15,7 +15,6 @@ from datahub.investment.project.test.factories import (
     GVAMultiplierFactory,
 )
 
-
 CAPITAL = GVAMultiplier.SectorClassificationChoices.CAPITAL
 LABOUR = GVAMultiplier.SectorClassificationChoices.LABOUR
 
@@ -33,8 +32,7 @@ class TestInvestmentProjectTasks:
         mock_update_investment_projects_for_gva_multiplier,
         caplog,
     ):
-        """
-        Tests update investment projects for gva multiplier task when
+        """Tests update investment projects for gva multiplier task when
         a GVA Multiplier no longer exists.
         """
         caplog.set_level('WARNING')
@@ -55,8 +53,7 @@ class TestInvestmentProjectTasks:
         self,
         mock_update_investment_projects_for_gva_multiplier,
     ):
-        """
-        Tests update investment projects for gva multiplier task updates
+        """Tests update investment projects for gva multiplier task updates
         calls update_investment_projects_for_gva.
         """
         gva_multipler = GVAMultiplierFactory()
@@ -65,8 +62,7 @@ class TestInvestmentProjectTasks:
         assert mock_update_investment_projects_for_gva_multiplier.called
 
     def test_update_investment_projects_for_gva_multiplier(self):
-        """
-        Tests update investment projects for gva multiplier task updates
+        """Tests update investment projects for gva multiplier task updates
         all related investment projects.
         """
         gva_multiplier = GVAMultiplierFactory(

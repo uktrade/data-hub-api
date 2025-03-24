@@ -5,8 +5,8 @@ from datahub.search.task.serializers import (
     SearchTaskQuerySerializer,
 )
 from datahub.search.views import (
-    register_v4_view,
     SearchAPIView,
+    register_v4_view,
 )
 
 
@@ -45,8 +45,7 @@ class SearchTaskAPIView(SearchTaskAPIViewMixin, SearchAPIView):
     """Filtered company search view."""
 
     def deep_get(self, dictionary, keys, default=None):
-        """
-        Perform a deep search on a dictionary to find the item at the location provided in the keys
+        """Perform a deep search on a dictionary to find the item at the location provided in the keys.
         """
         return reduce(
             lambda d, key: d.get(key, default) if isinstance(d, dict) else default,
@@ -55,8 +54,7 @@ class SearchTaskAPIView(SearchTaskAPIViewMixin, SearchAPIView):
         )
 
     def get_base_query(self, request, validated_data):
-        """
-        Check for filters that filter for not_* parameters and extend the open search base query
+        """Check for filters that filter for not_* parameters and extend the open search base query
         with the must_not filters.
         """
         must_not = []
@@ -102,8 +100,7 @@ class SearchTaskAPIView(SearchTaskAPIViewMixin, SearchAPIView):
         return base_query
 
     def must_limit_query_to_created_by_or_advisers(self, request):
-        """
-        Create filter that limits results to tasks that have been either created by or assigned to
+        """Create filter that limits results to tasks that have been either created by or assigned to
         the current user.
         """
         must = []
@@ -136,8 +133,7 @@ class SearchTaskAPIView(SearchTaskAPIViewMixin, SearchAPIView):
         return must
 
     def add_must_and_must_not_to_filters(self, base_query, must, must_not):
-        """
-        Merge the must and must not filters into single query.
+        """Merge the must and must not filters into single query.
         """
         raw_query = base_query.to_dict()
         filters = self.deep_get(raw_query, 'query|bool|filter')
