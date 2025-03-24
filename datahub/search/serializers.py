@@ -11,8 +11,7 @@ class SingleOrListField(serializers.ListField):
     """Field can be single instance or list."""
 
     def to_internal_value(self, data):
-        """
-        If data is str, call the child serialiser's run_validation() directly.
+        """If data is str, call the child serialiser's run_validation() directly.
 
         This is to maintain an error format matching the input (if a list is provided, return an
         error list for each item, otherwise return a single error list).
@@ -26,15 +25,13 @@ class SingleOrListField(serializers.ListField):
 
 
 class StringUUIDField(serializers.UUIDField):
-    """
-    String UUID field.
+    """String UUID field.
 
     We can't use UUID in OpenSearch queries, that's why we need to convert them back to string.
     """
 
     def to_internal_value(self, data):
-        """
-        Converts string to UUID and then back to string,
+        """Converts string to UUID and then back to string,
         to ensure that string is valid UUID.
         """
         uuid = super().to_internal_value(data)

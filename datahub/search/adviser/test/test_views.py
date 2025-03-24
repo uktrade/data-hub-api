@@ -7,7 +7,6 @@ from datahub.core.test_utils import APITestMixin, create_test_user
 from datahub.metadata.test.factories import TeamFactory
 from datahub.search.adviser import AdviserSearchApp
 
-
 pytestmark = [
     pytest.mark.django_db,
     # Index objects for this search app only

@@ -1,12 +1,11 @@
 from django.db.models import Exists, OuterRef
 
-from datahub.core.autocomplete import _apply_autocomplete_filter_to_queryset, AutocompleteFilter
+from datahub.core.autocomplete import AutocompleteFilter, _apply_autocomplete_filter_to_queryset
 from datahub.user.company_list.models import CompanyListItem
 
 
 class WithListAutocompleteFilter(AutocompleteFilter):
-    """
-    Autocomplete function that prepends any companies from the current users' list to the results.
+    """Autocomplete function that prepends any companies from the current users' list to the results.
     """
 
     def filter(self, queryset, value):

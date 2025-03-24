@@ -115,8 +115,7 @@ class TestCompanyAdminPermissions(AdminTestMixin):
             route_name,
             method,
     ):
-        """
-        Test that the view returns a 403 response if the staff user does not have the
+        """Test that the view returns a 403 response if the staff user does not have the
         change company permission.
         """
         url = reverse(route_name)

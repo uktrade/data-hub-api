@@ -13,8 +13,7 @@ class TestInteractionSerializerV4:
     """Tests for the Company Export Serializer"""
 
     def test_event_is_not_none_if_interaction_has_event(self):
-        """
-        Show the event from the serializer but ensure the stova_event_id is None as this event is
+        """Show the event from the serializer but ensure the stova_event_id is None as this event is
         not related to a stova event.
         """
         interaction = EventServiceDeliveryFactory()

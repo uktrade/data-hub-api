@@ -9,6 +9,8 @@ from rest_framework.reverse import reverse
 from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.core.constants import (
     Country as CountryConstant,
+)
+from datahub.core.constants import (
     UKRegion as UKRegionConstant,
 )
 from datahub.core.test_utils import APITestMixin, create_test_user
@@ -17,18 +19,35 @@ from datahub.investment.investor_profile.constants import (
 )
 from datahub.investment.investor_profile.test.constants import (
     AssetClassInterest as AssetClassInterestConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     ConstructionRisk as ConstructionRiskConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     DealTicketSize as DealTicketSizeConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     DesiredDealRole as DesiredDealRoleConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     EquityPercentage as EquityPercentageConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     InvestorType as InvestorTypeConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     LargeCapitalInvestmentTypes as LargeCapitalInvestmentTypesConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     Restriction as RestrictionConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     ReturnRate as ReturnRateConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     TimeHorizon as TimeHorizonConstant,
 )
 from datahub.investment.investor_profile.test.factories import LargeCapitalInvestorProfileFactory
-
 
 INVALID_CHOICE_ERROR_MESSAGE = (
     'Select a valid choice. That choice is not one of the available choices.'
@@ -43,7 +62,7 @@ def get_large_capital_profile_for_search():
     large_capital_profile = LargeCapitalInvestorProfileFactory(
         investor_company=investor_company,
     )
-    yield large_capital_profile
+    return large_capital_profile
 
 
 class TestCreateLargeCapitalProfileView(APITestMixin):
@@ -228,8 +247,7 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
         assert 'investor_description' not in response_data['incomplete_details_fields']
 
     def test_patch_large_capital_profile_with_a_different_company_returns_validation_error(self):
-        """
-        Test updating a large capital profile with a different investor company
+        """Test updating a large capital profile with a different investor company
         does return a validation error
         """
         investor_company = CompanyFactory()
@@ -600,8 +618,7 @@ class TestUpdateLargeCapitalProfileConditionalFields(APITestMixin):
         assert not response_data['required_checks_conducted_on']
 
     def test_patch_large_capital_required_checks_conducted_by_error(self):
-        """
-        Test updating required checks conducted by cannot be set when required checks
+        """Test updating required checks conducted by cannot be set when required checks
         conducted is blank.
         """
         investor_company = CompanyFactory()
@@ -662,8 +679,7 @@ class TestUpdateLargeCapitalProfileConditionalFields(APITestMixin):
         request_data,
         expected_error_response,
     ):
-        """
-        Test updating required checks conducted errors.
+        """Test updating required checks conducted errors.
 
         If the value of required_checks_conducted_id is already set to a value in
         constants.REQUIRED_CHECKS_THAT_NEED_ADDITIONAL_INFORMATION and is then updated to another

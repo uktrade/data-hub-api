@@ -2,7 +2,6 @@ import logging
 from functools import partial
 
 import environ
-
 from django.conf import settings
 from django.core.cache import cache
 from mohawk import Receiver
@@ -49,16 +48,14 @@ class HawkAuthentication(BaseAuthentication):
 
 
 class HawkResponseSigningMixin:
-    """
-    DRF view mixin to add the Server-Authorization header to responses, so the originator
+    """DRF view mixin to add the Server-Authorization header to responses, so the originator
     of the request can authenticate the response.
 
     Must be first in the base class list so that the APIView method is overridden.
     """
 
     def finalize_response(self, request, response, *args, **kwargs):
-        """
-        Add callback to sign Hawk responses.
+        """Add callback to sign Hawk responses.
 
         If the request was authenticated using Hawk, this adds a post-render callback to the
         response which sets the Server-Authorization header, so that the originator of the
@@ -71,8 +68,7 @@ class HawkResponseSigningMixin:
 
 
 class HawkScopePermission(BasePermission):
-    """
-    Permission class to authorise Hawk requests using the allowed scope of the client.
+    """Permission class to authorise Hawk requests using the allowed scope of the client.
 
     If the request was not authenticated using Hawk, access is denied.
     """

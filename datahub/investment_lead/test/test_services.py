@@ -1,9 +1,7 @@
 import logging
-
 from unittest.mock import patch
 
 import pytest
-
 from django.db import IntegrityError
 
 from datahub.company.models.company import Company
@@ -123,8 +121,7 @@ class TestEYBLeadServices:
             add_new_company_from_eyb_lead(eyb_lead)
 
     def test_existing_company_match_contact_on_email_address(self):
-        """
-        Match email address for contact associated with EYB Lead company
+        """Match email address for contact associated with EYB Lead company
         """
         contact = ContactFactory()
         eyb_lead_matching = EYBLeadFactory(
@@ -140,8 +137,7 @@ class TestEYBLeadServices:
         assert result
 
     def test_fail_match_on_partial_email(self):
-        """
-        Do not match an email address that is a subset of email address
+        """Do not match an email address that is a subset of email address
         where other parameters match.
         """
         contact = ContactFactory()
@@ -158,8 +154,7 @@ class TestEYBLeadServices:
         assert not result
 
     def test_fail_match_for_different_company(self):
-        """
-        Do not match contact with a matching email address belonging to a different company
+        """Do not match contact with a matching email address belonging to a different company
         """
         contact = ContactFactory()
         eyb_lead_not_matching = EYBLeadFactory(
@@ -174,8 +169,7 @@ class TestEYBLeadServices:
         assert not result
 
     def test_skip_creation_when_contact_exists(self):
-        """
-        Match email address for contact associated with EYB Lead company
+        """Match email address for contact associated with EYB Lead company
         """
         contact = ContactFactory()
         eyb_lead_matching = EYBLeadFactory(

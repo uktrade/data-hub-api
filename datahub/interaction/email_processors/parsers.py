@@ -6,8 +6,8 @@ import icalendar
 from django.utils.timezone import is_naive, make_aware
 
 from datahub.company.contact_matching import (
-    find_active_contact_by_email_address,
     MatchStrategy,
+    find_active_contact_by_email_address,
 )
 from datahub.email_ingestion.validation import was_email_sent_by_dit
 from datahub.interaction.email_processors.exceptions import (
@@ -22,7 +22,6 @@ from datahub.interaction.email_processors.utils import (
     get_best_match_adviser_by_email,
 )
 
-
 ICALENDAR_CONTENT_TYPE = 'application/ics'
 BEGIN_VCALENDAR = 'BEGIN:VCALENDAR'
 CALENDAR_STATUS_CONFIRMED = 'CONFIRMED'
@@ -30,8 +29,7 @@ CALENDAR_COMPONENT_VEVENT = 'VEVENT'
 
 
 def _get_top_company_from_contacts(contacts):
-    """
-    Get the company from the given contacts.
+    """Get the company from the given contacts.
     If these contacts are related to different companies, return the company
     with the highest number of contacts in our iterable.
     """
@@ -41,8 +39,7 @@ def _get_top_company_from_contacts(contacts):
 
 
 def _extract_calendar_string_from_text(message):
-    """
-    Extract an icalendar string from the plain text of a message.
+    """Extract an icalendar string from the plain text of a message.
 
     :param message: MailParser message object
     :returns: A string of the icalendar body or None if it could not be found in plain text
@@ -54,8 +51,7 @@ def _extract_calendar_string_from_text(message):
 
 
 def _extract_calendar_string_from_attachments(message):
-    """
-    Extract an icalendar string from the attachements of a message.
+    """Extract an icalendar string from the attachements of a message.
 
     :param message: MailParser message object
     :returns: A string of the icalendar body or None if no ICS file could be found in
@@ -69,8 +65,7 @@ def _extract_calendar_string_from_attachments(message):
 
 
 def _convert_calendar_time_to_utc_datetime(calendar_time):
-    """
-    Takes a scheduled calendar time (could be a datetime.date or datetime.datetime)
+    """Takes a scheduled calendar time (could be a datetime.date or datetime.datetime)
     and transposes it to a UTC datetime.
     """
     # If calendar_time is a datetime.date, make it a datetime
@@ -89,8 +84,7 @@ class BaseEmailParser:
     """Base email parser."""
 
     def __init__(self, message):
-        """
-        Initialise the BaseEmailParser with a MailParser email
+        """Initialise the BaseEmailParser with a MailParser email
         object.
         """
         self.message = message
@@ -127,8 +121,7 @@ class BaseEmailParser:
         return sender_adviser
 
     def _extract_secondary_advisers(self, all_recipients, sender_adviser):
-        """
-        Extract the secondary (non-sender) advisers for the calendar invite - that is,
+        """Extract the secondary (non-sender) advisers for the calendar invite - that is,
         any advisers that received the invite who did not send it.
         """
         secondary_advisers = []
@@ -140,8 +133,7 @@ class BaseEmailParser:
 
 
 class CalendarInteractionEmailParser(BaseEmailParser):
-    """
-    Parses and extracts calendar interaction information from a MailParser email
+    """Parses and extracts calendar interaction information from a MailParser email
     object.
     """
 
@@ -196,8 +188,7 @@ class CalendarInteractionEmailParser(BaseEmailParser):
         return calendar_event
 
     def extract_interaction_data_from_email(self):
-        """
-        Extract interaction data from the email message as a dictionary.
+        """Extract interaction data from the email message as a dictionary.
 
         This raises an InvalidInviteError if the interaction data could not be fully extracted
         or is invalid according to business logic.
@@ -224,8 +215,7 @@ class InteractionEmailParser(BaseEmailParser):
     """Parses and extracts interaction information from a MailParser email object."""
 
     def extract_interaction_data_from_email(self):
-        """
-        Extract interaction data from the email message as a dictionary.
+        """Extract interaction data from the email message as a dictionary.
 
         This raises an InvalidInviteError if the interaction data could not be fully extracted
         or is invalid according to business logic.

@@ -1,5 +1,4 @@
 import pytest
-
 from django.contrib.contenttypes.models import ContentType
 
 from datahub.company.test.factories import CompanyFactory
@@ -17,7 +16,6 @@ from datahub.documents.test.test_utils import (
     assert_retrieved_sharepoint_document,
 )
 from datahub.investment.project.test.factories import InvestmentProjectFactory
-
 
 pytestmark = pytest.mark.django_db
 

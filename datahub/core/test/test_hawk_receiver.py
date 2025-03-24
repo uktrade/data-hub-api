@@ -275,8 +275,7 @@ class TestHawkScopePermission:
     """Tests scoped-based permissions using HawkScopePermission."""
 
     def test_denies_access_when_without_the_required_scope(self, api_client):
-        """
-        Test that a 403 is returned if the request is Hawk authenticated but the client doesn't
+        """Test that a 403 is returned if the request is Hawk authenticated but the client doesn't
         have the required scope.
         """
         sender = _auth_sender(
@@ -313,8 +312,7 @@ class TestHawkScopePermission:
         }
 
     def test_authorises_when_with_the_required_scope(self, api_client):
-        """
-        Test that a 200 is returned if the request is Hawk authenticated and the client has
+        """Test that a 200 is returned if the request is Hawk authenticated and the client has
         the required scope.
         """
         sender = _auth_sender(
@@ -332,8 +330,7 @@ class TestHawkScopePermission:
         assert response.json() == {'content': 'hawk-test-view-with-scope'}
 
     def test_authorises_when_with_one_of_the_required_scopes(self, api_client):
-        """
-        Test that a 200 is returned if the request is Hawk authenticated and the client has
+        """Test that a 200 is returned if the request is Hawk authenticated and the client has
         one of the required scope.
         """
         sender = _auth_sender(

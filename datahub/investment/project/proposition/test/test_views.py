@@ -2026,8 +2026,7 @@ class TestPropositionDocumentViews(APITestMixin):
         self,
         monkeypatch,
     ):
-        """
-        Test that restricted user can schedule a virus scan for associated document.
+        """Test that restricted user can schedule a virus scan for associated document.
         """
         mock_schedule_virus_scan_document = Mock()
         monkeypatch.setattr(

@@ -6,7 +6,6 @@ from rest_framework.exceptions import ValidationError
 from datahub.omis.order.constants import VATStatus
 from datahub.omis.order.validators import VATSubValidator
 
-
 OrderPricing = namedtuple(
     'OrderPricing',
     ('net_cost', 'subtotal_cost', 'vat_cost', 'total_cost'),
@@ -16,8 +15,7 @@ ZERO_PRICING = OrderPricing(0, 0, 0, 0)
 
 
 def get_pricing_from_order(order, in_pence=True):
-    """
-    :returns: an instance of OrderPricing from the obj `order`
+    """:returns: an instance of OrderPricing from the obj `order`
     """
     if in_pence:
         transform = lambda x: x  # noqa: E731
@@ -33,8 +31,7 @@ def get_pricing_from_order(order, in_pence=True):
 
 
 def _validate_vat(order):
-    """
-    Validate that the order has all the VAT fields required.
+    """Validate that the order has all the VAT fields required.
 
     :raises ValidationError: if not
     """
@@ -43,9 +40,8 @@ def _validate_vat(order):
 
 
 def can_pricing_be_calculated(order):
-    """
-    :returns: True if the pricing for `order` can be calculated
-        (e.g. all the fields required are filled in)
+    """:returns: True if the pricing for `order` can be calculated
+    (e.g. all the fields required are filled in)
     """
     try:
         _validate_vat(order)
@@ -55,8 +51,7 @@ def can_pricing_be_calculated(order):
 
 
 def should_vat_be_applied(order):
-    """
-    The logic is the following:
+    """The logic is the following:
         - if VATStatus is uk => the VAT is always applied
         - if VATStatus is outside_eu => the VAT is never applied
         - if VATStatus is eu
@@ -77,8 +72,7 @@ def should_vat_be_applied(order):
 
 
 def _calculate_pricing(estimated_time, hourly_rate, vat_value, discount_value):
-    """
-    Calculate the pricing using the given base values.
+    """Calculate the pricing using the given base values.
 
     :param estimated_time: time needed to complete the order in minutes (e.g. 60 is 1 hour)
     :param hourly rate: hourly charges for the OMIS services in pence (e.g. 100 is £1)
@@ -110,8 +104,7 @@ def _calculate_pricing(estimated_time, hourly_rate, vat_value, discount_value):
 
 
 def calculate_order_pricing(order):
-    """
-    :returns: the pricing for `order`
+    """:returns: the pricing for `order`
     """
     if not can_pricing_be_calculated(order):
         return ZERO_PRICING
@@ -132,8 +125,7 @@ def calculate_order_pricing(order):
 
 
 def update_order_pricing(order, commit=True):
-    """
-    Change the order model by updating the pricing fields.
+    """Change the order model by updating the pricing fields.
     If commit = True, commit the changes to the db as well.
     """
     original_pricing = get_pricing_from_order(order)

@@ -2,8 +2,7 @@ from functools import update_wrapper
 from urllib.parse import quote
 
 from django import forms
-from django.contrib import admin
-from django.contrib import messages
+from django.contrib import admin, messages
 from django.contrib.admin.exceptions import SuspiciousOperation
 from django.contrib.admin.options import IS_POPUP_VAR
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
@@ -22,9 +21,9 @@ from django.views.decorators.csrf import csrf_protect
 
 from datahub.core.admin import (
     BaseModelAdminMixin,
+    ViewAndChangeOnlyAdmin,
     get_change_link,
     get_change_url,
-    ViewAndChangeOnlyAdmin,
 )
 from datahub.core.exceptions import APIConflictException
 from datahub.omis.order import validators
@@ -152,23 +151,20 @@ class OrderAdmin(BaseModelAdminMixin, ViewAndChangeOnlyAdmin):
         return f'{description} because "{order.cancellation_reason}"'
 
     def public_facing_url(self, order):
-        """
-        :returns: read-only and clickable URL to the public facing OMIS page
+        """:returns: read-only and clickable URL to the public facing OMIS page
         """
         url = order.get_public_facing_url()
         return format_html('<a href="{href}">{text}<a>', href=url, text=url)
 
     def discount(self, order):
-        """
-        :returns: details of any discount applied
+        """:returns: details of any discount applied
         """
         if not order.discount_value and not order.discount_label:
             return ''
         return f'{order.discount_value} pence - {order.discount_label}'
 
     def uk_advisers(self, order):
-        """
-        :returns: descriptive list of advisers subscribed to the order
+        """:returns: descriptive list of advisers subscribed to the order
         """
         return format_html_join(
             '', '<p>{0}</p>',
@@ -176,8 +172,7 @@ class OrderAdmin(BaseModelAdminMixin, ViewAndChangeOnlyAdmin):
         )
 
     def post_advisers(self, order):
-        """
-        :returns: descriptive list of advisers assigned to the order
+        """:returns: descriptive list of advisers assigned to the order
         """
         return format_html_join(
             '', '<p>{0} {1}- estimated time {2} mins - actual time {3} mins</p>',

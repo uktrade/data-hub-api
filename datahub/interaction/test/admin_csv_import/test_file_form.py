@@ -13,15 +13,15 @@ from datahub.company.contact_matching import ContactMatchingStatus
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.exceptions import DataHubError
 from datahub.interaction.admin_csv_import import file_form
-from datahub.interaction.admin_csv_import.cache_utils import _cache_key_for_token, CacheKeyType
+from datahub.interaction.admin_csv_import.cache_utils import CacheKeyType, _cache_key_for_token
 from datahub.interaction.admin_csv_import.file_form import (
-    InteractionCSVForm,
     REVISION_COMMENT,
+    InteractionCSVForm,
     UnmatchedRowCollector,
 )
 from datahub.interaction.admin_csv_import.row_form import (
-    CSVRowError,
     DUPLICATE_OF_ANOTHER_ROW_MESSAGE,
+    CSVRowError,
 )
 from datahub.interaction.models import Interaction
 from datahub.interaction.test.admin_csv_import.utils import (
@@ -174,8 +174,7 @@ class TestInteractionCSVForm:
         assert expected_contact_emails == actual_contact_emails
 
     def test_get_matching_summary_with_invalid_rows(self):
-        """
-        Test that get_matching_summary() raises an exception if one of the CSV rows fails
+        """Test that get_matching_summary() raises an exception if one of the CSV rows fails
         validation.
         """
         file = make_csv_file_from_dicts(
@@ -439,8 +438,7 @@ class TestInteractionCSVForm:
         ),
     )
     def test_from_token_with_invalid_token(self, cache_data):
-        """
-        Test that from_token() returns None if there is incomplete data for the token in
+        """Test that from_token() returns None if there is incomplete data for the token in
         the cache.
         """
         cache.set_many(cache_data)

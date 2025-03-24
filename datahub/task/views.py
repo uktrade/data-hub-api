@@ -1,18 +1,14 @@
 from django.db import transaction
 from django.db.models import Q
-
 from django_filters.rest_framework import (
     DjangoFilterBackend,
 )
 from rest_framework.decorators import action, api_view, permission_classes
-
 from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from datahub.company.models.company import Company
-
-
 from datahub.core.mixins import ArchivableViewSetMixin
 from datahub.core.schemas import StubSchema
 from datahub.core.viewsets import CoreViewSet
@@ -27,8 +23,7 @@ from datahub.user_event_log.utils import record_user_event
 
 class TasksMixin(CoreViewSet):
     def get_tasks(self, request):
-        """
-        Get the task queryset that is filtered using common filters from the query params
+        """Get the task queryset that is filtered using common filters from the query params
         """
         queryset = (
             Task.objects.all()
@@ -95,8 +90,7 @@ class TaskV4ViewSet(ArchivableViewSetMixin, TasksMixin):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_tasks_companies_and_projects(request):
-    """
-    Get the list of companies and projects that have tasks
+    """Get the list of companies and projects that have tasks
     """
     user_id = request.user.id
 

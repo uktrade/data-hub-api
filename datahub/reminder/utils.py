@@ -1,6 +1,5 @@
 from dateutil.relativedelta import relativedelta
 
-
 REMINDER_DAYS_MAPPING = {
     30: lambda day: day + relativedelta(months=1),
     60: lambda day: day + relativedelta(months=2),

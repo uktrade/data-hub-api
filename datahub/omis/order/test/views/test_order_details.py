@@ -24,7 +24,6 @@ from datahub.omis.order.test.factories import (
     OrderWithOpenQuoteFactory,
 )
 
-
 # mark the whole module for db use
 pytestmark = pytest.mark.django_db
 
@@ -201,8 +200,7 @@ class TestAddOrder(APITestMixin):
         assert not response.json()['billing_address_country']
 
     def test_fails_if_contact_not_from_company(self):
-        """
-        Test that if the contact does not work at the company specified, the validation fails.
+        """Test that if the contact does not work at the company specified, the validation fails.
         """
         company = CompanyFactory()
         contact = ContactFactory()  # doesn't work at `company`
@@ -280,8 +278,7 @@ class TestAddOrder(APITestMixin):
         }
 
     def test_fails_if_primary_market_doesnt_exist(self):
-        """
-        Test that if the primary market does not have an OMIS market record defined,
+        """Test that if the primary market does not have an OMIS market record defined,
         the creation fails.
         """
         company = CompanyFactory()
@@ -346,8 +343,7 @@ class TestAddOrder(APITestMixin):
         (VATStatus.OUTSIDE_EU, VATStatus.UK),
     )
     def test_vat_number_and_verified_reset_if_vat_status_not_eu(self, vat_status):
-        """
-        Test that if vat_number and vat_verified are set but vat_status != 'eu',
+        """Test that if vat_number and vat_verified are set but vat_status != 'eu',
         they are set to '' and None as they only make sense if company in 'eu'.
         """
         company = CompanyFactory()
@@ -373,8 +369,7 @@ class TestAddOrder(APITestMixin):
         assert response.json()['vat_verified'] is None
 
     def test_fails_with_incomplete_billing_address(self):
-        """
-        Test that if one of the billing address fields is set, all the other required
+        """Test that if one of the billing address fields is set, all the other required
         billing fields should be set as well.
         """
         company = CompanyFactory()
@@ -405,8 +400,7 @@ class TestGeneralChangeOrder(APITestMixin):
 
     @freeze_time('2017-04-18 13:00:00.000000')
     def test_uk_region_not_populated_on_change(self):
-        """
-        Test that if order.uk_region is None,
+        """Test that if order.uk_region is None,
         it doesn't get populated automatically on change.
         """
         order = OrderFactory(
@@ -426,8 +420,7 @@ class TestGeneralChangeOrder(APITestMixin):
         assert not response.json()['uk_region']
 
     def test_fails_if_contact_not_from_company(self):
-        """
-        Test that if the contact does not work at the company specified, the validation fails.
+        """Test that if the contact does not work at the company specified, the validation fails.
         """
         order = OrderFactory()
         other_contact = ContactFactory()  # doesn't work at `order.company`
@@ -487,8 +480,7 @@ class TestGeneralChangeOrder(APITestMixin):
 
     @freeze_time('2017-01-01 11:00:00.000000')
     def test_can_update_service_type_with_another_disabled_if_wasnt_at_creation_time(self):
-        """
-        Test that if I have an order created on 01/01/2017
+        """Test that if I have an order created on 01/01/2017
         with a service type which got disabled on 10/01/2017
 
         If I update the order
@@ -588,8 +580,7 @@ class TestGeneralChangeOrder(APITestMixin):
         (VATStatus.OUTSIDE_EU, VATStatus.UK),
     )
     def test_vat_number_and_verified_reset_if_vat_status_not_eu(self, vat_status):
-        """
-        Test that if vat_number and vat_verified are set but vat_status != 'eu',
+        """Test that if vat_number and vat_verified are set but vat_status != 'eu',
         they are set to '' and None as they only make sense if company in 'eu'.
         """
         order = OrderFactory(
@@ -610,8 +601,7 @@ class TestGeneralChangeOrder(APITestMixin):
         assert response.json()['vat_verified'] is None
 
     def test_fails_with_incomplete_billing_address(self):
-        """
-        Test that if one of the billing address fields is set, all the other required
+        """Test that if one of the billing address fields is set, all the other required
         billing fields should be set as well.
         """
         order = OrderFactory(
@@ -797,8 +787,7 @@ class TestChangeOrderInDraft(APITestMixin):
 
 
 class TestChangeOrderInQuoteStatuses(APITestMixin):
-    """
-    Tests for changing an order when it's in quote_awaiting_acceptance
+    """Tests for changing an order when it's in quote_awaiting_acceptance
     or quote_accepted.
     """
 
@@ -932,8 +921,7 @@ class TestChangeOrderInQuoteStatuses(APITestMixin):
         ),
     )
     def test_new_invoice_generated_if_quote_accepted(self, field, value):
-        """
-        Test that if the order is in status 'Quote accepted' and one of the
+        """Test that if the order is in status 'Quote accepted' and one of the
         billing fields has changed, a new invoice is generated.
         """
         order = OrderWithAcceptedQuoteFactory(
@@ -956,8 +944,7 @@ class TestChangeOrderInQuoteStatuses(APITestMixin):
         assert new_value == value
 
     def test_pricing_on_invoice_changed_if_quote_accepted(self):
-        """
-        Test that if the order is in status 'Quote accepted'
+        """Test that if the order is in status 'Quote accepted'
         and one of the vat fields change, the pricing on the new invoice
         get updated.
         """
@@ -1258,8 +1245,7 @@ class TestMarkOrderAsComplete(APITestMixin):
         ),
     )
     def test_409_if_order_not_in_allowed_status(self, disallowed_status):
-        """
-        Test that if the order is in a disallowed status, the order cannot be marked as complete.
+        """Test that if the order is in a disallowed status, the order cannot be marked as complete.
         """
         order = OrderPaidFactory(status=disallowed_status, assignees=[])
         OrderAssigneeCompleteFactory(order=order)
@@ -1272,8 +1258,7 @@ class TestMarkOrderAsComplete(APITestMixin):
         assert order.status == disallowed_status
 
     def test_400_if_not_all_actual_time_set(self):
-        """
-        Test that if not all assignee actual time fields have been set,
+        """Test that if not all assignee actual time fields have been set,
         a validation error is raised and the call fails.
         """
         order = OrderPaidFactory(status=OrderStatus.PAID, assignees=[])
@@ -1343,8 +1328,7 @@ class TestCancelOrder(APITestMixin):
         ),
     )
     def test_409_if_order_not_in_allowed_status(self, disallowed_status):
-        """
-        Test that if the order is in a disallowed status, the order cannot be cancelled.
+        """Test that if the order is in a disallowed status, the order cannot be cancelled.
         """
         reason = CancellationReason.objects.order_by('?').first()
         order = OrderFactory(status=disallowed_status)
@@ -1379,8 +1363,7 @@ class TestCancelOrder(APITestMixin):
         ),
     )
     def test_validation_errors(self, data, errors):
-        """
-        Test that if cancellation_reason is invalid, the endpoint returns 400.
+        """Test that if cancellation_reason is invalid, the endpoint returns 400.
         """
         order = OrderFactory(status=OrderStatus.DRAFT)
 

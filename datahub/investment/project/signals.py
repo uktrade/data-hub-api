@@ -1,5 +1,4 @@
 import reversion
-
 from django.db.models import Q
 from django.db.models.signals import m2m_changed, post_save, pre_save
 from django.dispatch import receiver
@@ -43,8 +42,7 @@ def project_code_project_post_save(sender, **kwargs):
     dispatch_uid='set_gross_value_added_for_investment_project_pre_save',
 )
 def set_gross_value_added_for_investment_project_pre_save(sender, instance, **kwargs):
-    """
-    Checks the investment project and if anything has changed that could affect
+    """Checks the investment project and if anything has changed that could affect
     the Gross Value Added if required the values are updated.
 
     GVA can change if the sector, business activity is set to retail or the
@@ -83,8 +81,7 @@ def update_gross_value_added_on_project_business_activities_m2m_changed(
     dispatch_uid='update_update_investment_projects_for_gva_multiplier_post_save',
 )
 def update_investment_projects_for_gva_multiplier_post_save(sender, **kwargs):
-    """
-    Calls a task to update the normalised gross_value_added for all investment projects
+    """Calls a task to update the normalised gross_value_added for all investment projects
     with the associated GVA Multiplier.
 
     If the GVA Multiplier is being created no need to call the task as the GVA Multiplier
@@ -104,8 +101,7 @@ def update_investment_projects_for_gva_multiplier_post_save(sender, **kwargs):
     dispatch_uid='update_country_investment_originates_from_post_save',
 )
 def update_country_investment_originates_from(sender, **kwargs):
-    """
-    Updates investment project's country of origin when investor company address country changes.
+    """Updates investment project's country of origin when investor company address country changes.
     The won investment projects are not updated.
     """
     instance = kwargs['instance']

@@ -33,8 +33,7 @@ def _random_non_ita_one_list_tier():
 
 
 class TestAssignRegionalCompanyAccountManagerView(APITestMixin):
-    """
-    Tests for the self-assign company account manager view.
+    """Tests for the self-assign company account manager view.
 
     (Implemented in CompanyViewSet.assign_regional_account_manager().)
     """
@@ -59,8 +58,7 @@ class TestAssignRegionalCompanyAccountManagerView(APITestMixin):
         ),
     )
     def test_returns_403_if_without_permission(self, permission_codenames):
-        """
-        Test that a 403 is returned if the user does not have all of the required
+        """Test that a 403 is returned if the user does not have all of the required
         permissions.
         """
         company = CompanyFactory()
@@ -89,8 +87,7 @@ class TestAssignRegionalCompanyAccountManagerView(APITestMixin):
         ),
     )
     def test_assigns_account_manager(self, company_factory, international_trade_adviser):
-        """
-        Test that an account manager can be assigned to:
+        """Test that an account manager can be assigned to:
 
         - a company not on the One List
         - a company on the One List tier 'Tier D - International Trade Adviser Accounts'
@@ -156,8 +153,7 @@ class TestAssignRegionalCompanyAccountManagerView(APITestMixin):
         regional_account_manager_fn,
         international_trade_adviser,
     ):
-        """
-        Test that an account manager can't be assigned:
+        """Test that an account manager can't be assigned:
 
         - to a company on a One List tier other than
         'Tier D - International Trade Adviser Accounts'
@@ -177,8 +173,7 @@ class TestAssignRegionalCompanyAccountManagerView(APITestMixin):
 
 
 class TestSelfAssignCompanyAccountManagerView(APITestMixin):
-    """
-    Tests for the self-assign company account manager view.
+    """Tests for the self-assign company account manager view.
 
     (Implemented in CompanyViewSet.self_assign_account_manager().)
     """
@@ -203,8 +198,7 @@ class TestSelfAssignCompanyAccountManagerView(APITestMixin):
         ),
     )
     def test_returns_403_if_without_permission(self, permission_codenames):
-        """
-        Test that a 403 is returned if the user does not have all of the required
+        """Test that a 403 is returned if the user does not have all of the required
         permissions.
         """
         company = CompanyFactory()
@@ -233,8 +227,7 @@ class TestSelfAssignCompanyAccountManagerView(APITestMixin):
     )
     @pytest.mark.django_db
     def test_assigns_account_manager(self, company_factory, international_trade_adviser):
-        """
-        Test that an account manager can be assigned to:
+        """Test that an account manager can be assigned to:
 
         - a company not on the One List
         - a company on the One List tier 'Tier D - International Trade Adviser Accounts'
@@ -282,8 +275,7 @@ class TestSelfAssignCompanyAccountManagerView(APITestMixin):
     )
     @pytest.mark.django_db
     def test_validation(self, company_factory, expected_errors, international_trade_adviser):
-        """
-        Test that an account manager can't be assigned to:
+        """Test that an account manager can't be assigned to:
 
         - a company on a One List tier other than 'Tier D - International Trade Adviser Accounts'
         - a company on that is a subsidiary of any One List company
@@ -298,8 +290,7 @@ class TestSelfAssignCompanyAccountManagerView(APITestMixin):
 
 
 class TestRemoveCompanyAccountManagerView(APITestMixin):
-    """
-    Tests for the remove company account manager view.
+    """Tests for the remove company account manager view.
 
     (Implemented in CompanyViewSet.remove_account_manager().)
     """
@@ -324,8 +315,7 @@ class TestRemoveCompanyAccountManagerView(APITestMixin):
         ),
     )
     def test_returns_403_if_without_permission(self, permission_codenames):
-        """
-        Test that a 403 is returned if the user does not have all of the required
+        """Test that a 403 is returned if the user does not have all of the required
         permissions.
         """
         company = CompanyFactory()
@@ -354,8 +344,7 @@ class TestRemoveCompanyAccountManagerView(APITestMixin):
     )
     @pytest.mark.django_db
     def test_removes_account_manager_and_tier(self, company_factory, international_trade_adviser):
-        """
-        Test that an account manager can be removed from:
+        """Test that an account manager can be removed from:
 
         - a company not on the One List
         - a company on the One List tier 'Tier D - International Trade Adviser Accounts'
@@ -374,8 +363,7 @@ class TestRemoveCompanyAccountManagerView(APITestMixin):
 
     @pytest.mark.django_db
     def test_cannot_remove_account_manager_for_other_tiers(self, international_trade_adviser):
-        """
-        Test that an account manager can't be removed from a company on a One List tier other
+        """Test that an account manager can't be removed from a company on a One List tier other
         than 'Tier D - International Trade Adviser Accounts'.
         """
         company = CompanyFactory(

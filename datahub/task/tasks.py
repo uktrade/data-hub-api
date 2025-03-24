@@ -35,7 +35,6 @@ from datahub.task.emails import (
 )
 from datahub.task.models import Task
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -61,8 +60,7 @@ def schedule_create_task_reminder_subscription_task(adviser_id):
 
 
 def create_task_reminder_subscription_task(adviser_id):
-    """
-    Creates a task reminder subscription for an adviser if the adviser doesn't have
+    """Creates a task reminder subscription for an adviser if the adviser doesn't have
     a subscription already.
     """
     if not UpcomingTaskReminderSubscription.objects.filter(adviser_id=adviser_id).first():
@@ -129,8 +127,7 @@ def create_upcoming_task_reminder(
     send_email,
     current_date,
 ):
-    """
-    Creates a reminder and sends an email if required.
+    """Creates a reminder and sends an email if required.
 
     If a reminder has already been sent on the same day, then do nothing.
     """
@@ -218,8 +215,7 @@ def schedule_create_task_assigned_to_me_from_others_subscription_task(task, advi
 
 
 def create_task_assigned_to_me_from_others_subscription(adviser):
-    """
-    Creates a task reminder subscription for an adviser if the adviser doesn't have
+    """Creates a task reminder subscription for an adviser if the adviser doesn't have
     a subscription already.
     """
     current_subscription = TaskAssignedToMeFromOthersSubscription.objects.filter(
@@ -234,8 +230,7 @@ def create_task_assigned_to_me_from_others_subscription(adviser):
 
 
 def notify_adviser_added_to_task(task, adviser_id):
-    """
-    Send a notification to the adviser added to the task
+    """Send a notification to the adviser added to the task
     """
     if adviser_id == task.created_by.id:
         return
@@ -281,8 +276,7 @@ def schedule_create_task_overdue_subscription_task(adviser_id):
 
 
 def create_task_overdue_subscription_task(adviser_id):
-    """
-    Creates a task overdue subscription for an adviser if the adviser doesn't have
+    """Creates a task overdue subscription for an adviser if the adviser doesn't have
     a subscription already.
     """
     if not TaskOverdueSubscription.objects.filter(adviser_id=adviser_id).first():
@@ -328,8 +322,7 @@ def schedule_create_task_completed_subscription_task(adviser_id):
 
 
 def create_task_completed_subscription(adviser_id):
-    """
-    Creates a task completed subscription for an adviser if the adviser doesn't have
+    """Creates a task completed subscription for an adviser if the adviser doesn't have
     a subscription already.
     """
     if not TaskCompletedSubscription.objects.filter(
@@ -353,8 +346,7 @@ def schedule_create_task_archived_subscription_task(adviser_id):
 
 
 def create_task_deleted_by_others_subscription(adviser_id):
-    """
-    Creates a task deleted/archived by others subscription for an adviser if the adviser doesn't
+    """Creates a task deleted/archived by others subscription for an adviser if the adviser doesn't
     have a subscription already.
     """
     if not TaskDeletedByOthersSubscription.objects.filter(
@@ -371,8 +363,7 @@ def notify_adviser_archived_completed_or_amended_task(
     created,
     adviser_ids_pre_m2m_change=None,
 ):
-    """
-    Send a notification to all advisers, excluding the adviser who amended,
+    """Send a notification to all advisers, excluding the adviser who amended,
     archived/deleted or completed the task.
     After a task status has been set to completed:
     - it can no longer be edited
@@ -445,6 +436,7 @@ def notify_advisers_of_task(
         reminder_class (BaseReminder): Reminder class to be used.
         subscription_class (BaseSubscription): Subscription class to be used.
         email_template_class (EmailTemplate): Email Template class to be used.
+
     """
     if adviser_ids_pre_m2m_change is None:
         advisers_to_notify = task.advisers.exclude(
@@ -524,8 +516,7 @@ def update_task_amended_by_others_email_status(email_notification_id, reminder_i
 
 
 def create_task_amended_by_others_subscription(adviser_id):
-    """
-    Creates a task amended by others subscription for an adviser if the adviser doesn't have
+    """Creates a task amended by others subscription for an adviser if the adviser doesn't have
     a subscription already.
     """
     if not TaskAmendedByOthersSubscription.objects.filter(
@@ -578,8 +569,7 @@ def schedule_reminders_tasks_overdue():
 
 
 def generate_reminders_tasks_overdue():
-    """
-    Generate reminders for all advisers on overdue tasks.
+    """Generate reminders for all advisers on overdue tasks.
     Do not send reminders if task is archived or status is complete.
     """
     with advisory_lock(
@@ -624,8 +614,7 @@ def create_tasks_overdue_reminder(
     send_email,
     current_date,
 ):
-    """
-    Creates a reminder and sends an email if required.
+    """Creates a reminder and sends an email if required.
 
     If a reminder has already been sent on the same day, then do nothing.
     """

@@ -43,8 +43,7 @@ class InteractionModelPermissions(ViewBasedModelPermissions):
 
 
 class InvestmentProjectInteractionAssociationChecker(InvestmentProjectAssociationCheckerBase):
-    """
-    Association checker for interactions, which checks association with the investment
+    """Association checker for interactions, which checks association with the investment
     project linked to the interaction.
     """
 
@@ -81,8 +80,7 @@ class HasAssociatedInvestmentProjectValidator:
     )
 
     def __call__(self, attrs, serializer):
-        """
-        Performs validation. Called by DRF.
+        """Performs validation. Called by DRF.
 
         :param attrs:   Serializer data (post-field-validation/processing)
         """

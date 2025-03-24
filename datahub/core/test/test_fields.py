@@ -6,10 +6,10 @@ from django.core.exceptions import ValidationError
 from datahub.core.fields import MultipleChoiceField
 
 
-@pytest.fixture()
+@pytest.fixture
 def field():
     """Instance of MultipleChoiceField with three choices."""
-    yield MultipleChoiceField(
+    return MultipleChoiceField(
         max_length=255,
         choices=(
             ('option1', 'Option 1'),

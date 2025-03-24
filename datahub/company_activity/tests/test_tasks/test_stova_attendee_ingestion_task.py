@@ -1,21 +1,20 @@
 import logging
-
 from datetime import datetime
 from unittest import mock
 
 import pytest
-
 from django.test import override_settings
 from moto import mock_aws
 
-from datahub.company.models import Advisor as Adviser, Company, Contact
+from datahub.company.models import Advisor as Adviser
+from datahub.company.models import Company, Contact
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.company_activity.models import StovaAttendee
 from datahub.company_activity.tasks.constants import STOVA_ATTENDEE_PREFIX
 from datahub.company_activity.tasks.ingest_stova_attendees import (
+    StovaAttendeeIngestionTask,
     stova_attendee_identification_task,
     stova_attendee_ingestion_task,
-    StovaAttendeeIngestionTask,
 )
 from datahub.company_activity.tests.factories import (
     StovaAttendeeFactory,
@@ -73,8 +72,7 @@ def test_base_stova_attendee():
 
 
 def create_stova_event_records():
-    """
-    Attendees will only be ingested if their associated StovaEvent exists. This creates some
+    """Attendees will only be ingested if their associated StovaEvent exists. This creates some
     initial test events from the event ids in the test fixture for the attendees.
     """
     StovaEventFactory(stova_event_id=3332)
@@ -91,8 +89,7 @@ class TestStovaIngestionTasks:
     def test_stova_data_file_ingestion(
         self, caplog, test_file, test_file_path, s3_object_processor,
     ):
-        """
-        Test that a Aventri/Stova data file is ingested correctly and the ingested file
+        """Test that a Aventri/Stova data file is ingested correctly and the ingested file
         is added to the IngestedObject table
         """
         initial_stova_activity_count = StovaAttendee.objects.count()
@@ -139,8 +136,7 @@ class TestStovaIngestionTasks:
     @override_settings(S3_LOCAL_ENDPOINT_URL=None)
     @pytest.mark.usefixtures('s3_client')
     def test_invalid_file(self, test_file_path):
-        """
-        Test that an exception is raised when the file is not valid
+        """Test that an exception is raised when the file is not valid
         """
         with pytest.raises(Exception) as e:
             stova_attendee_ingestion_task(test_file_path)
@@ -151,8 +147,7 @@ class TestStovaIngestionTasks:
 
     @pytest.mark.django_db
     def test_stova_attendee_fields_are_saved(self, test_base_stova_attendee):
-        """
-        Test that the ingested stova attendee fields are saved to the StovaAttendee model.
+        """Test that the ingested stova attendee fields are saved to the StovaAttendee model.
         """
         s3_processor_mock = mock.Mock()
         task = StovaAttendeeIngestionTask('dummy-prefix', s3_processor_mock)
@@ -227,8 +222,7 @@ class TestStovaIngestionTasks:
     def test_stova_attendee_fields_with_duplicate_attendee_ids_in_json(
         self, caplog, test_base_stova_attendee,
     ):
-        """
-        Test records which have duplicate IDs in their JSON do not raise errors and are handled.
+        """Test records which have duplicate IDs in their JSON do not raise errors and are handled.
         """
         s3_processor_mock = mock.Mock()
         task = StovaAttendeeIngestionTask('dummy-prefix', s3_processor_mock)
@@ -246,8 +240,7 @@ class TestStovaIngestionTasks:
     def test_stova_attendee_ingestion_handles_unexpected_fields(
         self, caplog, test_base_stova_attendee,
     ):
-        """
-        Test that if they rows from stova contain data in an unexpected data type these are handled
+        """Test that if they rows from stova contain data in an unexpected data type these are handled
         and logged.
         """
         s3_processor_mock = mock.Mock()
@@ -292,8 +285,7 @@ class TestStovaIngestionTasks:
         test_base_stova_attendee,
         s3_object_processor,
     ):
-        """
-        Tests attendee uses existing company if a match is found. This also tests for the
+        """Tests attendee uses existing company if a match is found. This also tests for the
         case-insensitive matches.
         """
         existing_company = CompanyFactory(name='A COMPANY which already exists')
@@ -317,8 +309,7 @@ class TestStovaIngestionTasks:
         test_base_stova_attendee,
         s3_object_processor,
     ):
-        """
-        Tests attendee uses existing contact if a match is found. This also tests for the
+        """Tests attendee uses existing contact if a match is found. This also tests for the
         case-insensitive matches.
         """
         data = test_base_stova_attendee
@@ -353,7 +344,7 @@ class TestStovaIngestionTasks:
 
         assert StovaAttendee.objects.filter(stova_attendee_id=data['id']).exists() is False
 
-    @pytest.mark.django_db()
+    @pytest.mark.django_db
     @mock_aws
     @override_settings(S3_LOCAL_ENDPOINT_URL=None)
     def test_attendee_and_company_are_not_created_if_contact_creation_errors(
@@ -379,8 +370,7 @@ class TestStovaIngestionTasks:
     def test_stova_attendee_not_created_if_event_does_not_exist(
         self, caplog, test_file, test_file_path, s3_object_processor,
     ):
-        """
-        A StovaEvent needs to exist before ingesting the Stova Attendee.
+        """A StovaEvent needs to exist before ingesting the Stova Attendee.
         """
         object_definition = (test_file_path, test_file)
         upload_objects_to_s3(s3_object_processor, [object_definition])
@@ -467,8 +457,7 @@ class TestStovaIngestionTasks:
     def test_stova_attendee_ingestion_creates_interaction(
         self, test_base_stova_attendee, s3_object_processor, test_file_path,
     ):
-        """
-        Test that the Stova Attendee ingestion creates an Interaction from the contact (attendee),
+        """Test that the Stova Attendee ingestion creates an Interaction from the contact (attendee),
         the event (stova event) and the default adviser.
         """
         data = test_base_stova_attendee
@@ -600,8 +589,7 @@ class TestStovaIngestionTasks:
     def test_created_companies_have_country_matching_stova_event_country(
         self, test_base_stova_attendee, s3_object_processor, test_file_path,
     ):
-        """
-        The feed from Stova Attendees does not contain a country field which is an issue as this
+        """The feed from Stova Attendees does not contain a country field which is an issue as this
         creates companies without countries. This test checks that the country defaults to the
         Event created from a StovaEvent country.
         """
@@ -641,8 +629,7 @@ class TestStovaIngestionTasks:
         test_base_stova_attendee,
         required_field,
     ):
-        """
-        Some fields are required by Data Hub events, if a Stova Event does not provide these fields
+        """Some fields are required by Data Hub events, if a Stova Event does not provide these fields
         the stova event will not be ingested.
         """
         s3_processor_mock = mock.Mock()

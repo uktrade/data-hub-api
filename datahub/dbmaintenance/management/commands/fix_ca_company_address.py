@@ -12,8 +12,7 @@ logger = getLogger(__name__)
 
 
 class Command(BaseCommand):
-    """
-    Command to make CA postcodes conform to a standard format and update states
+    """Command to make CA postcodes conform to a standard format and update states
     accordingly.
     Example of executing this command locally:
         python manage.py fix_ca_company_address
@@ -23,8 +22,7 @@ class Command(BaseCommand):
     help = 'Fix Canadian Company address postcodes for the purpose of setting address areas'
 
     def handle(self, *args, **options):
-        """
-        Resolves Company address issues for Canada
+        """Resolves Company address issues for Canada
         """
         company_address_resolver = CompanyAddressResolver(
             country_id=Country.canada.value.id,

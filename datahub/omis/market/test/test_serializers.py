@@ -3,7 +3,6 @@ import pytest
 from datahub.omis.market.models import Market
 from datahub.omis.market.serializers import MarketSerializer
 
-
 pytestmark = pytest.mark.django_db
 
 

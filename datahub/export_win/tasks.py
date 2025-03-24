@@ -1,15 +1,12 @@
 
 
 from datetime import datetime, timedelta
-
 from logging import getLogger
 
 from dateutil.relativedelta import relativedelta
-
 from django.conf import settings
-from django.db.models import (Count, Q, Sum)
+from django.db.models import Count, Q, Sum
 from django.utils.timezone import now
-
 from django_pglocks import advisory_lock
 
 from datahub.core.queues.job_scheduler import job_scheduler
@@ -18,8 +15,9 @@ from datahub.export_win.constants import (
     ANONYMOUS,
     EMAIL_MAX_DAYS_TO_RESPONSE_THRESHOLD,
     EMAIL_MAX_TOKEN_ISSUED_WITHIN_RESPONSE_THRESHOLD,
-    EMAIL_MAX_WEEKS_AUTO_RESEND_THRESHOLD)
-from datahub.export_win.models import (Breakdown, CustomerResponse, CustomerResponseToken)
+    EMAIL_MAX_WEEKS_AUTO_RESEND_THRESHOLD,
+)
+from datahub.export_win.models import Breakdown, CustomerResponse, CustomerResponseToken
 from datahub.notification.constants import NotifyServiceName
 from datahub.notification.core import notify_gateway
 from datahub.reminder.models import EmailDeliveryStatus
@@ -87,8 +85,7 @@ def auto_resend_client_email_from_unconfirmed_win():
 
 
 def create_token_for_contact(contact, customer_response, adviser=None):
-    """
-    Generate new token and set all existing unexpired token to expire
+    """Generate new token and set all existing unexpired token to expire
     """
     CustomerResponseToken.objects.filter(
         company_contact=contact,
@@ -184,8 +181,7 @@ def notify_export_win_email_by_rq_email(
         update_task,
         token_id=None,
 ):
-    """
-    Notify Export win contact, using GOVUK notify and some template context.
+    """Notify Export win contact, using GOVUK notify and some template context.
     """
     job = job_scheduler(
         function=send_export_win_email_notification_via_rq,
@@ -212,8 +208,7 @@ def send_export_win_email_notification_via_rq(
         object_id=None,
         notify_service_name=None,
 ):
-    """
-    Email notification function to be scheduled by RQ,
+    """Email notification function to be scheduled by RQ,
     setting up a second task to update the email delivery status.
 
     Logged notification_id and response so it is possible to track the status of

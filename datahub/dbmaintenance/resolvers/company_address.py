@@ -12,8 +12,7 @@ logger = getLogger(__name__)
 
 
 class CompanyAddressResolver:
-    """
-    Command for resolving company address postcode and areas
+    """Command for resolving company address postcode and areas
     """
 
     def __init__(
@@ -23,8 +22,7 @@ class CompanyAddressResolver:
         zip_states,
         postcode_replacement,
     ):
-        """
-        Fixing Company address areas by country
+        """Fixing Company address areas by country
         :param country_id: Country identifier associated with the address
         being resolved
         :param revision_comment: Comment for audit purpose
@@ -62,8 +60,7 @@ class CompanyAddressResolver:
         return result
 
     def update_registered_address_area(self, area_code, company):
-        """
-        Update registered address area with administrative area
+        """Update registered address area with administrative area
         :param area_code: Area code value
         :param company: Company data
         """
@@ -77,8 +74,7 @@ class CompanyAddressResolver:
             )
 
     def fix_address_postcode(self, company):
-        """
-        Fix address postcode formatting the postcode into an expected format if possible
+        """Fix address postcode formatting the postcode into an expected format if possible
         :param company: Company record
         """
         if is_not_blank(company.address_postcode):
@@ -90,8 +86,7 @@ class CompanyAddressResolver:
         return False
 
     def fix_postcodes_and_areas(self):
-        """
-        Does update on the postcode address table
+        """Does update on the postcode address table
         """
         for company in self.get_companies_with_no_areas():
             if self.fix_address_postcode(company):
@@ -102,16 +97,14 @@ class CompanyAddressResolver:
                 self.update_registered_address_area(area_code, company)
 
     def run(self):
-        """
-        Run the query and output the results as an info message to the log file.
+        """Run the query and output the results as an info message to the log file.
         """
         with reversion.create_revision():
             self.fix_postcodes_and_areas()
             reversion.set_comment(self.revision_comment)
 
     def update_address_area(self, area_code, company):
-        """
-        Update address area with administrative area
+        """Update address area with administrative area
         :param area_code: Area code value
         :param company: Company data
         """
@@ -122,8 +115,7 @@ class CompanyAddressResolver:
             logger.info(f'Updated area "{area_code}" for "{company.address_postcode}"')
 
     def get_area_code(self, post_code):
-        """
-        Get area code from a postcode
+        """Get area code from a postcode
         :param post_code: Post Code from an address
         :return: An area code based on the format states list
         """
@@ -134,8 +126,7 @@ class CompanyAddressResolver:
         return None
 
     def format_postcode(self, postcode):
-        """
-        Format postcode with postcode pattern for united states
+        """Format postcode with postcode pattern for united states
         :param postcode: Postcode string value
         :return: Formatted US postcode value
         """
@@ -148,17 +139,15 @@ class CompanyAddressResolver:
         )
 
     def is_valid_postcode_format(self, postcode):
-        """
-        Validates the postcode is valid based one the postcode replacement regex
+        """Validates the postcode is valid based one the postcode replacement regex
         :param postcode: Address Postcode
         :return: True if valid, False if Invalid
         """
         return re.fullmatch(self.postcode_replacement.postcode_pattern, postcode, re.MULTILINE)
 
     def fix_registered_address_postcode(self, company):
-        """
-        Fix registered address postcode formatting the postcode into an expected format if possible
-         :param company: company record
+        """Fix registered address postcode formatting the postcode into an expected format if possible
+        :param company: company record
         """
         if is_not_blank(company.registered_address_postcode):
             log_message = (
@@ -176,8 +165,7 @@ class CompanyAddressResolver:
         return False
 
     def get_administrative_area_by_code(self, area_code):
-        """
-        Gets United States Administrative Area by Area Code
+        """Gets United States Administrative Area by Area Code
         :param area_code: Unique ISO administrative area code
         :return: First Administrative Area Found
         """

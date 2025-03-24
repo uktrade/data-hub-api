@@ -18,7 +18,6 @@ from datahub.omis.order.test.factories import (
 from datahub.omis.quote.models import Quote, TermsAndConditions
 from datahub.omis.quote.test.factories import QuoteFactory
 
-
 # mark the whole module for db use
 pytestmark = pytest.mark.django_db
 
@@ -62,8 +61,7 @@ class TestCreatePreviewOrder(APITestMixin):
         ),
     )
     def test_409_if_order_in_disallowed_status(self, quote_view_name, disallowed_status):
-        """
-        Test that if the order is not in one of the allowed statuses, the endpoint
+        """Test that if the order is not in one of the allowed statuses, the endpoint
         returns 409.
         """
         order = OrderFactory(status=disallowed_status)
@@ -110,8 +108,7 @@ class TestCreatePreviewOrder(APITestMixin):
     @pytest.mark.parametrize('quote_view_name', ('detail', 'preview'))
     @freeze_time('2017-04-18 13:00:00.000000')
     def test_400_if_expiry_date_passed(self, quote_view_name):
-        """
-        If the generated quote expiry date is in the past because the delivery date
+        """If the generated quote expiry date is in the past because the delivery date
         is too close, return 400.
         """
         order = OrderFactory(
@@ -170,8 +167,7 @@ class TestCreatePreviewOrder(APITestMixin):
         assert order.quote != orig_quote
 
     def test_create_as_atomic_operation(self):
-        """
-        Test that if there's a problem when saving the order, the quote is not saved
+        """Test that if there's a problem when saving the order, the quote is not saved
         either so that we keep db integrity.
         """
         order = OrderFactory()
@@ -194,8 +190,7 @@ class TestCreatePreviewOrder(APITestMixin):
         (OrderFactory, OrderWithCancelledQuoteFactory),
     )
     def test_preview_success(self, order_factory):
-        """
-        Test a successful call to preview a quote.
+        """Test a successful call to preview a quote.
         Changes are not saved in the db.
         """
         order = order_factory(
@@ -305,8 +300,7 @@ class TestCancelOrder(APITestMixin):
         ),
     )
     def test_409_if_order_in_disallowed_status(self, disallowed_status):
-        """
-        Test that if the order is not in one of the allowed statuses, the endpoint
+        """Test that if the order is not in one of the allowed statuses, the endpoint
         returns 409.
         """
         quote = QuoteFactory()

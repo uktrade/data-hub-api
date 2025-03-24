@@ -6,7 +6,6 @@ from django.urls import reverse
 from datahub.company.test.factories import ContactFactory
 from datahub.core.test_utils import AdminTestMixin
 
-
 pytestmark = pytest.mark.django_db
 
 

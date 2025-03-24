@@ -35,8 +35,7 @@ class ContactWorksAtCompanyValidator:
 
 
 class OrderEditableFieldsValidator:
-    """
-    Validator that makes sure that only certain fields have been modified
+    """Validator that makes sure that only certain fields have been modified
     depending on the order status.
     """
 
@@ -44,8 +43,7 @@ class OrderEditableFieldsValidator:
     message = 'This field cannot be changed at this stage.'
 
     def __init__(self, mapping=None):
-        """
-        Set the mapping.
+        """Set the mapping.
 
         :param mapping: dict of <order status, editable fields>
         """
@@ -53,9 +51,8 @@ class OrderEditableFieldsValidator:
 
     @staticmethod
     def _has_changed(field, combiner):
-        """
-        :returns: True if the data value for `field` has changed compared to
-            its instance value.
+        """:returns: True if the data value for `field` has changed compared to
+        its instance value.
         """
         field_value = combiner.get_value_auto(field)
         instance_value = DataCombiner(
@@ -85,8 +82,7 @@ class OrderEditableFieldsValidator:
 
 
 class VATSubValidator:
-    """
-    Validator for checking VAT fields on the order.
+    """Validator for checking VAT fields on the order.
 
     This validator is designed for direct use rather than with a DRF serializer.
     """
@@ -94,8 +90,7 @@ class VATSubValidator:
     message = 'This field is required.'
 
     def __call__(self, data=None, order=None):
-        """
-        Check that:
+        """Check that:
         - vat_status is specified
         - if vat_status == eu:
             - vat_verified is specified
@@ -125,8 +120,7 @@ class VATSubValidator:
 
 
 class AssigneesFilledInSubValidator:
-    """
-    Validator which checks that the order has enough information about assignees.
+    """Validator which checks that the order has enough information about assignees.
 
     This validator is designed for direct use rather than with a DRF serializer.
     """
@@ -154,8 +148,7 @@ class AssigneesFilledInSubValidator:
 
 
 class OrderDetailsFilledInSubValidator:
-    """
-    Validator which checks that the order has all detail fields filled in.
+    """Validator which checks that the order has all detail fields filled in.
 
     This validator is designed for direct use rather than with a DRF serializer.
     """
@@ -175,16 +168,14 @@ class OrderDetailsFilledInSubValidator:
     message = 'This field is required.'
 
     def get_extra_validators(self):
-        """
-        Useful for subclassing or testing.
+        """Useful for subclassing or testing.
 
         :returns: the extra_validators.
         """
         return self.extra_validators
 
     def _run_extra_validators(self, data, order):
-        """
-        Run the extra validators against the instance/data.
+        """Run the extra validators against the instance/data.
 
         :returns: errors dict, either filled in or empty
         """
@@ -226,8 +217,7 @@ class OrderDetailsFilledInSubValidator:
 
 
 class NoOtherActiveQuoteExistsSubValidator:
-    """
-    Validator which checks that there's no other active quote.
+    """Validator which checks that there's no other active quote.
     Used to check whether a new quote for the specified order can be
     generated.
 
@@ -243,8 +233,7 @@ class NoOtherActiveQuoteExistsSubValidator:
 
 
 class OrderInStatusSubValidator:
-    """
-    Validator which checks that the order is in one of the given statuses.
+    """Validator which checks that the order is in one of the given statuses.
 
     This validator is designed for direct use rather than with a DRF serializer.
     """
@@ -252,8 +241,7 @@ class OrderInStatusSubValidator:
     message = 'The action cannot be performed in the current status {0}.'
 
     def __init__(self, allowed_statuses, order_required=True):
-        """
-        :param allowed_statuses: list of OrderStatus values allowed
+        """:param allowed_statuses: list of OrderStatus values allowed
         :param order_required: if False and the order is None, the validation passes,
             useful when creating orders
         """
@@ -272,15 +260,13 @@ class OrderInStatusSubValidator:
 
 
 class OrderInStatusValidator:
-    """
-    Validator which checks that the order is in one of the given statuses.
+    """Validator which checks that the order is in one of the given statuses.
     """
 
     requires_context = True
 
     def __init__(self, allowed_statuses, order_required=True):
-        """
-        :param allowed_statuses: list of OrderStatus values allowed
+        """:param allowed_statuses: list of OrderStatus values allowed
         :param order_required: if False and the order is None, the validation passes,
             useful when creating orders
         """
@@ -290,8 +276,7 @@ class OrderInStatusValidator:
         )
 
     def __call__(self, data, serializer):
-        """
-        Validate that the order is in one of the statuses.
+        """Validate that the order is in one of the statuses.
 
         An order instance is searched for in the following locations (using the first one found):
         - serializer.context['order]
@@ -302,8 +287,7 @@ class OrderInStatusValidator:
 
 
 class CompletableOrderSubValidator:
-    """
-    Validator which checks that the order can be completed, that is,
+    """Validator which checks that the order can be completed, that is,
     all the assignees have their actual_time field set.
 
     This validator is designed for direct use rather than with a DRF serializer.
@@ -320,16 +304,14 @@ class CompletableOrderSubValidator:
 
 
 class CancellableOrderSubValidator(OrderInStatusSubValidator):
-    """
-    Validator which checks that the order can be cancelled.
+    """Validator which checks that the order can be cancelled.
 
     This validator is designed for direct use rather than with a DRF serializer.
     """
 
     def __init__(self, force=False):
-        """
-        :param force: if True, cancelling an order in quote accepted or paid
-            is allowed.
+        """:param force: if True, cancelling an order in quote accepted or paid
+        is allowed.
         """
         allowed_statuses = [
             OrderStatus.DRAFT,

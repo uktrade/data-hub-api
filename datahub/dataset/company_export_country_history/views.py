@@ -6,8 +6,7 @@ from datahub.dataset.core.views import BaseDatasetView
 
 
 class CompanyExportCountryHistoryDatasetView(BaseDatasetView):
-    """
-    A GET API view to return the data for all company export_country_history
+    """A GET API view to return the data for all company export_country_history
     as required for syncing by Data-flow periodically.
     Data-flow uses the resulting response to insert data into Data workspace which can
     then be queried to create custom reports for users.

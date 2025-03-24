@@ -4,7 +4,6 @@ from mptt.admin import MPTTModelAdmin
 from datahub.core.admin import DisabledOnFilter, ViewAndChangeOnlyAdmin, ViewOnlyAdmin
 from datahub.metadata import models
 
-
 MODELS_TO_REGISTER_DISABLEABLE = (
     models.FDIType,
     models.InvestmentBusinessActivity,
@@ -37,8 +36,7 @@ MODELS_TO_REGISTER_EDITABLE_ORDER_ONLY = (
 
 @admin.register(*MODELS_TO_REGISTER_DISABLEABLE)
 class DisableableMetadataAdmin(admin.ModelAdmin):
-    """
-    Generic admin for disableable metadata models.
+    """Generic admin for disableable metadata models.
 
     Intended to be used across apps.
     """
@@ -52,8 +50,7 @@ class DisableableMetadataAdmin(admin.ModelAdmin):
 
 @admin.register(*MODELS_TO_REGISTER_READ_ONLY)
 class ReadOnlyMetadataAdmin(ViewOnlyAdmin):
-    """
-    Generic admin for metadata models that shouldn't be edited.
+    """Generic admin for metadata models that shouldn't be edited.
 
     Intended to be used across apps.
     """
@@ -65,8 +62,7 @@ class ReadOnlyMetadataAdmin(ViewOnlyAdmin):
 
 @admin.register(*MODELS_TO_REGISTER_WITH_ORDER)
 class OrderedMetadataAdmin(admin.ModelAdmin):
-    """
-    Generic admin for ordered metadata models.
+    """Generic admin for ordered metadata models.
 
     Intended to be used across apps.
     """
@@ -80,8 +76,7 @@ class OrderedMetadataAdmin(admin.ModelAdmin):
 
 @admin.register(*MODELS_TO_REGISTER_EDITABLE_ORDER_ONLY)
 class EditableOrderOnlyOrderedMetadataAdmin(OrderedMetadataAdmin, ViewAndChangeOnlyAdmin):
-    """
-    Generic admin for ordered metadata models with editable order.
+    """Generic admin for ordered metadata models with editable order.
 
     Intended to be used across apps.
     """
@@ -120,8 +115,7 @@ class CountryAdmin(ViewOnlyAdmin):
 
 
 class ServiceContextFilter(admin.SimpleListFilter):
-    """
-    Admin filter for the Service.contexts field.
+    """Admin filter for the Service.contexts field.
 
     The logic will work for any datahub.core.fields.MultipleChoiceField model field.
     """

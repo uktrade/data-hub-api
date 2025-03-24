@@ -41,8 +41,7 @@ def search_investment_project_by_id(pk):
 
 
 def assert_project_search_latest_interaction(has_interaction=True, name=''):
-    """
-    Assert that a project on OpenSearch has or does not have a latest interaction.
+    """Assert that a project on OpenSearch has or does not have a latest interaction.
 
     :param has_interaction: whether to expect the latest interaction to exist or not
     :param name: search term for OpenSearch
@@ -96,8 +95,7 @@ def test_investment_project_auto_updates_to_opensearch(opensearch_with_signals):
 
 
 def test_investment_project_delete_from_opensearch(opensearch_with_signals):
-    """
-    Test that when an investment project is deleted from the db it also
+    """Test that when an investment project is deleted from the db it also
     calls delete document to delete from OpenSearch
     """
     project = InvestmentProjectFactory()
@@ -114,7 +112,7 @@ def test_investment_project_delete_from_opensearch(opensearch_with_signals):
 @pytest.fixture
 def team_member():
     """Team member fixture"""
-    yield InvestmentProjectTeamMemberFactory(role='Co-ordinator')
+    return InvestmentProjectTeamMemberFactory(role='Co-ordinator')
 
 
 def test_investment_project_team_member_added_sync_to_opensearch(
@@ -193,8 +191,7 @@ def test_investment_project_syncs_when_adviser_changes(
     opensearch_with_signals,
     field,
 ):
-    """
-    Tests that when an adviser is updated, investment projects related to that adviser are
+    """Tests that when an adviser is updated, investment projects related to that adviser are
     resynced.
     """
     adviser = AdviserFactory()
@@ -216,8 +213,7 @@ def test_investment_project_syncs_when_team_member_adviser_changes(
     opensearch_with_signals,
     team_member,
 ):
-    """
-    Tests that when an adviser that is a team member of an investment project is updated,
+    """Tests that when an adviser that is a team member of an investment project is updated,
     the related investment project is resynced.
     """
     adviser = team_member.adviser
@@ -281,8 +277,7 @@ def test_investment_project_interaction_deleted_sync_to_opensearch(opensearch_wi
 
 
 def test_investment_project_interaction_changed_sync_to_opensearch(opensearch_with_signals):
-    """
-    Test projects get synced to OpenSearch when an interaction's project is changed.
+    """Test projects get synced to OpenSearch when an interaction's project is changed.
 
     When an interaction's project is switched to another project, both the old
     and new project should be updated in OpenSearch.
@@ -321,8 +316,7 @@ def test_investment_project_synched_only_if_interaction_linked(
     mocked_sync_object,
     opensearch_with_signals,
 ):
-    """
-    Test sync_object_async not called if no investment project related to an interaction.
+    """Test sync_object_async not called if no investment project related to an interaction.
 
     When an interaction without an investment project attached to it is saved, the
     investment_project_sync_search_interaction_change signal should return without attempting to
@@ -340,8 +334,7 @@ def test_investment_project_synched_only_if_interaction_linked(
 
 
 def test_incomplete_fields_syncs_when_project_changes(opensearch_with_signals):
-    """
-    When project fields change, the incomplete fields should update accordingly.
+    """When project fields change, the incomplete fields should update accordingly.
     """
     project = InvestmentProjectFactory(
         stage_id=InvestmentProjectStage.won.value.id,
@@ -442,8 +435,7 @@ def test_incomplete_fields_syncs_when_m2m_changes(
     field,
     get_field_values,
 ):
-    """
-    When an m2m field is updated, the incomplete fields should be updated accordingly.
+    """When an m2m field is updated, the incomplete fields should be updated accordingly.
     """
     project = InvestmentProjectFactory(
         stage_id=InvestmentProjectStage.won.value.id,
@@ -470,8 +462,7 @@ def test_incomplete_fields_syncs_when_m2m_changes(
 
 
 def test_incomplete_fields_syncs_when_business_activities_changes(opensearch_with_signals):
-    """
-    When business activities are updated the incomplete fields should be updated accordingly.
+    """When business activities are updated the incomplete fields should be updated accordingly.
 
     Specifically, when 'other' is added as a business activity, 'other_business_activity'
     should show as an incomplete field.

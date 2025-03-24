@@ -1,8 +1,6 @@
 import logging
-
 from collections import namedtuple
-from typing import Callable, NamedTuple, Sequence, Type
-from typing import Union
+from typing import Callable, NamedTuple, Sequence, Type, Union
 
 from django.db import models
 
@@ -49,8 +47,7 @@ def _default_object_updater(obj, field, target, source):
 
 
 class MergeConfiguration(NamedTuple):
-    """
-    Used to specify which `model` and its `field`/s to be merged into the `source_model`.
+    """Used to specify which `model` and its `field`/s to be merged into the `source_model`.
 
     :param model: The model related to the `source_model` model. i.e. `Interaction`.
     :param fields: The field/s in the given `model` which relates to the company.
@@ -149,8 +146,7 @@ def is_model_a_valid_merge_source(
 
 
 def is_model_a_valid_merge_target(model: Union[Contact, Company]):
-    """
-    Returns whether the specified model is a valid merge target.
+    """Returns whether the specified model is a valid merge target.
     This checks that the target model isn't archived.
     """
     return not model.archived

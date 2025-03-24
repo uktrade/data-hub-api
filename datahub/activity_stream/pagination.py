@@ -12,8 +12,7 @@ from rest_framework.settings import api_settings
 
 
 class ActivityCursorPagination(BasePagination):
-    """
-    Cursor pagination for activities.
+    """Cursor pagination for activities.
 
     The activity stream service scrapes specified endpoints at regular intervals to get the
     activity feed from various services. It scrapes all the pages and more frequently: the
@@ -44,8 +43,7 @@ class ActivityCursorPagination(BasePagination):
         return self.summary
 
     def _replace_query_param(self, url, key, vals):
-        """
-        Replaces all of the values of `key` of the query in `url` with `vals`
+        """Replaces all of the values of `key` of the query in `url` with `vals`
 
         The DRF version of this function is not used, since it always replaces all of the values of
         `key` with a single value.
@@ -57,8 +55,7 @@ class ActivityCursorPagination(BasePagination):
         ) + tuple((key, val) for val in vals))))
 
     def paginate_queryset(self, queryset, request, view=None):
-        """
-        Returns a page of results based on the cursor query string parameter. Designed to make the
+        """Returns a page of results based on the cursor query string parameter. Designed to make the
         last page empty
         """
         # Extract cursor from query string. Inclues partial support for DRF's base64-encoded cursor
@@ -114,8 +111,7 @@ class ActivityCursorPagination(BasePagination):
         return page
 
     def get_paginated_response(self, data):
-        """
-        Overriding this function to re-format the response according to
+        """Overriding this function to re-format the response according to
         activity stream spec.
         """
         return Response(

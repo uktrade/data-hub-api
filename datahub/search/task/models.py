@@ -1,6 +1,5 @@
 from opensearch_dsl import Boolean, Date, Integer, Keyword, Text
 
-
 from datahub.search import dict_utils, fields
 from datahub.search.models import BaseSearchModel
 

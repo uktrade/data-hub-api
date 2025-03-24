@@ -2,12 +2,10 @@ import datetime
 import json
 import logging
 import uuid
-
 from unittest import mock
 
 import boto3
 import pytest
-
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.test import override_settings
@@ -22,9 +20,9 @@ from datahub.company.tasks import (
 from datahub.company.tasks.contact import (
     BUCKET,
     CONSENT_PREFIX,
+    REGION,
     ContactConsentIngestionTask,
     ingest_contact_consent_data,
-    REGION,
     schedule_automatic_contact_archive,
 )
 from datahub.company.test.factories import CompanyFactory, ContactFactory
@@ -44,8 +42,7 @@ def generate_hawk_response(payload):
 
 @pytest.mark.django_db
 class TestContactArchiveTask:
-    """
-    Tests for the task that archives contacts
+    """Tests for the task that archives contacts
     """
 
     @pytest.mark.parametrize(
@@ -61,8 +58,7 @@ class TestContactArchiveTask:
         lock_acquired,
         call_count,
     ):
-        """
-        Test that the task doesn't run if it cannot acquire the advisory_lock
+        """Test that the task doesn't run if it cannot acquire the advisory_lock
         """
         mock_advisory_lock = mock.MagicMock()
         mock_advisory_lock.return_value.__enter__.return_value = lock_acquired
@@ -79,8 +75,7 @@ class TestContactArchiveTask:
         assert mock_automatic_contact_archive.call_count == call_count
 
     def test_limit(self):
-        """
-        Test contact archiving query limit
+        """Test contact archiving query limit
         """
         limit = 2
         contacts = [ContactFactory(company=CompanyFactory(archived=True)) for _ in range(3)]
@@ -95,8 +90,7 @@ class TestContactArchiveTask:
 
     @pytest.mark.parametrize('simulate', (True, False))
     def test_simulate(self, caplog, simulate):
-        """
-        Test contact archiving simulate flag
+        """Test contact archiving simulate flag
         """
         caplog.set_level(logging.INFO, logger='datahub.company.tasks.contact')
         date = timezone.now() - relativedelta(days=10)
@@ -140,8 +134,7 @@ class TestContactArchiveTask:
         contacts,
         message,
     ):
-        """
-        Test that appropriate realtime messaging is sent which reflects the archiving actions
+        """Test that appropriate realtime messaging is sent which reflects the archiving actions
         """
         for is_archived in contacts:
             company = CompanyFactory(archived=is_archived)
@@ -156,8 +149,7 @@ class TestContactArchiveTask:
         mock_send_realtime_message.assert_called_once_with(message)
 
     def test_archive_no_updates(self):
-        """
-        Test contact archiving with no updates on contacts
+        """Test contact archiving with no updates on contacts
         """
         date = timezone.now() - relativedelta(days=10)
         with freeze_time(date):
@@ -181,8 +173,7 @@ class TestContactArchiveTask:
                     assert contact.archived_on is None
 
     def test_archive_with_updates(self):
-        """
-        Test contact archiving with updates on correct contacts
+        """Test contact archiving with updates on correct contacts
         """
         date = timezone.now() - relativedelta(days=10)
         with freeze_time(date):
@@ -297,8 +288,7 @@ class TestContactConsentIngestionTaskScheduler:
         lock_acquired,
         call_count,
     ):
-        """
-        Test that the task doesn't run if it cannot acquire the advisory_lock
+        """Test that the task doesn't run if it cannot acquire the advisory_lock
         """
         mock_advisory_lock = mock.MagicMock()
         mock_advisory_lock.return_value.__enter__.return_value = lock_acquired
@@ -322,8 +312,7 @@ class TestContactConsentIngestionTask:
     @mock_aws
     @override_settings(S3_LOCAL_ENDPOINT_URL=None)
     def test_ingest_with_exception_logs_error_and_reraises_original_exception(self, test_files):
-        """
-        Test that the task can catch and log any unhandled exceptions
+        """Test that the task can catch and log any unhandled exceptions
         """
         setup_s3_bucket(BUCKET, test_files)
 
@@ -337,8 +326,7 @@ class TestContactConsentIngestionTask:
 
     @mock_aws
     def test_ingest_with_empty_s3_bucket_does_not_call_sync(self):
-        """
-        Test that the task can handle an empty S3 bucket
+        """Test that the task can handle an empty S3 bucket
         """
         setup_s3_bucket(BUCKET, [])
         task = ContactConsentIngestionTask()
@@ -355,8 +343,7 @@ class TestContactConsentIngestionTask:
         self,
         test_files,
     ):
-        """
-        Test that the task returns when the latest file is equal to an existing ingested file
+        """Test that the task returns when the latest file is equal to an existing ingested file
         """
         setup_s3_bucket(BUCKET, test_files)
         IngestedObjectFactory(object_key=test_files[-1])
@@ -374,8 +361,7 @@ class TestContactConsentIngestionTask:
         self,
         test_files,
     ):
-        """
-        Test that the ingest calls the sync with the latest file when the file key does
+        """Test that the ingest calls the sync with the latest file when the file key does
         not exist in the list of previously ingested files
         """
         setup_s3_bucket(BUCKET, test_files)
@@ -394,8 +380,7 @@ class TestContactConsentIngestionTask:
 
     @mock_aws
     def test_sync_file_without_contacts_stops_job_processing(self):
-        """
-        Test when no contacts are found, the function doesn't continue
+        """Test when no contacts are found, the function doesn't continue
         """
         filename = f'{CONSENT_PREFIX}file_{uuid.uuid4()}.jsonl'
         assert (
@@ -408,8 +393,7 @@ class TestContactConsentIngestionTask:
 
     @mock_aws
     def test_sync_file_with_row_without_email_key(self):
-        """
-        Test when a row is processed that has no email key it is skipped
+        """Test when a row is processed that has no email key it is skipped
         """
         contact = ContactFactory()
         row = {'consents': 'A'}
@@ -420,8 +404,7 @@ class TestContactConsentIngestionTask:
 
     @mock_aws
     def test_sync_file_with_row_with_email_key_that_is_blank(self):
-        """
-        Test when a row is processed that has no an email key that contains a blank string it
+        """Test when a row is processed that has no an email key that contains a blank string it
         is skipped
         """
         contact = ContactFactory()
@@ -433,8 +416,7 @@ class TestContactConsentIngestionTask:
 
     @mock_aws
     def test_sync_file_with_row_without_consents_key(self):
-        """
-        Test when a row is processed that has no consents key it is skipped
+        """Test when a row is processed that has no consents key it is skipped
         """
         contact = ContactFactory()
         file_row = {'email': contact.email}
@@ -446,8 +428,7 @@ class TestContactConsentIngestionTask:
     @mock_aws
     @override_settings(ENABLE_CONTACT_CONSENT_INGEST=True)
     def test_sync_file_without_matching_email_does_not_update_contact(self):
-        """
-        Test when a row has an email that does not match a contact no changes are made
+        """Test when a row has an email that does not match a contact no changes are made
         """
         file_row = {
             'email': 'not_matching@bar.com',
@@ -465,8 +446,7 @@ class TestContactConsentIngestionTask:
     @mock_aws
     @override_settings(ENABLE_CONTACT_CONSENT_INGEST=True)
     def test_sync_file_with_matching_email_without_loaded_contacts_does_not_update_contact(self):
-        """
-        Test when a row has an email that has a key in the contacts grouped dictionary, but not
+        """Test when a row has an email that has a key in the contacts grouped dictionary, but not
         any contacts on the value, no changes are made
         """
         filename = f'{CONSENT_PREFIX}file_{uuid.uuid4()}.jsonl'
@@ -491,8 +471,7 @@ class TestContactConsentIngestionTask:
     def test_sync_file_with_matching_email_but_fails_contact_check_does_not_update_contact(
         self,
     ):
-        """
-        Test when a row has an email that matches a contact, but doesn't pass the check on
+        """Test when a row has an email that matches a contact, but doesn't pass the check on
         whether the contact should be updated
         """
         contact = ContactFactory(
@@ -521,8 +500,7 @@ class TestContactConsentIngestionTask:
     def test_sync_file_with_matching_email_and_passes_contact_check_does_update_contact(
         self,
     ):
-        """
-        Test when a row has an email that matches a contact, and passes the check on
+        """Test when a row has an email that matches a contact, and passes the check on
         whether the contact should be updated, the contact is updated
         """
         contact = ContactFactory(consent_data='A', consent_data_last_modified=None)
@@ -552,8 +530,7 @@ class TestContactConsentIngestionTask:
     @freeze_time(FROZEN_TIME)
     @override_settings(ENABLE_CONTACT_CONSENT_INGEST=True)
     def test_sync_file_with_multiple_contacts_matching_email_does_update_contact(self):
-        """
-        Test when a row has an email that matches multiple contacts all contacts are updated
+        """Test when a row has an email that matches multiple contacts all contacts are updated
         """
         test_email = 'duplicate@test.com'
         ContactFactory.create()
@@ -582,8 +559,7 @@ class TestContactConsentIngestionTask:
     @mock_aws
     @override_settings(ENABLE_CONTACT_CONSENT_INGEST=False)
     def test_sync_file_with_matching_email_but_ingest_setting_false_does_not_update_contact(self):
-        """
-        Test when a row has an email that matches a contact but the ENABLE_CONTACT_CONSENT_INGEST
+        """Test when a row has an email that matches a contact but the ENABLE_CONTACT_CONSENT_INGEST
         setting is false the contact is not updated
         """
         contact = ContactFactory(
@@ -608,14 +584,12 @@ class TestContactConsentIngestionTask:
             assert Contact.objects.filter(id=contact.id).first().consent_data == 'A'
 
     def test_get_grouped_contacts_returns_empty_dict_when_no_contacts(self):
-        """
-        Test when no contacts are present an empty dictionary is returned
+        """Test when no contacts are present an empty dictionary is returned
         """
         assert ContactConsentIngestionTask().get_grouped_contacts() == {}
 
     def test_get_grouped_contacts_returns_unique_contacts_with_different_emails(self):
-        """
-        Test when contacts with a unique email are present, the dictionary returns 1 row per
+        """Test when contacts with a unique email are present, the dictionary returns 1 row per
         unique email with only the contacts matching that email as the value
         """
         contact1 = ContactFactory.create(email='unique1@test.com')
@@ -626,8 +600,7 @@ class TestContactConsentIngestionTask:
         }
 
     def test_get_grouped_contacts_returns_grouped_contacts_with_same_email(self):
-        """
-        Test when contacts with a duplicate emails are present, the dictionary returns a row with
+        """Test when contacts with a duplicate emails are present, the dictionary returns a row with
         the duplicate email as the key and all contacts matching that email as the value
         """
         contacts = ContactFactory.create_batch(3, email='grouped@test.com')
@@ -639,8 +612,7 @@ class TestContactConsentIngestionTask:
     def test_should_update_contact_with_row_date_missing_should_return_true(
         self,
     ):
-        """
-        Test when a row has an email that matches a contact, but the file has missing date,
+        """Test when a row has an email that matches a contact, but the file has missing date,
         returns True
         """
         task = ContactConsentIngestionTask()
@@ -659,8 +631,7 @@ class TestContactConsentIngestionTask:
     def test_should_update_contact_with_contact_date_missing_should_return_true(
         self,
     ):
-        """
-        Test when a row has an email that matches a contact, but the contact has missing date,
+        """Test when a row has an email that matches a contact, but the contact has missing date,
         returns True
         """
         task = ContactConsentIngestionTask()
@@ -679,8 +650,7 @@ class TestContactConsentIngestionTask:
     def test_should_update_contact_with_row_date_older_contact_date_should_return_false(
         self,
     ):
-        """
-        Test when a row has an email that matches a contact, but the file has an older modified
+        """Test when a row has an email that matches a contact, but the file has an older modified
         date, returns False
         """
         task = ContactConsentIngestionTask()
@@ -703,8 +673,7 @@ class TestContactConsentIngestionTask:
     def test_should_update_contact_with_row_date_newer_than_contact_date_should_return_true(
         self,
     ):
-        """
-        Test when a row has an email that matches a contact, but the file has an newer modified
+        """Test when a row has an email that matches a contact, but the file has an newer modified
         date, returns True
         """
         task = ContactConsentIngestionTask()

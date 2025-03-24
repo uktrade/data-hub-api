@@ -5,8 +5,7 @@ from rest_framework.utils import model_meta
 
 
 class DataCombiner:
-    """
-    Combines values from the dict of updated data and the model instance fields.
+    """Combines values from the dict of updated data and the model instance fields.
     Its methods return the first value found in the chain (update_data, instance).
 
     Used for cross-field validation of v3 endpoints (because PATCH requests
@@ -39,8 +38,7 @@ class DataCombiner:
         return field_name in field_info.relations and field_info.relations[field_name].to_many
 
     def get_value_auto(self, field_name):
-        """
-        Returns the value of a field (returning the ID for foreign keys).
+        """Returns the value of a field (returning the ID for foreign keys).
 
         Automatically calls get_value(), get_value_to_many() or get_value_id() depending on the
         field type.

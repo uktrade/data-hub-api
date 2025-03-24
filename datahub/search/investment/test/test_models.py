@@ -167,8 +167,7 @@ def test_max_values_of_doubles_gross_value_added_and_foreign_equity_investment(
     opensearch_with_signals,
     project_with_max_gross_value_added,
 ):
-    """
-    Tests the max value of gross value added and foreign equity investment.
+    """Tests the max value of gross value added and foreign equity investment.
 
     Both gross_value_added and foreign_equity_investment are decimal fields but the OpenSearch
     library casts them to floats so are treated as floats.

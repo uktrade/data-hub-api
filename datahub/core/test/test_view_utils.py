@@ -6,8 +6,7 @@ from datahub.core.view_utils import enforce_request_content_type
 
 
 class TestViewUtils:
-    """
-    Tests view_utils module.
+    """Tests view_utils module.
     """
 
     @pytest.mark.parametrize(
@@ -23,8 +22,7 @@ class TestViewUtils:
         ),
     )
     def test_enforce_request_content_type(self, enforced_content_type, content_type, passes):
-        """
-        Test enforce_request_content_type decorator.
+        """Test enforce_request_content_type decorator.
         """
         mocked_request = Mock()
         mocked_request.content_type = content_type

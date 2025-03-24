@@ -56,8 +56,7 @@ class TestGetOrderAssignees(APITestMixin):
         assert response.json() == []
 
     def test_non_empty(self):
-        """
-        Test that calling GET returns the list of advisers assigned to the order.
+        """Test that calling GET returns the list of advisers assigned to the order.
         """
         advisers = AdviserFactory.create_batch(3)
         order = OrderFactory(assignees=[])
@@ -134,8 +133,7 @@ class TestChangeAssigneesPermissions(APITestMixin):
 
 
 class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
-    """
-    Tests related to changing who is assigned to an order when the order is in draft.
+    """Tests related to changing who is assigned to an order when the order is in draft.
 
     - assignees can be added, removed and partially changed
     - only `estimated_time` and `is_lead` can be set/changed
@@ -143,8 +141,7 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
     """
 
     def test_ok_if_assignee_added_or_changed(self):
-        """
-        Test that assignees can be added and/or changed.
+        """Test that assignees can be added and/or changed.
         Given an order with the following assignees:
             [
                 {
@@ -278,8 +275,7 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
         assert assignee3.modified_by == self.user
 
     def test_ok_if_assignee_removed(self):
-        """
-        Test that assignees can be removed passing the `force_delete` flag.
+        """Test that assignees can be removed passing the `force_delete` flag.
         Given an order with the following assignees:
             [
                 {
@@ -348,8 +344,7 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
         assert returned_advisers == {str(adviser1.id), str(adviser3.id)}
 
     def test_without_changing_any_values(self):
-        """
-        Test that if I patch an assignee without changing any values,
+        """Test that if I patch an assignee without changing any values,
         the db record doesn't get changed (and therefore modified_by stays the same).
         Given an order with the following assignees:
             [
@@ -418,8 +413,7 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
         assert assignee1.modified_by == created_by
 
     def test_400_doesnt_commit_changes(self):
-        """
-        Test that in case of errors, changes are not saved.
+        """Test that in case of errors, changes are not saved.
         Given an order with the following assignees:
             [
                 {
@@ -519,8 +513,7 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
         assert assignee1.is_lead
 
     def test_400_if_readonly_fields_changed(self):
-        """
-        Test that the `actual_time` field cannot be set when the order is in draft.
+        """Test that the `actual_time` field cannot be set when the order is in draft.
         """
         order = OrderFactory(assignees=[])
         OrderAssigneeFactory(order=order, estimated_time=100, is_lead=True)
@@ -550,8 +543,7 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
         ]
 
     def test_only_one_lead_allowed(self):
-        """
-        Test that only one lead is allowed and you have to set the old lead to False
+        """Test that only one lead is allowed and you have to set the old lead to False
         if you want to promote a different adviser.
 
         Given an order with the following assignees:
@@ -634,8 +626,7 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
         ),
     )
     def test_409_if_order_not_in_allowed_status(self, disallowed_status):
-        """
-        Test that if the order is not in one of the allowed statuses, the endpoint
+        """Test that if the order is not in one of the allowed statuses, the endpoint
         returns 409.
         """
         order = OrderFactory(status=disallowed_status)
@@ -661,8 +652,7 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
 
 
 class TestChangeAssigneesWhenOrderInPaid(APITestMixin):
-    """
-    Tests related to changing order assignees when order is paid.
+    """Tests related to changing order assignees when order is paid.
 
     - assignees can be added
     - assignees cannot be removed
@@ -671,8 +661,7 @@ class TestChangeAssigneesWhenOrderInPaid(APITestMixin):
     """
 
     def test_ok_if_assignee_added(self):
-        """
-        Test that assignees can be added.
+        """Test that assignees can be added.
         Given an order with the following assignees:
             [
                 {
@@ -719,8 +708,7 @@ class TestChangeAssigneesWhenOrderInPaid(APITestMixin):
         assert str(new_adviser.id) in [item['adviser']['id'] for item in response.json()]
 
     def test_400_if_assignee_deleted(self):
-        """
-        Test that assignees cannot be deleted at this stage.
+        """Test that assignees cannot be deleted at this stage.
         Given an order with the following assignees:
             [
                 {
@@ -769,8 +757,7 @@ class TestChangeAssigneesWhenOrderInPaid(APITestMixin):
         }
 
     def test_set_actual_time(self):
-        """
-        Test that actual_time for any assignee can be set.
+        """Test that actual_time for any assignee can be set.
         Given an order with the following assignees:
             [
                 {
@@ -848,8 +835,7 @@ class TestChangeAssigneesWhenOrderInPaid(APITestMixin):
         ),
     )
     def test_400_if_readonly_fields_changed(self, data):
-        """
-        Test that estimated_time and is_lead cannot be set at this stage.
+        """Test that estimated_time and is_lead cannot be set at this stage.
         """
         order = OrderPaidFactory(assignees=[])
         assignee = OrderAssigneeFactory(order=order)
@@ -885,8 +871,7 @@ class TestChangeAssigneesWhenOrderInPaid(APITestMixin):
         ),
     )
     def test_400_if_assignee_added_with_extra_field(self, data):
-        """
-        Test that estimated_time and is_lead cannot be set at this stage
+        """Test that estimated_time and is_lead cannot be set at this stage
         even when adding a new assignee.
         """
         order = OrderPaidFactory()
@@ -919,8 +904,7 @@ class TestChangeAssigneesWhenOrderInPaid(APITestMixin):
 
 
 class TestChangeAssigneesWhenOrderInOtherAllowedStatuses(APITestMixin):
-    """
-    Tests related to changing order assignees when order is in
+    """Tests related to changing order assignees when order is in
     quote_awaiting_acceptance or quote_accepted.
 
     - assignees can be added
@@ -935,8 +919,7 @@ class TestChangeAssigneesWhenOrderInOtherAllowedStatuses(APITestMixin):
         ),
     )
     def test_ok_if_assignee_added(self, order_status):
-        """
-        Test that an assignee can be added.
+        """Test that an assignee can be added.
         Given an order with the following assignees:
             [
                 {
@@ -987,8 +970,7 @@ class TestChangeAssigneesWhenOrderInOtherAllowedStatuses(APITestMixin):
         ),
     )
     def test_400_if_assignee_deleted(self, order_status):
-        """
-        Test that assignees cannot be deleted.
+        """Test that assignees cannot be deleted.
         Given an order with the following assignees:
             [
                 {
@@ -1050,8 +1032,7 @@ class TestChangeAssigneesWhenOrderInOtherAllowedStatuses(APITestMixin):
         ),
     )
     def test_400_if_readonly_fields_changed(self, order_status, data):
-        """
-        Test that estimated_time, actual_time and is_lead cannot be set
+        """Test that estimated_time, actual_time and is_lead cannot be set
         at this stage.
         """
         order = OrderFactory(status=order_status, assignees=[])
@@ -1094,8 +1075,7 @@ class TestChangeAssigneesWhenOrderInOtherAllowedStatuses(APITestMixin):
         ),
     )
     def test_400_if_assignee_added_with_extra_field(self, order_status, data):
-        """
-        Test that estimated_time, actual_time and is_lead cannot be set
+        """Test that estimated_time, actual_time and is_lead cannot be set
         at this stage even when adding a new adviser.
         """
         order = OrderFactory(status=order_status)

@@ -9,14 +9,12 @@ from datahub.search.opensearch import (
     start_alias_transaction,
 )
 
-
 BULK_DELETION_TIMEOUT_SECS = 300
 logger = getLogger(__name__)
 
 
 def resync_after_migrate(search_app):
-    """
-    Completes a migration by performing a full resync, updating aliases and removing old indices.
+    """Completes a migration by performing a full resync, updating aliases and removing old indices.
     """
     if not search_app.search_model.was_migration_started():
         logger.warning(
@@ -51,8 +49,7 @@ def _clean_up_aliases_and_indices(search_app):
 
 
 def delete_from_secondary_indices_callback(read_indices, write_index, actions):
-    """
-    Callback for sync_app() and sync_objects() that deletes synced documents from any indices
+    """Callback for sync_app() and sync_objects() that deletes synced documents from any indices
     that are currently being migrated from.
 
     This is used to avoid multiple, differing copies of documents existing at the same time

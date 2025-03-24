@@ -22,9 +22,17 @@ from datahub.core.test_utils import (
 )
 from datahub.investment.investor_profile.test.constants import (
     AssetClassInterest as AssetClassInterestConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     ConstructionRisk as ConstructionRiskConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     LargeCapitalInvestmentTypes as InvestmentTypesConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     ReturnRate as ReturnRateConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     TimeHorizon as TimeHorizonConstant,
 )
 from datahub.investment.opportunity.models import LargeCapitalOpportunity
@@ -166,7 +174,7 @@ def setup_data(opensearch_with_collector):
         ]
     opensearch_with_collector.flush_and_refresh()
 
-    yield opportunities
+    return opportunities
 
 
 @pytest.mark.usefixtures('setup_data')

@@ -17,15 +17,18 @@ from datahub.company.merge import (
 )
 from datahub.company.merge_company import (
     ALLOWED_RELATIONS_FOR_MERGING as COMPANY_ALLOWED_RELATIONS_FOR_MERGING,
+)
+from datahub.company.merge_company import (
     MERGE_CONFIGURATION as COMPANY_MERGE_CONFIGURATION,
 )
 from datahub.company.merge_contact import (
     ALLOWED_RELATIONS_FOR_MERGING as CONTACT_ALLOWED_RELATIONS_FOR_MERGING,
+)
+from datahub.company.merge_contact import (
     MERGE_CONFIGURATION as CONTACT_MERGE_CONFIGURATION,
 )
 from datahub.company.models import Company, Contact
 from datahub.core.utils import reverse_with_query_string
-
 
 logger = logging.getLogger(__name__)
 
@@ -35,8 +38,7 @@ class BaseSelectPrimaryModelForm(forms.Form):
         super().__init__(*args, **kwargs)
 
     def clean(self):
-        """
-        Checks that the selection made is allowed.
+        """Checks that the selection made is allowed.
         """
         cleaned_data = super().clean()
         index = cleaned_data.get('selected_model')
@@ -152,8 +154,7 @@ def select_primary_contact(model_admin, request):
 
 @method_decorator(csrf_protect)
 def select_primary_model(model_admin, request, dict):
-    """
-    View for selecting the record to retain.
+    """View for selecting the record to retain.
 
     This is the view where the user selects which record should remain as the
     active record and which one should be archived.

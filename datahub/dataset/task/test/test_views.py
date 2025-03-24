@@ -47,8 +47,7 @@ def get_expected_data_from_task(task):
 
 @pytest.mark.django_db
 class TestTasksDatasetViewSet(BaseDatasetViewTest):
-    """
-    Tests for TasksDatasetView
+    """Tests for TasksDatasetView
     """
 
     view_url = reverse('api-v4:dataset:tasks-dataset')

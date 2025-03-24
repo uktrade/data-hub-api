@@ -16,17 +16,15 @@ from datahub.core.migration_utils import (
 from datahub.core.test.support.factories import BookFactory, PersonFactory
 from datahub.core.test.support.models import Book, PermissionModel, Person
 
-
 pytestmark = pytest.mark.django_db
 
 
 class TestLoadYamlInMigration:
     """Tests for the load_yaml_data_in_migration function."""
 
-    @pytest.fixture()
+    @pytest.fixture
     def migration_apps(self):
-        """
-        Fixture for a mocked django Apps instance.
+        """Fixture for a mocked django Apps instance.
         Migrations have a similar registry with the state of the apps
         defined up to that migration.
         """
@@ -39,11 +37,10 @@ class TestLoadYamlInMigration:
             }[model_name]
         apps.get_model.side_effect = _get_model_mocked
 
-        yield apps
+        return apps
 
     def test_loading(self, migration_apps):
-        """
-        Test that loading a yaml file updates the existing data.
+        """Test that loading a yaml file updates the existing data.
         """
         yaml_content = """
 # person with pk=1, last_name should change
@@ -112,8 +109,7 @@ class TestLoadYamlInMigration:
         ]
 
     def test_pk_required(self, migration_apps):
-        """
-        Test that if an item in the yaml does not include the pk field,
+        """Test that if an item in the yaml does not include the pk field,
         the function raises AssertionError.
         """
         yaml_content = """
@@ -129,8 +125,7 @@ class TestLoadYamlInMigration:
         assert str(excinfo.value) == 'pk field required'
 
     def test_many_to_many_fields_not_supported(self, migration_apps):
-        """
-        Test that if an item in the yaml includes a many-to-many field,
+        """Test that if an item in the yaml includes a many-to-many field,
         the function raises NotImplementedError as this is not supported yet.
         """
         yaml_content = """
@@ -153,8 +148,7 @@ class TestLoadYamlInMigration:
         assert str(excinfo.value) == 'Many-to-many fields not supported'
 
     def test_one_to_many_fields_not_supported(self, migration_apps):
-        """
-        Test that if an item in the yaml includes a one-to-many field,
+        """Test that if an item in the yaml includes a one-to-many field,
         the function raises NotImplementedError as this is not supported.
         """
         yaml_content = """
@@ -180,16 +174,14 @@ class TestLoadYamlInMigration:
         assert str(excinfo.value) == 'One-to-many fields not supported'
 
     def test_invalid_file_raises_exception(self, migration_apps):
-        """
-        Test that if an invalid filename is passed in, the function raises
+        """Test that if an invalid filename is passed in, the function raises
         FileNotFoundError.
         """
         with pytest.raises(FileNotFoundError):
             load_yaml_data_in_migration(migration_apps, 'invalid-path-to-file.yaml')
 
     def test_exception_rollsback_changes(self, migration_apps):
-        """
-        Test that if an exception happens when processing the file, the changes
+        """Test that if an exception happens when processing the file, the changes
         are rolled back.
         """
         yaml_content = """
@@ -221,8 +213,7 @@ class TestLoadYamlInMigration:
         assert not Person.objects.count()
 
     def test_invalid_fk_raises_exception(self, migration_apps):
-        """
-        Test that if there's a problem with deserialising the fk field,
+        """Test that if there's a problem with deserialising the fk field,
         the function raises DeserializationError.
         """
         yaml_content = """
@@ -243,8 +234,7 @@ class TestLoadYamlInMigration:
         )
 
     def test_invalid_field_raises_exception(self, migration_apps):
-        """
-        Test that if there's a problem with deserialising a field,
+        """Test that if there's a problem with deserialising a field,
         the function raises DeserializationError.
         """
         yaml_content = """
@@ -266,8 +256,7 @@ class TestLoadYamlInMigration:
 
 
 def test_delete_permissions_contenttypes():
-    """
-    Tests if the delete_permission_contenttypes function deleted the right
+    """Tests if the delete_permission_contenttypes function deleted the right
     permissions and contenttypes.
     """
     app_label = PermissionModel._meta.app_label

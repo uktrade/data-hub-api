@@ -4,6 +4,8 @@ from opensearch_dsl import Mapping
 
 from datahub.investment.opportunity.test.constants import (
     OpportunityStatus as OpportunityStatusConstant,
+)
+from datahub.investment.opportunity.test.constants import (
     OpportunityType as OpportunityTypeConstant,
 )
 from datahub.investment.opportunity.test.factories import LargeCapitalOpportunityFactory

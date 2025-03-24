@@ -68,8 +68,7 @@ class TestConfirmMergeViewGet(AdminTestMixin):
         ),
     )
     def test_returns_400_if_invalid_companies_passed(self, data):
-        """
-        Test that a 400 is returned when invalid values are passed in the query string.
+        """Test that a 400 is returned when invalid values are passed in the query string.
 
         This could only happen if the query string was manipulated, or one of the referenced
         companies was deleted.
@@ -124,8 +123,7 @@ class TestConfirmMergeViewPost(AdminTestMixin):
         creates_contacts,
         num_related_objects,
     ):
-        """
-        Test that the merge succeeds and the source company is marked as a duplicate when the
+        """Test that the merge succeeds and the source company is marked as a duplicate when the
         source company has various amounts of contacts, interactions, investment projects and
         orders.
         """
@@ -318,8 +316,7 @@ class TestConfirmMergeViewPost(AdminTestMixin):
         target_company_factory,
         disallowed_fields,
     ):
-        """
-        Test that the merge fails when the source company cannot be merged into the target company.
+        """Test that the merge fails when the source company cannot be merged into the target company.
         """
         source_company = source_company_factory()
         target_company = target_company_factory()
@@ -365,8 +362,7 @@ def _company_factory(
         num_company_list_items=0,
         num_pipeline_items=0,
 ):
-    """
-    Factory for a company that has companies, interactions, investment projects and OMIS orders.
+    """Factory for a company that has companies, interactions, investment projects and OMIS orders.
     """
     company = CompanyFactory()
     ContactFactory.create_batch(num_contacts, company=company)

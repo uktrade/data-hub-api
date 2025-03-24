@@ -3,7 +3,7 @@
 from django.urls import path
 
 from datahub.core.utils import join_truthy_strings
-from datahub.search.views import SearchBasicAPIView, v3_view_registry, v4_view_registry, ViewType
+from datahub.search.views import SearchBasicAPIView, ViewType, v3_view_registry, v4_view_registry
 
 
 def _construct_path(search_app, view_type, view_cls, suffix=None):

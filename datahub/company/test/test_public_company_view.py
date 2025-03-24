@@ -19,7 +19,7 @@ def public_company_api_client(hawk_api_client):
         'public-company-id',
         'public-company-key',
     )
-    yield hawk_api_client
+    return hawk_api_client
 
 
 @pytest.mark.django_db
@@ -184,8 +184,7 @@ class TestPublicCompanyViewSet:
         }
 
     def test_get_company_without_country(self, public_company_api_client):
-        """
-        Tests the company item view for a company without a country.
+        """Tests the company item view for a company without a country.
 
         Checks that the endpoint returns 200 and the uk_based attribute is
         set to None.
@@ -216,8 +215,7 @@ class TestPublicCompanyViewSet:
         expected_website,
         public_company_api_client,
     ):
-        """
-        Test that if the website field on a company doesn't have any scheme
+        """Test that if the website field on a company doesn't have any scheme
         specified, the endpoint adds it automatically.
         """
         company = CompanyFactory(
@@ -261,8 +259,7 @@ class TestPublicCompanyViewSet:
         ),
     )
     def test_one_list_group_tier(self, build_company, public_company_api_client):
-        """
-        Test that the endpoint includes the One List Tier
+        """Test that the endpoint includes the One List Tier
         of the Global Headquarters in the group.
         """
         one_list_tier = OneListTier.objects.first()

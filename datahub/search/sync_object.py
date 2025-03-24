@@ -12,8 +12,7 @@ logger = getLogger(__name__)
 
 
 def sync_object(search_app, pk):
-    """
-    Syncs a single object to OpenSearch.
+    """Syncs a single object to OpenSearch.
 
     This function is migration-safe – if a migration is in progress, the object is added to the
     new index and then deleted from the old index.
@@ -39,8 +38,7 @@ def sync_object(search_app, pk):
 
 
 def sync_object_async(search_app, pk):
-    """
-    Syncs a single object to OpenSearch asynchronously (by scheduling a RQ task).
+    """Syncs a single object to OpenSearch asynchronously (by scheduling a RQ task).
 
     This function is normally used by signal receivers to copy new or updated objects to
     OpenSearch.
@@ -84,8 +82,7 @@ def sync_related_objects_async(
         related_obj_filter=None,
         search_app_name=None,
 ):
-    """
-    Syncs objects related to another object via a specified field.
+    """Syncs objects related to another object via a specified field.
 
     For example, this function would sync the interactions of a company if given the following
     arguments:

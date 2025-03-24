@@ -9,8 +9,7 @@ class _Address:
     }
 
     def __init__(self, field_prefix, company):
-        """
-        Initialises the object from the company using the values from the fields
+        """Initialises the object from the company using the values from the fields
         with prefix `field_prefix`.
         """
         for attr_name, model_field_name_template in self.MAPPING.items():
@@ -20,8 +19,7 @@ class _Address:
             setattr(self, attr_name, model_field_value)
 
     def is_blank(self):
-        """
-        :returns: True if none of the field values are defined, False otherwise.
+        """:returns: True if none of the field values are defined, False otherwise.
         """
         return not any(
             getattr(self, attr)
@@ -30,8 +28,7 @@ class _Address:
 
 
 def compose_official_address(company):
-    """
-    :returns: the most official address for the given company as an object
+    """:returns: the most official address for the given company as an object
     with the following properties:
         line_1
         line_2
@@ -51,8 +48,7 @@ def compose_official_address(company):
 
 
 def populate_billing_data(order):
-    """
-    Populate the order.billing_* fields from the company/contact if not set already.
+    """Populate the order.billing_* fields from the company/contact if not set already.
 
     :param order: Order to change if needed
     :returns: order with billing_* fields filled in

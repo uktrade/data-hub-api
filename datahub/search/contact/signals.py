@@ -1,7 +1,8 @@
 from django.db import transaction
 from django.db.models.signals import post_save
 
-from datahub.company.models import Company as DBCompany, Contact as DBContact
+from datahub.company.models import Company as DBCompany
+from datahub.company.models import Contact as DBContact
 from datahub.search.contact import ContactSearchApp
 from datahub.search.signals import SignalReceiver
 from datahub.search.sync_object import sync_object_async, sync_related_objects_async

@@ -21,8 +21,7 @@ from datahub.search.models import BaseSearchModel
 
 
 class CompanyActivity(BaseSearchModel):
-    """
-    OpenSearch representation of Company model and its activities.
+    """OpenSearch representation of Company model and its activities.
     """
 
     id = Keyword()

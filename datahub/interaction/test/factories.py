@@ -71,8 +71,7 @@ class InteractionFactoryBase(factory.django.DjangoModelFactory):
 
     @to_many_field
     def contacts(self):
-        """
-        Contacts field.
+        """Contacts field.
 
         Defaults to the contact from the contact field.
         """
@@ -80,15 +79,13 @@ class InteractionFactoryBase(factory.django.DjangoModelFactory):
 
     @to_many_field
     def companies(self):
-        """
-        Add support for setting `companies`.
+        """Add support for setting `companies`.
         """
         return [self.company] if self.company else []
 
     @to_many_field
     def dit_participants(self, **kwargs):
-        """
-        Instances of InteractionDITParticipant.
+        """Instances of InteractionDITParticipant.
 
         Defaults to one InteractionDITParticipant based on dit_adviser and dit_team.
         """
@@ -128,8 +125,7 @@ class CompaniesInteractionFactory(InteractionFactoryBase):
 
     @to_many_field
     def companies(self):
-        """
-        Add support for setting `companies`.
+        """Add support for setting `companies`.
         """
         return [CompanyFactory()]
 
@@ -145,8 +141,7 @@ class CompanyReferralInteractionFactory(CompanyInteractionFactory):
 
 
 class CompanyInteractionFactoryWithPolicyFeedback(CompanyInteractionFactory):
-    """
-    Factory for creating an interaction relating to a company, with policy feedback
+    """Factory for creating an interaction relating to a company, with policy feedback
     additionally provided.
     """
 
@@ -159,8 +154,7 @@ class CompanyInteractionFactoryWithPolicyFeedback(CompanyInteractionFactory):
 
     @to_many_field
     def policy_areas(self):
-        """
-        Policy areas field.
+        """Policy areas field.
 
         Defaults to one random policy area.
         """
@@ -168,8 +162,7 @@ class CompanyInteractionFactoryWithPolicyFeedback(CompanyInteractionFactory):
 
     @to_many_field
     def policy_issue_types(self):
-        """
-        Policy issue types field.
+        """Policy issue types field.
 
         Defaults to one random policy issue type.
         """
@@ -213,8 +206,7 @@ class CompanyInteractionFactoryWithRelatedTradeAgreements(CompanyInteractionFact
 
     @to_many_field
     def related_trade_agreements(self):
-        """
-        related_trade_agreements field.
+        """related_trade_agreements field.
         """
         return TradeAgreement.objects.all()[:3]
 
@@ -280,8 +272,7 @@ class ExportCountriesInteractionFactory(CompanyInteractionFactory):
 
     @to_many_field
     def export_countries(self, **kwargs):
-        """
-        Instances of InteractionExportCountryFactory.
+        """Instances of InteractionExportCountryFactory.
         Defaults to one InteractionExportCountryFactory.
         """
         return [InteractionExportCountryFactory(interaction=self, **kwargs)]
@@ -295,8 +286,7 @@ class ExportCountriesServiceDeliveryFactory(ServiceDeliveryFactory):
 
     @to_many_field
     def export_countries(self, **kwargs):
-        """
-        Instances of InteractionExportCountryFactory.
+        """Instances of InteractionExportCountryFactory.
         Defaults to one InteractionExportCountryFactory.
         """
         return [InteractionExportCountryFactory(interaction=self, **kwargs)]
@@ -310,8 +300,7 @@ class CompaniesInteractionWithExportBarrierOtherFactory(CompanyInteractionFactor
 
     @to_many_field
     def export_barrier_types(self):
-        """
-        Add "other" export barrier type
+        """Add "other" export barrier type
         """
         return [constants.ExportBarrierType.other.value.id]
 
@@ -324,7 +313,6 @@ class CompaniesInteractionWithExportBarrierFinanceFactory(CompanyInteractionFact
 
     @to_many_field
     def export_barrier_types(self):
-        """
-        Add "other" export barrier type
+        """Add "other" export barrier type
         """
         return [constants.ExportBarrierType.finance.value.id]

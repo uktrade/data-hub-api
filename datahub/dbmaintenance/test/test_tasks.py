@@ -119,12 +119,11 @@ class TestReplaceNullWithDefault:
         ),
     )
     def test_raises_error_on_invalid_field(self, field, default, expected_error_msg):
-        """
-        Test that an error is raised if the task is called with:
-         - a model field without a default
-         - a model field with a callable default
-         - a non-nullable field
-         - a non-nullable field and an explicit default
+        """Test that an error is raised if the task is called with:
+        - a model field without a default
+        - a model field with a callable default
+        - a non-nullable field
+        - a non-nullable field and an explicit default
         """
         with pytest.raises(ValueError) as excinfo:
             replace_null_with_default(
@@ -254,8 +253,7 @@ class TestCopyForeignKeyToM2MField:
 
 @pytest.mark.django_db
 class TestCopyExportCountriesFromCompanyModelToCompanyExportCountryModel:
-    """
-    Tests for the task that copies all export countries from Company model to CompanyExportCountry
+    """Tests for the task that copies all export countries from Company model to CompanyExportCountry
     """
 
     @pytest.mark.parametrize(

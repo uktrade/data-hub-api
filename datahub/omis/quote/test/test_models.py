@@ -10,7 +10,6 @@ from datahub.omis.quote.test.factories import (
     QuoteFactory,
 )
 
-
 # mark the whole module for db use
 pytestmark = pytest.mark.django_db
 
@@ -34,8 +33,7 @@ class TestCancelQuote:
             assert quote.cancelled_by == adviser
 
     def test_cancel_already_cancelled_quote(self):
-        """
-        Test that if a quote is already cancelled and you try to cancel it again,
+        """Test that if a quote is already cancelled and you try to cancel it again,
         nothing happens.
         """
         quote = CancelledQuoteFactory()
@@ -86,8 +84,7 @@ class TestAcceptQuote:
             assert quote.accepted_by == contact
 
     def test_accept_already_accepted_quote(self):
-        """
-        Test that if a quote has already been accepted and you try to accept it again,
+        """Test that if a quote has already been accepted and you try to accept it again,
         nothing happens.
         """
         quote = AcceptedQuoteFactory()

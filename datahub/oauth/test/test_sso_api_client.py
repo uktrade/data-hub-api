@@ -5,16 +5,14 @@ from django.conf import settings
 from requests.exceptions import ConnectionError
 from rest_framework import status
 
-
 from datahub.oauth.sso_api_client import (
-    get_user_by_email,
-    get_user_by_email_user_id,
-    introspect_token,
     SSOInvalidTokenError,
     SSORequestError,
     SSOUserDoesNotExistError,
+    get_user_by_email,
+    get_user_by_email_user_id,
+    introspect_token,
 )
-
 
 FAKE_SSO_USER_DATA = {
     'email': 'email@email.test',

@@ -23,8 +23,7 @@ from datahub.omis.order.test.factories import OrderFactory
 )
 @pytest.mark.django_db
 def test_cursor_pagination(factory, endpoint, api_client, monkeypatch):
-    """
-    Test if pagination behaves as expected
+    """Test if pagination behaves as expected
     """
     page_size = 2
     monkeypatch.setattr(

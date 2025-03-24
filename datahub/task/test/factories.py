@@ -1,7 +1,6 @@
 import random
 
 import factory.fuzzy
-
 from django.utils.timezone import now
 
 from datahub.company.test.factories import AdviserFactory
@@ -25,8 +24,7 @@ class TaskFactory(factory.django.DjangoModelFactory):
 
     @to_many_field
     def advisers(self):
-        """
-        Add support for setting `advisers`.
+        """Add support for setting `advisers`.
         """
         return AdviserFactory.create_batch(random.randint(1, 3))
 

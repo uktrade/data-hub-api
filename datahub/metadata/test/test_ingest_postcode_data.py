@@ -1,11 +1,9 @@
 import logging
 from decimal import Decimal
-
 from unittest import mock
 
 import boto3
 import pytest
-
 from moto import mock_aws
 from sentry_sdk import init
 from sentry_sdk.transport import Transport
@@ -20,9 +18,9 @@ from datahub.metadata.models import (
     PostcodeData,
 )
 from datahub.metadata.tasks import (
+    POSTCODE_DATA_PREFIX,
     postcode_data_identification_task,
     postcode_data_ingestion_task,
-    POSTCODE_DATA_PREFIX,
 )
 from datahub.metadata.test.factories import (
     PostcodeDataFactory,
@@ -112,8 +110,7 @@ class TestPostcodeDataIngestionTask:
     @pytest.mark.django_db
     @mock_aws
     def test_ingesting_postcodes(self, test_file_path, test_file):
-        """
-        Test that when given a postcode file, the task inserts new records,
+        """Test that when given a postcode file, the task inserts new records,
         updates the field values of existing records, and deletes records
         that exist in the database but not in the file.
         """
@@ -135,8 +132,7 @@ class TestPostcodeDataIngestionTask:
     @pytest.mark.django_db
     @mock_aws
     def test_only_delete_if_valid_records_found(self, test_file_path, empty_test_file):
-        """
-        Test that we don't delete postcode records if no valid ids are found in the
+        """Test that we don't delete postcode records if no valid ids are found in the
         file as that indicates something has gone wrong with processing it
         """
         PostcodeDataFactory(id=400859, region_name='South West', lat=44.244941)
@@ -152,8 +148,7 @@ class TestPostcodeDataIngestionTask:
     @pytest.mark.django_db
     @mock_aws
     def test_invalid_file(self, test_file_path):
-        """
-        Test that an exception is raised when the file is not valid
+        """Test that an exception is raised when the file is not valid
         """
         mock_transport = MockSentryTransport()
         init(transport=mock_transport)

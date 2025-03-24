@@ -60,8 +60,7 @@ class OrderFactory(factory.django.DjangoModelFactory):
 
     @to_many_field
     def service_types(self):
-        """
-        Add support for setting service_types.
+        """Add support for setting service_types.
         If nothing specified when instantiating the object, the value returned by
         this method will be used by default.
         """
@@ -69,8 +68,7 @@ class OrderFactory(factory.django.DjangoModelFactory):
 
     @to_many_field
     def assignees(self):
-        """
-        Add support for setting assignees.
+        """Add support for setting assignees.
         If nothing specified when instantiating the object, the value returned by
         this method will be used by default.
         """

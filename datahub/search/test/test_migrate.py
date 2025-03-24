@@ -1,11 +1,11 @@
-from unittest.mock import ANY, call, Mock
+from unittest.mock import ANY, Mock, call
 
 import pytest
 from django.conf import settings
 
 from datahub.core.exceptions import DataHubError
 from datahub.core.test.queues.test_scheduler import PickleableMock
-from datahub.search.apps import _load_search_apps, get_search_apps, SearchApp
+from datahub.search.apps import SearchApp, _load_search_apps, get_search_apps
 from datahub.search.migrate import migrate_app, migrate_apps
 from datahub.search.models import BaseSearchModel
 from datahub.search.test.utils import create_mock_search_app
@@ -43,8 +43,7 @@ def test_migrate_app_with_uninitialised_app(
     mock_connection_for_create_index,
     sample_search_app,
 ):
-    """
-    Test that migrate_app() creates an index and schedules an initial sync for an
+    """Test that migrate_app() creates an index and schedules an initial sync for an
     uninitialised search app.
     """
     sync_model_task_mock = PickleableMock()
@@ -152,8 +151,7 @@ def test_migrate_app_with_app_not_needing_migration(
 
 
 def test_migrate_app_with_app_in_inconsistent_state(monkeypatch, mock_opensearch_client):
-    """
-    Test that migrate_app() resyncs an app in an inconsistent state.
+    """Test that migrate_app() resyncs an app in an inconsistent state.
 
     This refers to an app with multiple read indices (i.e. an app with an interrupted migration).
 
@@ -187,8 +185,7 @@ def test_migrate_app_with_app_in_inconsistent_state(monkeypatch, mock_opensearch
 
 
 def test_migrate_app_with_app_in_invalid_state(async_queue, monkeypatch, mock_opensearch_client):
-    """
-    Test that migrate_app() raises an exception for apps in an invalid state.
+    """Test that migrate_app() raises an exception for apps in an invalid state.
 
     This refers to an app that needs migrating, but the current write index is not one of
     the read indices. This should never happen.

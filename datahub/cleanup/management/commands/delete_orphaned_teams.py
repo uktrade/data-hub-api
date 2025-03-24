@@ -6,8 +6,7 @@ from datahub.metadata.models import Team
 
 
 class DummyFilter(object):
-    """
-    Just a dummy filter to satisfy the
+    """Just a dummy filter to satisfy the
     :class:`datahub.cleanup.cleanup_config.ModelCleanupConfig` constructor,
     which is expecting a list where the first item is an instance of
     :class:`datahub.cleanup.cleanup_config.DatetimeLessThanCleanupFilter`,

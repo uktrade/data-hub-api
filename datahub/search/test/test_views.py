@@ -1,10 +1,8 @@
 import datetime
-
 from uuid import UUID
 
 import factory
 import pytest
-
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -86,8 +84,7 @@ class TestValidateViewSortByAttributes:
         assert not invalid_fields
 
     def test_sort_by_remapping_keys_are_sort_by_fields(self, search_view):
-        """
-        Validate that the keys of view.es_sort_by_remappings are in serializer.SORT_BY_FIELDS.
+        """Validate that the keys of view.es_sort_by_remappings are in serializer.SORT_BY_FIELDS.
         """
         if not hasattr(search_view, 'es_sort_by_remappings'):
             return
@@ -236,8 +233,7 @@ class TestBasicSearch(APITestMixin):
         search_term,
         should_match,
     ):
-        """
-        Tests quality of results for fuzzy matching.
+        """Tests quality of results for fuzzy matching.
 
         This should not only hit on exact matches, but also close matches.
         """
@@ -282,8 +278,7 @@ class TestBasicSearch(APITestMixin):
         search_term,
         should_match,
     ):
-        """
-        Tests quality of results for fuzzy matching multiple fields.
+        """Tests quality of results for fuzzy matching multiple fields.
 
         This should not only hit on exact matches, but also close matches.
         """
@@ -315,8 +310,7 @@ class TestBasicSearch(APITestMixin):
         opensearch_with_collector,
         search_support_user,
     ):
-        """
-        Tests quality of results for fuzzy matching across multiple fields.
+        """Tests quality of results for fuzzy matching across multiple fields.
 
         Unfortunately we require "combined_fields" matching (introduced in OpenSearch
         v 7.13) to do fuzzy matching across multiple fields, but we should still be
@@ -363,8 +357,7 @@ class TestBasicSearch(APITestMixin):
         opensearch_with_collector,
         search_support_user,
     ):
-        """
-        Tests that name is more important than other fields in cross field matches.
+        """Tests that name is more important than other fields in cross field matches.
         """
         SimpleModel.objects.create(name='Smaxtec Limited', address='')
         SimpleModel.objects.create(name='Newsmax Media (HQ Florida)', address='')
@@ -555,8 +548,7 @@ class TestBasicSearch(APITestMixin):
         ('company', 'contact', 'event', 'interaction', 'investment_project', 'order', 'adviser'),
     )
     def test_permissions(self, opensearch_with_collector, permission, permission_entity, entity):
-        """
-        Tests model permissions enforcement in basic search.
+        """Tests model permissions enforcement in basic search.
 
         TODO: we should test permissions relevant to a specific search app in the tests for that
             search app, and remove this test.
@@ -683,8 +675,7 @@ class TestEntitySearch(APITestMixin):
         hierarchical_sectors,
         opensearch_with_collector,
     ):
-        """
-        Test that the sector_descends filter excludes ancestor sectors
+        """Test that the sector_descends filter excludes ancestor sectors
         (where a child sector already exists) for interactions.
 
         """
@@ -744,8 +735,7 @@ class TestEntitySearch(APITestMixin):
         hierarchical_sectors,
         opensearch_with_collector,
     ):
-        """
-        Test that the sector_descends filter excludes ancestor sectors
+        """Test that the sector_descends filter excludes ancestor sectors
         (where a child sector already exists) for companies.
 
         """

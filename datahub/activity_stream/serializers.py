@@ -2,16 +2,14 @@ from rest_framework import serializers
 
 
 class ActivitySerializer(serializers.Serializer):
-    """
-    Generic serializer for activity.
+    """Generic serializer for activity.
 
     Implements methods for serializing objects that are common across
     activity stream serializers.
     """
 
     def _get_company(self, company):
-        """
-        Get a serialized representation of a Company.
+        """Get a serialized representation of a Company.
         """
         return {} if company is None else {
             'id': f'dit:DataHubCompany:{company.pk}',
@@ -22,8 +20,7 @@ class ActivitySerializer(serializers.Serializer):
         }
 
     def _get_companies(self, companies):
-        """
-        Get a serialized representation of a list of Companies.
+        """Get a serialized representation of a list of Companies.
         """
         return [
             self._get_company(company)
@@ -31,8 +28,7 @@ class ActivitySerializer(serializers.Serializer):
         ]
 
     def _get_contact(self, contact):
-        """
-        Get a serialized representation of a contact.
+        """Get a serialized representation of a contact.
         """
         return {
             'id': f'dit:DataHubContact:{contact.pk}',
@@ -44,8 +40,7 @@ class ActivitySerializer(serializers.Serializer):
         }
 
     def _get_contacts(self, contacts):
-        """
-        Get a serialized representation of a list of Contacts.
+        """Get a serialized representation of a list of Contacts.
         """
         return [
             self._get_contact(contact)
@@ -53,8 +48,7 @@ class ActivitySerializer(serializers.Serializer):
         ]
 
     def _get_adviser(self, adviser):
-        """
-        Get a serialized representation of Adviser.
+        """Get a serialized representation of Adviser.
         """
         return {} if adviser is None else {
             'id': f'dit:DataHubAdviser:{adviser.pk}',
@@ -82,8 +76,7 @@ class ActivitySerializer(serializers.Serializer):
         }
 
     def _get_generator(self):
-        """
-        Get a serialized representation of the generator.
+        """Get a serialized representation of the generator.
         """
         return {
             'name': 'dit:dataHub',

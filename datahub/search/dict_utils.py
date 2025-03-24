@@ -1,6 +1,5 @@
 def _attrgetter_with_default(attr, default):
-    """
-    It returns a function that can be called with an object to get the value
+    """It returns a function that can be called with an object to get the value
     of attr or the default.
     Useful to convert None values to ''.
     """
@@ -56,8 +55,7 @@ def id_uri_dict(obj):
 
 
 def address_dict(obj, prefix='address'):
-    """
-    Creates a dictionary for the address fields with the given prefix
+    """Creates a dictionary for the address fields with the given prefix
     to be used as nested object.
     """
     if obj is None:
@@ -135,8 +133,7 @@ def contact_job_dict(obj):
 
 
 def core_team_advisers_list_of_dicts(list_of_obj):
-    """
-    Creates a list of dicts for company advisers if they are
+    """Creates a list of dicts for company advisers if they are
     not global account managers.
     """
     if list_of_obj is None:

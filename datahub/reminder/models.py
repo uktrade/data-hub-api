@@ -7,13 +7,11 @@ from django.db import models
 from datahub.core import reversion
 from datahub.task.models import Task
 
-
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
 class BaseSubscription(models.Model):
-    """
-    Base model for reminder subscriptions.
+    """Base model for reminder subscriptions.
     """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
@@ -32,8 +30,7 @@ class BaseSubscription(models.Model):
 
 
 class ScheduledSubscription(models.Model):
-    """
-    Model for reminder adding reminder days to a subscription.
+    """Model for reminder adding reminder days to a subscription.
     """
 
     reminder_days = ArrayField(
@@ -48,62 +45,52 @@ class ScheduledSubscription(models.Model):
 
 
 class NoRecentExportInteractionSubscription(BaseSubscription, ScheduledSubscription):
-    """
-    Subscription to get reminders about companies with no recent interactions.
+    """Subscription to get reminders about companies with no recent interactions.
     """
 
 
 class NewExportInteractionSubscription(BaseSubscription, ScheduledSubscription):
-    """
-    Subscription to get reminders about companies with new interactions.
+    """Subscription to get reminders about companies with new interactions.
     """
 
 
 class NoRecentInvestmentInteractionSubscription(BaseSubscription, ScheduledSubscription):
-    """
-    Subscription to get reminders about projects with no recent interactions.
+    """Subscription to get reminders about projects with no recent interactions.
     """
 
 
 class UpcomingEstimatedLandDateSubscription(BaseSubscription, ScheduledSubscription):
-    """
-    Subscription to get reminders about upcoming estimated land dates.
+    """Subscription to get reminders about upcoming estimated land dates.
     """
 
 
 class UpcomingTaskReminderSubscription(BaseSubscription, ScheduledSubscription):
-    """
-    Subscription to get reminders about upcoming tasks.
+    """Subscription to get reminders about upcoming tasks.
     """
 
 
 class TaskAssignedToMeFromOthersSubscription(BaseSubscription):
-    """
-    Subscription to get reminders about upcoming tasks.
+    """Subscription to get reminders about upcoming tasks.
     """
 
 
 class TaskOverdueSubscription(BaseSubscription, ScheduledSubscription):
-    """
-    Subscription to get reminders about tasks overdue.
+    """Subscription to get reminders about tasks overdue.
     """
 
 
 class TaskAmendedByOthersSubscription(BaseSubscription):
-    """
-    Subscription to get reminders about task amendments by others.
+    """Subscription to get reminders about task amendments by others.
     """
 
 
 class TaskCompletedSubscription(BaseSubscription):
-    """
-    Subscription to get reminders about task completed.
+    """Subscription to get reminders about task completed.
     """
 
 
 class TaskDeletedByOthersSubscription(BaseSubscription):
-    """
-    Subscription to get reminders about task deleted by others.
+    """Subscription to get reminders about task deleted by others.
     """
 
 
@@ -123,8 +110,7 @@ class ReminderStatus(models.TextChoices):
 
 
 class BaseReminderManager(models.Manager):
-    """
-    Base reminder manager that filters out dismissed reminders
+    """Base reminder manager that filters out dismissed reminders
     """
 
     def get_queryset(self):
@@ -138,8 +124,7 @@ class BaseReminderManager(models.Manager):
 
 
 class BaseReminder(models.Model):
-    """
-    Base model for reminders.
+    """Base model for reminders.
     """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
@@ -179,8 +164,7 @@ class BaseReminder(models.Model):
 
 @reversion.register_base_model()
 class NewExportInteractionReminder(BaseReminder):
-    """
-    New export interaction reminders.
+    """New export interaction reminders.
     """
 
     company = models.ForeignKey(
@@ -202,8 +186,7 @@ class NewExportInteractionReminder(BaseReminder):
 
 @reversion.register_base_model()
 class NoRecentExportInteractionReminder(BaseReminder):
-    """
-    No recent export interaction reminders.
+    """No recent export interaction reminders.
     """
 
     company = models.ForeignKey(
@@ -226,8 +209,7 @@ class NoRecentExportInteractionReminder(BaseReminder):
 
 
 class NoRecentInvestmentInteractionReminder(BaseReminder):
-    """
-    No recent investment interaction reminders.
+    """No recent investment interaction reminders.
     """
 
     project = models.ForeignKey(
@@ -238,8 +220,7 @@ class NoRecentInvestmentInteractionReminder(BaseReminder):
 
 
 class UpcomingEstimatedLandDateReminder(BaseReminder):
-    """
-    Upcoming estimated land date reminders.
+    """Upcoming estimated land date reminders.
     """
 
     project = models.ForeignKey(
@@ -250,8 +231,7 @@ class UpcomingEstimatedLandDateReminder(BaseReminder):
 
 
 class UpcomingTaskReminder(BaseReminder):
-    """
-    Upcoming generic task reminder.
+    """Upcoming generic task reminder.
     """
 
     task = models.ForeignKey(
@@ -262,8 +242,7 @@ class UpcomingTaskReminder(BaseReminder):
 
 
 class TaskAssignedToMeFromOthersReminder(BaseReminder):
-    """
-    Task assigned to me from others generic task reminder.
+    """Task assigned to me from others generic task reminder.
     """
 
     task = models.ForeignKey(
@@ -274,8 +253,7 @@ class TaskAssignedToMeFromOthersReminder(BaseReminder):
 
 
 class TaskAmendedByOthersReminder(BaseReminder):
-    """
-    Task amended by others generic task reminder.
+    """Task amended by others generic task reminder.
     """
 
     task = models.ForeignKey(
@@ -286,8 +264,7 @@ class TaskAmendedByOthersReminder(BaseReminder):
 
 
 class TaskOverdueReminder(BaseReminder):
-    """
-    Task overdue generic task reminder.
+    """Task overdue generic task reminder.
     """
 
     task = models.ForeignKey(
@@ -298,8 +275,7 @@ class TaskOverdueReminder(BaseReminder):
 
 
 class TaskCompletedReminder(BaseReminder):
-    """
-    Task completed generic task reminder.
+    """Task completed generic task reminder.
     """
 
     task = models.ForeignKey(
@@ -310,8 +286,7 @@ class TaskCompletedReminder(BaseReminder):
 
 
 class TaskDeletedByOthersReminder(BaseReminder):
-    """
-    Task deleted by others generic task reminder.
+    """Task deleted by others generic task reminder.
     """
 
     task = models.ForeignKey(

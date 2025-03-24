@@ -308,8 +308,7 @@ class TestGetCompany(APITestMixin):
     """Tests for getting a company."""
 
     def test_get_company_without_view_document_permission(self):
-        """
-        Tests that if the user doesn't have view document permission,
+        """Tests that if the user doesn't have view document permission,
         the response body will not include archived_documents_url_path.
         """
         company = CompanyFactory(
@@ -484,8 +483,7 @@ class TestGetCompany(APITestMixin):
         }
 
     def test_get_company_without_country(self):
-        """
-        Tests the company item view for a company without a country.
+        """Tests the company item view for a company without a country.
 
         Checks that the endpoint returns 200 and the uk_based attribute is
         set to None.
@@ -508,8 +506,7 @@ class TestGetCompany(APITestMixin):
         ),
     )
     def test_get_company_without_area(self, country_id):
-        """
-        Tests the company item view for a US/Canada company without an area
+        """Tests the company item view for a US/Canada company without an area
 
         Checks that the endpoint returns 200
         """
@@ -534,8 +531,7 @@ class TestGetCompany(APITestMixin):
         ),
     )
     def test_get_company_with_website(self, input_website, expected_website):
-        """
-        Test that if the website field on a company doesn't have any scheme
+        """Test that if the website field on a company doesn't have any scheme
         specified, the endpoint adds it automatically.
         """
         company = CompanyFactory(
@@ -555,8 +551,7 @@ class TestGetCompany(APITestMixin):
         ),
     )
     def test_get_company_pending_dnb_investigation(self, pending_dnb_investigation):
-        """
-        Test that `pending_dnb_investigation` is set for a company API result
+        """Test that `pending_dnb_investigation` is set for a company API result
         as expected.
         """
         company = CompanyFactory(
@@ -576,8 +571,7 @@ class TestGetCompany(APITestMixin):
         ),
     )
     def test_get_company_is_global_ultimate(self, is_global_ultimate):
-        """
-        Test that `is_global_ultimate` is set for a company API result
+        """Test that `is_global_ultimate` is set for a company API result
         as expected.
         """
         kwargs = {}
@@ -600,8 +594,7 @@ class TestGetCompany(APITestMixin):
         ),
     )
     def test_get_company_global_ultimate_duns_number(self, global_ultimate_overrides):
-        """
-        Test that `global_ultimate_duns_number` is set for a company API result
+        """Test that `global_ultimate_duns_number` is set for a company API result
         as expected.
         """
         company = CompanyFactory(
@@ -615,8 +608,7 @@ class TestGetCompany(APITestMixin):
         assert response.json()['global_ultimate_duns_number'] == global_ultimate_duns_number
 
     def test_get_company_with_export_countries(self):
-        """
-        Tests the company response has export countries that are
+        """Tests the company response has export countries that are
         in the new CompanyExportCountry model.
         """
         company = CompanyFactory()
@@ -634,7 +626,7 @@ class TestGetCompany(APITestMixin):
         response = api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.json().get('export_countries', []) is not []
+        assert response.json().get('export_countries', []) != []
         export_countries_response = response.json().get('export_countries')
         assert export_countries_response == [
             {
@@ -648,8 +640,7 @@ class TestGetCompany(APITestMixin):
         ]
 
     def test_check_company_dont_return_export_countries_with_no_permission(self):
-        """
-        Tests the company response has no export countries
+        """Tests the company response has no export countries
         without appropriate permission.
         """
         company = CompanyFactory()
@@ -698,8 +689,7 @@ class TestGetCompany(APITestMixin):
         ),
     )
     def test_one_list_group_tier(self, build_company):
-        """
-        Test that the endpoint includes the One List Tier
+        """Test that the endpoint includes the One List Tier
         of the Global Headquarters in the group.
         """
         one_list_tier = OneListTier.objects.first()
@@ -761,8 +751,7 @@ class TestGetCompany(APITestMixin):
         ),
     )
     def test_one_list_group_global_account_manager(self, build_company):
-        """
-        Test that the endpoint includes the One List Global Account Manager
+        """Test that the endpoint includes the One List Global Account Manager
         of the Global Headquarters in the group.
         """
         global_account_manager = AdviserFactory()
@@ -813,8 +802,7 @@ class TestGetCompany(APITestMixin):
         headquarter_type,
         expected_is_global_headquarters,
     ):
-        """
-        Test that `is_global_headquarters` is set for a company API result
+        """Test that `is_global_headquarters` is set for a company API result
         as expected.
         """
         company = CompanyFactory(headquarter_type_id=headquarter_type)
@@ -825,8 +813,7 @@ class TestGetCompany(APITestMixin):
         assert response.json()['is_global_headquarters'] == expected_is_global_headquarters
 
     def test_get_company_global_ultimate_country_for_global_ultimate(self):
-        """
-        Test that `global_ultimate_country` is set for a company API result
+        """Test that `global_ultimate_country` is set for a company API result
         when company is the global ultimate company.
         """
         company = CompanyFactory(
@@ -840,8 +827,7 @@ class TestGetCompany(APITestMixin):
         assert response.json()['global_ultimate_country'] == company.address_country.name
 
     def test_get_company_global_ultimate_country_for_subsidiary_company(self):
-        """
-        Test that `global_ultimate_country` is set for a company API result
+        """Test that `global_ultimate_country` is set for a company API result
         when the company is a subsidiary.
         """
         global_ultimate = CompanyFactory(
@@ -859,8 +845,7 @@ class TestGetCompany(APITestMixin):
         assert response.json()['global_ultimate_country'] == global_ultimate.address_country.name
 
     def test_get_company_global_ultimate_country_empty(self):
-        """
-        Test that `global_ultimate_country` is None
+        """Test that `global_ultimate_country` is None
         when the company has no global ultimate company.
         """
         company = CompanyFactory(
@@ -1080,8 +1065,7 @@ class TestUpdateCompany(APITestMixin):
         assert response_data['great_profile_status'] == Company.GreatProfileStatus.PUBLISHED
 
     def test_cannot_update_dnb_readonly_fields_if_duns_number_is_set(self):
-        """
-        Test that if company.duns_number is not blank, the client cannot update the
+        """Test that if company.duns_number is not blank, the client cannot update the
         fields defined by CompanySerializer.Meta.dnb_read_only_fields.
         """
         company = CompanyFactory(
@@ -1347,8 +1331,7 @@ class TestUpdateCompany(APITestMixin):
 
     @pytest.mark.parametrize('field', ('sector',))
     def test_update_null_field_to_null(self, field):
-        """
-        Tests setting fields to null that are currently null, and are allowed to be null
+        """Tests setting fields to null that are currently null, and are allowed to be null
         when already null.
         """
         company = CompanyFactory(**{f'{field}_id': None})
@@ -1374,8 +1357,7 @@ class TestUpdateCompany(APITestMixin):
         ),
     )
     def test_update_company_global_headquarters_with_not_a_global_headquarters(self, hq, is_valid):
-        """
-        Tests if adding company that is not a Global HQ as a Global HQ
+        """Tests if adding company that is not a Global HQ as a Global HQ
         will fail or if added company is a Global HQ then it will pass.
         """
         company = CompanyFactory(
@@ -1528,8 +1510,7 @@ class TestUpdateCompany(APITestMixin):
         ),
     )
     def test_get_company_with_export_potential(self, score):
-        """
-        Test imported export_potential field on a company appears as is
+        """Test imported export_potential field on a company appears as is
         """
         company = CompanyFactory(
             export_potential=score,
@@ -1549,8 +1530,7 @@ class TestUpdateCompany(APITestMixin):
         ),
     )
     def test_get_company_with_great_profile_status(self, profile_status):
-        """
-        Test imported `great_profile_status` field on a company appears as is
+        """Test imported `great_profile_status` field on a company appears as is
         """
         company = CompanyFactory(
             great_profile_status=profile_status,
@@ -2068,8 +2048,7 @@ class TestAddCompany(APITestMixin):
         assert response.json() == expected_error
 
     def test_post_create_stub(self):
-        """
-        Ensure that this endpoint will provide a good drop in replacement for our V1 company
+        """Ensure that this endpoint will provide a good drop in replacement for our V1 company
         investigation API endpoint.
         """
         payload = {

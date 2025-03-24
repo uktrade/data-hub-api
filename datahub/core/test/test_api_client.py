@@ -54,8 +54,7 @@ class TestHawkAuth:
 
 
 class TestTokenAuth:
-    """
-    Tests TokenAuth.
+    """Tests TokenAuth.
     """
 
     @pytest.mark.parametrize(
@@ -93,8 +92,7 @@ class TestAPIClient:
         assert response.request.timeout is None
 
     def test_raises_exception_on_unsuccessful_request_if_flag_is_true(self, requests_mock):
-        """
-        Tests that an exception is raised on an successful request
+        """Tests that an exception is raised on an successful request
         if the raise_for_status argument is True.
         """
         api_url = 'http://test/v1/'
@@ -107,8 +105,7 @@ class TestAPIClient:
         assert excinfo.value.response.status_code == 404
 
     def test_doesnt_raise_exception_on_unsuccessful_request_if_flag_is_false(self, requests_mock):
-        """
-        Tests that no exception is raised on an successful request
+        """Tests that no exception is raised on an successful request
         if the raise_for_status argument is False.
         """
         api_url = 'http://test/v1/'

@@ -14,17 +14,16 @@ from datahub.investment.project.constants import InvestorType as InvestorTypeCon
 from datahub.investment.project.proposition.models import PropositionDocument, PropositionStatus
 from datahub.investment.project.proposition.test.factories import PropositionFactory
 from datahub.investment.project.report.spi import (
-    _filter_row_dicts,
     ALL_SPI_SERVICE_IDS,
     SPIReport,
+    _filter_row_dicts,
     write_report,
 )
 from datahub.investment.project.test.factories import (
     InvestmentProjectFactory,
     VerifyWinInvestmentProjectFactory,
 )
-from datahub.metadata.models import Service
-from datahub.metadata.models import Team
+from datahub.metadata.models import Service, Team
 
 pytestmark = pytest.mark.django_db
 
@@ -32,14 +31,14 @@ pytestmark = pytest.mark.django_db
 @pytest.fixture
 def spi_report():
     """Gets instance of SPI Report."""
-    yield SPIReport()
+    return SPIReport()
 
 
 @pytest.fixture
 def ist_adviser():
     """Provides IST adviser."""
     team = TeamFactory(tags=[Team.Tag.INVESTMENT_SERVICES_TEAM])
-    yield AdviserFactory(dit_team_id=team.id)
+    return AdviserFactory(dit_team_id=team.id)
 
 
 @pytest.fixture
@@ -87,7 +86,7 @@ def propositions(ist_adviser):
 
         items[2].abandon(by=adviser, details='what')
 
-    yield items
+    return items
 
 
 def test_can_see_spi1_start(spi_report):

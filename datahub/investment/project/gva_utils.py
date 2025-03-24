@@ -1,15 +1,19 @@
-from decimal import Decimal, ROUND_HALF_UP
+from decimal import ROUND_HALF_UP, Decimal
 from logging import getLogger
 
 from django.utils.functional import cached_property
 
 from datahub.core.constants import (
     FDIType as FDITypeConstant,
-    InvestmentType as InvestmentTypeConstant,
-    Sector as SectorConstant,
 )
 from datahub.core.constants import (
     InvestmentBusinessActivity as InvestmentBusinessActivityConstant,
+)
+from datahub.core.constants import (
+    InvestmentType as InvestmentTypeConstant,
+)
+from datahub.core.constants import (
+    Sector as SectorConstant,
 )
 from datahub.investment.project.models import GVAMultiplier
 

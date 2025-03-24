@@ -87,8 +87,7 @@ def merge_select_other_contact(model_admin, request):
 
 @method_decorator(csrf_protect)
 def merge_select_other_model(model_admin, request, dict):
-    """
-    First view as part of the merge duplicate records process.
+    """First view as part of the merge duplicate records process.
 
     Used to select the second record of the two to merge.
 

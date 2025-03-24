@@ -5,7 +5,6 @@ from html.parser import HTMLParser
 from rest_framework import status
 from rest_framework.response import Response
 
-
 DISALLOWED_TAGS = ['script', 'style', 'iframe', 'embed', 'object', 'form']
 DISALLOWED_SYMBOLS = ['lt', 'gt', 'amp', 'quot', 'apos']
 DISALLOWED_CHARACTERS = ['<', '>']

@@ -2,8 +2,7 @@ from django.apps import AppConfig
 
 
 class MetadataConfig(AppConfig):
-    """
-    Django App Config for the Metadata app.
+    """Django App Config for the Metadata app.
     """
 
     name = 'datahub.metadata'

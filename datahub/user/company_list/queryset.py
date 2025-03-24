@@ -2,18 +2,17 @@ from django.db.models import Case, DurationField, ExpressionWrapper, F, Q, When
 from django.db.models.functions import Now
 
 from datahub.core.query_utils import (
+    JSONBBuildObject,
     get_array_agg_subquery,
     get_full_name_expression,
     get_top_related_expression_subquery,
-    JSONBBuildObject,
 )
 from datahub.interaction.models import Interaction, InteractionDITParticipant
 from datahub.user.company_list.models import CompanyListItem, PipelineItem
 
 
 def get_company_list_item_queryset():
-    """
-    Returns an annotated query set used by CompanyListItemViewSet and CompanyListViewSet.
+    """Returns an annotated query set used by CompanyListItemViewSet and CompanyListViewSet.
 
     The annotations are supported by an index on the Interaction model.
 
@@ -67,8 +66,7 @@ def get_company_list_item_queryset():
 
 
 def get_pipeline_item_queryset():
-    """
-    Returns a query set used by PipelineItemViewSet.
+    """Returns a query set used by PipelineItemViewSet.
     """
     return PipelineItem.objects.select_related(
         'company',

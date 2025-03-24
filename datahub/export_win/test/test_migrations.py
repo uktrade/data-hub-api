@@ -1,12 +1,10 @@
 from importlib import import_module
 
 import pytest
-
 from django.apps import apps
 
 from datahub.export_win.constants import EXPORT_WINS_LEGACY_ID_START_VALUE
 from datahub.export_win.test.factories import BreakdownFactory, WinAdviserFactory
-
 
 pytestmark = pytest.mark.django_db
 

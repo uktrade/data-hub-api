@@ -1,5 +1,4 @@
 import reversion
-
 from django.core.management.base import CommandError
 
 from datahub.company.models import Company

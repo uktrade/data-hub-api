@@ -3,13 +3,11 @@ from unittest import mock
 from unittest.mock import patch
 
 import pytest
-
 from django.core.management import call_command
 
 
 class MockWorker:
-    """
-    Mock queue names object returned by worker
+    """Mock queue names object returned by worker
     """
 
     queue_name = ''

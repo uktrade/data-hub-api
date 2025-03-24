@@ -18,8 +18,7 @@ from datahub.interaction.test.factories import (
     InteractionDITParticipantFactory,
 )
 from datahub.metadata.test.factories import TeamFactory
-from datahub.user.company_list.models import CompanyList
-from datahub.user.company_list.models import CompanyListItem
+from datahub.user.company_list.models import CompanyList, CompanyListItem
 from datahub.user.company_list.test.factories import CompanyListFactory, CompanyListItemFactory
 from datahub.user.company_list.views import (
     CANT_ADD_ARCHIVED_COMPANY_MESSAGE,
@@ -140,8 +139,7 @@ class TestListCompanyListsView(APITestMixin):
         assert actual_list_names == expected_list_names
 
     def test_filter_by_invalid_company_id(self):
-        """
-        Test that an error is returned when trying to filter by a company ID that is not a
+        """Test that an error is returned when trying to filter by a company ID that is not a
         valid UUID.
         """
         response = self.api_client.get(
@@ -186,8 +184,7 @@ class TestListCompanyListsView(APITestMixin):
         assert actual_list_ids == expected_list_ids
 
     def test_returns_no_lists_if_filtered_by_company_not_on_a_list(self):
-        """
-        Test that no lists are returned when filtering lists by a company not on any of the
+        """Test that no lists are returned when filtering lists by a company not on any of the
         authenticated user's lists.
         """
         # Create some lists and list items for the user
@@ -654,8 +651,7 @@ class TestCreateOrUpdateCompanyListItemAPIView(APITestMixin):
         ).count() == 2
 
     def test_with_existing_item(self):
-        """
-        Test that no error is returned if the specified company is already on the
+        """Test that no error is returned if the specified company is already on the
         authenticated user's list.
         """
         creation_date = datetime(2018, 1, 2, tzinfo=timezone.utc)
@@ -746,8 +742,7 @@ class TestCompanyListItemViewSet(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_with_no_list_items(self):
-        """
-        Test that an empty list is returned if the user does not have any companies on the
+        """Test that an empty list is returned if the user does not have any companies on the
         selected list.
         """
         company_list = CompanyListFactory(adviser=self.user)
@@ -775,8 +770,7 @@ class TestCompanyListItemViewSet(APITestMixin):
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     def test_with_only_items_on_other_users_lists(self):
-        """
-        Test that an empty list is returned if the user has no companies on their selected list,
+        """Test that an empty list is returned if the user has no companies on their selected list,
         but other users have companies on theirs.
         """
         CompanyListItemFactory.create_batch(5)
@@ -885,8 +879,7 @@ class TestCompanyListItemViewSet(APITestMixin):
         ]
 
     def test_sorting(self):
-        """
-        Test that list items are sorted in reverse order of the date of the latest
+        """Test that list items are sorted in reverse order of the date of the latest
         interaction with the company.
         Note that we want companies without any interactions to be sorted last.
         """
@@ -902,7 +895,7 @@ class TestCompanyListItemViewSet(APITestMixin):
         company_list = CompanyListFactory(adviser=self.user)
         list_items = CompanyListItemFactory.create_batch(len(interaction_dates), list=company_list)
 
-        for interaction_date, list_item in zip(shuffled_dates, list_items):
+        for interaction_date, list_item in zip(shuffled_dates, list_items, strict=False):
             if interaction_date:
                 CompanyInteractionFactory(date=interaction_date, company=list_item.company)
 
@@ -947,8 +940,7 @@ class TestDeleteCompanyListItemAPIView(APITestMixin):
         assert not CompanyListItem.objects.filter(list=company_list, company=company).exists()
 
     def test_with_company_not_on_the_list(self):
-        """
-        Test that 204 status is returned if company is not on the authenticated user's
+        """Test that 204 status is returned if company is not on the authenticated user's
         selected list.
         """
         company = CompanyFactory()
@@ -985,8 +977,7 @@ class TestDeleteCompanyListItemAPIView(APITestMixin):
         assert not CompanyListItem.objects.filter(list=company_list, company=company).exists()
 
     def test_that_actual_company_is_not_deleted(self):
-        """
-        Test that a company is not removed from database after removing from user's selected list.
+        """Test that a company is not removed from database after removing from user's selected list.
         """
         company = CompanyFactory()
         company_list = CompanyListFactory(adviser=self.user)

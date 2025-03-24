@@ -8,8 +8,7 @@ from datahub.metadata.utils import convert_usd_to_gbp
 
 
 class CompaniesDatasetView(BaseFilterDatasetView):
-    """
-    A GET API view to return the data for all companies as required
+    """A GET API view to return the data for all companies as required
     for syncing by Data-flow periodically.
     Data-flow uses the resulting response to insert data into Data workspace which can
     then be queried to create custom reports for users.

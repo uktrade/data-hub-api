@@ -2,9 +2,7 @@ import random
 from datetime import datetime
 
 import factory
-
 from dateutil.relativedelta import relativedelta
-
 from django.utils.timezone import now
 
 from datahub.company.test.factories import (
@@ -14,10 +12,18 @@ from datahub.company.test.factories import (
     ExportExperienceFactory,
 )
 from datahub.core.constants import (
-    BreakdownType as BreakdownTypeConstant,
-    BusinessPotential as BusinessPotentialConstant,
     HVC as HVCConstant,
+)
+from datahub.core.constants import (
+    BreakdownType as BreakdownTypeConstant,
+)
+from datahub.core.constants import (
+    BusinessPotential as BusinessPotentialConstant,
+)
+from datahub.core.constants import (
     WinType as WinTypeConstant,
+)
+from datahub.core.constants import (
     WinUKRegion as WinUKRegionConstant,
 )
 from datahub.core.test.factories import to_many_field
@@ -169,29 +175,25 @@ class WinFactory(factory.django.DjangoModelFactory):
 
     @to_many_field
     def associated_programme(self):  # noqa: D102
-        """
-        Add support for setting `associated_programme`.
+        """Add support for setting `associated_programme`.
         """
         return []
 
     @to_many_field
     def type_of_support(self):  # noqa: D102
-        """
-        Add support for setting `type_of_support`.
+        """Add support for setting `type_of_support`.
         """
         return []
 
     @to_many_field
     def company_contacts(self):  # noqa: D102
-        """
-        Add support for setting `company_contacts`.
+        """Add support for setting `company_contacts`.
         """
         return []
 
     @to_many_field
     def team_members(self):  # noqa: D102
-        """
-        Add support for setting `team_members`.
+        """Add support for setting `team_members`.
         """
         return []
 

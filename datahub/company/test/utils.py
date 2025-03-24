@@ -6,8 +6,7 @@ from datahub.core.test_utils import (
 
 
 def random_non_ita_one_list_tier(exclude=None):
-    """
-    Returns random non ITA One List tier.
+    """Returns random non ITA One List tier.
     :param exclude: OneListTier object to also exclude
     """
     queryset = OneListTier.objects.exclude(
@@ -19,8 +18,7 @@ def random_non_ita_one_list_tier(exclude=None):
 
 
 def format_expected_adviser(adviser):
-    """
-    Formats Adviser object into format expected to be returned by
+    """Formats Adviser object into format expected to be returned by
     `NestedAdviserWithEmailAndTeamField`.
     """
     if not adviser:
@@ -38,8 +36,7 @@ def format_expected_adviser(adviser):
 
 
 def address_area_or_none(address_area):
-    """
-    Get Formatted Address Area Result
+    """Get Formatted Address Area Result
     :param address_area: Address object returned on Company
     :return: Address as an id name object or None
     """

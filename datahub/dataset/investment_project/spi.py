@@ -5,8 +5,7 @@ from datahub.investment.project.report.spi import SPIReport
 
 
 class SPIReportFormatter:
-    """
-    SPI Report Formatter changes the format of the SPI Report.
+    """SPI Report Formatter changes the format of the SPI Report.
 
     TODO: Once original SPI report is removed from Django admin, this format should be
     implemented in the report itself.
@@ -43,8 +42,7 @@ class SPIReportFormatter:
         }
 
     def format(self, investment_projects):
-        """
-        Enrich Investment Project record with SPI report data and only include required fields.
+        """Enrich Investment Project record with SPI report data and only include required fields.
         """
         for investment_project in investment_projects:
             spi_report_row = self._SPIReport.get_row(investment_project)

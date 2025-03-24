@@ -4,7 +4,8 @@ import pytest
 
 from datahub.company.test.factories import CompanyFactory
 from datahub.core.management.commands.loadinitialmetadata import (
-    _ensure_no_existing_data, ExistingDataFoundError,
+    ExistingDataFoundError,
+    _ensure_no_existing_data,
 )
 
 pytestmark = pytest.mark.django_db

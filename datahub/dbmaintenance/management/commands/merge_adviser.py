@@ -1,8 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
-from datahub.company.models import Advisor
-from datahub.company.models import OneListCoreTeamMember
+from datahub.company.models import Advisor, OneListCoreTeamMember
 from datahub.company_referral.models import CompanyReferral
 from datahub.event.models import Event
 from datahub.interaction.models import InteractionDITParticipant

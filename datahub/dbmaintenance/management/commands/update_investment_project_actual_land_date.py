@@ -8,13 +8,11 @@ from datahub.dbmaintenance.management.base import CSVBaseCommand
 from datahub.dbmaintenance.utils import parse_date
 from datahub.investment.project.models import InvestmentProject
 
-
 logger = getLogger(__name__)
 
 
 class Command(CSVBaseCommand):
-    """
-    Command to update investment_project.actual_land_date.
+    """Command to update investment_project.actual_land_date.
 
     Any projects in the Won stage are not updated.
     """

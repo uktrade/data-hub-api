@@ -4,8 +4,7 @@ from datahub.dataset.utils import filter_data_by_modified_date
 
 
 class CompanyExportCountryDatasetView(BaseFilterDatasetView):
-    """
-    A GET API view to return the data for all company export_country
+    """A GET API view to return the data for all company export_country
     as required for syncing by Data-flow periodically.
     Data-flow uses the resulting response to insert data into Data workspace which can
     then be queried to create custom reports for users.

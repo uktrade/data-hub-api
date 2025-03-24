@@ -11,8 +11,7 @@ def field_incomplete(combiner, field):
 
 
 def _is_provided_and_is_date_in_the_past(value):
-    """
-    Returns True if the date value is provided and is today's date or in the past.
+    """Returns True if the date value is provided and is today's date or in the past.
 
     Note that comparing the date to today's date could cause issues
     with users who are in different timezones as they could be in front of UTC.

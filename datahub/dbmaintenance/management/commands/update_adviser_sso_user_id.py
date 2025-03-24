@@ -4,9 +4,9 @@ from django.core.management import BaseCommand
 
 from datahub.company.models import Advisor
 from datahub.oauth.sso_api_client import (
-    get_user_by_email,
     SSORequestError,
     SSOUserDoesNotExistError,
+    get_user_by_email,
 )
 from datahub.search.signals import disable_search_signal_receivers
 
@@ -14,8 +14,7 @@ logger = getLogger(__name__)
 
 
 class Command(BaseCommand):
-    """
-    Command to update SSO user ID for each adviser
+    """Command to update SSO user ID for each adviser
     Example of executing this command locally:
         python manage.py update_adviser_sso_user_id
     """
@@ -32,8 +31,7 @@ class Command(BaseCommand):
 
     @disable_search_signal_receivers(Advisor)
     def handle(self, *args, **options):
-        """
-        Updates SSO user ID
+        """Updates SSO user ID
         """
         is_simulation = options['simulate']
         num_skipped = 0

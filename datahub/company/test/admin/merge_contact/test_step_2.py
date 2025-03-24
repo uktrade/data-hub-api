@@ -1,7 +1,6 @@
 from unittest.mock import patch
 
 import pytest
-
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.test.html import parse_html
@@ -43,8 +42,7 @@ class TestSelectPrimaryContactViewGet(AdminTestMixin):
         ),
     )
     def test_returns_400_if_invalid_contacts_passed(self, data):
-        """
-        Test that a 400 is returned when invalid values are passed for contact_1 or contact_2.
+        """Test that a 400 is returned when invalid values are passed for contact_1 or contact_2.
 
         This could only happen if the query string was manipulated, or one of the referenced
         contacts was deleted.
@@ -80,8 +78,7 @@ class TestSelectPrimaryContactViewGet(AdminTestMixin):
         contact_2_factory,
         swap,
     ):
-        """
-        Tests that the radio button to select a contact is disabled if it is archived
+        """Tests that the radio button to select a contact is disabled if it is archived
         """
         contact_1 = (contact_2_factory if swap else contact_1_factory)()
         contact_2 = (contact_1_factory if swap else contact_2_factory)()

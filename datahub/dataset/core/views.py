@@ -11,8 +11,7 @@ from datahub.dataset.core.pagination import DatasetCursorPagination
 
 
 class BaseDatasetView(HawkResponseSigningMixin, APIView):
-    """
-    Base API view to be used for creating endpoints for consumption
+    """Base API view to be used for creating endpoints for consumption
     by Data Flow and insertion into Data Workspace.
     """
 
@@ -31,16 +30,14 @@ class BaseDatasetView(HawkResponseSigningMixin, APIView):
         return paginator.get_paginated_response(page)
 
     def _get_request_params(self, request):
-        """
-        Hook for checking request parameters before querying dataset.
+        """Hook for checking request parameters before querying dataset.
         By default it does nothing, but subclasses can use it to modify the query set,
         based on user parameters.
         """
         pass
 
     def _enrich_data(self, dataset):
-        """
-        Hook for enriching the paged dataset before returning a response.
+        """Hook for enriching the paged dataset before returning a response.
         By default it does nothing but can be changed in subclasses to make
         calls to external APIs if required.
         """
@@ -52,8 +49,7 @@ class BaseDatasetView(HawkResponseSigningMixin, APIView):
 
 
 class BaseFilterDatasetView(HawkResponseSigningMixin, APIView):
-    """
-    Base API view to be used for creating endpoints for consumption
+    """Base API view to be used for creating endpoints for consumption
     by Data Flow and insertion into Data Workspace.
     """
 
@@ -71,8 +67,7 @@ class BaseFilterDatasetView(HawkResponseSigningMixin, APIView):
         return paginator.get_paginated_response(page)
 
     def _enrich_data(self, dataset):
-        """
-        Hook for enriching the paged dataset before returning a response.
+        """Hook for enriching the paged dataset before returning a response.
         By default it does nothing but can be changed in subclasses to make
         calls to external APIs if required.
         """

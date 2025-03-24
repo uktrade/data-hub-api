@@ -56,8 +56,7 @@ def test_skips_deleting_if_no_matching_indices(mock_opensearch_client):
 
 
 def test_skips_deleting_if_not_confirmed(mock_opensearch_client, monkeypatch):
-    """
-    Test that if the user types 'no' when asked to confirm the action, the command
+    """Test that if the user types 'no' when asked to confirm the action, the command
     exits without deleting.
     """
     mocked_input = Mock(return_value='no')

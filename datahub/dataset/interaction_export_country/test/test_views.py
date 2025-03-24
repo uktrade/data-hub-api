@@ -25,8 +25,7 @@ def get_expected_data_from_interaction_export_country(interaction_export_country
 
 @pytest.mark.django_db
 class TestInteractionsExportCountryDatasetViewSet(BaseDatasetViewTest):
-    """
-    Tests for InteractionsExportCountryDatasetView
+    """Tests for InteractionsExportCountryDatasetView
     """
 
     view_url = reverse('api-v4:dataset:interactions-export-country-dataset')

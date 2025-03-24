@@ -11,13 +11,11 @@ from datahub.company.test.factories import CompanyFactory
 from datahub.dnb_api.constants import ALL_DNB_UPDATED_MODEL_FIELDS
 from datahub.dnb_api.utils import update_company_from_dnb
 
-
 pytestmark = pytest.mark.django_db
 
 
 def test_run(s3_stubber, formatted_dnb_company):
-    """
-    Test that the command successfully rolls back the specified records.
+    """Test that the command successfully rolls back the specified records.
     """
     with reversion.create_revision():
         companies = [
@@ -79,8 +77,7 @@ def test_run(s3_stubber, formatted_dnb_company):
     'rollback_dnb_company_update',
 )
 def test_simulate(mocked_rollback_dnb_company_update, s3_stubber):
-    """
-    Test that the command simulates rollbacks if --simulate is passed in.
+    """Test that the command simulates rollbacks if --simulate is passed in.
     """
     companies = [
         CompanyFactory(duns_number='123456789'),

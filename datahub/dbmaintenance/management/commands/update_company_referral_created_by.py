@@ -1,21 +1,17 @@
 from logging import getLogger
 
 import reversion
-
 from django.core.management.base import BaseCommand
-
 from django.db import transaction
 
 from datahub.company.models import Advisor
 from datahub.company_referral.models import CompanyReferral
 
-
 logger = getLogger(__name__)
 
 
 class Command(BaseCommand):
-    """
-    Command to set referral.created_by where incorrect.
+    """Command to set referral.created_by where incorrect.
 
     Some referral records have incorrect created_by values which
     is set as the default value for sending advisor. This changes the created_by value

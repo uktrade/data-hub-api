@@ -17,12 +17,12 @@ from datahub.interaction.admin_csv_import.row_form import (
     ADVISER_2_IS_THE_SAME_AS_ADVISER_1,
     ADVISER_NOT_FOUND_MESSAGE,
     ADVISER_WITH_TEAM_NOT_FOUND_MESSAGE,
-    CSVRowError,
     DUPLICATE_OF_ANOTHER_ROW_MESSAGE,
     DUPLICATE_OF_EXISTING_INTERACTION_MESSAGE,
-    InteractionCSVRowForm,
     MULTIPLE_ADVISERS_FOUND_MESSAGE,
     OBJECT_DISABLED_MESSAGE,
+    CSVRowError,
+    InteractionCSVRowForm,
 )
 from datahub.interaction.models import Interaction
 from datahub.interaction.test.admin_csv_import.utils import random_communication_channel
@@ -495,8 +495,7 @@ class TestInteractionCSVRowFormValidation:
         existing_objects_data,
         expected_errors,
     ):
-        """
-        Test that an error is returned if the interaction is a duplicate of an existing
+        """Test that an error is returned if the interaction is a duplicate of an existing
         record.
         """
         adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
@@ -622,8 +621,7 @@ class TestInteractionCSVRowFormValidation:
         prior_rows,
         expected_errors,
     ):
-        """
-        Test that an error is returned if the interaction is a duplicate of a row encountered
+        """Test that an error is returned if the interaction is a duplicate of a row encountered
         earlier in the file being imported.
         """
         adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
@@ -689,15 +687,13 @@ class TestInteractionCSVRowFormValidation:
 
 @pytest.mark.django_db
 class TestInteractionCSVRowFormSerializerUsage:
-    """
-    Tests general logic of InteractionSerializer validators usage in InteractionCSVRowForm.
+    """Tests general logic of InteractionSerializer validators usage in InteractionCSVRowForm.
 
     (This excludes validation of specific fields which is part of the validation tests above.)
     """
 
     def test_serializer_error_for_invalid_form(self, monkeypatch):
-        """
-        Test that an unmapped error from the serializer validators is not added to
+        """Test that an unmapped error from the serializer validators is not added to
         NON_FIELD_ERRORS if the form was otherwise invalid.
         """
         def validator(_):
@@ -756,8 +752,7 @@ class TestInteractionCSVRowFormSerializerUsage:
 
 @pytest.mark.django_db
 class TestInteractionCSVRowFormSuccessfulCleaning:
-    """
-    Tests for successful field cleaning in InteractionCSVRowForm.
+    """Tests for successful field cleaning in InteractionCSVRowForm.
 
     This includes looking up model objects and the transformation of values.
     """
@@ -883,8 +878,7 @@ class TestInteractionCSVRowFormSuccessfulCleaning:
         ),
     )
     def test_common_relation_fields(self, kind, field, object_creator, input_transformer):
-        """
-        Test the looking up of values for relationship fields common to interactions and
+        """Test the looking up of values for relationship fields common to interactions and
         service deliveries.
         """
         adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
@@ -1038,8 +1032,7 @@ class TestInteractionCSVRowFormSuccessfulCleaning:
         ),
     )
     def test_contact_lookup(self, input_email, matching_status):
-        """
-        Test that various contact matching scenarios.
+        """Test that various contact matching scenarios.
 
         Note that the matching logic is tested more extensively in the company app.
         """
@@ -1080,8 +1073,7 @@ class TestInteractionCSVRowFormSuccessfulCleaning:
         ('Documents & Regulations', 'Markets & Sectors'),
     )
     def test_service_answer(self, service_answer_name):
-        """
-        Test that valid service answer will be transformed into service_answers dictionary
+        """Test that valid service answer will be transformed into service_answers dictionary
         and is not case sensitive.
         """
         adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
@@ -1276,8 +1268,7 @@ class TestInteractionCSVRowFormCleanedDataAsSerializerDict:
         }
 
     def test_cleaned_data_as_serializer_dict_for_export_interaction_without_barrier_types(self):
-        """
-        Test that cleaned_data_as_serializer_dict() transforms an export interaction
+        """Test that cleaned_data_as_serializer_dict() transforms an export interaction
         that has no export barrier types provided.
         """
         adviser = AdviserFactory(first_name='Neptune', last_name='Doris')

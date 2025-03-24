@@ -6,7 +6,6 @@ from config import api_urls
 from datahub.ping.views import ping
 from datahub.user.views import who_am_i
 
-
 if settings.ADMIN_OAUTH2_ENABLED:
     from datahub.oauth.admin_sso.views import callback as admin_oauth_callback
     admin_oauth2_urls = [

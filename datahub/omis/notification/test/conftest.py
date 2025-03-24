@@ -10,8 +10,7 @@ from datahub.omis.notification.constants import OMIS_USE_NOTIFICATION_APP_FEATUR
 
 @pytest.fixture(params=(True, False))
 def use_notification_app(request):
-    """
-    Fixture determining whether or not to use omis' notification package or
+    """Fixture determining whether or not to use omis' notification package or
     datahub's new datahub.notification django app.
 
     By using the pytest.fixture params kwarg, we ensure that every test case
@@ -26,10 +25,9 @@ def use_notification_app(request):
     return False
 
 
-@pytest.fixture()
+@pytest.fixture
 def mocked_notify_client(use_notification_app):
-    """
-    Get a reference to the correct mocked GOVUK notify client, depending on whether the
+    """Get a reference to the correct mocked GOVUK notify client, depending on whether the
     feature flag for using the notification app is active or not.
     """
     if use_notification_app:

@@ -14,7 +14,6 @@ from datahub.investment.project.test.factories import (
 )
 from datahub.metadata.test.factories import SectorFactory
 
-
 CAPITAL = GVAMultiplier.SectorClassificationChoices.CAPITAL
 
 

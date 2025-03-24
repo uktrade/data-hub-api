@@ -1,8 +1,7 @@
 """Search views."""
 import uuid
-
 from collections import namedtuple
-from enum import auto, Enum
+from enum import Enum, auto
 from itertools import islice
 
 from django.conf import settings
@@ -18,9 +17,9 @@ from datahub.metadata.models import Sector
 from datahub.search.apps import get_global_search_apps_as_mapping
 from datahub.search.execute_query import execute_search_query
 from datahub.search.permissions import (
-    has_permissions_for_app,
     SearchAndExportPermissions,
     SearchPermissions,
+    has_permissions_for_app,
 )
 from datahub.search.query_builder import (
     get_basic_search_query,
@@ -37,16 +36,14 @@ from datahub.user_event_log.utils import record_user_event
 
 
 class SearchStubSchema(AutoSchema):
-    """
-    AutoSchema with supressed responses schema.
+    """AutoSchema with supressed responses schema.
 
     The search response has different schema than the request. This prevents showing
     wrong example in the OpenAPI docs.
     """
 
     def get_operation(self, path, path_regex, path_prefix, method, registry):
-        """
-        Supress showing the response in the form of the request body.
+        """Supress showing the response in the form of the request body.
         """
         operation = super().get_operation(
             path=path,
@@ -71,8 +68,7 @@ class SearchStubSchema(AutoSchema):
 
 
 class SearchBasicStubSchema(SearchStubSchema):
-    """
-    SearchStubSchema with defined query parameters to allow query basic search from the Open API
+    """SearchStubSchema with defined query parameters to allow query basic search from the Open API
     docs.
     """
 
@@ -165,8 +161,7 @@ class SearchBasicAPIView(APIView):
 
 
 def _get_global_search_permission_filters(request):
-    """
-    Gets the permissions filters that should be applied to each search entity (to enforce
+    """Gets the permissions filters that should be applied to each search entity (to enforce
     permissions) in global search.
 
     Only global search entities that the user has access to are returned.
@@ -355,8 +350,7 @@ class SearchExportAPIView(SearchAPIView):
         return ' - '.join(filename_parts)
 
     def _get_ids(self, es_query):
-        """
-        Gets the document IDs from an OpenSearch query using the scroll API.
+        """Gets the document IDs from an OpenSearch query using the scroll API.
 
         The number of IDs returned is limited by settings.SEARCH_EXPORT_MAX_RESULTS.
         """
@@ -383,8 +377,7 @@ class SearchExportAPIView(SearchAPIView):
         )
 
     def _get_rows(self, ids, search_ordering):
-        """
-        Returns an iterable using QuerySet.iterator() over the search results.
+        """Returns an iterable using QuerySet.iterator() over the search results.
 
         The search sort-by value is translated to a value compatible with the Django ORM and
         applied to the query set to preserve the original sort order.
@@ -411,8 +404,7 @@ class SearchExportAPIView(SearchAPIView):
         )
 
     def _translate_search_ordering_to_django_ordering(self, ordering):
-        """
-        Converts a sort-by value as used in the search API to a tuple of values that can be
+        """Converts a sort-by value as used in the search API to a tuple of values that can be
         passed to QuerySet.order_by().
 
         Note that this relies on the same field names having been used; if they differ then you
@@ -438,8 +430,7 @@ class ViewType(Enum):
 
 
 def register_v3_view(sub_path=None):
-    """
-    Decorator that registers a v3 search view.
+    """Decorator that registers a v3 search view.
 
     :param sub_path: optional sub-path to add to the URL
 
@@ -468,8 +459,7 @@ def register_v3_view(sub_path=None):
 
 
 def register_v4_view(sub_path=None, is_public=False):
-    """
-    Decorator that registers a v4 search view.
+    """Decorator that registers a v4 search view.
 
     :param sub_path: optional sub-path to add to the URL
     :param is_public: if True, the URL path will have a /v4/public prefix instead of just /v4

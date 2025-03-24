@@ -1,5 +1,4 @@
-"""
-Logic for detecting probable duplicates when importing interactions.
+"""Logic for detecting probable duplicates when importing interactions.
 
 This includes:
 
@@ -12,7 +11,6 @@ which have specific services and are only created by importing CSV files.
 """
 
 from datahub.interaction.models import Interaction
-
 
 # They keys of this mapping correspond the cleaned data of an InteractionCSVRowForm and are used
 # to determine if an interaction is a duplicate.
@@ -32,8 +30,7 @@ DUPLICATE_FIELD_MAPPING = {
 
 
 def is_duplicate_of_existing_interaction(cleaned_data):
-    """
-    Check if a cleaned InteractionCSVRowForm is a duplicate of an existing interaction in the
+    """Check if a cleaned InteractionCSVRowForm is a duplicate of an existing interaction in the
     database.
 
     The query appears to be fairly fast, and makes use of existing indexes.
@@ -50,8 +47,7 @@ def is_duplicate_of_existing_interaction(cleaned_data):
 
 
 class DuplicateTracker:
-    """
-    Used to detect rows that are duplicates of another row in an interactions CSV file
+    """Used to detect rows that are duplicates of another row in an interactions CSV file
     that is being imported.
     """
 
@@ -60,24 +56,21 @@ class DuplicateTracker:
         self.item_keys = set()
 
     def add_item(self, cleaned_data):
-        """
-        Add the cleaned data of a InteractionCSVRowForm to the collection of rows seen so far.
+        """Add the cleaned data of a InteractionCSVRowForm to the collection of rows seen so far.
         """
         key = _cleaned_data_to_key(cleaned_data)
         if key:
             self.item_keys.add(key)
 
     def has_item(self, cleaned_data):
-        """
-        Check if a InteractionCSVRowForm is a duplicate of a previously-added row.
+        """Check if a InteractionCSVRowForm is a duplicate of a previously-added row.
         """
         key = _cleaned_data_to_key(cleaned_data)
         return key and key in self.item_keys
 
 
 def _cleaned_data_to_key(cleaned_data):
-    """
-    Return a tuple representing a unique key for the cleaned data of an InteractionCSVRowForm.
+    """Return a tuple representing a unique key for the cleaned data of an InteractionCSVRowForm.
     """
     # As an optimisation we could just track the pk for model instances,
     # but that is omitted for simplicity

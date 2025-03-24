@@ -12,7 +12,6 @@ from datahub.investment_lead.tasks.ingest_eyb_common import (
 )
 from datahub.investment_lead.tasks.ingest_eyb_marketing import eyb_marketing_identification_task
 
-
 USER_PREFIX = f'{DATA_FLOW_EXPORTS_PREFIX}DirectoryExpandYourBusinessUserDataPipeline/'
 
 

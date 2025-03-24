@@ -2,9 +2,9 @@ import uuid
 
 from django.contrib.postgres.fields import ArrayField
 from django.core.validators import (
-    integer_validator,
     MaxLengthValidator,
     MinLengthValidator,
+    integer_validator,
 )
 from django.db import models, transaction
 from mptt.fields import TreeForeignKey
@@ -12,7 +12,6 @@ from mptt.fields import TreeForeignKey
 from datahub.company_activity.models import CompanyActivity
 from datahub.core import reversion
 from datahub.core.models import ArchivableModel
-
 
 CHAR_FIELD_MAX_LENGTH = 256
 
@@ -167,8 +166,7 @@ class EYBLead(InvestmentLead):
         return f'EYB Lead ({shortened_pk}...)'
 
     def save(self, *args, **kwargs):
-        """
-        Creates a CompanyActivity when a EYB Lead is saved
+        """Creates a CompanyActivity when a EYB Lead is saved
         """
         with transaction.atomic():
             super().save(*args, **kwargs)

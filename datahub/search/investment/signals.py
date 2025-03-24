@@ -7,6 +7,8 @@ from datahub.company.models import Advisor
 from datahub.interaction.models import Interaction
 from datahub.investment.project.models import (
     InvestmentProject as DBInvestmentProject,
+)
+from datahub.investment.project.models import (
     InvestmentProjectTeamMember,
 )
 from datahub.search.deletion import delete_document
@@ -37,8 +39,7 @@ def remove_investment_project_from_opensearch(instance):
 
 
 def investment_project_sync_search_interaction_change(instance):
-    """
-    Sync investment projects in OpenSearch when related interactions change.
+    """Sync investment projects in OpenSearch when related interactions change.
 
     When an interaction changes, the OpenSearch index is also updated for
     the related investment project. The previous version also needs to be
@@ -65,8 +66,7 @@ def investment_project_sync_search_interaction_change(instance):
 
 
 def investment_project_sync_search_adviser_change(instance):
-    """
-    post_save handler for advisers, to make sure that any projects they're linked to are
+    """post_save handler for advisers, to make sure that any projects they're linked to are
     resynced.
 
     This is primarily to update the teams stored against the project in OpenSearch.
@@ -90,8 +90,7 @@ def investment_project_sync_search_adviser_change(instance):
 
 
 def investment_project_sync_m2m_opensearch(instance, action, reverse, pk_set, **kwargs):
-    """
-    Sync opensearch when m2m fields change on the investment project.
+    """Sync opensearch when m2m fields change on the investment project.
     """
     if action not in ('post_add', 'post_remove', 'post_clear'):
         return

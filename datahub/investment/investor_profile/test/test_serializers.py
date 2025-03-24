@@ -73,8 +73,7 @@ class TestLargeCapitalInvestorProfileSerializer:
         empty_value,
         expected_value,
     ):
-        """
-        Test validates fields allow null or empty values when the profile
+        """Test validates fields allow null or empty values when the profile
         only has an investor company.
         """
         profile = LargeCapitalInvestorProfileFactory()

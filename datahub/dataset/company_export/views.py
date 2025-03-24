@@ -8,8 +8,7 @@ from datahub.metadata.query_utils import get_sector_name_subquery
 
 
 class CompanyExportDatasetView(BaseFilterDatasetView):
-    """
-    A GET API view to return pipeline item data for syncing by data-flow periodically.
+    """A GET API view to return pipeline item data for syncing by data-flow periodically.
     """
 
     def get_dataset(self, request):

@@ -31,7 +31,6 @@ from datahub.omis.order.validators import (
     OrderInStatusValidator,
 )
 
-
 ORDER_FIELDS_INVOICE_RELATED = {
     'billing_address_1',
     'billing_address_2',
@@ -254,16 +253,14 @@ class OrderSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        """
-        Populate `uk_region` during the order creation if not otherwise specified.
+        """Populate `uk_region` during the order creation if not otherwise specified.
         """
         if 'uk_region' not in validated_data:
             validated_data['uk_region'] = validated_data['company'].uk_region
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
-        """
-        Update invoice details if any of the invoice related fields has changed.
+        """Update invoice details if any of the invoice related fields has changed.
         """
         with transaction.atomic():
             instance = super().update(instance, validated_data)
@@ -359,8 +356,7 @@ class PublicOrderSerializer(serializers.ModelSerializer):
 
 
 def existing_adviser(adviser_id):
-    """
-    DRF Validator. It raises a ValidationError if adviser_id is not a valid adviser id.
+    """DRF Validator. It raises a ValidationError if adviser_id is not a valid adviser id.
     """
     try:
         Advisor.objects.get(id=adviser_id)
@@ -384,8 +380,7 @@ class SubscribedAdviserListSerializer(serializers.ListSerializer):
     ]
 
     def save(self, **kwargs):
-        """
-        Overrides save as the logic is not the standard DRF one.
+        """Overrides save as the logic is not the standard DRF one.
 
         1. if a subscriber is still in the list, don't do anything
         2. if a subscriber was not in the list, add it
@@ -434,8 +429,7 @@ class TeamWithRegionSerializer(serializers.ModelSerializer):
 
 
 class SubscribedAdviserSerializer(serializers.Serializer):
-    """
-    DRF serializer for an adviser subscribed to an order.
+    """DRF serializer for an adviser subscribed to an order.
     """
 
     id = serializers.UUIDField(validators=[existing_adviser])
@@ -478,8 +472,7 @@ class OrderAssigneeListSerializer(serializers.ListSerializer):
         return data
 
     def validate_only_one_lead(self, data):
-        """
-        If the order is in draft, validate that only one assignee can be marked as lead.
+        """If the order is in draft, validate that only one assignee can be marked as lead.
         """
         order = self.context['order']
         force_delete = self.context['force_delete']
@@ -519,8 +512,7 @@ class OrderAssigneeListSerializer(serializers.ListSerializer):
         return data
 
     def save(self, **kwargs):
-        """
-        Overrides save as the logic is not the standard DRF one.
+        """Overrides save as the logic is not the standard DRF one.
 
         1. if an assignee is not in data and force_delete is True then, assignee is deleted
         2. if the assignee is in data, it gets updated

@@ -13,7 +13,6 @@ from datahub.investment.project.test.factories import (
 from datahub.metadata.models import Sector
 from datahub.metadata.test.factories import SectorFactory
 
-
 pytestmark = pytest.mark.django_db
 
 

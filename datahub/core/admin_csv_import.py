@@ -61,8 +61,7 @@ class BaseCSVImportForm(forms.Form):
 
     @contextmanager
     def open_file_as_text_stream(self):
-        """
-        Opens the CSV file in the csv_file field as a text stream.
+        """Opens the CSV file in the csv_file field as a text stream.
 
         Must only be called if is_valid() has returned True.
         """
@@ -79,8 +78,7 @@ class BaseCSVImportForm(forms.Form):
 
     @contextmanager
     def open_file_as_dict_reader(self):
-        """
-        Opens the CSV file in the csv_file field as a csv.DictReader.
+        """Opens the CSV file in the csv_file field as a csv.DictReader.
 
         Must only be called if is_valid() has returned True.
         """

@@ -7,8 +7,7 @@ from datahub.metadata.models import Country
 
 
 def format_company_diff(dh_company, dnb_company):
-    """
-    Format the Datahub and D&B companies for templates.
+    """Format the Datahub and D&B companies for templates.
     """
 
     def get_field(name):
@@ -114,8 +113,7 @@ def format_company_diff(dh_company, dnb_company):
 
 
 def redirect_with_messages(func):
-    """
-    Decorator that redirects to a given URL with one or more messages for the user in case of an
+    """Decorator that redirects to a given URL with one or more messages for the user in case of an
     error.
     """
 
@@ -134,14 +132,12 @@ def redirect_with_messages(func):
 
 
 class AdminError(Exception):
-    """
-    Exception in an admin view. Contains the message to be displayed to the user and the
+    """Exception in an admin view. Contains the message to be displayed to the user and the
     redirect_url.
     """
 
     def __init__(self, messages, redirect_url):
-        """
-        Initialise the AdminError.
+        """Initialise the AdminError.
         """
         self.messages = messages
         self.redirect_url = redirect_url

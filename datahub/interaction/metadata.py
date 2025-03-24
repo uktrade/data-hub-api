@@ -1,7 +1,6 @@
 from datahub.interaction import models
 from datahub.metadata.registry import registry
 
-
 registry.register(
     metadata_id='communication-channel',
     model=models.CommunicationChannel,

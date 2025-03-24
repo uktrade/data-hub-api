@@ -3,8 +3,7 @@ from rest_framework.settings import api_settings
 
 
 class ReconcilablePaymentsSubValidator:
-    """
-    Validator which checks that the specified payments data can be
+    """Validator which checks that the specified payments data can be
     reconciled, that is, their sum is equal or greater than the order total.
 
     This validator is designed for direct use rather than with a DRF serializer.

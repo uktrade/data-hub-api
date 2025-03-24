@@ -4,7 +4,7 @@ from typing import Literal
 from rq import Retry
 
 from datahub.core.queues.constants import THREE_MINUTES_IN_SECONDS
-from datahub.core.queues.scheduler import DataHubScheduler, SHORT_RUNNING_QUEUE
+from datahub.core.queues.scheduler import SHORT_RUNNING_QUEUE, DataHubScheduler
 
 logger = getLogger(__name__)
 
@@ -56,6 +56,7 @@ def job_scheduler(
         job_timeout (int, optional): Default timeout is 180 seconds
         description (str, opional): Cron scheduling allows a description to be assigned making it
             easier for debugging and tracing cron jobs, and is only applicable to jobs with crons
+
     """
     is_backoff_an_int = isinstance(retry_backoff, int) and retry_backoff > 1
     if retry_backoff is True or is_backoff_an_int:

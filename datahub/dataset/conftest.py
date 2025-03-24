@@ -8,4 +8,4 @@ def data_flow_api_client(hawk_api_client):
         'data-flow-api-id',
         'data-flow-api-key',
     )
-    yield hawk_api_client
+    return hawk_api_client

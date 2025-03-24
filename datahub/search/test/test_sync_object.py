@@ -35,8 +35,7 @@ def test_sync_related_objects_syncs_using_rq(opensearch):
 
 @pytest.mark.django_db
 def test_sync_object_task_handles_obj_no_longer_in_db(opensearch, caplog):
-    """
-    Test that the sync does not crash trying to sync a deleted object, there are signals which
+    """Test that the sync does not crash trying to sync a deleted object, there are signals which
     can trigger the sync for deleted objects.
     """
     caplog.set_level('ERROR')

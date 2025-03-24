@@ -15,15 +15,14 @@ from datahub.core.models import (
     BaseModel,
     BaseOrderedConstantModel,
 )
-from datahub.core.utils import get_front_end_url, StrEnum
+from datahub.core.utils import StrEnum, get_front_end_url
 from datahub.metadata import models as metadata_models
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
 class InteractionPermission(StrEnum):
-    """
-    Permission codename constants.
+    """Permission codename constants.
 
     (Defined here rather than in permissions to avoid an import of that module.)
 
@@ -71,29 +70,25 @@ class CommunicationChannel(BaseConstantModel):
 
 
 class ServiceDeliveryStatus(BaseOrderedConstantModel):
-    """
-    Status of a service delivery.
+    """Status of a service delivery.
 
     Primarily used for Tradeshow Access Programme (TAP) grants.
     """
 
 
 class PolicyArea(BaseOrderedConstantModel):
-    """
-    Policy area for a policy feedback interaction.
+    """Policy area for a policy feedback interaction.
     """
 
 
 class PolicyIssueType(BaseOrderedConstantModel):
-    """
-    Policy issue type for a policy feedback interaction.
+    """Policy issue type for a policy feedback interaction.
     """
 
 
 @reversion.register_base_model()
 class InteractionDITParticipant(models.Model):
-    """
-    Many-to-many model between an interaction and an adviser (called a DIT participant).
+    """Many-to-many model between an interaction and an adviser (called a DIT participant).
 
     Due to a small number of old records that have only a team or an adviser,
     adviser and team are nullable (but do not have blank=True, to avoid any further
@@ -351,8 +346,7 @@ class Interaction(ArchivableModel, BaseModel):
         return self.subject
 
     def save(self, *args, **kwargs):
-        """
-        Create a `CompanyActivity` linked to this interaction for
+        """Create a `CompanyActivity` linked to this interaction for
         showing all activities related to a company, if the relation
         doesn't already exist.
         """
@@ -410,8 +404,7 @@ class Interaction(ArchivableModel, BaseModel):
 
 @reversion.register_base_model()
 class InteractionExportCountry(BaseModel):
-    """
-    Record `Interaction`'s exporting status to a `Country`.
+    """Record `Interaction`'s exporting status to a `Country`.
     Where `status` is `CompanyExportCountry.Status`
 
     This data will help consolidate company level countries
@@ -447,8 +440,7 @@ class InteractionExportCountry(BaseModel):
         verbose_name_plural = 'interaction export countries'
 
     def __str__(self):
-        """
-        Admin human readable name
+        """Admin human readable name
         """
         return (
             f'{self.interaction} {self.country} {self.status}'

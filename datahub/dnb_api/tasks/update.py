@@ -9,7 +9,7 @@ from datahub.company.models import Company
 from datahub.core.queues.constants import HALF_DAY_IN_SECONDS, THIRTY_MINUTES_IN_SECONDS
 from datahub.core.queues.errors import RetryError
 from datahub.core.queues.job_scheduler import job_scheduler
-from datahub.core.queues.scheduler import DataHubScheduler, LONG_RUNNING_QUEUE
+from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE, DataHubScheduler
 from datahub.core.realtime_messaging import send_realtime_message
 from datahub.core.utils import log_to_sentry
 from datahub.dnb_api.tasks.sync import logger
@@ -21,8 +21,7 @@ from datahub.dnb_api.utils import (
 
 
 def schedule_record_audit(job_ids, start_time):
-    """
-    Check all jobs every 30 minutes for the span of 4 hours
+    """Check all jobs every 30 minutes for the span of 4 hours
     and then fail if not finished
     """
     max_retries = 8
@@ -44,8 +43,7 @@ def schedule_record_audit(job_ids, start_time):
 
 
 def record_audit(job_ids, start_time):
-    """
-    Record an audit log for the get_company_updates task which expresses the number
+    """Record an audit log for the get_company_updates task which expresses the number
     of companies successfully updates, failures, job_count and RQ
     task info and start/end times.
     """
@@ -141,8 +139,7 @@ def schedule_get_company_updates(
 
 
 def get_company_updates(last_updated_after=None, fields_to_update=None):
-    """
-    Gets the lastest updates for D&B companies from dnb-service.
+    """Gets the lastest updates for D&B companies from dnb-service.
 
     The `dnb-service` exposes these updates as a cursor-paginated list. This
     task goes through the pages and spawns tasks that update the records in
@@ -177,8 +174,7 @@ def schedule_update_company_from_dnb_data(
 
 
 def update_company_from_dnb_data(dnb_company_data, fields_to_update=None, update_descriptor=None):
-    """
-    Update the company with the latest data from dnb-service. This task should be called
+    """Update the company with the latest data from dnb-service. This task should be called
     when some other logic interacts with dnb-service to get the company data as the task itself
     will not interact with dnb-service.
     """

@@ -10,8 +10,7 @@ from datahub.interaction.test.factories import CompanyInteractionFactory
 
 @pytest.fixture
 def dnb_response_non_uk():
-    """
-    Fixture for a record as returned by the dnb-service.
+    """Fixture for a record as returned by the dnb-service.
     """
     original_registration_description = 'Federal Taxpayer Identification Number (US)'
     return {
@@ -77,8 +76,7 @@ def dnb_response_non_uk():
 
 @pytest.fixture
 def dnb_company_updates_response_uk(dnb_response_uk):
-    """
-    Returns a UK based DNB company in the format of the "company update" API endpoint
+    """Returns a UK based DNB company in the format of the "company update" API endpoint
     for dnb-service.
     """
     return {
@@ -91,8 +89,7 @@ def dnb_company_updates_response_uk(dnb_response_uk):
 
 @pytest.fixture
 def dnb_company_search_datahub_companies():
-    """
-    Creates Data Hub companies for hydrating DNB search results with.
+    """Creates Data Hub companies for hydrating DNB search results with.
     """
     # Company with no interactions
     CompanyFactory(duns_number='1234567', id='6083b732-b07a-42d6-ada4-c8082293285b')
@@ -124,8 +121,7 @@ def dnb_company_search_datahub_companies():
 
 @pytest.fixture
 def base_company_dict():
-    """
-    A basic dictionary of values for defaulted Company fields - this should be used
+    """A basic dictionary of values for defaulted Company fields - this should be used
     as a foundation for `model_to_dict` comparisons.
     """
     return {

@@ -326,8 +326,7 @@ class TestSearchExportCountryHistory(APITestMixin):
         ),
     )
     def test_sorts_results(self, opensearch_with_collector, request_args, is_reversed):
-        """
-        Test sorting in various cases.
+        """Test sorting in various cases.
 
         Note that a filter is mandatory in this view, hence the test filters by company.
         """

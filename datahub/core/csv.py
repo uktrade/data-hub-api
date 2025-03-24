@@ -47,8 +47,7 @@ def create_csv_response(rows, field_titles, filename):
 
 
 def escape(payload):
-    """
-    Escape Potentially dangerous CSV payloads.
+    """Escape Potentially dangerous CSV payloads.
 
     This addresses a security issue identified here:
         https://owasp.org/www-community/attacks/CSV_Injection
@@ -78,8 +77,7 @@ def _transform_csv_row(row):
 
 
 def transform_csv_value(value):
-    """
-    Transforms values before they are written to a CSV file for better compatibility with Excel.
+    """Transforms values before they are written to a CSV file for better compatibility with Excel.
 
     In particular, datetimes are formatted in a way that results in better compatibility with
     Excel. Other values are passed through unchanged (the csv module automatically formats None

@@ -42,8 +42,7 @@ class PipelineItemFactory(factory.django.DjangoModelFactory):
 
     @to_many_field
     def contacts(self):
-        """
-        Contacts field.
+        """Contacts field.
         """
         return []
 

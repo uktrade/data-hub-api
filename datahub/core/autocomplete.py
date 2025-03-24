@@ -7,8 +7,7 @@ from django_filters import CharFilter
 
 
 class AutocompleteFilter(CharFilter):
-    """
-    Autocomplete filters that performs a prefix match of the specified search terms against a
+    """Autocomplete filters that performs a prefix match of the specified search terms against a
     set of fields.
 
     See the docstring for _apply_autocomplete_filter_to_queryset below for more details on how
@@ -16,8 +15,7 @@ class AutocompleteFilter(CharFilter):
     """
 
     def __init__(self, *args, search_fields=None, **kwargs):
-        """
-        Initialises the filter.
+        """Initialises the filter.
 
         The search_fields keyword argument specifies which fields to search and is required.
         """
@@ -43,8 +41,7 @@ def _apply_autocomplete_filter_to_queryset(
     search_string,
     priority_order_by=None,
 ):
-    """
-    Performs an autocomplete search.
+    """Performs an autocomplete search.
 
     search_string is split into tokens. Each token must match a prefix of a word in any of
     the following fields (case-insensitive) in any of the fields specified in autocomplete_fields.
@@ -96,7 +93,7 @@ def _apply_autocomplete_filter_to_queryset(
                 IntegerField(),
             ),
             _matched_field=_make_ordering_case_expression(
-                zip(autocomplete_fields, autocomplete_fields),
+                zip(autocomplete_fields, autocomplete_fields, strict=False),
                 escaped_tokens,
                 CharField(),
             ),
@@ -115,8 +112,7 @@ def _apply_autocomplete_filter_to_queryset(
 
 
 def _make_ordering_q_for_field(field, escaped_tokens):
-    r"""
-    Creates a Q object that checks if any of a list of tokens appears in a field (as a
+    r"""Creates a Q object that checks if any of a list of tokens appears in a field (as a
     prefix).
 
     For example::
@@ -134,8 +130,7 @@ def _make_ordering_q_for_field(field, escaped_tokens):
 
 
 def _make_filter_q_for_token(fields, escaped_token):
-    r"""
-    Creates a Q object that checks if a token appears in a list of fields (as a prefix).
+    r"""Creates a Q object that checks if a token appears in a list of fields (as a prefix).
 
     For example::
 
@@ -152,8 +147,7 @@ def _make_filter_q_for_token(fields, escaped_token):
 
 
 def _make_prefix_match_q(field, escaped_token):
-    r"""
-    Generates a Q object that performs a case-insensitive match of a token with prefixes
+    r"""Generates a Q object that performs a case-insensitive match of a token with prefixes
     of any of the words in a field.
 
     The \m in the regular expression means a word boundary (a word is defined as a unbroken
@@ -167,8 +161,7 @@ def _make_prefix_match_q(field, escaped_token):
 
 
 def _make_ordering_case_expression(sort_values_and_fields, escaped_tokens, output_field):
-    r"""
-    Returns a case expression that returns a specified value for the first search field
+    r"""Returns a case expression that returns a specified value for the first search field
     that is matched by any token from a list.
 
     For example::

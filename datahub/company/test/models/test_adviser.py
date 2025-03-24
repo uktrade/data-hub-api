@@ -24,8 +24,7 @@ pytestmark = pytest.mark.django_db
     ),
 )
 def test_get_email_domain(email, domain, db):
-    """
-    Test that the `Adviser.get_email_domain` method
+    """Test that the `Adviser.get_email_domain` method
     returns the domain for the given adviser's email.
     """
     adviser = AdviserFactory(email=email, contact_email=email)

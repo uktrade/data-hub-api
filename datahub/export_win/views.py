@@ -1,11 +1,9 @@
 import functools
 import logging
-
 from datetime import datetime
 
 from django.conf import settings
 from django.db.models import Case, Count, Max, Min, Q, Value, When
-
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import (
@@ -13,15 +11,13 @@ from django_filters.rest_framework import (
     Filter,
     FilterSet,
 )
-
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import AllowAny
-from rest_framework.views import exception_handler, Response
+from rest_framework.views import Response, exception_handler
 
 from datahub.core.schemas import StubSchema
-
 from datahub.core.viewsets import CoreViewSet
 from datahub.export_win.decorators import validate_script_and_html_tags
 from datahub.export_win.models import (
@@ -39,7 +35,6 @@ from datahub.export_win.tasks import (
     notify_export_win_email_by_rq_email,
     update_customer_response_token_for_email_notification_id,
 )
-
 
 logger = logging.getLogger(__name__)
 
@@ -156,8 +151,7 @@ class WinViewSet(CoreViewSet):
         return super().partial_update(request, *args, **kwargs)
 
     def perform_create(self, serializer):
-        """
-        Ensure instance with first sent and last sent dates
+        """Ensure instance with first sent and last sent dates
         is available to serializer.
         """
         instance = serializer.save()
@@ -190,8 +184,7 @@ class WinViewSet(CoreViewSet):
 
     @action(methods=['post'], detail=True, schema=StubSchema())
     def resend_export_win(self, request, *args, **kwargs):
-        """
-        Resend email manually via ITA dashboard
+        """Resend email manually via ITA dashboard
         """
         win = self.get_object()
         contact = win.company_contacts.first()

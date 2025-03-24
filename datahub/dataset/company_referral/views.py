@@ -4,8 +4,7 @@ from datahub.dataset.utils import filter_data_by_modified_date
 
 
 class CompanyReferralDatasetView(BaseFilterDatasetView):
-    """
-    A GET API view to return the data for all company referrals for syncing
+    """A GET API view to return the data for all company referrals for syncing
     by data flow periodically.
     """
 

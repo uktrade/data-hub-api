@@ -11,7 +11,6 @@ from datahub.company.test.factories import CompanyFactory
 from datahub.core.test_utils import AdminTestMixin, create_test_user
 from datahub.core.utils import reverse_with_query_string
 
-
 DNB_V2_SEARCH_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'v2/companies/search/')
 
 
@@ -28,13 +27,11 @@ def _get_review_changes_url(company, duns_number):
 
 
 class TestReviewChangesViewGet(AdminTestMixin):
-    """
-    Test the review changes view with GET requests.
+    """Test the review changes view with GET requests.
     """
 
     def test_permission_required(self):
-        """
-        Test that a user without permission to change companies gets a 403.
+        """Test that a user without permission to change companies gets a 403.
         """
         review_changes_url = _get_review_changes_url(CompanyFactory(), '123456789')
         user = create_test_user(
@@ -69,8 +66,7 @@ class TestReviewChangesViewGet(AdminTestMixin):
         ),
     )
     def test_validation_errors_rendered(self, data_overrides, expected_errors):
-        """
-        Test that validation errors are rendered as expected.
+        """Test that validation errors are rendered as expected.
         """
         review_changes_route_name = admin_urlname(Company._meta, 'dnb-link-review-changes')
         data = {
@@ -90,8 +86,7 @@ class TestReviewChangesViewGet(AdminTestMixin):
             assert expected_error in response.rendered_content
 
     def test_dh_company_already_linked_renders_error(self):
-        """
-        Test that a validation error is rendered if the Data Hub company is already D&B linked.
+        """Test that a validation error is rendered if the Data Hub company is already D&B linked.
         """
         review_changes_url = _get_review_changes_url(
             CompanyFactory(duns_number='123456789'),
@@ -105,8 +100,7 @@ class TestReviewChangesViewGet(AdminTestMixin):
         assert expected_error in response.rendered_content
 
     def test_duns_number_already_linked_renders_error(self):
-        """
-        Test that a validation error is rendered if the duns number has already been linked to a
+        """Test that a validation error is rendered if the duns number has already been linked to a
         Data Hub company.
         """
         duns_number = '123456789'
@@ -123,8 +117,7 @@ class TestReviewChangesViewGet(AdminTestMixin):
         assert expected_error in response.rendered_content
 
     def test_changes_returned(self, requests_mock, dnb_response):
-        """
-        Test that the review changes view renders proposed D&B changes.
+        """Test that the review changes view renders proposed D&B changes.
         """
         requests_mock.post(
             DNB_V2_SEARCH_URL,
@@ -142,13 +135,11 @@ class TestReviewChangesViewGet(AdminTestMixin):
 
 
 class TestReviewChangesViewPost(AdminTestMixin):
-    """
-    Test the review changes view with POST requests.
+    """Test the review changes view with POST requests.
     """
 
     def test_post(self, requests_mock, dnb_response):
-        """
-        Test that a post request to 'review changes' updates the company.
+        """Test that a post request to 'review changes' updates the company.
         """
         requests_mock.post(
             DNB_V2_SEARCH_URL,
@@ -172,8 +163,7 @@ class TestReviewChangesViewPost(AdminTestMixin):
 
 
 class TestReviewChangesViewDNBErrors(AdminTestMixin):
-    """
-    Test the review changes view - for both GET and POST - when dnb-service returns errors.
+    """Test the review changes view - for both GET and POST - when dnb-service returns errors.
     """
 
     @pytest.mark.parametrize(
@@ -191,8 +181,7 @@ class TestReviewChangesViewDNBErrors(AdminTestMixin):
         ),
     )
     def test_dnb_service_error(self, requests_mock, http_method, dnb_response_code):
-        """
-        Tests that the users get an error message if the dnb-service
+        """Tests that the users get an error message if the dnb-service
         doesn't return with a 200 status code.
         """
         requests_mock.post(
@@ -238,8 +227,7 @@ class TestReviewChangesViewDNBErrors(AdminTestMixin):
         search_results,
         expected_message,
     ):
-        """
-        Test if we get anything other than a single company from dnb-service,
+        """Test if we get anything other than a single company from dnb-service,
         we return an error message to the user.
         """
         requests_mock.post(
@@ -262,8 +250,7 @@ class TestReviewChangesViewDNBErrors(AdminTestMixin):
         requests_mock,
         dnb_response,
     ):
-        """
-        Tests that if the data returned from DNB does not clear DataHub validation, we show an
+        """Tests that if the data returned from DNB does not clear DataHub validation, we show an
         appropriate message to our users.
         """
         dnb_response['results'][0]['primary_name'] = None

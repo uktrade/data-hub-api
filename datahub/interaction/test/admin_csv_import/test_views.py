@@ -18,8 +18,8 @@ from datahub.company.test.factories import AdviserFactory
 from datahub.core.exceptions import DataHubError
 from datahub.core.test_utils import AdminTestMixin, create_test_user
 from datahub.interaction.admin_csv_import.cache_utils import (
-    _cache_key_for_token,
     CacheKeyType,
+    _cache_key_for_token,
     load_unmatched_rows_csv_contents,
 )
 from datahub.interaction.admin_csv_import.views import (
@@ -37,7 +37,6 @@ from datahub.interaction.test.admin_csv_import.utils import (
 )
 from datahub.interaction.test.utils import random_service
 
-
 import_interactions_url = reverse(
     admin_urlname(Interaction._meta, 'import'),
 )
@@ -53,8 +52,7 @@ class TestInteractionAdminChangeList(AdminTestMixin):
     """Tests for the contact admin change list."""
 
     def test_load_import_link_exists(self):
-        """
-        Test that there is a link to import interactions on the interaction change list page.
+        """Test that there is a link to import interactions on the interaction change list page.
         """
         response = self.client.get(interaction_change_list_url)
         assert response.status_code == status.HTTP_200_OK
@@ -62,8 +60,7 @@ class TestInteractionAdminChangeList(AdminTestMixin):
         assert import_interactions_url in response.rendered_content
 
     def test_import_link_does_not_exist_if_only_has_view_permission(self):
-        """
-        Test that there is not a link to import interactions if the user only has the delete
+        """Test that there is not a link to import interactions if the user only has the delete
         (but not change) permission for interactions.
         """
         user = create_test_user(
@@ -114,8 +111,7 @@ class TestAccessRestrictions(AdminTestMixin):
         assert response['Location'] == self.login_url_with_redirect(url)
 
     def test_permission_denied_if_staff_and_without_change_permission(self, url, http_method):
-        """
-        Test that the view returns a 403 response if the staff user does not have the
+        """Test that the view returns a 403 response if the staff user does not have the
         change interaction permission.
         """
         user = create_test_user(
@@ -159,8 +155,7 @@ class TestInvalidTokenRedirectView(AdminTestMixin):
         url,
         expected_message,
     ):
-        """
-        Test that the user is redirected to the change list and an error is displayed if the
+        """Test that the user is redirected to the change list and an error is displayed if the
         token is invalid.
         """
         # Note: Client.generic() doesn't support follow=True
@@ -183,8 +178,7 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
     """Tests for the import interaction select file form."""
 
     def test_displays_page_if_with_correct_permissions(self):
-        """
-        Test that the view returns displays the form if the user has the correct permissions.
+        """Test that the view returns displays the form if the user has the correct permissions.
         """
         response = self.client.get(import_interactions_url)
 
@@ -216,8 +210,7 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
         ]
 
     def test_rejects_large_files(self):
-        """
-        Test that large files are rejected.
+        """Test that large files are rejected.
 
         Note: INTERACTION_ADMIN_CSV_IMPORT_MAX_SIZE is set to 5 kB in config.settings.test
         """
@@ -278,8 +271,7 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
         assert response.context['num_errors_omitted'] == expected_num_errors_omitted
 
     def test_displays_no_matches_message_if_no_matches(self):
-        """
-        Test that if a valid file is uploaded but no records are matched to contacts,
+        """Test that if a valid file is uploaded but no records are matched to contacts,
         the import_no_matches.html template is used.
         """
         adviser = AdviserFactory()
@@ -335,8 +327,7 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
         monkeypatch,
         # _,
     ):
-        """
-        Test that if a valid file is uploaded and some records are matched to contacts,
+        """Test that if a valid file is uploaded and some records are matched to contacts,
         the import_preview.html template is used with an appropriate context.
         """
         max_preview_rows = 5
@@ -369,8 +360,7 @@ class TestImportInteractionsSaveView(AdminTestMixin):
     """Tests for the import interaction save view."""
 
     def test_raises_error_if_file_in_cache_is_invalid(self):
-        """
-        Test that if the file in the cache fails InteractionCSVForm re-validation,
+        """Test that if the file in the cache fails InteractionCSVForm re-validation,
         a DataHubError is raised.
 
         (This should not happen in normal circumstances.)
@@ -391,8 +381,7 @@ class TestImportInteractionsSaveView(AdminTestMixin):
             self.client.post(url)
 
     def test_creates_interactions(self):
-        """
-        Test that interactions are created if a valid token is provided, and that the
+        """Test that interactions are created if a valid token is provided, and that the
         user is redirected to the import complete page.
 
         Note: The full saving logic is tested in the InteractionCSVForm tests.

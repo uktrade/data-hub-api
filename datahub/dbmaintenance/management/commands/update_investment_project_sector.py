@@ -12,8 +12,7 @@ class Command(CSVBaseCommand):
 
     @lru_cache(maxsize=None)
     def get_sector(self, sector_id):
-        """
-        :param company_id: uuid of the company
+        """:param company_id: uuid of the company
         :return: instance of Company with id == company_id if it exists,
             None otherwise
         """
@@ -26,8 +25,7 @@ class Command(CSVBaseCommand):
         investment_project,
         old_sector,
     ):
-        """
-        Checks if Investment project should be updated.
+        """Checks if Investment project should be updated.
 
         :param investment_project: instance of InvestmentProject
         :param old_sector: instance of Company or None

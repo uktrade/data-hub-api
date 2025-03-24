@@ -1,7 +1,8 @@
 from datahub.export_win import models
 from datahub.metadata.registry import registry
 from datahub.metadata.serializers import (
-    HQTeamRegionOrPostSerializer, HVCSerializer,
+    HQTeamRegionOrPostSerializer,
+    HVCSerializer,
 )
 
 registry.register(

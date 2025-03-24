@@ -8,7 +8,7 @@ from datahub.notification.constants import DEFAULT_SERVICE_NAME, NotifyServiceNa
 from datahub.notification.tasks import send_email_notification
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_rq_get_current_job(monkeypatch):
     mock_notification_tasks_get_current_job = mock.Mock()
     monkeypatch.setattr(
@@ -28,8 +28,7 @@ def mock_rq_get_current_job(monkeypatch):
     ),
 )
 def test_send_email_notification(context, service_name):
-    """
-    Test the send_email_notification utility.
+    """Test the send_email_notification utility.
     """
     expected_service_name = service_name or DEFAULT_SERVICE_NAME
     notification_api_client = notify_gateway.clients[expected_service_name]
@@ -65,8 +64,7 @@ def test_send_email_notification_retries_errors(
         expect_retry,
         get_current_job_return_none,
 ):
-    """
-    Test the send_email_notification utility.
+    """Test the send_email_notification utility.
     """
     notification_api_client = notify_gateway.clients[DEFAULT_SERVICE_NAME]
     # Set up an HTTPError with the parametrized status code

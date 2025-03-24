@@ -2,7 +2,6 @@ import datetime
 from importlib import import_module
 from unittest.mock import MagicMock
 
-
 from django.apps import apps
 
 from datahub.company.test.factories import AdviserFactory

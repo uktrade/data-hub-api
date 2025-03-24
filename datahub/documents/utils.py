@@ -2,7 +2,6 @@ from functools import lru_cache
 from logging import getLogger
 
 import boto3
-
 from django.apps import apps
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
@@ -11,13 +10,11 @@ from django.core.exceptions import ObjectDoesNotExist
 from datahub.core.exceptions import DataHubError
 from datahub.documents.exceptions import DocumentDeleteException
 
-
 logger = getLogger(__name__)
 
 
 def get_document_by_pk(document_pk):
-    """
-    Get Document by pk.
+    """Get Document by pk.
 
     This is to avoid circular imports from av_scan and tasks.
     """
@@ -72,8 +69,7 @@ def sign_s3_url(bucket_id, key, method='get_object', expires=3600):
 
 
 def perform_delete_document(document_pk):
-    """
-    Deletes Document and corresponding S3 file.
+    """Deletes Document and corresponding S3 file.
 
     :raises: DocumentDeleteException if document:
         - doesn't have status=UploadStatus.DELETION_PENDING

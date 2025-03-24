@@ -40,8 +40,7 @@ def get_basic_search_query(
     fields_to_exclude=None,
     fuzzy=False,
 ):
-    """
-    Performs basic search for the given term in the given entity using the SEARCH_FIELDS.
+    """Performs basic search for the given term in the given entity using the SEARCH_FIELDS.
     It also returns number of results in other entities.
 
     :param permission_filters_by_entity: List of pairs of entities and corresponding permission
@@ -112,8 +111,7 @@ def get_search_by_entities_query(
     fields_to_include=None,
     fields_to_exclude=None,
 ):
-    """
-    Performs filtered search for the given term across given entities.
+    """Performs filtered search for the given term across given entities.
     """
     filter_data = filter_data or {}
     query = []
@@ -190,10 +188,9 @@ def _clip_limit(offset, limit):
 
 
 def _build_global_permission_query(permission_filters_by_entity):
-    """
-    Returns the filter query to use to enforce permissions in global search.
+    """Returns the filter query to use to enforce permissions in global search.
 
-    See also:
+    See Also:
         get_basic_search_query()
 
     """
@@ -247,8 +244,7 @@ def _build_entity_permission_query(permission_filters):
 
 
 def _build_term_query(term, fields=None, fuzzy=False):
-    """
-    Builds a term query depending on the value of the fuzzy arg.
+    """Builds a term query depending on the value of the fuzzy arg.
 
     If the fuzzy argument is true, then we use fuzzy matching,
     otherwise uses the old matching method.
@@ -281,8 +277,7 @@ def _build_basic_term_query(term, fields=None):
 
 
 def _build_fuzzy_term_query(term, fields=None):
-    """
-    Builds a fuzzy term query that matches with minor spelling errors etc.
+    """Builds a fuzzy term query that matches with minor spelling errors etc.
 
     We use trigram fields as they are suitable indicator for fields that can be fuzzy
     matched.
@@ -348,8 +343,7 @@ def _build_exists_query(field, value):
 
 
 def _build_single_field_query(field, value):
-    """
-    Used by _build_field_query and always expecting value as a single value.
+    """Used by _build_field_query and always expecting value as a single value.
     You should never need to use this, it's more likely you want _build_field_query instead.
     """
     if field.endswith('_exists'):
@@ -378,8 +372,7 @@ def _build_field_query(field, value):
 
 
 def _build_field_queries(filters):
-    """
-    Builds field queries.
+    """Builds field queries.
     Same as _build_field_query but expects a dict of field/values and returns a list of queries.
     """
     return [_build_field_query(field, value) for field, value in filters.items()]

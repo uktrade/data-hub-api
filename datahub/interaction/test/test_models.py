@@ -33,8 +33,7 @@ class TestInteractionExportCountry:
 
     @pytest.mark.django_db
     def test_unique_constraint(self):
-        """
-        Test unique constraint
+        """Test unique constraint
         a interaction and country combination can't be added more than once
         """
         interaction = CompanyInteractionFactory()
@@ -57,8 +56,7 @@ class TestInteraction:
     """Tests for the Interaction model."""
 
     def test_save(self):
-        """
-        Test save also saves to the `CompanyActivity` model.
+        """Test save also saves to the `CompanyActivity` model.
         Test save does not save to the `CompanyActivity` model if it already exists.
         """
         assert not CompanyActivity.objects.all().exists()

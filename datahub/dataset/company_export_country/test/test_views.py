@@ -1,13 +1,9 @@
 from datetime import datetime, timezone
 
 import pytest
-
 from django.urls import reverse
-
 from freezegun import freeze_time
-
 from rest_framework import status
-
 
 from datahub.company.test.factories import CompanyExportCountryFactory
 from datahub.core.test_utils import format_date_or_datetime
@@ -29,8 +25,7 @@ def get_expected_data_from_company_export_country(company_export_country):
 
 @pytest.mark.django_db
 class TestCompanyExportCountryDatasetView(BaseDatasetViewTest):
-    """
-    Tests for CompanyExportCountryDatasetView
+    """Tests for CompanyExportCountryDatasetView
     """
 
     factory = CompanyExportCountryFactory

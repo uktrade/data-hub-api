@@ -1,10 +1,8 @@
 import datetime
 import uuid
-
 from operator import attrgetter, itemgetter
 
 import pytest
-
 from dateutil.parser import parse
 from django.utils.timezone import now
 from faker import Faker
@@ -65,8 +63,7 @@ class TestAddExport(APITestMixin):
         }
 
     def test_missing_mandatory_fields_return_expected_error(self):
-        """
-        Test when mandatory fields are not provided these fields are included in the
+        """Test when mandatory fields are not provided these fields are included in the
         error response
         """
         url = reverse('api-v4:export:collection')
@@ -91,8 +88,7 @@ class TestAddExport(APITestMixin):
         }
 
     def test_too_many_team_members_return_expected_error(self):
-        """
-        Test when the number of team_members provided is above the maximum allowed, the response
+        """Test when the number of team_members provided is above the maximum allowed, the response
         contains this error message
         """
         url = reverse('api-v4:export:collection')
@@ -227,8 +223,7 @@ class TestListExport(APITestMixin):
     def test_list_export_request_user_not_owner_user_is_a_team_member_returns_success_with_results(
         self,
     ):
-        """
-        Test a LIST with an export that has the current user as a team member returns only that
+        """Test a LIST with an export that has the current user as a team member returns only that
         item
         """
         export = ExportFactory(
@@ -244,8 +239,7 @@ class TestListExport(APITestMixin):
     def test_list_export_request_user_is_owner_user_not_a_team_member_returns_success_with_results(
         self,
     ):
-        """
-        Test a LIST with an export that has the current user as the owner returns only that
+        """Test a LIST with an export that has the current user as the owner returns only that
         item
         """
         export = ExportFactory(owner=self.user, team_members=[AdviserFactory()])
@@ -253,8 +247,7 @@ class TestListExport(APITestMixin):
         self._assert_export_list_success([export])
 
     def test_list_export_request_user_is_owner_user_is_a_team_member_returns_success(self):
-        """
-        Test a LIST with an export that has the current user as the owner and a team member
+        """Test a LIST with an export that has the current user as the owner and a team member
         returns only that item
         """
         export = ExportFactory(
@@ -270,8 +263,7 @@ class TestListExport(APITestMixin):
     def test_list_multiple_exports_request_user_is_owner_user_is_a_team_member_returns_success(
         self,
     ):
-        """
-        Test a LIST with a combination of exports where the current user is the owner, team member
+        """Test a LIST with a combination of exports where the current user is the owner, team member
         and both returns only those items
         """
         export_owner_only = ExportFactory(
@@ -319,8 +311,7 @@ class TestListExport(APITestMixin):
         limit,
         expected_count,
     ):
-        """
-        Test a request with pagination criteria returns expected export results
+        """Test a request with pagination criteria returns expected export results
         """
         ExportFactory.create_batch(batch_size, owner=self.user, team_members=[self.user])
 
@@ -350,8 +341,7 @@ class TestPatchExport(APITestMixin):
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     def test_patch_too_many_team_members_return_expected_error(self):
-        """
-        Test when the number of team_members provided is above the maximum allowed, the response
+        """Test when the number of team_members provided is above the maximum allowed, the response
         contains this error message
         """
         export = ExportFactory()
@@ -364,8 +354,7 @@ class TestPatchExport(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_patch_success(self):
-        """
-        Test a PATCH request with a known export id provides a success response
+        """Test a PATCH request with a known export id provides a success response
         """
         modified_date = now()
         with freeze_time(modified_date):
@@ -442,8 +431,7 @@ class TestDeleteExport(APITestMixin):
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     def test_delete_success(self):
-        """
-        Test a DELETE request with a known export id provides a success response, and
+        """Test a DELETE request with a known export id provides a success response, and
         request with the same id returns the item archived
         """
         export = ExportFactory()

@@ -10,7 +10,7 @@ from django.utils.functional import cached_property
 from django.utils.timezone import now
 
 from datahub.core import reversion
-from datahub.core.utils import join_truthy_strings, StrEnum
+from datahub.core.utils import StrEnum, join_truthy_strings
 from datahub.metadata import models as metadata_models
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
@@ -165,14 +165,12 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
         send_mail(subject, message, from_email, [self.get_current_email()], **kwargs)
 
     def get_current_email(self):
-        """
-        :returns: the most up-to-date email address for this adviser.
+        """:returns: the most up-to-date email address for this adviser.
         """
         return self.contact_email or self.email
 
     def get_email_domain(self):
-        """
-        :returns: Domain for adviser's current email.
+        """:returns: Domain for adviser's current email.
         """
         email = self.get_current_email()
         try:
@@ -183,8 +181,7 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
 
     @cached_property
     def active_features(self):
-        """
-        :returns: Features that are currently active.
+        """:returns: Features that are currently active.
         """
         features = []
         for feature_group in self.feature_groups.filter(is_active=True):
@@ -197,7 +194,6 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
 
     @cached_property
     def active_feature_groups(self):
-        """
-        :returns: Feature groups that are currently active.
+        """:returns: Feature groups that are currently active.
         """
         return self.feature_groups.filter(is_active=True).values_list('code', flat=True)

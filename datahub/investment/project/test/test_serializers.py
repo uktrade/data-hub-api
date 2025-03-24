@@ -15,7 +15,6 @@ from datahub.investment.project.test.factories import (
     InvestmentProjectTeamMemberFactory,
 )
 
-
 pytestmark = pytest.mark.django_db
 
 

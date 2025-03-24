@@ -21,8 +21,7 @@ class BaseQuoteViewSet(BaseNestedOrderViewSet):
     queryset = Quote.objects.none()
 
     def get_object(self):
-        """
-        :returns: the quote related to the order.
+        """:returns: the quote related to the order.
 
         :raises Http404: if the quote doesn't exist
         """

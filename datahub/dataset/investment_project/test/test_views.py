@@ -35,7 +35,7 @@ pytestmark = pytest.mark.django_db
 def ist_adviser():
     """Provides IST adviser."""
     team = TeamFactory(tags=[Team.Tag.INVESTMENT_SERVICES_TEAM])
-    yield AdviserFactory(dit_team_id=team.id)
+    return AdviserFactory(dit_team_id=team.id)
 
 
 @pytest.fixture
@@ -83,7 +83,7 @@ def propositions(ist_adviser):
 
         items[2].abandon(by=adviser, details='what')
 
-    yield items
+    return items
 
 
 def get_expected_data_from_project(project, won_date=None):
@@ -211,8 +211,7 @@ def get_expected_data_from_project(project, won_date=None):
 
 @pytest.mark.django_db
 class TestInvestmentProjectsDatasetViewSet(BaseDatasetViewTest):
-    """
-    Tests for InvestmentProjectsDatasetView
+    """Tests for InvestmentProjectsDatasetView
     """
 
     view_url = reverse('api-v4:dataset:investment-projects-dataset')
@@ -297,8 +296,7 @@ class TestInvestmentProjectsDatasetViewSet(BaseDatasetViewTest):
 
 
 class TestInvestmentProjectsActivityDatasetViewSet(BaseDatasetViewTest):
-    """
-    Tests for InvestmentProjectsActivityDatasetView
+    """Tests for InvestmentProjectsActivityDatasetView
 
     It only tests if results are being returned. The results are validated in separate tests
     in the investment project app.

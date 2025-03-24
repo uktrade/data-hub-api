@@ -1,6 +1,7 @@
 import time
 from logging import getLogger
 from typing import Callable, TypeVar
+
 logger = getLogger(__name__)
 T = TypeVar('T')
 

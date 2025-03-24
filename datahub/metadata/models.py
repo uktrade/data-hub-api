@@ -12,17 +12,18 @@ from datahub.core import reversion
 from datahub.core.exceptions import DataHubError
 from datahub.core.fields import MultipleChoiceField
 from datahub.core.models import (
-    BaseConstantModel, BaseModel, BaseOrderedConstantModel, DisableableModel,
+    BaseConstantModel,
+    BaseModel,
+    BaseOrderedConstantModel,
+    DisableableModel,
 )
 from datahub.core.utils import join_truthy_strings
-
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
 class _MPTTObjectName:
-    """
-    This adds a cached property "name" to the model that gets a full name
+    """This adds a cached property "name" to the model that gets a full name
     of the object using parent.
     """
 
@@ -176,8 +177,7 @@ class ExchangeRate(BaseModel):
 
 
 class AdministrativeArea(BaseConstantModel):
-    """
-    States, provinces etc. within a country.
+    """States, provinces etc. within a country.
 
     This is used by Market Access (but is not currently used in Data Hub CRM).
     """
@@ -191,8 +191,7 @@ class AdministrativeArea(BaseConstantModel):
     area_name = models.CharField(blank=True, max_length=255)
 
     def __str__(self):
-        """
-        To make this clearer for anyone using the admin drop down on this data
+        """To make this clearer for anyone using the admin drop down on this data
         """
         return f'{self.name} ({self.country.name})'
 
@@ -215,8 +214,7 @@ class TeamRole(BaseConstantModel):
 
 
 class Team(BaseConstantModel):
-    """
-    Team.
+    """Team.
 
     Additional indexes created via migrations:
 
@@ -259,8 +257,7 @@ class Team(BaseConstantModel):
 
 
 class Service(MPTTModel, _MPTTObjectName, BaseOrderedConstantModel):
-    """
-    Service.
+    """Service.
 
     Services use a tree structure managed by `django-mptt` so that we can group services that
     are somewhat related and make it easier to find them.

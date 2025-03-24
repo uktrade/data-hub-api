@@ -6,7 +6,6 @@ from dateutil.parser import parse as dateutil_parse
 from datahub.company.test.factories import AdviserFactory
 from datahub.omis.quote.models import Quote, TermsAndConditions
 
-
 # mark the whole module for db use
 pytestmark = pytest.mark.django_db
 
@@ -23,8 +22,7 @@ class TestQuoteManager:
         mocked_generate_quote_reference,
         mocked_calculate_quote_expiry_date,
     ):
-        """
-        Test that Quote.objects.create_from_order creates a quote
+        """Test that Quote.objects.create_from_order creates a quote
         and commits the changes.
         """
         expiry_date = dateutil_parse('2030-01-01').date()
@@ -56,8 +54,7 @@ class TestQuoteManager:
         mocked_generate_quote_reference,
         mocked_calculate_quote_expiry_date,
     ):
-        """
-        Test that Quote.objects.create_from_order with commit=False builds a quote
+        """Test that Quote.objects.create_from_order with commit=False builds a quote
         but doesn't commit the changes.
         """
         expiry_date = dateutil_parse('2030-01-01').date()

@@ -11,8 +11,7 @@ from datahub.metadata.query_utils import get_service_name_subquery
 
 
 class EventsDatasetView(BaseFilterDatasetView):
-    """
-    An APIView that provides 'get' action to return desired fields for
+    """An APIView that provides 'get' action to return desired fields for
     Events Dataset to be consumed by Data-flow periodically. Data-flow uses
     response result to insert data into Dataworkspace through its defined API endpoints.
     """

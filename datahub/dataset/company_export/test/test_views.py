@@ -5,8 +5,7 @@ from django.urls import reverse
 from freezegun import freeze_time
 from rest_framework import status
 
-from datahub.company.test.factories import ContactFactory
-from datahub.company.test.factories import ExportFactory
+from datahub.company.test.factories import ContactFactory, ExportFactory
 from datahub.core.test_utils import format_date_or_datetime, get_attr_or_none
 from datahub.dataset.core.test import BaseDatasetViewTest
 
@@ -50,8 +49,7 @@ def get_expected_data_from_company_export(export):
 
 @pytest.mark.django_db
 class TestCompanyExportDatasetViewSet(BaseDatasetViewTest):
-    """
-    Tests for CompanyExportDatasetView
+    """Tests for CompanyExportDatasetView
     """
 
     view_url = reverse('api-v4:dataset:company-export-dataset')

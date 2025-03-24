@@ -2,7 +2,6 @@ import uuid
 from unittest.mock import Mock
 
 import pytest
-
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import Group
 from django.test import RequestFactory
@@ -14,10 +13,12 @@ from datahub.export_win.admin import (
     AnonymousWinAdminForm,
     BreakdownInlineForm,
     CustomerResponseInlineForm,
-    DeletedWinAdmin, WinAdmin,
+    DeletedWinAdmin,
+    WinAdmin,
     WinAdminForm,
     WinAdviserAdmin,
-    WinSoftDeletedAdminForm)
+    WinSoftDeletedAdminForm,
+)
 from datahub.export_win.models import DeletedWin, Win, WinAdviser
 from datahub.export_win.tasks import (
     notify_export_win_email_by_rq_email,
@@ -25,7 +26,10 @@ from datahub.export_win.tasks import (
     update_customer_response_token_for_email_notification_id,
 )
 from datahub.export_win.test.factories import (
-    CustomerResponseFactory, WinAdviserFactory, WinFactory)
+    CustomerResponseFactory,
+    WinAdviserFactory,
+    WinFactory,
+)
 from datahub.notification.constants import NotifyServiceName
 
 
@@ -206,8 +210,7 @@ def test_has_view_permission_for_anonymous_wins(admin):
 
 @pytest.mark.django_db
 def test_get_queryset():
-    """
-    Test to get winadviser
+    """Test to get winadviser
     And only show winadviser where win is not deleted
     """
     deleted_win1 = WinFactory(is_deleted=False)
@@ -238,7 +241,7 @@ def test_get_computed_adviser_name_legacy_adviser():
     assert admin_instance.get_computed_adviser_name(win_adviser) == 'John Smith'
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_job_scheduler(monkeypatch):
     mock_job_scheduler = Mock()
     monkeypatch.setattr(
@@ -318,8 +321,7 @@ class TestAnonymousWinAdminForm:
         self,
         mock_job_scheduler,
     ):
-        """
-        Test for notify anonymous wins adviser as contact
+        """Test for notify anonymous wins adviser as contact
 
         It should schedule a task to:
             * notify an adviser
@@ -407,8 +409,7 @@ class InstanceMock:
 
 @pytest.mark.django_db
 class TestCustomerResponseInlineForm:
-    """
-    Test for Customer Response in line form
+    """Test for Customer Response in line form
     Field name is not required and field id should be read-only
     """
 

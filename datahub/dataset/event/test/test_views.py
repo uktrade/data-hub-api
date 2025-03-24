@@ -41,8 +41,7 @@ def get_expected_data_from_event(event):
 
 @pytest.mark.django_db
 class TestEventDatasetViewSet(BaseDatasetViewTest):
-    """
-    Tests for the events dataset endpoint
+    """Tests for the events dataset endpoint
     """
 
     view_url = reverse('api-v4:dataset:events-dataset')

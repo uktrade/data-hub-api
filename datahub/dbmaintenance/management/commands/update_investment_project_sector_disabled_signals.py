@@ -16,8 +16,7 @@ class Command(CSVBaseCommand):
 
     @disable_search_signal_receivers(InvestmentProject)
     def _handle(self, *args, **options):
-        """
-        Disables search signal receivers for investment projects.
+        """Disables search signal receivers for investment projects.
         Avoid queuing huge number of RQ tasks for syncing investment projects to OpenSearch.
         (Syncing can be manually performed afterwards using sync_search if required.)
         """

@@ -1,17 +1,14 @@
 import uuid
-
 from datetime import timedelta
 
 from django.conf import settings
 from django.db import models
 
-
 from datahub.company.models import Advisor
 from datahub.company.models.company import Company
-
 from datahub.core import reversion
 from datahub.core.models import ArchivableModel, BaseModel
-from datahub.core.utils import get_front_end_url, StrEnum
+from datahub.core.utils import StrEnum, get_front_end_url
 from datahub.interaction.models import Interaction
 from datahub.investment.project.models import InvestmentProject
 
@@ -86,8 +83,7 @@ class Task(ArchivableModel, BaseModel):
         return get_front_end_url(self)
 
     def get_company(self):
-        """
-        Get the company from the available foreign keys
+        """Get the company from the available foreign keys
         """
         if self.investment_project:
             return self.investment_project.investor_company

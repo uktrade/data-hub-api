@@ -34,8 +34,7 @@ class EvidenceDocumentViewSet(BaseEntityDocumentModelViewSet):
     )
 
     def initial(self, request, *args, **kwargs):
-        """
-        Raise an Http404 if there is no project corresponding to the project ID specified in
+        """Raise an Http404 if there is no project corresponding to the project ID specified in
         the URL path.
         """
         super().initial(request, *args, **kwargs)

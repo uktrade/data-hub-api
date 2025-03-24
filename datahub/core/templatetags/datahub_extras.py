@@ -10,8 +10,7 @@ register = template.Library()
 
 @register.simple_tag
 def verbose_name_for_count(count, model_meta):
-    """
-    Template tag similar to the pluralize filter but for model verbose names.
+    """Template tag similar to the pluralize filter but for model verbose names.
 
     Picks verbose_name or verbose_name_plural from a model _meta object based on a count passed
     in.
@@ -25,8 +24,7 @@ def verbose_name_for_count(count, model_meta):
 
 @register.simple_tag
 def admin_change_link(obj, target_blank=False):
-    """
-    Template filter to generate the URL to the admin change page for a model object.
+    """Template filter to generate the URL to the admin change page for a model object.
 
     Usage examples:
 
@@ -47,8 +45,7 @@ def admin_change_link(obj, target_blank=False):
 
 @register.filter
 def admin_change_url(obj):
-    """
-    Template filter to generate the URL to the admin change page for a model object.
+    """Template filter to generate the URL to the admin change page for a model object.
 
     Usage example:
 

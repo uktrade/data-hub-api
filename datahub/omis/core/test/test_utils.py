@@ -10,8 +10,7 @@ class TestGenerateReference:
     """Tests for the generate_reference utility function."""
 
     def test_defaults(self):
-        """
-        Test that it returns the value from its `gen` if the value
+        """Test that it returns the value from its `gen` if the value
         hasn't been used before.
         """
         model = mock.Mock()
@@ -21,8 +20,7 @@ class TestGenerateReference:
         assert reference == 'something'
 
     def test_with_prefix(self):
-        """
-        Test that if a prefix is specified, it will be used to generate the reference.
+        """Test that if a prefix is specified, it will be used to generate the reference.
         """
         model = mock.Mock()
         model.objects.filter().exists.return_value = False
@@ -31,8 +29,7 @@ class TestGenerateReference:
         assert reference == 'pref/something'
 
     def test_with_collision(self):
-        """
-        Test that if gen returns a collision, the next available generated value
+        """Test that if gen returns a collision, the next available generated value
         is used instead.
         """
         model = mock.Mock()
@@ -44,8 +41,7 @@ class TestGenerateReference:
         assert reference == '2nd try'
 
     def test_max_retries_reached(self):
-        """
-        Test that if there are n max collisions, the function raises RuntimeError.
+        """Test that if there are n max collisions, the function raises RuntimeError.
         """
         model = mock.Mock()
         model.objects.filter().exists.side_effect = [True] * 10
@@ -69,8 +65,7 @@ class TestGenerateDateTimeBasedReference:
 
     @freeze_time('2017-04-18 13:00:00')
     def test_with_prefix(self):
-        """
-        Test that if a prefix is specified, it will be used to generate the reference.
+        """Test that if a prefix is specified, it will be used to generate the reference.
         """
         model = mock.Mock()
         model.objects.select_for_update().filter.return_value = []
@@ -81,8 +76,7 @@ class TestGenerateDateTimeBasedReference:
 
     @freeze_time('2017-04-18 13:00:00')
     def test_with_collision(self):
-        """
-        Test that if there's already a record with that reference, the seq part is incremented.
+        """Test that if there's already a record with that reference, the seq part is incremented.
         """
         model = mock.Mock()
         model.objects.select_for_update().filter.return_value = []
@@ -93,8 +87,7 @@ class TestGenerateDateTimeBasedReference:
 
     @freeze_time('2017-04-18 13:00:00')
     def test_non_first_record_of_day(self):
-        """
-        Test that if there are already some record for that day,
+        """Test that if there are already some record for that day,
         the seq part starts counting from the next number.
         """
         model = mock.Mock()
@@ -105,8 +98,7 @@ class TestGenerateDateTimeBasedReference:
         assert reference == '201704180003'
 
     def test_max_retries_reached(self):
-        """
-        Test that if there are n max collisions, the function raises RuntimeError.
+        """Test that if there are n max collisions, the function raises RuntimeError.
         """
         model = mock.Mock()
         model.objects.select_for_update().filter.return_value = []

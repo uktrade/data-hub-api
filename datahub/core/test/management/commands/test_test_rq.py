@@ -3,7 +3,6 @@ from datetime import datetime
 from unittest import mock
 
 import pytest
-
 from django.core.management import call_command
 
 from datahub.core.queues.errors import RetryError

@@ -1,11 +1,10 @@
 import pytest
 
-from datahub.omis.payment.govukpay import govuk_url, GOVUKPayAPIException, PayClient
+from datahub.omis.payment.govukpay import GOVUKPayAPIException, PayClient, govuk_url
 
 
 def test_govuk_url(settings):
-    """
-    Test that the url to a GOV.UK endpoint is built from the value base
+    """Test that the url to a GOV.UK endpoint is built from the value base
     in the django settings.
     """
     settings.GOVUK_PAY_URL = 'http://test.example.com/'

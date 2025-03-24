@@ -118,8 +118,7 @@ class Document(BaseModel, ArchivableModel):
         return self.status
 
     def get_signed_url(self, allow_unsafe=False):
-        """
-        Generate pre-signed download URL.
+        """Generate pre-signed download URL.
 
         URL is generated when either file has passed virus scanning (av_clean=True)
         or allow_unsafe is set.
@@ -167,8 +166,7 @@ class EntityDocumentManager(models.Manager):
         return super().get_queryset().exclude(document__status=UploadStatus.DELETION_PENDING)
 
     def include_objects_deletion_pending(self):
-        """
-        Gets query set for all objects.
+        """Gets query set for all objects.
 
         (including objects with document having deletion pending as status).
         """
@@ -181,8 +179,7 @@ class EntityDocumentManager(models.Manager):
 
 
 class AbstractEntityDocumentModel(BaseModel):
-    """
-    Base document model.
+    """Base document model.
 
     Entity document having its corresponding document with status=UPLOAD_STATUSES_deletion_pending
     should not be included in the responses to clients. This is achieved in EntityDocumentManager,

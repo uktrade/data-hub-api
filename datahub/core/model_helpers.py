@@ -1,5 +1,4 @@
-"""
-Contains various utilities and helper functions for working with models.
+"""Contains various utilities and helper functions for working with models.
 
 (This module is named model_helpers rather than model_utils as we were previously
 using a third-party package called model_utils.)
@@ -7,8 +6,7 @@ using a third-party package called model_utils.)
 
 
 def get_m2m_model(model, field_name):
-    """
-    Gets the many-to-many through model for a many-to-many field.
+    """Gets the many-to-many through model for a many-to-many field.
 
     This is rarely needed, but can be useful in rare cases when a hidden many-to-many
     through model automatically created by Django needs to be accessed.
@@ -17,8 +15,7 @@ def get_m2m_model(model, field_name):
 
 
 def get_related_fields(model):
-    """
-    Returns all the fields of `model` that hold the link between referencing objects
+    """Returns all the fields of `model` that hold the link between referencing objects
     and the referenced object (`model`).
 
     :param model: orphaned model class
@@ -34,8 +31,7 @@ def get_related_fields(model):
 
 
 def get_self_referential_relations(model):
-    """
-    Returns all fields of `model` that refer back to `model`.
+    """Returns all fields of `model` that refer back to `model`.
 
     :param model: model class
     :returns: list of self-referential fields of `model`

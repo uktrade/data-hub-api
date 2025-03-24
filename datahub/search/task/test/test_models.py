@@ -2,7 +2,6 @@ import pytest
 
 from datahub.interaction.test.factories import InteractionFactoryBase
 from datahub.investment.project.test.factories import InvestmentProjectFactory
-
 from datahub.search.task.apps import TaskSearchApp
 from datahub.search.task.models import Task
 from datahub.task.models import Task as TaskModel

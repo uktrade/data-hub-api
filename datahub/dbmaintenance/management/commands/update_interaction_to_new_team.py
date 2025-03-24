@@ -10,8 +10,7 @@ logger = getLogger(__name__)
 
 
 class Command(CSVBaseCommand):
-    """
-    Command to update an interaction advisers to a new team.
+    """Command to update an interaction advisers to a new team.
 
     Requires a CSV with a row of interaction ids to update.
     Must specify a `team_id` for updating the team on the InteractionDITParticipant.

@@ -5,8 +5,7 @@ from datahub.user.company_list.models import PipelineItem
 
 
 class PipelineItemsDatasetView(BaseDatasetView):
-    """
-    A GET API view to return pipeline item data for syncing by data-flow periodically.
+    """A GET API view to return pipeline item data for syncing by data-flow periodically.
     """
 
     def get_dataset(self):

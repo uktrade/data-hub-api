@@ -8,8 +8,7 @@ logger = getLogger(__name__)
 
 
 class SignalReceiver:
-    """
-    Helper class for managing signal receivers in search apps.
+    """Helper class for managing signal receivers in search apps.
 
     Instances of this class are intended to be used with the automatic signal receiver
     connection and disconnection mechanism of the search apps.
@@ -58,8 +57,7 @@ class SignalReceiver:
         self.is_connected = False
 
     def enable(self):
-        """
-        Enables a previously disabled signal receiver for the current thread.
+        """Enables a previously disabled signal receiver for the current thread.
 
         This only affects connected signal receivers. Connected signal receivers
         default to being enabled.
@@ -67,8 +65,7 @@ class SignalReceiver:
         self._thread_locals.enabled = True
 
     def disable(self):
-        """
-        Disables a signal receiver for the current thread.
+        """Disables a signal receiver for the current thread.
 
         This only affects connected signal receivers.
         """
@@ -76,8 +73,7 @@ class SignalReceiver:
 
     @property
     def is_enabled(self):
-        """
-        Whether the signal receiver is enabled for the current thread.
+        """Whether the signal receiver is enabled for the current thread.
 
         A signal receiver must also be connected for it to receive signals.
         """
@@ -94,8 +90,7 @@ class SignalReceiver:
 
 @contextmanager
 def disable_search_signal_receivers(sender):
-    """
-    Context manager that disables search signals receivers for a particular sender (e.g. a model).
+    """Context manager that disables search signals receivers for a particular sender (e.g. a model).
 
     This disables any signal receivers for the specified sender in all search apps (and not just
     the search app corresponding to the specified sender). For example, specifying Company will

@@ -1,7 +1,7 @@
 from datahub.search.test.search_support.models import SimpleModel
 from datahub.search.test.search_support.simplemodel import SimpleModelSearchApp
 from datahub.search.test.search_support.simplemodel.serializers import SearchSimpleModelSerializer
-from datahub.search.views import register_v3_view, SearchAPIView, SearchExportAPIView
+from datahub.search.views import SearchAPIView, SearchExportAPIView, register_v3_view
 
 
 class SearchSimpleModelAPIViewMixin:

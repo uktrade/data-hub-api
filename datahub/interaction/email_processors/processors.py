@@ -24,7 +24,6 @@ from datahub.interaction.email_processors.utils import (
 from datahub.interaction.models import Interaction
 from datahub.interaction.serializers import InteractionSerializer
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -51,8 +50,7 @@ EXCEPTION_NOTIFY_MESSAGES = {
 
 
 def _flatten_serializer_errors_to_list(serializer_errors):
-    """
-    Flatten DRF Serializer validation errors to a list with one field per item.
+    """Flatten DRF Serializer validation errors to a list with one field per item.
     """
     field_errors = []
     for field_name, details in serializer_errors.items():
@@ -62,16 +60,14 @@ def _flatten_serializer_errors_to_list(serializer_errors):
 
 
 def _filter_contacts_to_single_company(contacts, company):
-    """
-    Given a list of contacts and a company, return all of the contacts who are
+    """Given a list of contacts and a company, return all of the contacts who are
     attributed to that company.
     """
     return [contact for contact in contacts if contact.company == company]
 
 
 def _get_meeting_subject(sender, contacts, secondary_advisers):
-    """
-    Construct and return a meeting subject given a sender, contacts and secondary
+    """Construct and return a meeting subject given a sender, contacts and secondary
     advisers (if present).
     """
     adviser_names = [
@@ -116,8 +112,7 @@ class BaseInteractionEmailProcessor:
         notify_meeting_ingest_failure(sender_adviser, errors, recipient_emails)
 
     def validate_with_serializer(self, data):
-        """
-        Transforms extracted data into a dict suitable for use with InteractionSerializer
+        """Transforms extracted data into a dict suitable for use with InteractionSerializer
         and then runs data through this serializer for validation.
 
         Returns the instantiated serializer.
@@ -156,15 +151,13 @@ class BaseInteractionEmailProcessor:
 
 
 class CalendarInteractionEmailProcessor(BaseInteractionEmailProcessor, EmailProcessor):
-    """
-    An EmailProcessor which checks whether incoming email is a valid DBT/company
+    """An EmailProcessor which checks whether incoming email is a valid DBT/company
     meeting, parses meeting information and creates a draft Interaction model
     instance for it if the information is valid.
     """
 
     def _handle_invalid_invite(self, exception, message):
-        """
-        Given an InvalidInviteError and an email message, log the error that
+        """Given an InvalidInviteError and an email message, log the error that
         the user triggered and notify them with an explanation (if applicable).
         """
         error_str = repr(exception)
@@ -181,8 +174,7 @@ class CalendarInteractionEmailProcessor(BaseInteractionEmailProcessor, EmailProc
 
     @transaction.atomic
     def save_serializer_as_interaction(self, serializer, interaction_data):
-        """
-        Create the interaction model instance from the validated serializer.
+        """Create the interaction model instance from the validated serializer.
         """
         # Provide an overridden value for source - so that we save the meeting
         # data properly
@@ -194,8 +186,7 @@ class CalendarInteractionEmailProcessor(BaseInteractionEmailProcessor, EmailProc
         return interaction
 
     def process_email(self, message):
-        """
-        Review the metadata and calendar attachment (if present) of an email
+        """Review the metadata and calendar attachment (if present) of an email
         message to see if it fits the our criteria of a valid Data Hub meeting
         request.  If it does, create a draft Interaction for it.
 
@@ -249,16 +240,14 @@ class CalendarInteractionEmailProcessor(BaseInteractionEmailProcessor, EmailProc
 
 
 class InteractionPlainEmailProcessor(BaseInteractionEmailProcessor, EmailProcessor):
-    """
-    An EmailProcessor which checks whether incoming email is a valid DBT/company
+    """An EmailProcessor which checks whether incoming email is a valid DBT/company
     interaction, parses meeting information and creates a draft Interaction model
     instance for it if the information is valid.
     """
 
     @transaction.atomic
     def save_serializer_as_interaction(self, serializer, interaction_data):
-        """
-        Create the interaction model instance from the validated serializer.
+        """Create the interaction model instance from the validated serializer.
         """
         # Provide an overridden value for source - so that we save the meeting
         # data properly
@@ -270,8 +259,7 @@ class InteractionPlainEmailProcessor(BaseInteractionEmailProcessor, EmailProcess
         return interaction
 
     def process_email(self, message):
-        """
-        Review the metadata of an email message to see if it fits the our criteria
+        """Review the metadata of an email message to see if it fits the our criteria
         of a valid Data Hub interaction. If it does, create a draft Interaction for it.
 
         :param message: mailparser.MailParser object - the message to process

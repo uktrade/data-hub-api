@@ -11,7 +11,6 @@ from datahub.core.models import (
 )
 from datahub.core.utils import get_front_end_url
 
-
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 

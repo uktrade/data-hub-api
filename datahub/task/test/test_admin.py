@@ -5,7 +5,6 @@ from datahub.interaction.test.factories import InteractionFactoryBase
 from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.task.admin import TaskAdminForm
 
-
 pytestmark = pytest.mark.django_db
 
 

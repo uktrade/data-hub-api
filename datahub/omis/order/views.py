@@ -98,8 +98,7 @@ class SubscriberListView(APIView):
     queryset = OrderSubscriber.objects.all()
 
     def get_order(self, order_pk):
-        """
-        Returns the order related to the subscriber list or
+        """Returns the order related to the subscriber list or
         raises Http404 if it doesn't exist.
         """
         try:
@@ -108,8 +107,7 @@ class SubscriberListView(APIView):
             raise Http404
 
     def get_list_response(self, order):
-        """
-        Returns a Response object with the serialised list of advisers subscribed to
+        """Returns a Response object with the serialised list of advisers subscribed to
         the order.
         """
         advisers = (sub.adviser for sub in order.subscribers.select_related('adviser').all())
@@ -118,15 +116,13 @@ class SubscriberListView(APIView):
         return Response(serializer.data)
 
     def get(self, request, order_pk, format=None):
-        """
-        Returns a serialised list of advisers subscribed to the order.
+        """Returns a serialised list of advisers subscribed to the order.
         """
         order = self.get_order(order_pk)
         return self.get_list_response(order)
 
     def put(self, request, order_pk, format=None):
-        """
-        Updates a subscriber list.
+        """Updates a subscriber list.
         It adds/keeps/deletes the advisers based on the new list passed in.
         """
         order = self.get_order(order_pk)
@@ -153,8 +149,7 @@ class AssigneeView(APIView):
     FORCE_DELETE_PARAM = 'force-delete'
 
     def get_order(self, order_pk):
-        """
-        Returns the related order or raises Http404 if it doesn't exist.
+        """Returns the related order or raises Http404 if it doesn't exist.
         """
         try:
             return Order.objects.get(pk=order_pk)
@@ -162,8 +157,7 @@ class AssigneeView(APIView):
             raise Http404
 
     def get_list_response(self, order):
-        """
-        Returns a Response object with the serialised list of advisers assigned to
+        """Returns a Response object with the serialised list of advisers assigned to
         the order.
         """
         advisers = order.assignees.select_related('adviser').all()
@@ -172,15 +166,13 @@ class AssigneeView(APIView):
         return Response(serializer.data)
 
     def get(self, request, order_pk, format=None):
-        """
-        Returns a serialised list of advisers assigned to the order.
+        """Returns a serialised list of advisers assigned to the order.
         """
         order = self.get_order(order_pk)
         return self.get_list_response(order)
 
     def patch(self, request, order_pk, format=None):
-        """
-        Updates the list of assignees.
+        """Updates the list of assignees.
         It adds/keeps/updates/deletes the advisers based on the new list passed in.
         """
         order = self.get_order(order_pk)
@@ -202,8 +194,7 @@ class AssigneeView(APIView):
 
 
 class BaseNestedOrderViewSet(CoreViewSet):
-    """
-    Base class for nested viewsets with order as parent
+    """Base class for nested viewsets with order as parent
     E.g. /order/<order-id>/<child>
     """
 
@@ -214,8 +205,7 @@ class BaseNestedOrderViewSet(CoreViewSet):
     order_queryset = Order.objects
 
     def get_order(self):
-        """
-        :returns: the main order from url kwargs (or None if it a matching order is not found).
+        """:returns: the main order from url kwargs (or None if it a matching order is not found).
         """
         try:
             return self.order_queryset.get(
@@ -225,8 +215,7 @@ class BaseNestedOrderViewSet(CoreViewSet):
             return None
 
     def get_order_or_404(self):
-        """
-        :returns: the main order from url kwargs.
+        """:returns: the main order from url kwargs.
 
         :raises Http404: if the order doesn't exist
         """
@@ -238,8 +227,7 @@ class BaseNestedOrderViewSet(CoreViewSet):
         return order
 
     def initial(self, request, *args, **kwargs):
-        """
-        Makes sure that the order_pk in the URL path refers to an existent order.
+        """Makes sure that the order_pk in the URL path refers to an existent order.
 
         :raises Http404: if a matching order cannot be found
         """
@@ -248,8 +236,7 @@ class BaseNestedOrderViewSet(CoreViewSet):
         self.get_order_or_404()
 
     def get_serializer_context(self):
-        """
-        Extra context provided to the serializer class.
+        """Extra context provided to the serializer class.
 
         Note: The DRF built-in docs feature will call this function with an empty dict in
         self.kwargs. The function should not fail in this case.

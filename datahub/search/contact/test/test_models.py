@@ -62,8 +62,7 @@ def test_contact_dbmodels_to_documents(opensearch):
 
 
 def test_contact_dbmodels_to_document_without_country(opensearch):
-    """
-    Tests conversion of db models to OpenSearch documents when
+    """Tests conversion of db models to OpenSearch documents when
     country is None.
     """
     # We want to bypass any validation

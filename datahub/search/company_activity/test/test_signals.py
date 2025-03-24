@@ -52,8 +52,7 @@ def test_updated_company_activity_synced(opensearch_with_signals):
 
 
 def test_deleted_company_activity_is_deleted_from_opensearch(opensearch_with_signals):
-    """
-    Test that when a company activity is deleted from db it is also
+    """Test that when a company activity is deleted from db it is also
     deleted from OpenSearch.
     """
     company_activity = CompanyActivityInteractionFactory()
@@ -114,8 +113,7 @@ def test_company_activity_syncs_interaction_fields_when_changed(opensearch_with_
 
 
 def test_updating_company_name_updates_activity(opensearch_with_signals):
-    """
-    Test that when a company name is updated, the company activity company name is synced to
+    """Test that when a company name is updated, the company activity company name is synced to
     OpenSearch.
     """
     interaction = CompanyInteractionFactory(dit_participants=[], contacts=[])
@@ -240,8 +238,7 @@ def test_company_activity_syncs_order_fields_when_changed(opensearch_with_signal
 
 
 def test_company_activity_syncs_great_fields_when_changed(opensearch_with_signals):
-    """
-    Test that company_activities are synced to OpenSearch
+    """Test that company_activities are synced to OpenSearch
     if their great export enquiry order updates.
     """
     great_export_enquiry = GreatExportEnquiryFactory()

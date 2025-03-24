@@ -76,8 +76,7 @@ def get_expected_data_from_eyb(eyb_lead):
 
 @pytest.mark.django_db
 class TestEYBLeadsDatasetViewSet(BaseDatasetViewTest):
-    """
-    Tests for EYBDatasetView
+    """Tests for EYBDatasetView
     """
 
     view_url = reverse('api-v4:dataset:expand-your-business-dataset')

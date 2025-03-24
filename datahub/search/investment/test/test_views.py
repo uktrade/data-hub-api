@@ -12,11 +12,9 @@ import pytest
 from dateutil.parser import parse as dateutil_parse
 from django.conf import settings
 from django.utils.timezone import now
-
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
-
 
 from datahub.company.models import OneListTier
 from datahub.company.test.factories import AdviserFactory, CompanyFactory
@@ -101,7 +99,7 @@ def investment_project_with_stage_log(opensearch_with_collector):
     ]
     opensearch_with_collector.flush_and_refresh()
 
-    yield investment_projects
+    return investment_projects
 
 
 @pytest.fixture
@@ -160,7 +158,7 @@ def setup_data(opensearch_with_collector, project_with_max_gross_value_added):
     ]
     opensearch_with_collector.flush_and_refresh()
 
-    yield investment_projects
+    return investment_projects
 
 
 @pytest.fixture
@@ -183,7 +181,7 @@ def created_on_data(opensearch_with_collector):
 
     opensearch_with_collector.flush_and_refresh()
 
-    yield investment_projects
+    return investment_projects
 
 
 class TestSearch(APITestMixin):
@@ -1222,8 +1220,7 @@ class TestSearchPermissions(APITestMixin):
         }
 
     def test_restricted_user_with_no_team_cannot_see_projects(self, opensearch_with_collector):
-        """
-        Checks that a restricted user that doesn't have a team cannot view any projects (in
+        """Checks that a restricted user that doesn't have a team cannot view any projects (in
         particular projects associated with other advisers that don't have teams).
         """
         url = reverse('api-v3:search:investment_project')
@@ -1919,8 +1916,7 @@ class TestBasicSearchPermissions(APITestMixin):
         self,
         opensearch_with_collector,
     ):
-        """
-        Automatic filter to see only associated IP for a specific (leps) user
+        """Automatic filter to see only associated IP for a specific (leps) user
         """
         team = TeamFactory()
         team_other = TeamFactory()
@@ -1972,8 +1968,7 @@ class TestBasicSearchPermissions(APITestMixin):
         self,
         opensearch_with_collector,
     ):
-        """
-        Checks that a restricted user that doesn't have a team cannot view projects associated
+        """Checks that a restricted user that doesn't have a team cannot view projects associated
         with other advisers that don't have teams.
         """
         adviser_other = AdviserFactory(dit_team_id=None)

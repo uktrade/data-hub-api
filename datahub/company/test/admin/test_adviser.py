@@ -3,7 +3,7 @@ from django.test import Client
 from django.urls import reverse
 from rest_framework import status
 
-from datahub.company.admin.adviser_forms import AddAdviserFromSSOForm, DUPLICATE_USER_MESSAGE
+from datahub.company.admin.adviser_forms import DUPLICATE_USER_MESSAGE, AddAdviserFromSSOForm
 from datahub.company.models import Advisor
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.test_utils import AdminTestMixin, create_test_user
@@ -83,8 +83,7 @@ class TestAddAdviserFromSSO(AdminTestMixin):
 
     @pytest.mark.parametrize('http_method', ('get', 'post'))
     def test_permission_denied_if_staff_and_without_add_permission(self, http_method):
-        """
-        Test that the view returns a 403 response if the staff user does not have the
+        """Test that the view returns a 403 response if the staff user does not have the
         add adviser permission.
         """
         user = create_test_user(

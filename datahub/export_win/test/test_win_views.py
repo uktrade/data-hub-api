@@ -2,11 +2,9 @@ import datetime
 from unittest import mock
 
 import pytest
-
 from django.conf import settings
 from django.utils.timezone import now
 from freezegun import freeze_time
-
 from rest_framework import status
 from rest_framework.reverse import reverse
 from reversion.models import Version
@@ -20,15 +18,35 @@ from datahub.company.test.factories import (
 )
 from datahub.core.constants import (
     AssociatedProgramme as AssociatedProgrammeConstant,
+)
+from datahub.core.constants import (
     BreakdownType as BreakdownTypeConstant,
+)
+from datahub.core.constants import (
     BusinessPotential as BusinessPotentialConstant,
+)
+from datahub.core.constants import (
     Country as CountryConstant,
+)
+from datahub.core.constants import (
     ExpectedValueRelation as ExpectedValueRelationConstant,
+)
+from datahub.core.constants import (
     HQTeamRegionOrPost as HQTeamRegionOrPostConstant,
+)
+from datahub.core.constants import (
     Sector as SectorConstant,
+)
+from datahub.core.constants import (
     SupportType as SupportTypeConstant,
+)
+from datahub.core.constants import (
     TeamType as TeamTypeConstant,
+)
+from datahub.core.constants import (
     WinType as WinTypeConstant,
+)
+from datahub.core.constants import (
     WinUKRegion as WinUKRegionConstant,
 )
 from datahub.core.test_utils import (
@@ -56,7 +74,7 @@ from datahub.metadata.test.factories import TeamFactory
 pytestmark = pytest.mark.django_db
 
 
-@pytest.fixture()
+@pytest.fixture
 def export_wins():
     confirmed = CustomerResponseFactory.create_batch(
         2,
@@ -69,7 +87,7 @@ def export_wins():
         responded_on=datetime.datetime.utcnow(),
     )
     awaiting = CustomerResponseFactory(agree_with_win=None)
-    yield [
+    return [
         confirmed,
         unconfirmed,
         awaiting,
@@ -85,7 +103,7 @@ def mock_export_win_create_token(monkeypatch):
     return mock_create_token
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_export_win_get_all_fields(monkeypatch):
     mock_get_all_fields = mock.Mock()
     monkeypatch.setattr(
@@ -95,7 +113,7 @@ def mock_export_win_get_all_fields(monkeypatch):
     return mock_get_all_fields
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_notify_export_win_email_by_rq_email(monkeypatch):
     mock_contact_by_rq_email = mock.Mock()
     monkeypatch.setattr(

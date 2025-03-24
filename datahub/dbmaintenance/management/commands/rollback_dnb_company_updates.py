@@ -5,8 +5,7 @@ from datahub.dnb_api.utils import rollback_dnb_company_update
 
 
 class Command(CSVBaseCommand):
-    """
-    Command to rollback company updates made from DNB data.
+    """Command to rollback company updates made from DNB data.
     """
 
     help = """
@@ -16,8 +15,7 @@ class Command(CSVBaseCommand):
     """
 
     def add_arguments(self, parser):
-        """
-        Set arguments for the management command.
+        """Set arguments for the management command.
         """
         super().add_arguments(parser)
         parser.add_argument(

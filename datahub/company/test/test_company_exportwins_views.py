@@ -1,12 +1,9 @@
 import uuid
-
 from datetime import datetime
 
 import pytest
-
 from dateutil.relativedelta import relativedelta
 from freezegun import freeze_time
-
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -34,7 +31,7 @@ from datahub.export_win.test.factories import (
 )
 
 
-@pytest.fixture()
+@pytest.fixture
 def export_wins():
     confirmed = CustomerResponseFactory.create_batch(
         2,
@@ -47,7 +44,7 @@ def export_wins():
         responded_on=datetime.utcnow(),
     )
     awaiting = CustomerResponseFactory(agree_with_win=None)
-    yield [
+    return [
         confirmed,
         unconfirmed,
         awaiting,
@@ -81,8 +78,7 @@ class TestGetCompanyExportWins(APITestMixin):
         assert response.status_code == expected_status
 
     def test_no_company_with_pk_raises_404(self):
-        """
-        Test if company pk provided in get parameters doesn't match,
+        """Test if company pk provided in get parameters doesn't match,
         404 is raised.
         """
         user = create_test_user(

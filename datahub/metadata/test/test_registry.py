@@ -48,8 +48,7 @@ def test_register_with_overriding_values():
     ),
 )
 def test_register_id_already_used(metadata_id, path_prefix, expected_mapping):
-    """
-    Tests that if I try to register the same metadata twice, the second call fails.
+    """Tests that if I try to register the same metadata twice, the second call fails.
     """
     reg = MetadataRegistry()
 
@@ -62,8 +61,7 @@ def test_register_id_already_used(metadata_id, path_prefix, expected_mapping):
 
 
 def test_register_with_path_prefix():
-    """
-    Tests registering with a prefix to url path
+    """Tests registering with a prefix to url path
 
     """
     reg = MetadataRegistry()

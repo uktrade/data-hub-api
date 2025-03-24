@@ -1,6 +1,5 @@
 from datahub.interaction.models import InteractionPermission
 
-
 NON_RESTRICTED_VIEW_PERMISSIONS = (
     (
         InteractionPermission.view_all,

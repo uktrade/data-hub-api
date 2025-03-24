@@ -32,8 +32,7 @@ from datahub.metadata.test.factories import TeamFactory
     ],
 )
 def test_interaction_activity(api_client, factory):
-    """
-    Get a list of interactions and test the returned JSON is valid as per:
+    """Get a list of interactions and test the returned JSON is valid as per:
     https://www.w3.org/TR/activitystreams-core/
     """
     start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
@@ -131,8 +130,7 @@ def test_interaction_activity(api_client, factory):
 
 @pytest.mark.django_db
 def test_interaction_investment_project_activity(api_client):
-    """
-    Get a list of interactions and test the returned JSON is valid as per:
+    """Get a list of interactions and test the returned JSON is valid as per:
     https://www.w3.org/TR/activitystreams-core/
     """
     start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
@@ -226,8 +224,7 @@ def test_interaction_investment_project_activity(api_client):
 
 @pytest.mark.django_db
 def test_service_delivery_activity(api_client):
-    """
-    Get a list of interactions and test the returned JSON is valid as per:
+    """Get a list of interactions and test the returned JSON is valid as per:
     https://www.w3.org/TR/activitystreams-core/
     """
     start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
@@ -311,8 +308,7 @@ def test_service_delivery_activity(api_client):
 
 @pytest.mark.django_db
 def test_service_delivery_event_activity(api_client):
-    """
-    Get a list of interactions and test the returned JSON is valid as per:
+    """Get a list of interactions and test the returned JSON is valid as per:
     https://www.w3.org/TR/activitystreams-core/
     """
     start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
@@ -412,8 +408,7 @@ def test_service_delivery_event_activity(api_client):
 
 
 def test_kinds_mapping():
-    """
-    Tests if the mapping covers all kinds of interactions.
+    """Tests if the mapping covers all kinds of interactions.
     """
     model_kinds = set(Interaction.Kind.values)
     serializer_kinds = {k for k in InteractionActivitySerializer.KINDS_JSON}
@@ -422,8 +417,7 @@ def test_kinds_mapping():
 
 @pytest.mark.django_db
 def test_interaction_ordering(api_client):
-    """
-    Test that the interactions are ordered by ('modified_on', 'pk')
+    """Test that the interactions are ordered by ('modified_on', 'pk')
     """
     interactions = []
 
@@ -451,8 +445,7 @@ def test_interaction_ordering(api_client):
 
 @pytest.mark.django_db
 def test_contacts_ordering(api_client):
-    """
-    Test that contacts are ordered by `pk`
+    """Test that contacts are ordered by `pk`
     """
     with freeze_time() as frozen_datetime:
         contacts = ContactFactory.create_batch(5)
@@ -478,8 +471,7 @@ def test_contacts_ordering(api_client):
 
 @pytest.mark.django_db
 def test_dit_participant_ordering(api_client):
-    """
-    Test that dit_participants are ordered by `pk`
+    """Test that dit_participants are ordered by `pk`
     """
     with freeze_time() as frozen_datetime:
         interaction = CompaniesInteractionFactory(dit_participants=[])
@@ -505,8 +497,7 @@ def test_dit_participant_ordering(api_client):
 
 @pytest.mark.django_db
 def test_null_adviser(api_client):
-    """
-    Test that we can handle dit_participant.adviser being None
+    """Test that we can handle dit_participant.adviser being None
     """
     with freeze_time() as frozen_datetime:
         interaction = CompaniesInteractionFactory(dit_participants=[])
@@ -523,8 +514,7 @@ def test_null_adviser(api_client):
 
 @pytest.mark.django_db
 def test_null_team(api_client):
-    """
-    Test that we can handle dit_participant.team being None
+    """Test that we can handle dit_participant.team being None
     """
     interaction = EventServiceDeliveryFactory(dit_participants=[])
     InteractionDITParticipantFactory(

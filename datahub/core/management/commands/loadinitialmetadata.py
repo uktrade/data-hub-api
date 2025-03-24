@@ -2,10 +2,9 @@ from pathlib import PurePath
 
 import yaml
 from django.apps import apps
-from django.core.management import BaseCommand, call_command, CommandError
+from django.core.management import BaseCommand, CommandError, call_command
 
 from datahub.metadata.fixtures import Fixture
-
 
 SOURCE_ROOT = PurePath(__file__).parents[4]
 SHARED_METADATA_FIXTURE_DIR = SOURCE_ROOT / 'fixtures' / 'metadata'
@@ -49,8 +48,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, force=None, **options):
-        """
-        It loads all metadata fixtures.
+        """It loads all metadata fixtures.
 
         The algorithm could iterate and import all the files in the `metadata`
         folder but some could have dependencies so it's safer to specify the

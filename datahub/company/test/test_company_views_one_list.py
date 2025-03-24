@@ -16,8 +16,7 @@ from datahub.core.test_utils import (
 
 
 class TestUpdateOneListTierAndGlobalAccountManager(APITestMixin):
-    """
-    Tests for the update company One List tier and global account manager view.
+    """Tests for the update company One List tier and global account manager view.
 
     (Implemented in CompanyViewSet.update_one_list_tier_and_global_account_manager().)
     """
@@ -45,8 +44,7 @@ class TestUpdateOneListTierAndGlobalAccountManager(APITestMixin):
         ),
     )
     def test_returns_403_if_without_permission(self, permission_codenames):
-        """
-        Test that a 403 is returned if the user does not have all of the required
+        """Test that a 403 is returned if the user does not have all of the required
         permissions.
         """
         company = CompanyFactory()
@@ -79,8 +77,7 @@ class TestUpdateOneListTierAndGlobalAccountManager(APITestMixin):
         company_factory,
         one_list_editor,
     ):
-        """
-        Test that a One List tier and account manager can be assigned to:
+        """Test that a One List tier and account manager can be assigned to:
 
         - a company not on the One List
         - a company on random One List tier except 'Tier D - International Trade Adviser Accounts'
@@ -125,8 +122,7 @@ class TestUpdateOneListTierAndGlobalAccountManager(APITestMixin):
         self,
         permission_codenames, allowed,
     ):
-        """
-        Test that an account manager:
+        """Test that an account manager:
         - can update the One List tier of the company they are managing
         - AND they have change_company permission.
         """
@@ -173,8 +169,7 @@ class TestUpdateOneListTierAndGlobalAccountManager(APITestMixin):
     def test_returns_403_on_editing_one_list_tier_by_other_account_manager(
         self,
     ):
-        """
-        Test that an account manager:
+        """Test that an account manager:
         - can not update the One List tier of a company they are not managing.
         """
         company = CompanyFactory(
@@ -271,8 +266,7 @@ class TestUpdateOneListTierAndGlobalAccountManager(APITestMixin):
         expected_errors,
         one_list_editor,
     ):
-        """
-        Test that a One List tier and account manager can't be assigned to:
+        """Test that a One List tier and account manager can't be assigned to:
 
         - a company on a One List tier 'Tier D - International Trade Adviser Accounts'
         - a company on that is a subsidiary of any One List company
@@ -293,8 +287,7 @@ class TestUpdateOneListTierAndGlobalAccountManager(APITestMixin):
 
 
 class TestRemoveCompanyFromOneList(APITestMixin):
-    """
-    Tests for the remove company from One List view.
+    """Tests for the remove company from One List view.
 
     (Implemented in CompanyViewSet.remove_from_one_list().)
     """
@@ -319,8 +312,7 @@ class TestRemoveCompanyFromOneList(APITestMixin):
         ),
     )
     def test_returns_403_if_without_permission(self, permission_codenames):
-        """
-        Test that a 403 is returned if the user does not have all of the required
+        """Test that a 403 is returned if the user does not have all of the required
         permissions.
         """
         company = CompanyFactory()
@@ -353,8 +345,7 @@ class TestRemoveCompanyFromOneList(APITestMixin):
         company_factory,
         one_list_editor,
     ):
-        """
-        Test that a company can be removed from One List:
+        """Test that a company can be removed from One List:
 
         - a company not on the One List
         - a company on the One List tier other than 'Tier D - International Trade Adviser Accounts'
@@ -373,8 +364,7 @@ class TestRemoveCompanyFromOneList(APITestMixin):
 
     @pytest.mark.django_db
     def test_cannot_remove_company_from_tier_d_ita(self, one_list_editor):
-        """
-        Test that a company can't be removed from One List when on a
+        """Test that a company can't be removed from One List when on a
         'Tier D - International Trade Adviser Accounts' tier.
         """
         company = CompanyFactory(

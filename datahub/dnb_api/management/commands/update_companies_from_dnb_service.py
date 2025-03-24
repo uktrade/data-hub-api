@@ -9,8 +9,7 @@ logger = getLogger(__name__)
 
 
 class Command(BaseCommand):
-    """
-    Management command to get the latest DNB company updates from dnb-service using the
+    """Management command to get the latest DNB company updates from dnb-service using the
     `datahub.dnb_api.tasks.schedule_get_company_updates` rq task.
     """
 
@@ -20,8 +19,7 @@ class Command(BaseCommand):
     )
 
     def add_arguments(self, parser):
-        """
-        Parse arguments/options for this command.
+        """Parse arguments/options for this command.
         """
         parser.add_argument(
             'last_updated_after',
@@ -40,8 +38,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        """
-        Run the scheduled task.
+        """Run the scheduled task.
         """
         schedule_get_company_updates(
             last_updated_after=options['last_updated_after'],

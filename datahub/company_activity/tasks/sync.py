@@ -10,13 +10,11 @@ from datahub.investment.project.models import InvestmentProject
 from datahub.investment_lead.models import EYBLead
 from datahub.omis.order.models import Order
 
-
 logger = logging.getLogger(__name__)
 
 
 def relate_company_activity_to_interactions(batch_size=500):
-    """
-    Grabs all interactions so they can be related to the
+    """Grabs all interactions so they can be related to the
     `CompanyActivity` model with bulk_create. Excludes any
     interactions already associated in the CompanyActivity model.
 
@@ -46,8 +44,7 @@ def relate_company_activity_to_interactions(batch_size=500):
 
 
 def relate_company_activity_to_referrals(batch_size=500):
-    """
-    Grabs all referrals so they can be related to the
+    """Grabs all referrals so they can be related to the
     `CompanyActivity` model with a bulk_create. Excludes any
     referrals already associated in the CompanyActivity model.
 
@@ -76,8 +73,7 @@ def relate_company_activity_to_referrals(batch_size=500):
 
 
 def relate_company_activity_to_investment_projects(batch_size=500):
-    """
-    Grabs all investment projects so they can be related to the
+    """Grabs all investment projects so they can be related to the
     `CompanyActivity` model with a bulk_create. Excludes any
     investment projects already associated in the CompanyActivity model.
     """
@@ -106,8 +102,7 @@ def relate_company_activity_to_investment_projects(batch_size=500):
 
 
 def relate_company_activity_to_orders(batch_size=500):
-    """
-    Grabs all omis orders so they can be related to the
+    """Grabs all omis orders so they can be related to the
     `CompanyActivity` model with a bulk_create. Excludes any
     order projects already associated in the CompanyActivity model.
     """
@@ -136,8 +131,7 @@ def relate_company_activity_to_orders(batch_size=500):
 
 
 def relate_company_activity_to_great(batch_size=500):
-    """
-    Grabs all great export enquiry so they can be related to the
+    """Grabs all great export enquiry so they can be related to the
     `CompanyActivity` model with a bulk_create. Excludes any
     great export enquiry already associated in the CompanyActivity model.
     """
@@ -166,8 +160,7 @@ def relate_company_activity_to_great(batch_size=500):
 
 
 def relate_company_activity_to_eyb_lead(batch_size=500):
-    """
-    Grabs all EYB leads so they can be related to the
+    """Grabs all EYB leads so they can be related to the
     `CompanyActivity` model with a bulk_create. Excludes any
     EYB leads already associated in the CompanyActivity model.
     """
@@ -197,8 +190,7 @@ def relate_company_activity_to_eyb_lead(batch_size=500):
 
 
 def schedule_sync_data_to_company_activity(relate_function):
-    """
-    Schedules a task for the given function.
+    """Schedules a task for the given function.
     """
     job = job_scheduler(
         queue_name=LONG_RUNNING_QUEUE,

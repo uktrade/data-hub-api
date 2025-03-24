@@ -12,8 +12,7 @@ pytestmark = pytest.mark.django_db
 
 
 def test_run_with_old_regions(s3_stubber, caplog):
-    """
-    Test that the command updates the specified records, checking if current regions match
+    """Test that the command updates the specified records, checking if current regions match
     the old regions column.
     """
     caplog.set_level('ERROR')
@@ -28,7 +27,7 @@ def test_run_with_old_regions(s3_stubber, caplog):
         allow_blank_possible_uk_regions=factory.Iterator(old_allow_blank_possible_uk_regions),
     )
 
-    for project, project_regions in zip(investment_projects, old_uk_region_locations):
+    for project, project_regions in zip(investment_projects, old_uk_region_locations, strict=False):
         project.uk_region_locations.set(project_regions)
 
     bucket = 'test_bucket'
@@ -76,8 +75,7 @@ def test_run_with_old_regions(s3_stubber, caplog):
 
 
 def test_run_ignore_old_regions(s3_stubber, caplog):
-    """
-    Test that the command updates the specified records (ignoring the old regions column).
+    """Test that the command updates the specified records (ignoring the old regions column).
     """
     caplog.set_level('ERROR')
 
@@ -91,7 +89,7 @@ def test_run_ignore_old_regions(s3_stubber, caplog):
         allow_blank_possible_uk_regions=factory.Iterator(old_allow_blank_possible_uk_regions),
     )
 
-    for project, project_regions in zip(investment_projects, old_uk_region_locations):
+    for project, project_regions in zip(investment_projects, old_uk_region_locations, strict=False):
         project.uk_region_locations.set(project_regions)
 
     bucket = 'test_bucket'
@@ -150,7 +148,7 @@ def test_simulate(s3_stubber, caplog):
         allow_blank_possible_uk_regions=factory.Iterator(old_allow_blank_possible_uk_regions),
     )
 
-    for project, project_regions in zip(investment_projects, old_uk_region_locations):
+    for project, project_regions in zip(investment_projects, old_uk_region_locations, strict=False):
         project.uk_region_locations.set(project_regions)
 
     bucket = 'test_bucket'

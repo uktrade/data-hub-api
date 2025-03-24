@@ -14,6 +14,8 @@ from datahub.investment.investor_profile.serializers import RequiredChecksConduc
 from datahub.investment.investor_profile.validate import get_incomplete_fields
 from datahub.investment.opportunity.constants import (
     OpportunityStatus as OpportunityStatusConstant,
+)
+from datahub.investment.opportunity.constants import (
     OpportunityType as OpportunityTypeConstant,
 )
 from datahub.investment.opportunity.models import (

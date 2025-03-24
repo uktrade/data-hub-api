@@ -8,8 +8,8 @@ from datahub.core.test_utils import APITestMixin, format_date_or_datetime
 from datahub.omis.order.constants import OrderStatus
 from datahub.omis.order.test.factories import (
     OrderFactory,
+    OrderWithOpenQuoteFactory,
 )
-from datahub.omis.order.test.factories import OrderWithOpenQuoteFactory
 from datahub.omis.quote.models import TermsAndConditions
 from datahub.omis.quote.test.factories import QuoteFactory
 
@@ -251,8 +251,7 @@ class TestAcceptOrder(APITestMixin):
         quote_fields,
         public_omis_api_client,
     ):
-        """
-        Test that if the order is not in one of the allowed statuses, the endpoint
+        """Test that if the order is not in one of the allowed statuses, the endpoint
         returns 409.
         """
         quote = QuoteFactory(**quote_fields)

@@ -1,4 +1,5 @@
-from datahub.company.models import Advisor as DBAdvisor, AdvisorPermission
+from datahub.company.models import Advisor as DBAdvisor
+from datahub.company.models import AdvisorPermission
 from datahub.search.adviser.models import Adviser
 from datahub.search.apps import SearchApp
 

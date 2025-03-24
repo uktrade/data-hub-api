@@ -56,8 +56,7 @@ class TestReportAdmin(AdminTestMixin):
         assert response.status_code == status.HTTP_200_OK
 
     def test_non_existent_report_download(self):
-        """
-        Test that the view returns a 404 response if the report ID does not refer to a
+        """Test that the view returns a 404 response if the report ID does not refer to a
         registered report.
         """
         url = reverse('admin_report:download-report', kwargs={'report_id': 'non-existent-report'})
@@ -68,8 +67,7 @@ class TestReportAdmin(AdminTestMixin):
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     def test_report_download_without_permission(self):
-        """
-        Test that the view returns a 403 response if the staff user does not have the
+        """Test that the view returns a 403 response if the staff user does not have the
         correct permissions.
         """
         url = reverse('admin_report:download-report', kwargs={'report_id': 'test-report'})

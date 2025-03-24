@@ -2,7 +2,6 @@ from unittest.mock import MagicMock, Mock, patch
 from urllib.parse import parse_qs, urlparse
 
 import pytest
-
 from rest_framework import serializers
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.request import Request
@@ -168,7 +167,7 @@ class TestAuditLog:
 
         assert len(result) == len(expected_entries)
         if expected_entries:
-            for actual, expected in zip(result, expected_entries):
+            for actual, expected in zip(result, expected_entries, strict=False):
                 assert actual['id'] == expected['id']
 
     def test_get_audit_log_with_pagination(self):

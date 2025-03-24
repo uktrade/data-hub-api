@@ -1,5 +1,4 @@
 import pytest
-
 from moto import mock_aws
 
 from datahub.company.models import Company, Contact
@@ -15,12 +14,12 @@ from datahub.ingest.utils import (
 )
 from datahub.investment_lead.models import EYBLead
 from datahub.investment_lead.tasks.ingest_eyb_triage import (
-    eyb_triage_ingestion_task,
     TRIAGE_PREFIX,
+    eyb_triage_ingestion_task,
 )
 from datahub.investment_lead.tasks.ingest_eyb_user import (
-    eyb_user_ingestion_task,
     USER_PREFIX,
+    eyb_user_ingestion_task,
 )
 from datahub.investment_lead.test.factories import (
     eyb_lead_triage_record_faker,
@@ -31,7 +30,6 @@ from datahub.investment_lead.test.utils import (
     assert_eyb_lead_matches_company,
     assert_eyb_lead_matches_contact,
 )
-
 
 pytestmark = pytest.mark.django_db
 
@@ -78,8 +76,7 @@ class TestEYBCompanyContactLinking:
         triage_object_processor,
         user_object_processor,
     ):
-        """
-        Test ingests triage and user data without any pre existing company and contacts
+        """Test ingests triage and user data without any pre existing company and contacts
         and verifies that their creation + linking to the EYB lead happens correctly
         """
         initial_eyb_lead_count = EYBLead.objects.count()
@@ -121,8 +118,7 @@ class TestEYBCompanyContactLinking:
         triage_object_processor,
         user_object_processor,
     ):
-        """
-        Test ingests triage and user data with pre existing company and contacts
+        """Test ingests triage and user data with pre existing company and contacts
         and verifies that their match + linking to the EYB lead happens correctly
         """
         company = CompanyFactory(duns_number='123')

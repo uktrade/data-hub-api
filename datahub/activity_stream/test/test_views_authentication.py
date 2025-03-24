@@ -5,7 +5,6 @@ from rest_framework import status
 from datahub.activity_stream.test import hawk
 from datahub.activity_stream.test.utils import get_url
 
-
 ACTIVITY_STREAM_URLS = (
     'api-v3:activity-stream:interactions',
     'api-v3:activity-stream:investment-project-added',
@@ -82,8 +81,7 @@ def test_401_wrong_ip_adress(api_client, endpoint):
 )
 @pytest.mark.django_db
 def test_403_returned(api_client, endpoint):
-    """
-    Test that a 403 is returned if the request is Hawk authenticated but the client doesn't have
+    """Test that a 403 is returned if the request is Hawk authenticated but the client doesn't have
     the required scope.
     """
     url = get_url(endpoint)

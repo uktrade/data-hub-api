@@ -18,8 +18,7 @@ from datahub.notification.constants import DEFAULT_SERVICE_NAME, NotifyServiceNa
     ),
 )
 def test_send_email_notification(context, service_name):
-    """
-    Test that NotificationClient.send_email_notification method
+    """Test that NotificationClient.send_email_notification method
     works calls through
     to the underlying notify library as expected.
     """
@@ -50,8 +49,7 @@ def test_send_email_notification(context, service_name):
     ),
 )
 def test_get_notification_by_id(notification_id, service_name):
-    """
-    Test that NotificationClient.get_notification_by_id method
+    """Test that NotificationClient.get_notification_by_id method
     works calls through
     to the underlying notify library as expected.
     """

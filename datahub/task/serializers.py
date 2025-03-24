@@ -2,7 +2,6 @@ from django.conf import settings
 from rest_framework import serializers
 
 from datahub.company.models.company import Company
-
 from datahub.company.serializers import NestedAdviserField
 from datahub.core.serializers import NestedRelatedField
 from datahub.interaction.models import Interaction

@@ -48,8 +48,7 @@ def notify_post_save_order_adviser(sender, instance, created, raw=False, **kwarg
 @receiver(post_delete, sender=OrderAssignee, dispatch_uid='notify_post_delete_assignee')
 @receiver(post_delete, sender=OrderSubscriber, dispatch_uid='notify_post_delete_subscriber')
 def notify_post_delete_order_adviser(sender, instance, **kwargs):
-    """
-    Notify people that they have been removed from the order.
+    """Notify people that they have been removed from the order.
 
     Note that `instance` is no longer in the database at this point,
     so be very careful what you do with it.
