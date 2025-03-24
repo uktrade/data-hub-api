@@ -398,7 +398,7 @@ pygments==2.15.0
     # via ipython
 pyjwt==2.6.0
     # via notifications-python-client
-pylint==3.3.4
+pylint==3.3.6
     # via
     #   -r requirements-dev.in
     #   pylint-django
