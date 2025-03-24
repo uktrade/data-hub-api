@@ -30,11 +30,11 @@ class TestAdviserChangeListLinks(AdminTestMixin):
     """Tests for customisations for the adviser admin change list links."""
 
     @pytest.mark.parametrize(
-        'permission_codenames,should_link_exist',
-        (
+        ('permission_codenames', 'should_link_exist'),
+        [
             (['view_advisor'], False),
             (['view_advisor', 'add_advisor'], True),
-        ),
+        ],
     )
     def test_add_adviser_link_existence(
         self,
@@ -61,7 +61,7 @@ class TestAdviserChangeListLinks(AdminTestMixin):
 class TestAddAdviserFromSSO(AdminTestMixin):
     """Tests for the add adviser from SSO view."""
 
-    @pytest.mark.parametrize('http_method', ('get', 'post'))
+    @pytest.mark.parametrize('http_method', ['get', 'post'])
     def test_redirects_to_login_page_if_not_logged_in(self, http_method):
         """Test that the view redirects to the login page if the user isn't authenticated."""
         client = Client()
@@ -70,7 +70,7 @@ class TestAddAdviserFromSSO(AdminTestMixin):
         assert response.status_code == status.HTTP_302_FOUND
         assert response['Location'] == self.login_url_with_redirect(add_from_sso_url)
 
-    @pytest.mark.parametrize('http_method', ('get', 'post'))
+    @pytest.mark.parametrize('http_method', ['get', 'post'])
     def test_redirects_to_login_page_if_not_staff(self, http_method):
         """Test that the view redirects to the login page if the user isn't a member of staff."""
         user = create_test_user(is_staff=False, password=self.PASSWORD)
@@ -81,7 +81,7 @@ class TestAddAdviserFromSSO(AdminTestMixin):
         assert response.status_code == status.HTTP_302_FOUND
         assert response['Location'] == self.login_url_with_redirect(add_from_sso_url)
 
-    @pytest.mark.parametrize('http_method', ('get', 'post'))
+    @pytest.mark.parametrize('http_method', ['get', 'post'])
     def test_permission_denied_if_staff_and_without_add_permission(self, http_method):
         """Test that the view returns a 403 response if the staff user does not have the
         add adviser permission.

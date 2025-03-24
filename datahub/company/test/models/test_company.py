@@ -34,13 +34,13 @@ class TestPendingDNBInvestigation(APITestMixin):
 
 
 @pytest.mark.parametrize(
-    'duns_number,global_ultimate_duns_number,expected_is_global_ultimate',
-    (
+    ('duns_number', 'global_ultimate_duns_number', 'expected_is_global_ultimate'),
+    [
         ('', '', False),
         (None, '', False),
         ('123456789', '123456789', True),
         ('999999999', '123456789', False),
-    ),
+    ],
 )
 def test_is_global_ultimate(
     duns_number: Literal['', '123456789', '999999999'] | None,
@@ -99,15 +99,15 @@ class TestOneListAccountOwner():
 
 
 class TestCompany:
-    """Tests for the Company model"""
+    """Tests for the Company model."""
 
     @pytest.mark.parametrize(
-        'name,expected_return',
-        (
+        ('name', 'expected_return'),
+        [
             ('', False),
             ('This is a company with a name', True),
             (' ', True),
-        ),
+        ],
     )
     def test_has_name(self, name: str, expected_return: bool) -> None:
         """Test the has_name property returns the correct response for a variety of scenarios.

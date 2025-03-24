@@ -66,7 +66,7 @@ def load_yaml_data_in_migration(apps, fixture_file_path):
     """Loads the content of the yaml file `fixture_file_path` into the database.
     This is similar to `loaddata` but:
     - it's safe to be used in migrations
-    - it does not change the fields that are not present in the yaml
+    - it does not change the fields that are not present in the yaml.
 
     Motivation:
     Calling `loaddata` from a data migration makes django use the latest version
@@ -93,7 +93,7 @@ class DeleteModelWithMetadata(DeleteModel):
     """
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        """Delete permissions and contenttypes before deleting the model
+        """Delete permissions and contenttypes before deleting the model.
         """
         DeleteModelWithMetadata.delete_metadata(
             from_state.apps,

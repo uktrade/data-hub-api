@@ -73,7 +73,7 @@ def test_sector_name_level_recursive_unsaved():
 
 
 @pytest.mark.parametrize(
-    ['segments', 'expected_name'],
+    ('segments', 'expected_name'),
     [
         (
             ['Level 0', 'Level 1', 'Level 2'],
@@ -103,7 +103,7 @@ def test_get_name_from_segments(segments, expected_name):
 
 
 @pytest.mark.parametrize(
-    ['name', 'expected_segments'],
+    ('name', 'expected_segments'),
     [
         (
             'Level 0 : Level 1 : Level 2',

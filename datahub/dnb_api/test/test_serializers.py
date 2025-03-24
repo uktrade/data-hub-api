@@ -45,7 +45,7 @@ def test_dnb_company_serializer_partial_save(db):
 
 
 def test_dnb_change_request_serializer(db):
-    """Test that dnb change requests serialize correctly
+    """Test that dnb change requests serialize correctly.
     """
     change_request = ChangeRequestSerializer(data={'turnover_gbp': 200})
     change_request.is_valid()
@@ -68,7 +68,7 @@ def test_dnb_company_serializer_partial_save_serializer_not_partial(db):
 
 
 def test_duns_number_is_not_valid(db):
-    """Tests that serializer is not valid when duns number is not provided"""
+    """Tests that serializer is not valid when duns number is not provided."""
     serializer = DNBCompanyHierarchySerializer(
         {},
         data={'duns_number': None},
@@ -80,7 +80,7 @@ def test_duns_number_is_not_valid(db):
 
 
 def test_duns_number_is_valid(db):
-    """Tests that serializer is valid when duns number is provided"""
+    """Tests that serializer is valid when duns number is provided."""
     dh_company = CompanyFactory(duns_number='123456789')
     serializer = DNBCompanyHierarchySerializer(
         dh_company,

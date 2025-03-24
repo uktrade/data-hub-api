@@ -13,7 +13,7 @@ class ContactsDatasetView(BaseFilterDatasetView):
     """
 
     def get_dataset(self, request):
-        """Returns list of Contacts Dataset records"""
+        """Returns list of Contacts Dataset records."""
         queryset = Contact.objects.annotate(
             name=get_full_name_expression(),
         ).values(

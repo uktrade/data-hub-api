@@ -15,10 +15,10 @@ class TestReportAdmin(AdminTestMixin):
 
     @pytest.mark.parametrize(
         'url',
-        (
+        [
             reverse('admin_report:index'),
             reverse('admin_report:download-report', kwargs={'report_id': 'test-report'}),
-        ),
+        ],
     )
     def test_redirects_to_login_page_if_not_logged_in(self, url):
         """Test that the view redirects to the login page if the user isn't authenticated."""
@@ -31,10 +31,10 @@ class TestReportAdmin(AdminTestMixin):
 
     @pytest.mark.parametrize(
         'url',
-        (
+        [
             reverse('admin_report:index'),
             reverse('admin_report:download-report', kwargs={'report_id': 'test-report'}),
-        ),
+        ],
     )
     def test_redirects_to_login_page_if_not_staff(self, url):
         """Test that the view redirects to the login page if the user isn't a member of staff."""

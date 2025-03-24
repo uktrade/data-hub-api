@@ -10,7 +10,7 @@ pytestmark = pytest.mark.django_db
 
 
 def test_merge_id_duns_number(s3_stubber):
-    """Test that the command merge id and duns number
+    """Test that the command merge id and duns number.
     """
     with reversion.create_revision():
         company_1 = CompanyFactory(duns_number='123456789')
@@ -51,7 +51,7 @@ def test_merge_id_duns_number(s3_stubber):
 
 
 def test_logs_contain_errors(s3_stubber, caplog):
-    """Tests errors are captured in the logs"""
+    """Tests errors are captured in the logs."""
     caplog.set_level('INFO')
     global_company = CompanyFactory()
     company_source = CompanyFactory(
@@ -85,7 +85,7 @@ def test_logs_contain_errors(s3_stubber, caplog):
 
 
 def test_subsidiary_logs(s3_stubber, caplog):
-    """Tests subsidiary errors are captured in the logs"""
+    """Tests subsidiary errors are captured in the logs."""
     caplog.set_level('INFO')
     company = CompanyFactory()
     SubsidiaryFactory(global_headquarters=company)
@@ -114,7 +114,7 @@ def test_subsidiary_logs(s3_stubber, caplog):
 
 
 def test_non_subsidiary_logs(s3_stubber, caplog):
-    """Tests subsidiary list in log is empty"""
+    """Tests subsidiary list in log is empty."""
     caplog.set_level('INFO')
     non_subsidiary_company = CompanyFactory()
     company_with_duns = CompanyFactory(duns_number='12345678')

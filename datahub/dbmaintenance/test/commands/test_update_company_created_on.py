@@ -15,10 +15,10 @@ pytestmark = pytest.mark.django_db
 
 @pytest.mark.parametrize(
     'simulate',
-    (
+    [
         True,
         False,
-    ),
+    ],
 )
 def test_run(s3_stubber, caplog, simulate):
     """Test that the command:

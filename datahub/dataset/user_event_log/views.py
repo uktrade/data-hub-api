@@ -12,7 +12,7 @@ class UserEventsView(BaseFilterDatasetView):
     """
 
     def get_dataset(self, request):
-        """Returns a list of all interaction records"""
+        """Returns a list of all interaction records."""
         queryset = UserEvent.objects.values(
             'adviser__id',
             'type',

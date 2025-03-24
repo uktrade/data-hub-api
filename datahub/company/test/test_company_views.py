@@ -44,7 +44,7 @@ class TestListCompanies(APITestMixin):
     """Tests for listing companies."""
 
     def test_companies_list_no_permissions(self):
-        """Should return 403"""
+        """Should return 403."""
         user = create_test_user(dit_team=TeamFactory())
         api_client = self.create_api_client(user=user)
         url = reverse('api-v4:company:collection')
@@ -127,7 +127,7 @@ class TestListCompanies(APITestMixin):
         assert companies[3]['is_in_adviser_list'] is False
 
     def test_autocomplete_companies_in_multiple_lists(self):
-        """Test that a company in multiple lists is only returned once"""
+        """Test that a company in multiple lists is only returned once."""
         company1 = CompanyFactory(name='Apple')
         CompanyFactory(name='Aardvark')
         CompanyFactory(name='Banana')
@@ -500,13 +500,13 @@ class TestGetCompany(APITestMixin):
 
     @pytest.mark.parametrize(
         'country_id',
-        (
+        [
             Country.united_states.value.id,
             Country.canada.value.id,
-        ),
+        ],
     )
     def test_get_company_without_area(self, country_id):
-        """Tests the company item view for a US/Canada company without an area
+        """Tests the company item view for a US/Canada company without an area.
 
         Checks that the endpoint returns 200
         """
@@ -521,14 +521,14 @@ class TestGetCompany(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
 
     @pytest.mark.parametrize(
-        'input_website,expected_website',
-        (
+        ('input_website', 'expected_website'),
+        [
             ('www.google.com', 'http://www.google.com'),
             ('http://www.google.com', 'http://www.google.com'),
             ('https://www.google.com', 'https://www.google.com'),
             ('', ''),
             (None, None),
-        ),
+        ],
     )
     def test_get_company_with_website(self, input_website, expected_website):
         """Test that if the website field on a company doesn't have any scheme
@@ -545,10 +545,10 @@ class TestGetCompany(APITestMixin):
 
     @pytest.mark.parametrize(
         'pending_dnb_investigation',
-        (
+        [
             True,
             False,
-        ),
+        ],
     )
     def test_get_company_pending_dnb_investigation(self, pending_dnb_investigation):
         """Test that `pending_dnb_investigation` is set for a company API result
@@ -565,10 +565,10 @@ class TestGetCompany(APITestMixin):
 
     @pytest.mark.parametrize(
         'is_global_ultimate',
-        (
+        [
             True,
             False,
-        ),
+        ],
     )
     def test_get_company_is_global_ultimate(self, is_global_ultimate):
         """Test that `is_global_ultimate` is set for a company API result
@@ -587,11 +587,11 @@ class TestGetCompany(APITestMixin):
 
     @pytest.mark.parametrize(
         'global_ultimate_overrides',
-        (
+        [
             {'global_ultimate_duns_number': ''},
             {'global_ultimate_duns_number': '123456789'},
             {'global_ultimate_duns_number': '123456789', 'duns_number': '123456789'},
-        ),
+        ],
     )
     def test_get_company_global_ultimate_duns_number(self, global_ultimate_overrides):
         """Test that `global_ultimate_duns_number` is set for a company API result
@@ -659,7 +659,7 @@ class TestGetCompany(APITestMixin):
 
     @pytest.mark.parametrize(
         'build_company',
-        (
+        [
             # subsidiary with Global Headquarters on the One List
             lambda one_list_tier: CompanyFactory(
                 one_list_tier=None,
@@ -680,7 +680,7 @@ class TestGetCompany(APITestMixin):
                 one_list_tier=None,
                 global_headquarters=None,
             ),
-        ),
+        ],
         ids=(
             'as_subsidiary_of_one_list_company',
             'as_subsidiary_of_non_one_list_company',
@@ -713,7 +713,7 @@ class TestGetCompany(APITestMixin):
 
     @pytest.mark.parametrize(
         'build_company',
-        (
+        [
             # subsidiary with Global Headquarters on the One List
             lambda one_list_tier, gam: CompanyFactory(
                 one_list_tier=None,
@@ -742,7 +742,7 @@ class TestGetCompany(APITestMixin):
                 global_headquarters=None,
                 one_list_account_owner=None,
             ),
-        ),
+        ],
         ids=(
             'as_subsidiary_of_one_list_company',
             'as_subsidiary_of_non_one_list_company',
@@ -790,12 +790,12 @@ class TestGetCompany(APITestMixin):
             }
 
     @pytest.mark.parametrize(
-        'headquarter_type, expected_is_global_headquarters',
-        (
+        ('headquarter_type', 'expected_is_global_headquarters'),
+        [
             (HeadquarterType.ehq.value.id, False),
             (HeadquarterType.ghq.value.id, True),
             (HeadquarterType.ukhq.value.id, False),
-        ),
+        ],
     )
     def test_get_company_is_global_headquarters(
         self,
@@ -864,8 +864,8 @@ class TestUpdateCompany(APITestMixin):
     """Tests for updating a single company."""
 
     @pytest.mark.parametrize(
-        'initial_model_values,data,expected_response',
-        (
+        ('initial_model_values', 'data', 'expected_response'),
+        [
             # change of names
             (
                 {
@@ -990,7 +990,7 @@ class TestUpdateCompany(APITestMixin):
                     'registered_address': None,
                 },
             ),
-        ),
+        ],
     )
     def test_update_company(self, initial_model_values, data, expected_response):
         """Test company update."""
@@ -1132,8 +1132,8 @@ class TestUpdateCompany(APITestMixin):
             assert response_data[field] != value
 
     @pytest.mark.parametrize(
-        'data,expected_error',
-        (
+        ('data', 'expected_error'),
+        [
             # trading names too long
             (
                 {'trading_names': ['a' * 600]},
@@ -1309,7 +1309,7 @@ class TestUpdateCompany(APITestMixin):
                     },
                 },
             ),
-        ),
+        ],
     )
     def test_validation_error(self, data, expected_error):
         """Test validation scenarios."""
@@ -1329,7 +1329,7 @@ class TestUpdateCompany(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == expected_error
 
-    @pytest.mark.parametrize('field', ('sector',))
+    @pytest.mark.parametrize('field', ['sector'])
     def test_update_null_field_to_null(self, field):
         """Tests setting fields to null that are currently null, and are allowed to be null
         when already null.
@@ -1348,13 +1348,13 @@ class TestUpdateCompany(APITestMixin):
         assert response.json()[field] is None
 
     @pytest.mark.parametrize(
-        'hq,is_valid',
-        (
+        ('hq', 'is_valid'),
+        [
             (HeadquarterType.ehq.value.id, False),
             (HeadquarterType.ukhq.value.id, False),
             (HeadquarterType.ghq.value.id, True),
             (None, False),
-        ),
+        ],
     )
     def test_update_company_global_headquarters_with_not_a_global_headquarters(self, hq, is_valid):
         """Tests if adding company that is not a Global HQ as a Global HQ
@@ -1453,8 +1453,8 @@ class TestUpdateCompany(APITestMixin):
         assert response.json()['headquarter_type'] == error
 
     @pytest.mark.parametrize(
-        'headquarter_type_id,changed_to,has_subsidiaries,is_valid',
-        (
+        ('headquarter_type_id', 'changed_to', 'has_subsidiaries', 'is_valid'),
+        [
             (None, HeadquarterType.ghq.value.id, False, True),
             (None, HeadquarterType.ukhq.value.id, False, True),
             (None, HeadquarterType.ehq.value.id, False, True),
@@ -1462,7 +1462,7 @@ class TestUpdateCompany(APITestMixin):
             (HeadquarterType.ghq.value.id, HeadquarterType.ehq.value.id, True, False),
             (HeadquarterType.ghq.value.id, HeadquarterType.ehq.value.id, False, True),
             (HeadquarterType.ghq.value.id, None, False, True),
-        ),
+        ],
     )
     def test_update_headquarter_type(
         self,
@@ -1502,15 +1502,15 @@ class TestUpdateCompany(APITestMixin):
 
     @pytest.mark.parametrize(
         'score',
-        (
+        [
             'very_high',
             'medium',
             'low',
             None,
-        ),
+        ],
     )
     def test_get_company_with_export_potential(self, score):
-        """Test imported export_potential field on a company appears as is
+        """Test imported export_potential field on a company appears as is.
         """
         company = CompanyFactory(
             export_potential=score,
@@ -1523,14 +1523,14 @@ class TestUpdateCompany(APITestMixin):
 
     @pytest.mark.parametrize(
         'profile_status',
-        (
+        [
             Company.GreatProfileStatus.PUBLISHED,
             Company.GreatProfileStatus.UNPUBLISHED,
             None,
-        ),
+        ],
     )
     def test_get_company_with_great_profile_status(self, profile_status):
-        """Test imported `great_profile_status` field on a company appears as is
+        """Test imported `great_profile_status` field on a company appears as is.
         """
         company = CompanyFactory(
             great_profile_status=profile_status,
@@ -1546,8 +1546,8 @@ class TestAddCompany(APITestMixin):
     """Tests for adding a company."""
 
     @pytest.mark.parametrize(
-        'data,expected_response,feature_flags',
-        (
+        ('data', 'expected_response', 'feature_flags'),
+        [
             # uk company
             (
                 {
@@ -1755,7 +1755,7 @@ class TestAddCompany(APITestMixin):
                 },
                 [],
             ),
-        ),
+        ],
     )
     def test_success_cases(self, data, expected_response, feature_flags):
         """Test success scenarios."""
@@ -1803,8 +1803,8 @@ class TestAddCompany(APITestMixin):
         }
 
     @pytest.mark.parametrize(
-        'data,expected_error,feature_flags',
-        (
+        ('data', 'expected_error', 'feature_flags'),
+        [
             # uk_region is required
             (
                 {'uk_region': None},
@@ -2019,7 +2019,7 @@ class TestAddCompany(APITestMixin):
                 },
                 [],
             ),
-        ),
+        ],
     )
     def test_validation_error(self, data, expected_error, feature_flags):
         """Test validation scenarios."""

@@ -34,8 +34,8 @@ def test_csv_iterator_with_error():
 
 
 @pytest.mark.parametrize(
-    'value,expected_value',
-    (
+    ('value', 'expected_value'),
+    [
         (
             Decimal('2000000000000000000000000000000000000'),
             '2000000000000000000000000000000000000',
@@ -73,19 +73,18 @@ def test_csv_iterator_with_error():
             "=cmd|' /c calc'!'A1",
             "'=cmd\\|' /c calc'!'A1",
         ),
-    ),
+    ],
 )
 def test_transform_csv_value(value, expected_value):
-    """Test transform csv value"""
+    """Test transform csv value."""
     assert transform_csv_value(value) == expected_value
 
 
-@pytest.mark.parametrize('value,expected_value', [
+@pytest.mark.parametrize(('value', 'expected_value'), [
     # Sample dangerous payloads
     ('=1+1', "'=1+1"),
     ('-1+1', "'-1+1"),
     ('+1+1', "'+1+1"),
-    ('=1+1', "'=1+1"),
     ('@A3', "'@A3"),
     ('%1', "'%1"),
     ('|1+1', "'\\|1+1"),

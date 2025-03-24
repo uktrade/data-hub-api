@@ -11,7 +11,7 @@ class IProjectCreatedSerializer(ActivitySerializer):
 
     def to_representation(self, instance):
         """Serialize the investment project as per Activity Stream spec:
-        https://www.w3.org/TR/activitystreams-core/
+        https://www.w3.org/TR/activitystreams-core/.
         """
         project_id = f'dit:DataHubInvestmentProject:{instance.pk}'
         project = {

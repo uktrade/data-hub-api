@@ -20,12 +20,12 @@ def mock_rq_get_current_job(monkeypatch):
 
 
 @pytest.mark.parametrize(
-    'context,service_name',
-    (
+    ('context', 'service_name'),
+    [
         (None, None),
         ({'foo': 'bar'}, None),
         ({'foo': 'bar'}, NotifyServiceName.omis),
-    ),
+    ],
 )
 def test_send_email_notification(context, service_name):
     """Test the send_email_notification utility.
@@ -48,14 +48,14 @@ def test_send_email_notification(context, service_name):
 
 
 @pytest.mark.parametrize(
-    'error_status_code,expect_retry,get_current_job_return_none',
-    (
+    ('error_status_code', 'expect_retry', 'get_current_job_return_none'),
+    [
         (503, True, False),
         (500, True, False),
         (403, False, False),
         (400, False, False),
         (400, False, True),
-    ),
+    ],
 )
 def test_send_email_notification_retries_errors(
         monkeypatch,

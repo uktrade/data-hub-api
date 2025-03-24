@@ -405,7 +405,7 @@ class Interaction(ArchivableModel, BaseModel):
 @reversion.register_base_model()
 class InteractionExportCountry(BaseModel):
     """Record `Interaction`'s exporting status to a `Country`.
-    Where `status` is `CompanyExportCountry.Status`
+    Where `status` is `CompanyExportCountry.Status`.
 
     This data will help consolidate company level countries
     in `company.CompanyExportCountry`
@@ -440,7 +440,7 @@ class InteractionExportCountry(BaseModel):
         verbose_name_plural = 'interaction export countries'
 
     def __str__(self):
-        """Admin human readable name
+        """Admin human readable name.
         """
         return (
             f'{self.interaction} {self.country} {self.status}'

@@ -46,8 +46,8 @@ class TestGetStringAggSubquery:
     """Tests for get_string_agg_subquery()."""
 
     @pytest.mark.parametrize(
-        'names,distinct,expected_result',
-        (
+        ('names', 'distinct', 'expected_result'),
+        [
             ([], False, None),
             (['Barbara'], False, 'Barbara'),
             (['Barbara', 'Claire'], False, 'Barbara, Claire'),
@@ -61,7 +61,7 @@ class TestGetStringAggSubquery:
                 True,
                 'Barbara, Claire, John, Samantha',
             ),
-        ),
+        ],
     )
     def test_can_annotate_queryset(self, names, distinct, expected_result):
         """Test that the first names of all authors for each book can be concatenated into
@@ -88,17 +88,17 @@ class TestGetStringAggSubquery:
 class TestGetArrayAggSubquery:
     """Tests for get_array_agg_subquery()."""
 
-    @pytest.mark.parametrize('distinct', (True, False))
+    @pytest.mark.parametrize('distinct', [True, False])
     @pytest.mark.parametrize(
         'names',
-        (
+        [
             [],
             ['Barbara'],
             ['Barbara', 'Claire'],
             ['Barbara', 'Claire', 'John'],
             ['Barbara', 'Claire', 'Claire'],
             ['Barbara', 'Barbara', 'Claire', 'John', 'John', 'John', 'Samantha'],
-        ),
+        ],
     )
     def test_aggregates_as_array(self, names, distinct):
         """Test that the first names of all authors for each book can be aggregated into an array
@@ -126,7 +126,7 @@ class TestGetArrayAggSubquery:
             assert Counter(actual_author_names) == Counter(names)
 
     @pytest.mark.parametrize(
-        'names,desired_names', (
+        ('names', 'desired_names'), [
             (
                 ['Barbara'], ['Barbara'],
             ),
@@ -140,7 +140,7 @@ class TestGetArrayAggSubquery:
                 ['Barbara', 'Barbara', 'Claire', 'John', 'John', 'John', 'Samantha'],
                 ['John', 'Samantha'],
             ),
-        ),
+        ],
     )
     def test_aggregates_as_filtered_array(self, names, desired_names):
         """Test that the desired first names of authors for each book can be aggregated into an array
@@ -165,11 +165,11 @@ class TestGetArrayAggSubquery:
         assert set(actual_author_names.author_names) == set(desired_names)
 
     @pytest.mark.parametrize(
-        'ordering,expected_names',
-        (
+        ('ordering', 'expected_names'),
+        [
             ('person__first_name', ['Barbara', 'Claire', 'Samantha']),
             ('-person__first_name', ['Samantha', 'Claire', 'Barbara']),
-        ),
+        ],
     )
     def test_orders_results_when_ordering_specified(self, ordering, expected_names):
         """Test that the values are ordered corrected when an ordering is specified."""
@@ -196,7 +196,7 @@ class TestGetArrayAggSubquery:
 class TestGetAggregateSubquery:
     """Tests for get_aggregate_subquery()."""
 
-    @pytest.mark.parametrize('num_books', (0, 5))
+    @pytest.mark.parametrize('num_books', [0, 5])
     def test_with_max_aggregate_expression(self, num_books):
         """Test that Max() can be used to calculate the maximum published-on date for the books a
         person has proofread.
@@ -222,7 +222,7 @@ class TestGetAggregateSubquery:
 class TestGetTopRelatedExpressionSubquery:
     """Tests for get_top_related_expression_subquery()."""
 
-    @pytest.mark.parametrize('expression', ('name', F('name')))
+    @pytest.mark.parametrize('expression', ['name', F('name')])
     def test_with_default_outer_field(self, expression):
         """Test that a Person query set can annotated with the name of the most
         recently published book.
@@ -304,7 +304,7 @@ class TestGetTopRelatedExpressionSubquery:
         assert returned_person.name_of_latest_book is None
 
 
-@pytest.mark.parametrize('genre', ('horror', 'non_fiction', 'invalid-option', None))
+@pytest.mark.parametrize('genre', ['horror', 'non_fiction', 'invalid-option', None])
 def test_get_choices_as_case_expression(genre):
     """Test that get_choices_as_case_expression() generates display names for a field with
     choices the same way that model_obj.get_FIELD_display() does.
@@ -320,8 +320,8 @@ def test_get_choices_as_case_expression(genre):
 class TestGetFullNameExpression:
     """Tests for get_full_name_expression()."""
 
-    @pytest.mark.parametrize('include_country', (True, False))
-    @pytest.mark.parametrize('country', ('French', '', None))
+    @pytest.mark.parametrize('include_country', [True, False])
+    @pytest.mark.parametrize('country', ['French', '', None])
     def test_full_name_annotation(self, include_country, country):
         """Tests that a Person query set can be annotated with full names."""
         person = PersonFactory(country=country)
@@ -343,8 +343,8 @@ class TestGetFullNameExpression:
         )
         assert queryset.first().name == person.last_name
 
-    @pytest.mark.parametrize('include_country', (True, False))
-    @pytest.mark.parametrize('country', ('French', '', None))
+    @pytest.mark.parametrize('include_country', [True, False])
+    @pytest.mark.parametrize('country', ['French', '', None])
     def test_full_name_related_annotation(self, include_country, country):
         """Tests that a Book query set can be annotated with the full name of the proofreader
         of each book.
@@ -376,8 +376,8 @@ class TestBracketedConcatExpression:
     """Tests for get_bracketed_concat_expression()."""
 
     @pytest.mark.parametrize(
-        'first_name,last_name,country,fields,bracketed_field,expected_value',
-        (
+        ('first_name', 'last_name', 'country', 'fields', 'bracketed_field', 'expected_value'),
+        [
             (
                 'John',
                 'Rogers',
@@ -426,7 +426,7 @@ class TestBracketedConcatExpression:
                 'country',
                 '',
             ),
-        ),
+        ],
     )
     def test_annotation(
         self,
@@ -464,8 +464,8 @@ class TestGetQuerysetObject:
     """Tests for get_queryset_object()."""
 
     @pytest.mark.parametrize(
-        'get_name,expected_exception',
-        (
+        ('get_name', 'expected_exception'),
+        [
             (
                 'Spring',
                 Book.MultipleObjectsReturned,
@@ -474,7 +474,7 @@ class TestGetQuerysetObject:
                 'Winter',
                 Book.DoesNotExist,
             ),
-        ),
+        ],
     )
     def test_raises_exception_when_not_one_match(self, get_name, expected_exception):
         """Test that exceptions are raised when no matches or multiple matches are found."""
@@ -496,11 +496,11 @@ class TestGetQuerysetObject:
 
 
 @pytest.mark.parametrize(
-    'value,expected',
-    (
+    ('value', 'expected'),
+    [
         ('what', 'what'),
         (None, ''),
-    ),
+    ],
 )
 def test_get_empty_string_if_null_expression(value, expected):
     """Tests if None can be replaced with an empty string."""

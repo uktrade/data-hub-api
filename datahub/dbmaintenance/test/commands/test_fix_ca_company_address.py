@@ -11,7 +11,7 @@ pytestmark = pytest.mark.django_db
 
 
 def setup_ca_company_with_all_addresses(post_code):
-    """Sets up CA Company for tests"""
+    """Sets up CA Company for tests."""
     return CompanyFactory(
         address_town='Saskatoon',
         address_country_id=Country.canada.value.id,
@@ -28,7 +28,7 @@ def setup_ca_company_with_all_addresses(post_code):
 
 
 def setup_ca_company_with_address_only(post_code):
-    """Sets up Canada Company with address only for tests"""
+    """Sets up Canada Company with address only for tests."""
     return CompanyFactory(
         address_town='Saskatoon',
         address_country_id=Country.canada.value.id,
@@ -45,7 +45,7 @@ def setup_ca_company_with_address_only(post_code):
 
 
 def setup_ca_company_with_registered_address_only(post_code):
-    """Sets up Canada Company with registered address only for tests"""
+    """Sets up Canada Company with registered address only for tests."""
     return CompanyFactory(
         registered_address_town='Saskatoon',
         registered_address_country_id=Country.canada.value.id,
@@ -62,7 +62,7 @@ def setup_ca_company_with_registered_address_only(post_code):
 
 
 @pytest.mark.parametrize(
-    'post_code, expected_result',
+    ('post_code', 'expected_result'),
     [
         ('M5H 2M5', 'M5H 2M5'),
         ('v6c 0c3', 'v6c 0c3'),
@@ -104,7 +104,7 @@ def test_command_regex_generates_the_expected_postcode_substitution(
     """Test regex efficiently without connecting to a database
     :param post_code: POSTCODE format good and bad
     :param expected_result: regular expression substituted value using the
-           Command pattern
+           Command pattern.
     """
     resolver = CompanyAddressResolver(
         country_id=None,
@@ -117,7 +117,7 @@ def test_command_regex_generates_the_expected_postcode_substitution(
 
 
 @pytest.mark.parametrize(
-    'post_code, area_code',
+    ('post_code', 'area_code'),
     [
         ('J2W 4C0', 'QC'),
         ('P2A6K7', 'ON'),
@@ -132,7 +132,7 @@ def test_ca_company_with_unique_zips_generates_valid_address_area(
     """Test postcode is fixed for the purpose of admin area
     generation with valid zip codes format
     :param post_code: POSTCODE good
-    :param area_code: Area Code to be generated from Command
+    :param area_code: Area Code to be generated from Command.
     """
     company = setup_ca_company_with_all_addresses(post_code)
     assert company.address_area is None
@@ -146,7 +146,7 @@ def test_ca_company_with_unique_zips_generates_valid_address_area(
 
 
 @pytest.mark.parametrize(
-    'post_code, area_code',
+    ('post_code', 'area_code'),
     [
         ('T8L 3X6', 'AB'),
         ('B2J-6A2', 'NS'),
@@ -160,7 +160,7 @@ def test_ca_company_with_address_data_only_will_generate_address_area(
 ):
     """Test postcode fixes and area generation with address area data
     :param post_code: POSTCODE good
-    :param area_code: Area Code to be generated from Command
+    :param area_code: Area Code to be generated from Command.
     """
     company = setup_ca_company_with_address_only(post_code)
     assert company.address_area is None
@@ -174,7 +174,7 @@ def test_ca_company_with_address_data_only_will_generate_address_area(
 
 
 @pytest.mark.parametrize(
-    'post_code, area_code',
+    ('post_code', 'area_code'),
     [
         ('E3L 3E2', 'NB'),
         ('R2C 1V3', 'MB'),
@@ -189,7 +189,7 @@ def test_ca_company_with_unique_zips_generates_the_valid_registered_address_area
     """Test registered address postcode fixes and area generation a
     couple of valid Zip Codes using the real DB
     :param post_code: POSTCODE good
-    :param area_code: Area Code to be generated from Command
+    :param area_code: Area Code to be generated from Command.
     """
     company = setup_ca_company_with_all_addresses(post_code)
     assert company.registered_address_area is None
@@ -203,7 +203,7 @@ def test_ca_company_with_unique_zips_generates_the_valid_registered_address_area
 
 
 @pytest.mark.parametrize(
-    'post_code, area_code',
+    ('post_code', 'area_code'),
     [
         ('T8L 3B8', 'AB'),
         ('C0A 1S7', 'PE'),
@@ -217,7 +217,7 @@ def test_ca_company_with_registered_address_data_only_will_generate_registered_a
 ):
     """Test registered address data only creates data expected
     :param post_code: POSTCODE good
-    :param area_code: Area Code to be generated from Command
+    :param area_code: Area Code to be generated from Command.
     """
     company = setup_ca_company_with_registered_address_only(post_code)
     assert company.registered_address_area is None
@@ -231,7 +231,7 @@ def test_ca_company_with_registered_address_data_only_will_generate_registered_a
 
 
 @pytest.mark.parametrize(
-    'post_code, expected_result',
+    ('post_code', 'expected_result'),
     [
         ('ON  L2A 3T9', 'L2A 3T9'),
         ('AB T4N 6M4', 'T4N 6M4'),
@@ -248,7 +248,7 @@ def test_command_fixes_invalid_postcodes_in_all_post_code_fields(
 ):
     """Test Patterns that need fixing in all postcode fields
     :param post_code: Invalid Postcode Format
-    :param expected_result:  The expected result of the fix
+    :param expected_result:  The expected result of the fix.
     """
     company = setup_ca_company_with_all_addresses(post_code)
     assert company.address_postcode == post_code
@@ -262,7 +262,7 @@ def test_command_fixes_invalid_postcodes_in_all_post_code_fields(
 
 
 @pytest.mark.parametrize(
-    'post_code, expected_result',
+    ('post_code', 'expected_result'),
     [
         ('T"R 0E3', 'T"R 0E3'),
         ('Ohio 44130', 'Ohio 44130'),
@@ -278,7 +278,7 @@ def test_command_leaves_invalid_postcodes_in_original_state_with_no_area(
 ):
     """Test edge cases are preserved
     :param post_code: Invalid Postcode Format
-    :param expected_result:  The expected result of the fix
+    :param expected_result:  The expected result of the fix.
     """
     company = setup_ca_company_with_all_addresses(post_code)
 
@@ -292,7 +292,7 @@ def test_command_leaves_invalid_postcodes_in_original_state_with_no_area(
 
 
 @pytest.mark.parametrize(
-    'post_code, expected_result',
+    ('post_code', 'expected_result'),
     [
         ('E3L 3E2', 'E3L 3E2'),
         ('R2C-1V3', 'R2C-1V3'),
@@ -302,7 +302,7 @@ def test_command_leaves_invalid_postcodes_in_original_state_with_no_area(
 def test_audit_log(post_code, expected_result):
     """Verify auditable versions of the code are retained
     :param post_code: Invalid Postcode Format
-    :param expected_result:  The expected result of the fix
+    :param expected_result:  The expected result of the fix.
     """
     company = setup_ca_company_with_all_addresses(post_code)
 
@@ -316,7 +316,7 @@ def test_audit_log(post_code, expected_result):
 
 
 @pytest.mark.parametrize(
-    'post_code, expected_result',
+    ('post_code', 'expected_result'),
     [
         ('E3L 3E2', 'E3L 3E2'),
         ('R2C-1V3', 'R2C-1V3'),
@@ -326,7 +326,7 @@ def test_audit_log(post_code, expected_result):
 def test_audit_does_not_continue_creating_revisions(post_code, expected_result):
     """Verify auditable versions of the code are retained
     :param post_code: Invalid Postcode Format
-    :param expected_result:  The expected result of the fix
+    :param expected_result:  The expected result of the fix.
     """
     company = setup_ca_company_with_all_addresses(post_code)
 

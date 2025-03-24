@@ -85,7 +85,7 @@ class InvestmentProjectAdmin(BaseModelAdminMixin, VersionAdmin):
         description='EYB Leads',
     )
     def get_eyb_leads(self, obj):
-        """EYB Leads associated with this Investment Project"""
+        """EYB Leads associated with this Investment Project."""
         return '\n'.join(
             [str(eyb.id) for eyb in obj.eyb_leads.all()],
         )

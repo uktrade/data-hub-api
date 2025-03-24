@@ -39,7 +39,7 @@ _MANY_TO_MANY_VIEW_TO_ACTION_MAPPING = {
 
 
 class DjangoCrudPermission(DjangoModelPermissions):
-    """Extension of Permission class to include view permissions"""
+    """Extension of Permission class to include view permissions."""
 
     perms_map = {
         **DjangoModelPermissions.perms_map,

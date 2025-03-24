@@ -28,10 +28,10 @@ def test_new_task_synced(opensearch_with_signals):
 
 
 @pytest.mark.parametrize(
-    'task_factory,expected_in_index,expected_to_call_delete',
-    (
+    ('task_factory', 'expected_in_index', 'expected_to_call_delete'),
+    [
         (TaskFactory, True, True),
-    ),
+    ],
 )
 def test_delete_from_opensearch(
     task_factory,

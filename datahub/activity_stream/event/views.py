@@ -12,7 +12,7 @@ class EventCursorPagination(ActivityCursorPagination):
 
 
 class EventActivityViewSet(ActivityViewSet):
-    """Events ViewSet for the activity stream
+    """Events ViewSet for the activity stream.
     """
 
     pagination_class = EventCursorPagination

@@ -23,14 +23,14 @@ class TestReplaceNullWithDefault:
     """Tests for the replace_null_with_default task."""
 
     @pytest.mark.parametrize(
-        'num_objects,batch_size,expected_batches',
-        (
+        ('num_objects', 'batch_size', 'expected_batches'),
+        [
             (10, 4, 3),
             (10, 5, 3),
             (11, 6, 2),
             (11, 12, 1),
             (0, 5, 1),
-        ),
+        ],
     )
     def test_replaces_null_with_default(
             self,
@@ -57,14 +57,14 @@ class TestReplaceNullWithDefault:
         assert NullableWithDefaultModel.objects.filter(nullable_with_default=False).count() == 10
 
     @pytest.mark.parametrize(
-        'num_objects,batch_size,expected_batches',
-        (
+        ('num_objects', 'batch_size', 'expected_batches'),
+        [
             (10, 4, 3),
             (10, 5, 3),
             (11, 6, 2),
             (11, 12, 1),
             (0, 5, 1),
-        ),
+        ],
     )
     def test_replaces_null_with_given_default(
             self,
@@ -94,8 +94,8 @@ class TestReplaceNullWithDefault:
         ).count() == 10
 
     @pytest.mark.parametrize(
-        'field,default,expected_error_msg',
-        (
+        ('field', 'default', 'expected_error_msg'),
+        [
             (
                 'nullable_without_default',
                 None,
@@ -116,14 +116,14 @@ class TestReplaceNullWithDefault:
                 True,
                 'non_nullable_with_default is not nullable',
             ),
-        ),
+        ],
     )
     def test_raises_error_on_invalid_field(self, field, default, expected_error_msg):
         """Test that an error is raised if the task is called with:
         - a model field without a default
         - a model field with a callable default
         - a non-nullable field
-        - a non-nullable field and an explicit default
+        - a non-nullable field and an explicit default.
         """
         with pytest.raises(ValueError) as excinfo:
             replace_null_with_default(
@@ -139,14 +139,14 @@ class TestCopyForeignKeyToM2MField:
     """Tests for the copy_foreign_key_to_m2m_field task."""
 
     @pytest.mark.parametrize(
-        'num_objects,batch_size,expected_batches',
-        (
+        ('num_objects', 'batch_size', 'expected_batches'),
+        [
             (10, 4, 2),
             (10, 5, 2),
             (11, 6, 1),
             (11, 12, 0),
             (0, 5, 0),
-        ),
+        ],
     )
     def test_successfully_copies_data(
             self,
@@ -253,17 +253,17 @@ class TestCopyForeignKeyToM2MField:
 
 @pytest.mark.django_db
 class TestCopyExportCountriesFromCompanyModelToCompanyExportCountryModel:
-    """Tests for the task that copies all export countries from Company model to CompanyExportCountry
+    """Tests for the task that copies all export countries from Company model to CompanyExportCountry.
     """
 
     @pytest.mark.parametrize(
-        'num_objects,batch_size,expected_batches',
-        (
+        ('num_objects', 'batch_size', 'expected_batches'),
+        [
             (10, 4, 2),
             (10, 5, 2),
             (11, 6, 1),
             (11, 12, 0),
-        ),
+        ],
     )
     def test_successfully_copies_from_company_model_future_interest(
             self,
@@ -327,13 +327,13 @@ class TestCopyExportCountriesFromCompanyModelToCompanyExportCountryModel:
         )
 
     @pytest.mark.parametrize(
-        'num_objects,batch_size,expected_batches',
-        (
+        ('num_objects', 'batch_size', 'expected_batches'),
+        [
             (10, 4, 2),
             (10, 5, 2),
             (11, 6, 1),
             (11, 12, 0),
-        ),
+        ],
     )
     def test_successfully_copies_from_company_model_currently_exporting(
             self,
@@ -396,14 +396,14 @@ class TestCopyExportCountriesFromCompanyModelToCompanyExportCountryModel:
         )
 
     @pytest.mark.parametrize(
-        'num_objects,batch_size,expected_batches',
-        (
+        ('num_objects', 'batch_size', 'expected_batches'),
+        [
             (10, 4, 2),
             (10, 5, 2),
             (11, 6, 1),
             (11, 12, 0),
             (0, 5, 0),
-        ),
+        ],
     )
     def test_successfully_copies_from_company_model_when_duplicates_involved(
             self,

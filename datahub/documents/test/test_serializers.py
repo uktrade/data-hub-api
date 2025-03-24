@@ -21,7 +21,7 @@ pytestmark = pytest.mark.django_db
 
 
 class TestSharePointDocumentSerializer:
-    """Tests for SharePointDocumentSerializer"""
+    """Tests for SharePointDocumentSerializer."""
 
     def test_serializing_instance_returns_expected_fields(self):
         sharepoint_document = SharePointDocumentFactory()
@@ -30,7 +30,7 @@ class TestSharePointDocumentSerializer:
 
 
 class TestGenericDocumentRetrieveSerializer:
-    """Tests for GenericDocumentRetrieveSerializer"""
+    """Tests for GenericDocumentRetrieveSerializer."""
 
     def test_serializing_instance_returns_expected_fields(self):
         generic_document = CompanySharePointDocumentFactory()

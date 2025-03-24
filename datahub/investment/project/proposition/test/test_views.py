@@ -298,7 +298,7 @@ class TestUpdateProposition(APITestMixin):
     """Tests for the update proposition view."""
 
     @pytest.mark.parametrize(
-        'method', ('put', 'patch'),
+        'method', ['put', 'patch'],
     )
     def test_cannot_update_collection(self, method):
         """Test cannot update proposition."""
@@ -313,7 +313,7 @@ class TestUpdateProposition(APITestMixin):
         assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
 
     @pytest.mark.parametrize(
-        'method', ('put', 'patch'),
+        'method', ['put', 'patch'],
     )
     def test_cannot_update_item(self, method):
         """Test cannot update given proposition."""
@@ -338,7 +338,7 @@ class TestUpdateProposition(APITestMixin):
 class TestListPropositions(APITestMixin):
     """Tests for the list propositions view."""
 
-    @pytest.mark.parametrize('api_version', ('v3', 'v4'))
+    @pytest.mark.parametrize('api_version', ['v3', 'v4'])
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_VIEW_PERMISSIONS)
     def test_non_restricted_user_can_list_propositions(self, permissions, api_version):
         """List of propositions by a non restricted user."""
@@ -406,7 +406,7 @@ class TestListPropositions(APITestMixin):
             ],
         }
 
-    @pytest.mark.parametrize('api_version', ('v3', 'v4'))
+    @pytest.mark.parametrize('api_version', ['v3', 'v4'])
     def test_restricted_user_can_list_propositions(self, api_version):
         """List of propositions by a restricted user."""
         PropositionFactory.create_batch(3)
@@ -446,7 +446,7 @@ class TestListPropositions(APITestMixin):
         expected_ids = {str(i.id) for i in propositions}
         assert actual_ids == expected_ids
 
-    @pytest.mark.parametrize('api_version', ('v3', 'v4'))
+    @pytest.mark.parametrize('api_version', ['v3', 'v4'])
     def test_restricted_user_cannot_list_non_associated_ip_propositions(self, api_version):
         """Restricted user cannot list non associated investment project propositions."""
         project_creator = AdviserFactory()
@@ -483,7 +483,7 @@ class TestListPropositions(APITestMixin):
             'detail': 'You do not have permission to perform this action.',
         }
 
-    @pytest.mark.parametrize('api_version', ('v3', 'v4'))
+    @pytest.mark.parametrize('api_version', ['v3', 'v4'])
     def test_filtered_by_adviser(self, api_version):
         """List of propositions filtered by assigned adviser."""
         adviser = AdviserFactory()
@@ -523,14 +523,14 @@ class TestListPropositions(APITestMixin):
         expected_ids = {str(i.id) for i in propositions}
         assert actual_ids == expected_ids
 
-    @pytest.mark.parametrize('api_version', ('v3', 'v4'))
+    @pytest.mark.parametrize('api_version', ['v3', 'v4'])
     @pytest.mark.parametrize(
         'proposition_status',
-        (
+        [
             PropositionStatus.ONGOING,
             PropositionStatus.ABANDONED,
             PropositionStatus.COMPLETED,
-        ),
+        ],
     )
     def test_filtered_by_status(self, proposition_status, api_version):
         """List of propositions filtered by status."""
@@ -574,7 +574,7 @@ class TestGetProposition(APITestMixin):
     """Tests for get proposition view."""
 
     def test_fails_without_permissions(self, api_client):
-        """Should return 401"""
+        """Should return 401."""
         proposition = PropositionFactory()
         url = reverse(
             'api-v3:investment:proposition:item',
@@ -757,7 +757,7 @@ class TestDeleteProposition(APITestMixin):
     """Tests for delete proposition view."""
 
     def test_fails_without_permissions(self, api_client):
-        """Should return 401"""
+        """Should return 401."""
         proposition = PropositionFactory()
         url = reverse(
             'api-v3:investment:proposition:item',
@@ -989,9 +989,9 @@ class TestCompleteProposition(APITestMixin):
         assert proposition.modified_by != user
 
     @pytest.mark.parametrize(
-        'proposition_status', (
+        'proposition_status', [
             PropositionStatus.COMPLETED, PropositionStatus.ABANDONED,
-        ),
+        ],
     )
     def test_cannot_complete_proposition_without_ongoing_status(self, proposition_status):
         """Test cannot complete proposition that doesn't have ongoing status."""
@@ -1244,9 +1244,9 @@ class TestAbandonProposition(APITestMixin):
         assert proposition.modified_by != user
 
     @pytest.mark.parametrize(
-        'proposition_status', (
+        'proposition_status', [
             PropositionStatus.COMPLETED, PropositionStatus.ABANDONED,
-        ),
+        ],
     )
     def test_cannot_abandon_proposition_without_ongoing_status(self, proposition_status):
         """Test cannot abandon proposition that doesn't have ongoing status."""
@@ -1298,7 +1298,7 @@ class TestAbandonProposition(APITestMixin):
         assert proposition.status == PropositionStatus.ONGOING
 
 
-@pytest.mark.parametrize('http_method', ('get', 'post'))
+@pytest.mark.parametrize('http_method', ['get', 'post'])
 class TestPropositionDocumentCollectionView404Handling(APITestMixin):
     """Tests for 404-handling in the proposition document collection view."""
 
@@ -1347,13 +1347,13 @@ class TestPropositionDocumentCollectionView404Handling(APITestMixin):
 
 
 @pytest.mark.parametrize(
-    'urlname,http_method',
-    (
+    ('urlname', 'http_method'),
+    [
         ('api-v3:investment:proposition:document-item', 'get'),
         ('api-v3:investment:proposition:document-item', 'delete'),
         ('api-v3:investment:proposition:document-item-callback', 'post'),
         ('api-v3:investment:proposition:document-item-download', 'get'),
-    ),
+    ],
 )
 class TestPropositionDocumentItemViews404Handling(APITestMixin):
     """Tests for 404-handling in all proposition document item views."""
@@ -1888,10 +1888,10 @@ class TestPropositionDocumentViews(APITestMixin):
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     @pytest.mark.parametrize(
-        'av_clean,expected_status', (
+        ('av_clean', 'expected_status'), [
             (True, status.HTTP_200_OK),
             (False, status.HTTP_403_FORBIDDEN),
-        ),
+        ],
     )
     @patch('datahub.documents.models.sign_s3_url')
     def test_document_download(self, sign_s3_url, av_clean, expected_status):

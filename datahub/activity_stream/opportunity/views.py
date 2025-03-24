@@ -14,7 +14,7 @@ class LargeCapitalOpportunityPagination(ActivityCursorPagination):
 
 
 class LargeCapitalOpportunityActivityViewSet(ActivityViewSet):
-    """Large Capital Opportunity ViewSet for the activity stream
+    """Large Capital Opportunity ViewSet for the activity stream.
     """
 
     pagination_class = LargeCapitalOpportunityPagination

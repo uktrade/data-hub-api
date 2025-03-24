@@ -78,8 +78,8 @@ class TestServiceAnswers(APITestMixin):
     @freeze_time('2017-04-18 13:25:30.986208')
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_ADD_PERMISSIONS)
     @pytest.mark.parametrize(
-        'service,extra_data,expected_response',
-        (
+        ('service', 'extra_data', 'expected_response'),
+        [
             pytest.param(
                 ServiceConstant.providing_investment_advice_and_information.value.id,
                 {
@@ -170,7 +170,7 @@ class TestServiceAnswers(APITestMixin):
                 },
                 id='give more than one answer option',
             ),
-        ),
+        ],
     )
     def test_cannot_add(self, service, extra_data, expected_response, permissions):
         """Test that interaction with incorrect answers cannot be added."""
@@ -203,8 +203,8 @@ class TestServiceAnswers(APITestMixin):
         assert response_data == expected_response
 
     @pytest.mark.parametrize(
-        'initial_value,new_value',
-        (
+        ('initial_value', 'new_value'),
+        [
             pytest.param(
                 {
                     'service_id':
@@ -247,7 +247,7 @@ class TestServiceAnswers(APITestMixin):
                 },
                 id='change to different service and answer',
             ),
-        ),
+        ],
     )
     def test_update_service_answers(self, initial_value, new_value):
         """Test that the service answers field can be updated."""
@@ -264,8 +264,8 @@ class TestServiceAnswers(APITestMixin):
         assert response_data['service_answers'] == new_value['service_answers']
 
     @pytest.mark.parametrize(
-        'initial_value,new_value,expected_response',
-        (
+        ('initial_value', 'new_value', 'expected_response'),
+        [
             pytest.param(
                 {
                     'service_id':
@@ -389,7 +389,7 @@ class TestServiceAnswers(APITestMixin):
                 {'service_answers': ['This field is required.']},
                 id='change service, give empty service_answers',
             ),
-        ),
+        ],
     )
     def test_cannot_update_service_answers(self, initial_value, new_value, expected_response):
         """Test that the service answers field cannot be updated with incorrect data."""

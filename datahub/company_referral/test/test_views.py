@@ -40,11 +40,11 @@ class TestListCompanyListsView(APITestMixin):
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     @pytest.mark.parametrize(
-        'permission_codenames,expected_status',
-        (
+        ('permission_codenames', 'expected_status'),
+        [
             ([], status.HTTP_403_FORBIDDEN),
             (['view_companyreferral'], status.HTTP_200_OK),
-        ),
+        ],
     )
     def test_permission_checking(self, permission_codenames, expected_status, api_client):
         """Test that the expected status is returned for various user permissions."""
@@ -127,11 +127,11 @@ class TestAddCompanyReferral(APITestMixin):
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     @pytest.mark.parametrize(
-        'permission_codenames,expected_status',
-        (
+        ('permission_codenames', 'expected_status'),
+        [
             ([], status.HTTP_403_FORBIDDEN),
             (['add_companyreferral'], status.HTTP_201_CREATED),
-        ),
+        ],
     )
     def test_permission_checking(self, permission_codenames, expected_status, api_client):
         """Test that the expected status is returned depending on the permissions the user has.
@@ -154,8 +154,8 @@ class TestAddCompanyReferral(APITestMixin):
         assert response.status_code == expected_status
 
     @pytest.mark.parametrize(
-        'request_data,expected_response_data',
-        (
+        ('request_data', 'expected_response_data'),
+        [
             pytest.param(
                 {},
                 {
@@ -201,7 +201,7 @@ class TestAddCompanyReferral(APITestMixin):
                 },
                 id='non-blank-fields',
             ),
-        ),
+        ],
     )
     def test_validates_input(self, request_data, expected_response_data):
         """Test validation for various scenarios."""
@@ -352,11 +352,11 @@ class TestGetCompanyReferral(APITestMixin):
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     @pytest.mark.parametrize(
-        'permission_codenames,expected_status',
-        (
+        ('permission_codenames', 'expected_status'),
+        [
             ([], status.HTTP_403_FORBIDDEN),
             (['view_companyreferral'], status.HTTP_200_OK),
-        ),
+        ],
     )
     def test_permission_checking(self, permission_codenames, expected_status, api_client):
         """Test that the expected status is returned depending on the permissions the user has.
@@ -378,11 +378,11 @@ class TestGetCompanyReferral(APITestMixin):
 
     @pytest.mark.parametrize(
         'factory',
-        (
+        [
             CompanyReferralFactory,
             ClosedCompanyReferralFactory,
             CompleteCompanyReferralFactory,
-        ),
+        ],
     )
     def test_retrieve_a_referral(self, factory):
         """Test that a single referral can be retrieved."""

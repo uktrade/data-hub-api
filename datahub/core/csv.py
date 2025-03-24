@@ -58,11 +58,11 @@ def escape(payload):
         return ''
 
     def starts_dangerously(value):
-        """Checks if value starts with a potentially dangerous character"""
+        """Checks if value starts with a potentially dangerous character."""
         return str(value)[0] in ('@', '+', '-', '=', '|', '%')
 
     def is_number(value):
-        """Checks if value is a number"""
+        """Checks if value is a number."""
         return re.match('^-?[0-9,\\.]+$', str(value))
 
     if str(payload) and starts_dangerously(payload) and not is_number(payload):

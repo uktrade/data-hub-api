@@ -84,7 +84,7 @@ class TestRawIdWidget:
 
     @pytest.mark.parametrize(
         'value',
-        ('123', 'b77ffa2a-bce8-440b-9d8a-b4f247f194dd'),
+        ['123', 'b77ffa2a-bce8-440b-9d8a-b4f247f194dd'],
     )
     @pytest.mark.django_db
     def test_get_context_with_invalid_value(self, value):
@@ -134,11 +134,11 @@ class TestMaxUploadSize:
     """Tests the max_upload_size decorator."""
 
     @pytest.mark.parametrize(
-        'file_size,error_expected',
-        (
+        ('file_size', 'error_expected'),
+        [
             (MAX_UPLOAD_SIZE, False),
             (MAX_UPLOAD_SIZE + 1, True),
-        ),
+        ],
     )
     @pytest.mark.urls('datahub.core.test.support.urls')
     @pytest.mark.django_db
@@ -268,8 +268,8 @@ class TestFormatJsonAsHtml:
     """Tests for format_json_as_html()."""
 
     @pytest.mark.parametrize(
-        'value,expected_output',
-        (
+        ('value', 'expected_output'),
+        [
             (
                 None,
                 '<pre>null</pre>',
@@ -280,7 +280,7 @@ class TestFormatJsonAsHtml:
   &quot;1&quot;: &quot;&lt;&quot;
 }</pre>""",
             ),
-        ),
+        ],
     )
     def test_format_json_as_html(self, value, expected_output):
         """Test that various values are serialised and escaped as expected."""
@@ -305,14 +305,14 @@ class TestAdminAccountLockout:
     }
 
     def create_admin_user(self, email=None, password=PASSWORD):
-        """Creates admin user"""
+        """Creates admin user."""
         return get_user_model().objects.create_superuser(
             email=email or Faker().email(), password=password,
         )
 
     @override_settings(**SETTINGS)
     def test_admin_account_lock_out_successful_login(self):
-        """Tests if user account can successfully login"""
+        """Tests if user account can successfully login."""
         user = self.create_admin_user(email=Faker().email())
         client = Client()
 
@@ -328,7 +328,7 @@ class TestAdminAccountLockout:
 
     @override_settings(**SETTINGS)
     def test_admin_account_lock_out_after_too_many_attempts(self):
-        """Tests if user account is locked out after configured number of attempts"""
+        """Tests if user account is locked out after configured number of attempts."""
         user = self.create_admin_user(email=Faker().email())
         client = Client()
         data = {'username': user.email, 'password': self.INVALID_PASSWORD}

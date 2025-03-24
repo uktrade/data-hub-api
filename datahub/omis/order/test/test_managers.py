@@ -12,7 +12,7 @@ class TestOrderManager:
     """Tests for the Order Manager."""
 
     @pytest.mark.parametrize(
-        'include_reopened', (False, True),
+        'include_reopened', [False, True],
     )
     def test_publicly_accessible(self, include_reopened):
         """Test that `publicly_accessible()` only returns the publicly accessible orders.

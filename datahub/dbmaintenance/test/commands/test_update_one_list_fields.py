@@ -37,7 +37,7 @@ def assert_changed(company, *fields):
         assert getattr(company, field) != getattr(company, f'_prev_{field}')
 
 
-@pytest.mark.parametrize('reset_unmatched', (False, True))
+@pytest.mark.parametrize('reset_unmatched', [False, True])
 def test_run(s3_stubber, caplog, reset_unmatched):
     """Test that the command updates the specified records (ignoring ones with errors).
     If `reset_unmatched` is False, the existing records not in the CSV are kept untouched,
@@ -160,7 +160,7 @@ def test_run(s3_stubber, caplog, reset_unmatched):
         )
 
 
-@pytest.mark.parametrize('reset_unmatched', (False, ))
+@pytest.mark.parametrize('reset_unmatched', [False ])
 def test_simulate(s3_stubber, caplog, reset_unmatched):
     """Test that the command simulates updates if --simulate is passed in."""
     caplog.set_level('ERROR')

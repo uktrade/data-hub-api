@@ -78,8 +78,8 @@ class TestTradingNamesInCompanyAdmin(AdminTestMixin):
         assert Company.objects.first().trading_names == list(trading_names_data.values())
 
     @pytest.mark.parametrize(
-        'trading_names_number,expected_field_size',
-        (
+        ('trading_names_number', 'expected_field_size'),
+        [
             (
                 0,
                 CompanyAdminForm.TRADING_NAMES_DEFAULT_FIELD_SIZE,
@@ -96,7 +96,7 @@ class TestTradingNamesInCompanyAdmin(AdminTestMixin):
                 CompanyAdminForm.TRADING_NAMES_DEFAULT_FIELD_SIZE + 1,
                 CompanyAdminForm.TRADING_NAMES_DEFAULT_FIELD_SIZE + 2,
             ),
-        ),
+        ],
     )
     def test_right_field_size_with_existing_company(
         self,

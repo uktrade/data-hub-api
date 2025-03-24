@@ -90,7 +90,7 @@ def propositions(ist_adviser):
 
 
 def test_can_see_spi1_start(spi_report):
-    """Checks if creation of Investment Project starts SPI 1"""
+    """Checks if creation of Investment Project starts SPI 1."""
     investment_project = InvestmentProjectFactory()
 
     rows = list(spi_report.rows())
@@ -101,8 +101,8 @@ def test_can_see_spi1_start(spi_report):
 
 
 @pytest.mark.parametrize(
-    'service_id,visible',
-    (
+    ('service_id', 'visible'),
+    [
         (ServiceConstant.investment_enquiry_requested_more_information.value.id, True),
         (ServiceConstant.investment_enquiry_confirmed_prospect.value.id, True),
         (ServiceConstant.investment_enquiry_assigned_to_ist_cmc.value.id, True),
@@ -113,7 +113,7 @@ def test_can_see_spi1_start(spi_report):
         (ServiceConstant.investment_enquiry_transferred_to_lp.value.id, True),
         (ServiceConstant.inbound_referral.value.id, False),
         (ServiceConstant.account_management.value.id, False),
-    ),
+    ],
 )
 def test_interaction_would_end_spi1_or_not(spi_report, service_id, visible):
     """Checks if specified interaction ends spi1 or not."""
@@ -140,8 +140,8 @@ def test_interaction_would_end_spi1_or_not(spi_report, service_id, visible):
 
 
 @pytest.mark.parametrize(
-    'service_id,visible',
-    (
+    ('service_id', 'visible'),
+    [
         (ServiceConstant.investment_enquiry_requested_more_information.value.id, False),
         (ServiceConstant.investment_enquiry_confirmed_prospect.value.id, False),
         (ServiceConstant.investment_enquiry_assigned_to_ist_cmc.value.id, True),
@@ -152,7 +152,7 @@ def test_interaction_would_end_spi1_or_not(spi_report, service_id, visible):
         (ServiceConstant.investment_enquiry_transferred_to_lp.value.id, False),
         (ServiceConstant.inbound_referral.value.id, False),
         (ServiceConstant.account_management.value.id, False),
-    ),
+    ],
 )
 def test_interaction_would_start_spi2_or_not(spi_report, ist_adviser, service_id, visible):
     """Checks if specified interaction starts spi2 or not."""

@@ -155,7 +155,7 @@ class LargeCapitalInvestorProfile(BaseModel):
         )
 
     def __str__(self):
-        """Human-readable representation"""
+        """Human-readable representation."""
         return f'{self.investor_company}, Large capital profile'
 
     def get_absolute_url(self):

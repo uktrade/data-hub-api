@@ -298,7 +298,7 @@ class TestListGenericDocumentView(APITestMixin):
         assert response.data['results'] == []
 
     def test_pagination(self, test_user_with_view_permissions):
-        """Test that LimitOffsetPagination is enabled for this view"""
+        """Test that LimitOffsetPagination is enabled for this view."""
         number_of_documents = 3
         pagination_limit = 2
         CompanySharePointDocumentFactory.create_batch(number_of_documents)

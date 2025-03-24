@@ -896,7 +896,7 @@ class UpdateExportDetailsSerializer(serializers.Serializer):
 
     @transaction.atomic
     def save(self, adviser):
-        """Save it"""
+        """Save it."""
         export_countries = self.validated_data.pop('export_countries', [])
         self._update_export_countries_model(self.instance, export_countries, adviser)
 
@@ -1074,7 +1074,7 @@ class UpdateOneListCoreTeamMembersSerializer(serializers.Serializer):
 
     @transaction.atomic
     def save(self, adviser):
-        """Save it"""
+        """Save it."""
         core_team_members = self.validated_data.pop('core_team_members', [])
         self._update_core_team_members(self.instance, core_team_members, adviser)
 
@@ -1105,7 +1105,7 @@ class OneListCoreTeamMemberSerializer(serializers.Serializer):
 
 
 class CompanyExportSerializer(serializers.ModelSerializer):
-    """Company Export serializer"""
+    """Company Export serializer."""
 
     company = NestedRelatedField(Company)
     owner = NestedAdviserWithTeamField()
@@ -1134,7 +1134,7 @@ class CompanyExportSerializer(serializers.ModelSerializer):
     export_potential = serializers.CharField()
 
     def validate_team_members(self, value):
-        """Validate the value provided for the team_members field"""
+        """Validate the value provided for the team_members field."""
         validate_team_member_max_count(value, serializers.ValidationError)
         return value
 

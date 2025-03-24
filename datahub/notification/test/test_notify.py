@@ -12,11 +12,11 @@ from datahub.notification.notify import (
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    'adviser_data,notify_service_name',
-    (
+    ('adviser_data', 'notify_service_name'),
+    [
         ({'contact_email': ''}, None),
         ({}, NotifyServiceName.omis),
-    ),
+    ],
 )
 def test_notify_adviser_by_email(async_queue, adviser_data, notify_service_name):
     """Test the notify_adviser_by_email utility.
@@ -35,10 +35,10 @@ def test_notify_adviser_by_email(async_queue, adviser_data, notify_service_name)
 @pytest.mark.django_db
 @pytest.mark.parametrize(
     'notify_service_name',
-    (
+    [
         None,
         NotifyServiceName.omis,
-    ),
+    ],
 )
 def test_notify_contact_by_email(notify_service_name):
     """Test the notify_contact_by_email utility.
@@ -57,10 +57,10 @@ def test_notify_contact_by_email(notify_service_name):
 @pytest.mark.django_db
 @pytest.mark.parametrize(
     'notify_service_name',
-    (
+    [
         None,
         NotifyServiceName.omis,
-    ),
+    ],
 )
 def test_notify_by_email(notify_service_name):
     """Test the notify_by_email utility.

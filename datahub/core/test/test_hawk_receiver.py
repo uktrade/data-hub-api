@@ -55,8 +55,8 @@ class TestHawkAuthentication:
     """Tests Hawk authentication when using HawkAuthentication."""
 
     @pytest.mark.parametrize(
-        'get_kwargs,expected_json',
-        (
+        ('get_kwargs', 'expected_json'),
+        [
             (
                 # If the Authorization header isn't passed
                 {
@@ -125,11 +125,11 @@ class TestHawkAuthentication:
                 },
                 {'detail': 'Incorrect authentication credentials.'},
             ),
-        ),
+        ],
     )
     def test_401_returned(self, api_client, get_kwargs, expected_json):
         """If the request isn't properly Hawk-authenticated, then a 401 is
-        returned
+        returned.
         """
         resolved_get_kwargs = resolve_data(get_kwargs)
         response = api_client.get(
@@ -142,7 +142,7 @@ class TestHawkAuthentication:
 
     def test_if_61_seconds_in_past_401_returned(self, api_client):
         """If the Authorization header is generated 61 seconds in the past, then a
-        401 is returned
+        401 is returned.
         """
         past = datetime.datetime.now() - datetime.timedelta(seconds=61)
         with freeze_time(past):
@@ -158,7 +158,7 @@ class TestHawkAuthentication:
 
     @pytest.mark.usefixtures('local_memory_cache')
     def test_if_authentication_reused_401_returned(self, api_client):
-        """If the Authorization header is reused, then a 401 is returned"""
+        """If the Authorization header is reused, then a 401 is returned."""
         auth = _auth_sender().request_header
 
         response_1 = api_client.get(
@@ -179,7 +179,7 @@ class TestHawkAuthentication:
     def test_empty_object_returned_with_authentication_3_ips(self, api_client):
         """If the Authorization and X-Forwarded-For headers are correct,
         with an extra IP address prepended to the X-Forwarded-For then
-        the correct, and authentic, data is returned
+        the correct, and authentic, data is returned.
         """
         sender = _auth_sender()
         response = api_client.get(
@@ -193,7 +193,7 @@ class TestHawkAuthentication:
 
     def test_empty_object_returned_with_authentication(self, api_client):
         """If the Authorization and X-Forwarded-For headers are correct, then
-        the correct, and authentic, data is returned
+        the correct, and authentic, data is returned.
         """
         sender = _auth_sender()
         response = api_client.get(
@@ -213,7 +213,7 @@ class TestHawkResponseSigningMixin:
 
     def test_empty_object_returned_with_authentication(self, api_client):
         """If the Authorization and X-Forwarded-For headers are correct, then
-        the correct, and authentic, data is returned
+        the correct, and authentic, data is returned.
         """
         sender = _auth_sender()
         response = api_client.get(

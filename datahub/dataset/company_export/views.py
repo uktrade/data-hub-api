@@ -12,7 +12,7 @@ class CompanyExportDatasetView(BaseFilterDatasetView):
     """
 
     def get_dataset(self, request):
-        """Returns list of CompanyExport records"""
+        """Returns list of CompanyExport records."""
         queryset = CompanyExport.objects.annotate(
             sector_name=get_sector_name_subquery('sector'),
             contact_ids=get_array_agg_subquery(

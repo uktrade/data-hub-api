@@ -2,7 +2,7 @@ from datahub.dataset.core.pagination import DatasetCursorPagination
 
 
 class CompanyExportCountryHistoryDatasetViewCursorPagination(DatasetCursorPagination):
-    """Cursor Pagination for CompanyExportCountryHistory
+    """Cursor Pagination for CompanyExportCountryHistory.
     """
 
     ordering = ('history_date', 'history_id')

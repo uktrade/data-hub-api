@@ -348,7 +348,7 @@ def schedule_export_win_customer_response_token_jobs():
 
 
 def schedule_export_win_auto_resend_client_email():
-    """Schedule auto resend client email from unconfirmed win"""
+    """Schedule auto resend client email from unconfirmed win."""
     job_scheduler(
         function=auto_resend_client_email_from_unconfirmed_win,
         max_retries=5,
@@ -361,7 +361,7 @@ def schedule_export_win_auto_resend_client_email():
 
 
 def schedule_update_company_export_potential_from_csv():
-    """Schedule ingestion of export potential data"""
+    """Schedule ingestion of export potential data."""
     job_scheduler(
         function=update_company_export_potential_from_csv,
         function_kwargs={

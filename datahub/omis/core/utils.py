@@ -26,7 +26,7 @@ def generate_reference(model, gen, field='reference', prefix='', max_retries=10)
 
 def generate_datetime_based_reference(model, field='reference', prefix='', max_retries=10):
     """Generate a unique datetime based reference of type:
-        <year><month><day><4-digit-seq> e.g. 201702300001
+        <year><month><day><4-digit-seq> e.g. 201702300001.
 
     :param model: the class of the django model
     :param field: reference field of the model that needs to be unique

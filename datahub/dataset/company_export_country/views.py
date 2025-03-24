@@ -11,7 +11,7 @@ class CompanyExportCountryDatasetView(BaseFilterDatasetView):
     """
 
     def get_dataset(self, request):
-        """Returns list of company_export_country records"""
+        """Returns list of company_export_country records."""
         queryset = CompanyExportCountry.objects.values(
             'id',
             'company_id',

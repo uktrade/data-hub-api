@@ -33,8 +33,8 @@ class TestSearchExportCountryHistory(APITestMixin):
     """Tests search views."""
 
     @pytest.mark.parametrize(
-        'permission_codenames,expected_status',
-        (
+        ('permission_codenames', 'expected_status'),
+        [
             (
                 [],
                 status.HTTP_403_FORBIDDEN,
@@ -51,7 +51,7 @@ class TestSearchExportCountryHistory(APITestMixin):
                 ['view_companyexportcountry', InteractionPermission.view_all],
                 status.HTTP_200_OK,
             ),
-        ),
+        ],
     )
     @pytest.mark.usefixtures('opensearch')
     def test_permission_checking(self, permission_codenames, expected_status, api_client):
@@ -186,12 +186,12 @@ class TestSearchExportCountryHistory(APITestMixin):
 
     @pytest.mark.parametrize(
         'factory',
-        (
+        [
             lambda: CompanyExportCountryHistoryFactory(history_type=HistoryType.INSERT),
             lambda: CompanyExportCountryHistoryFactory(history_type=HistoryType.DELETE),
             ExportCountriesInteractionFactory,
             ExportCountriesServiceDeliveryFactory,
-        ),
+        ],
     )
     def test_filtering_by_company_returns_matches(self, opensearch_with_collector, factory):
         """Test that filtering by company includes matching objects."""
@@ -237,10 +237,10 @@ class TestSearchExportCountryHistory(APITestMixin):
 
     @pytest.mark.parametrize(
         'factory',
-        (
+        [
             lambda: CompanyExportCountryHistoryFactory(history_type=HistoryType.INSERT),
             lambda: CompanyExportCountryHistoryFactory(history_type=HistoryType.DELETE),
-        ),
+        ],
     )
     def test_filtering_by_country_returns_matching_history_objects(
         self,
@@ -265,10 +265,10 @@ class TestSearchExportCountryHistory(APITestMixin):
 
     @pytest.mark.parametrize(
         'factory',
-        (
+        [
             ExportCountriesInteractionFactory,
             ExportCountriesServiceDeliveryFactory,
-        ),
+        ],
     )
     def test_filtering_by_country_returns_matching_interactions(
         self, opensearch_with_collector, factory,
@@ -317,13 +317,13 @@ class TestSearchExportCountryHistory(APITestMixin):
         assert response_data['results'] == []
 
     @pytest.mark.parametrize(
-        'request_args,is_reversed',
-        (
+        ('request_args', 'is_reversed'),
+        [
             # default sorting
             ({}, True),
             ({'sortby': 'date:asc'}, False),
             ({'sortby': 'date:desc'}, True),
-        ),
+        ],
     )
     def test_sorts_results(self, opensearch_with_collector, request_args, is_reversed):
         """Test sorting in various cases.

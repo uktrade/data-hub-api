@@ -15,7 +15,7 @@ class CompanyExportCountryHistoryDatasetView(BaseDatasetView):
     pagination_class = CompanyExportCountryHistoryDatasetViewCursorPagination
 
     def get_dataset(self):
-        """Returns list of company_export_country_history records"""
+        """Returns list of company_export_country_history records."""
         return CompanyExportCountryHistory.objects.values(
             'id',
             'company_id',

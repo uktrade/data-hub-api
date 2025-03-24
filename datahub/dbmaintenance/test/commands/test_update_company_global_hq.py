@@ -150,7 +150,7 @@ def test_overwrite(s3_stubber, caplog):
 
 @pytest.mark.parametrize(
     'overwrite',
-    (True, False),
+    [True, False],
 )
 def test_simulate(s3_stubber, caplog, overwrite):
     """Test that the command simulates updates if --simulate is passed in."""

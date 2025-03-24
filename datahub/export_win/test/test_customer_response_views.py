@@ -66,7 +66,7 @@ class TestGetCustomerResponseView(APITestMixin):
     """Get single customer response view tests."""
 
     def test_win_details_no_permissions(self):
-        """Should return 404"""
+        """Should return 404."""
         CustomerResponseTokenFactory()
         api_client = self.create_api_client(user=None)
         url = reverse('api-v4:export-win:customer-response', kwargs={'token_pk': uuid.uuid4()})
@@ -197,10 +197,10 @@ class TestUpdateCustomerResponseView(APITestMixin):
 
     @pytest.mark.parametrize(
         'agree_with_win',
-        (
+        [
             True,
             False,
-        ),
+        ],
     )
     def test_update_customer_response(
         self,

@@ -62,7 +62,7 @@ class SearchCompanyActivityAPIView(SearchCompanyActivityAPIViewMixin, SearchAPIV
     """Filtered company activity search view."""
 
     def get_base_query(self, request, validated_data):
-        """Overwritten to add additional data to the Opensearch query"""
+        """Overwritten to add additional data to the Opensearch query."""
         company_ids = validated_data.get('company')
         if company_ids:
             validated_data = self._include_parent_and_subsidiary_companies(

@@ -133,7 +133,7 @@ class TestPostcodeDataIngestionTask:
     @mock_aws
     def test_only_delete_if_valid_records_found(self, test_file_path, empty_test_file):
         """Test that we don't delete postcode records if no valid ids are found in the
-        file as that indicates something has gone wrong with processing it
+        file as that indicates something has gone wrong with processing it.
         """
         PostcodeDataFactory(id=400859, region_name='South West', lat=44.244941)
         PostcodeDataFactory(id=999999999)
@@ -148,7 +148,7 @@ class TestPostcodeDataIngestionTask:
     @pytest.mark.django_db
     @mock_aws
     def test_invalid_file(self, test_file_path):
-        """Test that an exception is raised when the file is not valid
+        """Test that an exception is raised when the file is not valid.
         """
         mock_transport = MockSentryTransport()
         init(transport=mock_transport)

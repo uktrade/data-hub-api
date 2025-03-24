@@ -10,7 +10,7 @@ pytestmark = pytest.mark.django_db
 
 
 class TestContacts(AdminTestMixin):
-    """Test that Contacts are properly validated"""
+    """Test that Contacts are properly validated."""
 
     @pytest.mark.parametrize(
         'telephone_number',

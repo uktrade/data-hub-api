@@ -5,7 +5,7 @@ from datahub.search.models import BaseSearchModel
 
 
 class Adviser(BaseSearchModel):
-    """Adviser model"""
+    """Adviser model."""
 
     id = Keyword()
     first_name = Text(

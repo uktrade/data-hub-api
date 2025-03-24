@@ -468,7 +468,7 @@ class DNBRelatedCompaniesView(APIView):
     @method_decorator(cache_page(COMPANY_TREE_TIMEOUT, key_prefix='related_companies'))
     def get(self, request, company_id):
         """Given a Company Id, get the data for the company hierarchy from dnb-service
-        then find the related companies to create a list of IDs
+        then find the related companies to create a list of IDs.
         """
         company_ids = get_datahub_ids_for_dnb_service_company_hierarchy(
             include_parent_companies=(
@@ -484,7 +484,7 @@ class DNBRelatedCompaniesView(APIView):
 
 
 class DNBRelatedCompaniesCountView(APIView):
-    """View for returning the count of related companies a company has
+    """View for returning the count of related companies a company has.
     """
 
     permission_classes = (

@@ -90,7 +90,7 @@ class TestStovaIngestionTasks:
         self, caplog, test_file, test_file_path, s3_object_processor,
     ):
         """Test that a Aventri/Stova data file is ingested correctly and the ingested file
-        is added to the IngestedObject table
+        is added to the IngestedObject table.
         """
         initial_stova_activity_count = StovaAttendee.objects.count()
         initial_ingested_count = IngestedObject.objects.count()
@@ -120,7 +120,7 @@ class TestStovaIngestionTasks:
     def test_skip_previously_ingested_records(
         self, test_file_path, test_base_stova_attendee, s3_object_processor,
     ):
-        """Test that we skip updating records that have already been ingested"""
+        """Test that we skip updating records that have already been ingested."""
         StovaAttendeeFactory(stova_attendee_id=123456789)
         data = test_base_stova_attendee
         data['id'] = 123456789
@@ -136,7 +136,7 @@ class TestStovaIngestionTasks:
     @override_settings(S3_LOCAL_ENDPOINT_URL=None)
     @pytest.mark.usefixtures('s3_client')
     def test_invalid_file(self, test_file_path):
-        """Test that an exception is raised when the file is not valid
+        """Test that an exception is raised when the file is not valid.
         """
         with pytest.raises(Exception) as e:
             stova_attendee_ingestion_task(test_file_path)
@@ -550,10 +550,10 @@ class TestStovaIngestionTasks:
     @pytest.mark.django_db
     @pytest.mark.parametrize(
         'company_name',
-        (
+        [
             '',
             None,
-        ),
+        ],
     )
     def test_get_or_create_company__returns_when_company_name_empty(
         self, s3_object_processor, test_file_path, caplog, company_name,
@@ -614,14 +614,14 @@ class TestStovaIngestionTasks:
     @pytest.mark.django_db
     @pytest.mark.parametrize(
         'required_field',
-        (
+        [
             'id',
             'event_id',
             'company_name',
             'first_name',
             'last_name',
             'email',
-        ),
+        ],
     )
     def test_stova_attendee_ingestion_rejects_attendee_if_missing_required_fields(
         self,

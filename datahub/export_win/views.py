@@ -62,7 +62,7 @@ class NullBooleanFieldFilter(Filter):
     """Null boolean field filter."""
 
     def filter(self, qs, value):
-        """Filter query"""
+        """Filter query."""
         if value is not None:
             sanitised_value = value.strip().lower()
             if sanitised_value == 'null':
@@ -184,7 +184,7 @@ class WinViewSet(CoreViewSet):
 
     @action(methods=['post'], detail=True, schema=StubSchema())
     def resend_export_win(self, request, *args, **kwargs):
-        """Resend email manually via ITA dashboard
+        """Resend email manually via ITA dashboard.
         """
         win = self.get_object()
         contact = win.company_contacts.first()

@@ -56,7 +56,7 @@ def should_vat_be_applied(order):
         - if VATStatus is outside_eu => the VAT is never applied
         - if VATStatus is eu
             - if the VAT has been verified => the VAT is not applied
-            - if the VAT has not been verified => the VAT is applied
+            - if the VAT has not been verified => the VAT is applied.
 
     :returns: True if the VAT should be applied when calculating the pricing
     """

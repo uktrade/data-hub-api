@@ -200,7 +200,7 @@ class LargeCapitalOpportunityInteractionFactory(InteractionFactoryBase):
 
 
 class CompanyInteractionFactoryWithRelatedTradeAgreements(CompanyInteractionFactory):
-    """Factory for creating a company interaction with related_trade_agreements"""
+    """Factory for creating a company interaction with related_trade_agreements."""
 
     has_related_trade_agreements = True
 
@@ -300,7 +300,7 @@ class CompaniesInteractionWithExportBarrierOtherFactory(CompanyInteractionFactor
 
     @to_many_field
     def export_barrier_types(self):
-        """Add "other" export barrier type
+        """Add "other" export barrier type.
         """
         return [constants.ExportBarrierType.other.value.id]
 
@@ -313,6 +313,6 @@ class CompaniesInteractionWithExportBarrierFinanceFactory(CompanyInteractionFact
 
     @to_many_field
     def export_barrier_types(self):
-        """Add "other" export barrier type
+        """Add "other" export barrier type.
         """
         return [constants.ExportBarrierType.finance.value.id]

@@ -21,7 +21,7 @@ LONG_RUNNING_QUEUE = 'long-running'
 
 class WorkerStrategy:
     """Worker base facilitating connections and implementations around processing queues
-    See https://python-rq.org/docs/workers/ for more information
+    See https://python-rq.org/docs/workers/ for more information.
     """
 
     def __init__(self, connection):
@@ -43,7 +43,7 @@ class Fork(WorkerStrategy):
 
 class DataHubScheduler:
     """Datahub Queue utilising RQ to instantiate different types of Queues
-    for processing work using Redis as the underlying PUB SUB durability layer
+    for processing work using Redis as the underlying PUB SUB durability layer.
     """
 
     def __init__(

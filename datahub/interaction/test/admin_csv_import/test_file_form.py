@@ -119,15 +119,15 @@ class TestInteractionCSVForm:
         ]
 
     @pytest.mark.parametrize(
-        'num_matching,num_unmatched,num_multiple_matches,max_returned_rows',
-        (
+        ('num_matching', 'num_unmatched', 'num_multiple_matches', 'max_returned_rows'),
+        [
             (4, 3, 2, 4),
             (4, 3, 2, 2),
             (4, 3, 2, 8),
             (4, 0, 0, 4),
             (0, 2, 2, 4),
             (0, 0, 2, 4),
-        ),
+        ],
     )
     def test_get_matching_summary(
         self,
@@ -201,8 +201,8 @@ class TestInteractionCSVForm:
         with pytest.raises(DataHubError):
             form.get_matching_summary(50)
 
-    @pytest.mark.parametrize('num_unmatched', (0, 2))
-    @pytest.mark.parametrize('num_multiple_matches', (0, 2))
+    @pytest.mark.parametrize('num_unmatched', [0, 2])
+    @pytest.mark.parametrize('num_multiple_matches', [0, 2])
     @pytest.mark.usefixtures('local_memory_cache')
     def test_save_returns_correct_counts(self, num_unmatched, num_multiple_matches):
         """Test that save() returns the expected counts for each matching status."""
@@ -235,8 +235,8 @@ class TestInteractionCSVForm:
             ContactMatchingStatus.multiple_matches: num_multiple_matches,
         }
 
-    @pytest.mark.parametrize('num_unmatched', (0, 2))
-    @pytest.mark.parametrize('num_multiple_matches', (0, 2))
+    @pytest.mark.parametrize('num_unmatched', [0, 2])
+    @pytest.mark.parametrize('num_multiple_matches', [0, 2])
     @pytest.mark.usefixtures('local_memory_cache')
     def test_save_returns_unmatched_rows(self, num_unmatched, num_multiple_matches):
         """Test that save() returns an UnmatchedRowCollector with the expected rows."""
@@ -268,8 +268,8 @@ class TestInteractionCSVForm:
             *multiple_matches_rows,
         ]
 
-    @pytest.mark.parametrize('num_unmatched', (0, 2))
-    @pytest.mark.parametrize('num_multiple_matches', (0, 2))
+    @pytest.mark.parametrize('num_unmatched', [0, 2])
+    @pytest.mark.parametrize('num_multiple_matches', [0, 2])
     def test_save_creates_interactions(self, num_unmatched, num_multiple_matches):
         """Test that save() creates interactions."""
         num_matching = 3
@@ -428,14 +428,14 @@ class TestInteractionCSVForm:
     @pytest.mark.usefixtures('local_memory_cache')
     @pytest.mark.parametrize(
         'cache_data',
-        (
+        [
             # only the file contents
             {_cache_key_for_token('test-token', CacheKeyType.file_contents): b'data'},
             # only the file name
             {_cache_key_for_token('test-token', CacheKeyType.file_name): 'name'},
             # nothing
             {},
-        ),
+        ],
     )
     def test_from_token_with_invalid_token(self, cache_data):
         """Test that from_token() returns None if there is incomplete data for the token in

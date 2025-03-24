@@ -19,8 +19,8 @@ class TestPopulateBillingData:
     """Tests for the populate_billing_data logic."""
 
     @pytest.mark.parametrize(
-        'initial_model_values,expected_billing_address_fields',
-        (
+        ('initial_model_values', 'expected_billing_address_fields'),
+        [
             # registered address
             (
                 {
@@ -101,7 +101,7 @@ class TestPopulateBillingData:
                     'billing_address_country': None,
                 },
             ),
-        ),
+        ],
     )
     def test_with_empty_order(self, initial_model_values, expected_billing_address_fields):
         """Test that an order without any of the billing fields filled in is populated
@@ -154,7 +154,7 @@ class TestPopulateBillingData:
 
     @pytest.mark.parametrize(
         'billing_address',
-        (
+        [
             {
                 'billing_address_1': 'Populated address 1',
                 'billing_address_2': 'Populated address 2',
@@ -171,7 +171,7 @@ class TestPopulateBillingData:
                 'billing_address_postcode': '',
                 'billing_address_country_id': uuid.UUID(constants.Country.italy.value.id),
             },
-        ),
+        ],
     )
     def test_with_already_populated_billing_address(self, billing_address):
         """Test that if the order has some billing address fields already populated,
@@ -204,8 +204,8 @@ class TestComposeOfficialAddress:
     """Tests for the compose_official_address function."""
 
     @pytest.mark.parametrize(
-        'initial_model_values,expected_address_values',
-        (
+        ('initial_model_values', 'expected_address_values'),
+        [
             # registered address
             (
                 {
@@ -286,7 +286,7 @@ class TestComposeOfficialAddress:
                     'country': None,
                 },
             ),
-        ),
+        ],
     )
     def test(self, initial_model_values, expected_address_values):
         """Test that registered address is used if defined or address otherwise.

@@ -31,10 +31,10 @@ class TestCompany:
 
     @pytest.mark.parametrize(
         'build_global_headquarters',
-        (
+        [
             lambda: CompanyFactory.build(),
             lambda: None,
-        ),
+        ],
         ids=('as_subsidiary', 'as_non_subsidiary'),
     )
     def test_get_group_global_headquarters(self, build_global_headquarters):
@@ -50,7 +50,7 @@ class TestCompany:
 
     @pytest.mark.parametrize(
         'build_company',
-        (
+        [
             # subsidiary with Global Headquarters on the One List
             lambda one_list_tier: CompanyFactory(
                 one_list_tier=None,
@@ -71,7 +71,7 @@ class TestCompany:
                 one_list_tier=None,
                 global_headquarters=None,
             ),
-        ),
+        ],
         ids=(
             'as_subsidiary_of_one_list_company',
             'as_subsidiary_of_non_one_list_company',
@@ -96,7 +96,7 @@ class TestCompany:
 
     @pytest.mark.parametrize(
         'build_company',
-        (
+        [
             # as subsidiary
             lambda gam: CompanyFactory(
                 global_headquarters=CompanyFactory(one_list_account_owner=gam),
@@ -106,12 +106,12 @@ class TestCompany:
                 global_headquarters=None,
                 one_list_account_owner=gam,
             ),
-        ),
+        ],
         ids=('as_subsidiary', 'as_non_subsidiary'),
     )
     @pytest.mark.parametrize(
         'with_global_account_manager',
-        (True, False),
+        [True, False],
         ids=lambda val: f'{"With" if val else "Without"} global account manager',
     )
     def test_get_one_list_group_core_team(
@@ -150,7 +150,7 @@ class TestCompany:
 
     @pytest.mark.parametrize(
         'build_company',
-        (
+        [
             # subsidiary with Global Headquarters on the One List
             lambda one_list_tier, gam: CompanyFactory(
                 one_list_tier=None,
@@ -179,7 +179,7 @@ class TestCompany:
                 global_headquarters=None,
                 one_list_account_owner=None,
             ),
-        ),
+        ],
         ids=(
             'as_subsidiary_of_one_list_company',
             'as_subsidiary_of_non_one_list_company',
@@ -213,8 +213,8 @@ class TestContact:
         )
 
     @pytest.mark.parametrize(
-        'first_name,last_name,company_factory,expected_output',
-        (
+        ('first_name', 'last_name', 'company_factory', 'expected_output'),
+        [
             ('First', 'Last', lambda: CompanyFactory(name='Company'), 'First Last (Company)'),
             ('', 'Last', lambda: CompanyFactory(name='Company'), 'Last (Company)'),
             ('First', '', lambda: CompanyFactory(name='Company'), 'First (Company)'),
@@ -222,7 +222,7 @@ class TestContact:
             ('First', 'Last', lambda: CompanyFactory(name=''), 'First Last'),
             ('', '', lambda: CompanyFactory(name='Company'), '(no name) (Company)'),
             ('', '', lambda: None, '(no name)'),
-        ),
+        ],
     )
     def test_str(self, first_name, last_name, company_factory, expected_output):
         """Test the human-friendly string representation of a Contact object."""
@@ -235,17 +235,17 @@ class TestContact:
 
 
 class TestCompanyExportCountry:
-    """Tests Company export country model"""
+    """Tests Company export country model."""
 
     def test_str(self):
-        """Test the human friendly string representation of the object"""
+        """Test the human friendly string representation of the object."""
         export_country = CompanyExportCountryFactory()
         status = f'{export_country.company} {export_country.country} {export_country.status}'
         assert str(export_country) == status
 
     def test_unique_constraint(self):
         """Test unique constraint
-        a company and country combination can't be added more than once
+        a company and country combination can't be added more than once.
         """
         company_1 = CompanyFactory()
         country = random_obj_for_model(Country)
@@ -263,10 +263,10 @@ class TestCompanyExportCountry:
 
 
 class TestCompanyExportCountryHistory:
-    """Tests Company export country history model"""
+    """Tests Company export country history model."""
 
     def test_str(self):
-        """Test the human friendly string representation of the object"""
+        """Test the human friendly string representation of the object."""
         history = CompanyExportCountryHistoryFactory()
         status = f'{history.company} {history.country} {history.status}'
         assert str(history) == status

@@ -38,11 +38,11 @@ class TestGetPipelineItemsView(APITestMixin):
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     @pytest.mark.parametrize(
-        'permission_codenames,expected_status',
-        (
+        ('permission_codenames', 'expected_status'),
+        [
             ([], status.HTTP_403_FORBIDDEN),
             (['view_pipelineitem'], status.HTTP_200_OK),
-        ),
+        ],
     )
     def test_permission_checking(self, permission_codenames, expected_status, api_client):
         """Test that the expected status is returned for various user permissions."""
@@ -255,8 +255,8 @@ class TestGetPipelineItemsView(APITestMixin):
         )
 
     @pytest.mark.parametrize(
-        'request_data,count',
-        (
+        ('request_data', 'count'),
+        [
             pytest.param(
                 {'status': PipelineItem.Status.IN_PROGRESS},
                 1,
@@ -267,7 +267,7 @@ class TestGetPipelineItemsView(APITestMixin):
                 0,
                 id='non existent status',
             ),
-        ),
+        ],
     )
     def test_can_filter_by_valid_status(self, request_data, count):
         """Test that it can filter by status."""
@@ -536,12 +536,12 @@ class TestAddPipelineItemView(APITestMixin):
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     @pytest.mark.parametrize(
-        'permission_codenames,expected_status',
-        (
+        ('permission_codenames', 'expected_status'),
+        [
             ([], status.HTTP_403_FORBIDDEN),
             (['view_pipelineitem'], status.HTTP_403_FORBIDDEN),
             (['add_pipelineitem'], status.HTTP_201_CREATED),
-        ),
+        ],
     )
     def test_permission_checking(self, permission_codenames, expected_status):
         """Test that the expected status is returned for various user permissions."""
@@ -561,8 +561,8 @@ class TestAddPipelineItemView(APITestMixin):
         assert response.status_code == expected_status
 
     @pytest.mark.parametrize(
-        'request_data,expected_errors',
-        (
+        ('request_data', 'expected_errors'),
+        [
             pytest.param(
                 {},
                 {
@@ -626,7 +626,7 @@ class TestAddPipelineItemView(APITestMixin):
                 },
                 id='company is empty string',
             ),
-        ),
+        ],
     )
     def test_validation(self, request_data, expected_errors):
         """Test validation."""
@@ -656,7 +656,7 @@ class TestAddPipelineItemView(APITestMixin):
         }
 
     def test_validate_non_existent_contact(self):
-        """Test that non existent contact adding results in error"""
+        """Test that non existent contact adding results in error."""
         company = CompanyFactory()
         dummy_contact_id = str(uuid4())
         pipeline_status = PipelineItem.Status.LEADS
@@ -675,7 +675,7 @@ class TestAddPipelineItemView(APITestMixin):
         }
 
     def test_validate_non_existent_sector(self):
-        """Test that non existent sector adding results in error"""
+        """Test that non existent sector adding results in error."""
         company = CompanyFactory()
         dummy_sector_id = str(uuid4())
         pipeline_status = PipelineItem.Status.LEADS
@@ -942,12 +942,12 @@ class TestPatchPipelineItemView(APITestMixin):
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     @pytest.mark.parametrize(
-        'permission_codenames,expected_status',
-        (
+        ('permission_codenames', 'expected_status'),
+        [
             ([], status.HTTP_403_FORBIDDEN),
             (['view_pipelineitem'], status.HTTP_403_FORBIDDEN),
             (['change_pipelineitem'], status.HTTP_200_OK),
-        ),
+        ],
     )
     def test_permission_checking(self, permission_codenames, expected_status, api_client):
         """Test that the expected status is returned for various user permissions."""
@@ -965,8 +965,8 @@ class TestPatchPipelineItemView(APITestMixin):
         assert response.status_code == expected_status
 
     @pytest.mark.parametrize(
-        'request_data,expected_errors',
-        (
+        ('request_data', 'expected_errors'),
+        [
             pytest.param(
                 {
                     'status': None,
@@ -1030,7 +1030,7 @@ class TestPatchPipelineItemView(APITestMixin):
                 },
                 id='name is not a empty string',
             ),
-        ),
+        ],
     )
     def test_validation(self, request_data, expected_errors):
         """Test validation."""
@@ -1042,7 +1042,7 @@ class TestPatchPipelineItemView(APITestMixin):
         assert response.json() == expected_errors
 
     def test_validate_only_allowed_fields_can_be_updated(self):
-        """Test that any other field other than status or name throws a 400"""
+        """Test that any other field other than status or name throws a 400."""
         company = CompanyFactory()
         item = PipelineItemFactory(adviser=self.user)
         url = _pipeline_item_detail_url(item.pk)
@@ -1105,8 +1105,8 @@ class TestPatchPipelineItemView(APITestMixin):
         }
 
     @pytest.mark.parametrize(
-        'field,value',
-        (
+        ('field', 'value'),
+        [
             pytest.param(
                 'status',
                 PipelineItem.Status.LEADS,
@@ -1147,7 +1147,7 @@ class TestPatchPipelineItemView(APITestMixin):
                 None,
                 id='patch expected_win_date',
             ),
-        ),
+        ],
     )
     def test_can_patch_an_individual_field_values(self, field, value):
         """Test that each field of a pipeline item can be patched."""
@@ -1472,12 +1472,12 @@ class TestGetPipelineItemView(APITestMixin):
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     @pytest.mark.parametrize(
-        'permission_codenames,expected_status',
-        (
+        ('permission_codenames', 'expected_status'),
+        [
             ([], status.HTTP_403_FORBIDDEN),
             (['change_pipelineitem'], status.HTTP_403_FORBIDDEN),
             (['view_pipelineitem'], status.HTTP_200_OK),
-        ),
+        ],
     )
     def test_permission_checking(self, permission_codenames, expected_status, api_client):
         """Test that the expected status is returned for various user permissions."""
@@ -1597,12 +1597,12 @@ class TestDeletePipelineItemView(APITestMixin):
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     @pytest.mark.parametrize(
-        'permission_codenames,expected_status',
-        (
+        ('permission_codenames', 'expected_status'),
+        [
             ([], status.HTTP_403_FORBIDDEN),
             (['view_pipelineitem'], status.HTTP_403_FORBIDDEN),
             (['delete_pipelineitem'], status.HTTP_204_NO_CONTENT),
-        ),
+        ],
     )
     def test_permission_checking(self, permission_codenames, expected_status, api_client):
         """Test that the expected status is returned for various user permissions."""

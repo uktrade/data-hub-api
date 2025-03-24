@@ -78,14 +78,14 @@ class TestInteractionAdminChangeList(AdminTestMixin):
 
 
 @pytest.mark.parametrize(
-    'http_method,url',
-    (
+    ('http_method', 'url'),
+    [
         ('get', import_interactions_url),
         ('post', import_interactions_url),
         ('post', reverse(import_save_urlname, kwargs={'token': 'test-token'})),
         ('get', reverse(import_complete_urlname, kwargs={'token': 'test-token'})),
         ('get', reverse(import_download_unmatched_urlname, kwargs={'token': 'test-token'})),
-    ),
+    ],
 )
 class TestAccessRestrictions(AdminTestMixin):
     """Tests permissions and other access restrictions on import interaction-related views."""
@@ -126,8 +126,8 @@ class TestAccessRestrictions(AdminTestMixin):
 
 
 @pytest.mark.parametrize(
-    'http_method,url,expected_message',
-    (
+    ('http_method', 'url', 'expected_message'),
+    [
         (
             'post',
             reverse(import_save_urlname, kwargs={'token': 'test-token'}),
@@ -143,7 +143,7 @@ class TestAccessRestrictions(AdminTestMixin):
             reverse(import_download_unmatched_urlname, kwargs={'token': 'test-token'}),
             INVALID_TOKEN_MESSAGE_POST_SAVE,
         ),
-    ),
+    ],
 )
 @pytest.mark.usefixtures('local_memory_cache')
 class TestInvalidTokenRedirectView(AdminTestMixin):
@@ -234,11 +234,11 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
         )
 
     @pytest.mark.parametrize(
-        'max_errors,expected_num_errors_omitted',
-        (
+        ('max_errors', 'expected_num_errors_omitted'),
+        [
             (5, 7),
             (12, 0),
-        ),
+        ],
     )
     def test_displays_errors_for_file_with_invalid_rows(
         self,
@@ -314,11 +314,11 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
         assert response.context['num_matched_omitted'] == 0
 
     @pytest.mark.parametrize(
-        'num_input_rows,expected_num_omitted_rows',
-        (
+        ('num_input_rows', 'expected_num_omitted_rows'),
+        [
             (2, 0),
             (10, 5),
-        ),
+        ],
     )
     def test_shows_preview_if_matches(
         self,
@@ -459,12 +459,12 @@ class TestImportInteractionsSaveView(AdminTestMixin):
         }
 
     @pytest.mark.parametrize(
-        'num_unmatched,num_multiple_matches',
-        (
+        ('num_unmatched', 'num_multiple_matches'),
+        [
             (0, 0),
             (0, 2),
             (3, 0),
-        ),
+        ],
     )
     def test_stores_unmatched_rows(self, num_unmatched, num_multiple_matches):
         """Test that unmatched rows are saved in the cache."""
@@ -496,9 +496,9 @@ class TestImportInteractionsSaveView(AdminTestMixin):
 class TestImportInteractionsCompleteView(AdminTestMixin):
     """Tests for the import complete view."""
 
-    @pytest.mark.parametrize('num_matching', (1, 2))
-    @pytest.mark.parametrize('num_unmatched', (0, 1, 3))
-    @pytest.mark.parametrize('num_multiple_matches', (0, 1, 4))
+    @pytest.mark.parametrize('num_matching', [1, 2])
+    @pytest.mark.parametrize('num_unmatched', [0, 1, 3])
+    @pytest.mark.parametrize('num_multiple_matches', [0, 1, 4])
     def test_displays_counts_by_status(self, num_matching, num_unmatched, num_multiple_matches):
         """Test that counts are displayed for each matching status."""
         token = 'test-token'
@@ -526,9 +526,9 @@ class TestImportInteractionsCompleteView(AdminTestMixin):
 class TestImportInteractionsDownloadUnmatchedView(AdminTestMixin):
     """Tests for the download unmatched rows view."""
 
-    @pytest.mark.parametrize('num_matching', (1, 2))
-    @pytest.mark.parametrize('num_unmatched', (0, 1, 3))
-    @pytest.mark.parametrize('num_multiple_matches', (0, 1, 4))
+    @pytest.mark.parametrize('num_matching', [1, 2])
+    @pytest.mark.parametrize('num_unmatched', [0, 1, 3])
+    @pytest.mark.parametrize('num_multiple_matches', [0, 1, 4])
     @freeze_time('2019-05-10 12:13:14')
     def test_can_download_unmatched_rows(self, num_matching, num_unmatched, num_multiple_matches):
         """Test that unmatched rows can be downloaded."""

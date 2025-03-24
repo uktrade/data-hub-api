@@ -73,10 +73,10 @@ class TestExportWinsAdvisersDatasetView(BaseDatasetViewTest):
 
     @pytest.mark.parametrize(
         'list_legacy_data',
-        (
+        [
             True,
             False,
-        ),
+        ],
     )
     def test_success_with_legacy_data(
         self,
@@ -98,10 +98,10 @@ class TestExportWinsAdvisersDatasetView(BaseDatasetViewTest):
 
     @pytest.mark.parametrize(
         'allow_legacy_data',
-        (
+        [
             True,
             False,
-        ),
+        ],
     )
     def test_success_with_legacy_content_override(
         self,
@@ -176,10 +176,10 @@ class TestExportWinsBreakdownDatasetView(BaseDatasetViewTest):
 
     @pytest.mark.parametrize(
         'list_legacy_data',
-        (
+        [
             True,
             False,
-        ),
+        ],
     )
     def test_success_with_legacy_data(
         self,
@@ -200,10 +200,10 @@ class TestExportWinsBreakdownDatasetView(BaseDatasetViewTest):
 
     @pytest.mark.parametrize(
         'allow_legacy_data',
-        (
+        [
             True,
             False,
-        ),
+        ],
     )
     def test_success_with_legacy_content_override(
         self,
@@ -449,7 +449,7 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
 
     @pytest.mark.parametrize(
         'responded',
-        (True, False),
+        [True, False],
     )
     def test_success(self, data_flow_api_client, responded):
         associated_programmes = AssociatedProgrammeFactory.create_batch(3)
@@ -484,10 +484,10 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
 
     @pytest.mark.parametrize(
         'list_legacy_data',
-        (
+        [
             True,
             False,
-        ),
+        ],
     )
     def test_success_with_legacy_data(
         self,
@@ -515,10 +515,10 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
 
     @pytest.mark.parametrize(
         'allow_legacy_data',
-        (
+        [
             True,
             False,
-        ),
+        ],
     )
     def test_success_with_legacy_content_override(
         self,

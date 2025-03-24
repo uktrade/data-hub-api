@@ -17,13 +17,13 @@ pytestmark = pytest.mark.django_db
 
 @pytest.mark.parametrize(
     'order_factory',
-    (
+    [
         OrderCancelledFactory,
         OrderCompleteFactory,
         OrderFactory,
         OrderPaidFactory,
         OrderWithAcceptedQuoteFactory,
-    ),
+    ],
 )
 def test_order_to_dict(order_factory):
     """Test converting an order to dict."""

@@ -184,7 +184,7 @@ class TestExportCountryHistoryCustomSignals:
 
     def test_delete_company_export_country_no_signal(self):
         """Test that attempting to delete an nonexisting CompanyExportCountry
-        record won't send a signal and won't track history
+        record won't send a signal and won't track history.
         """
         company = CompanyFactory()
         countries = CountryModel.objects.order_by('name')[:2]

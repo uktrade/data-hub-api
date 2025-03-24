@@ -72,7 +72,7 @@ class ReminderTestMixin:
         return self.api_client.get(f'{url}?offset=0&limit=2')
 
     def create_reminders(self):
-        """Creates some mock reminders"""
+        """Creates some mock reminders."""
         with freeze_time('2022-11-07T17:00:00.000000Z'):
             reminder_1 = self.factory(
                 adviser=self.user,
@@ -84,14 +84,14 @@ class ReminderTestMixin:
         return [reminder_1, reminder_2]
 
     def test_not_authed(self):
-        """Should return Unauthorised"""
+        """Should return Unauthorised."""
         url = reverse(self.url_name)
         api_client = APIClient()
         response = api_client.get(url)
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     def test_get_reminders_only_includes_current(self):
-        """Only the reminders belonging to the current user should be returned"""
+        """Only the reminders belonging to the current user should be returned."""
         reminder_count = 3
         self.factory.create_batch(
             reminder_count,
@@ -104,7 +104,7 @@ class ReminderTestMixin:
         assert data.get('count') == reminder_count
 
     def test_default_sort_by(self):
-        """Default sort should be in reverse date order"""
+        """Default sort should be in reverse date order."""
         reminder_1, reminder_2 = self.create_reminders()
         response = self.get_response
         assert response.status_code == status.HTTP_200_OK
@@ -115,7 +115,7 @@ class ReminderTestMixin:
         assert results[1]['id'] == str(reminder_1.id)
 
     def test_sort_by_created(self):
-        """Should sort in date order"""
+        """Should sort in date order."""
         reminder_1, reminder_2 = self.create_reminders()
         url = reverse(self.url_name)
         response = self.api_client.get(f'{url}?offset=0&limit=2&sortby=created_on')
@@ -127,7 +127,7 @@ class ReminderTestMixin:
         assert results[1]['id'] == str(reminder_2.id)
 
     def test_sort_by_created_descending(self):
-        """Should sort in reverse date order"""
+        """Should sort in reverse date order."""
         reminder_1, reminder_2 = self.create_reminders()
         url = reverse(self.url_name)
         response = self.api_client.get(f'{url}?offset=0&limit=2&sortby=-created_on')
@@ -139,7 +139,7 @@ class ReminderTestMixin:
         assert results[1]['id'] == str(reminder_1.id)
 
     def test_delete(self):
-        """Deleting should remove the model instance"""
+        """Deleting should remove the model instance."""
         reminder_count = 3
         reminder = self.factory.create_batch(
             reminder_count,
@@ -159,7 +159,7 @@ class ReminderTestMixin:
 class TaskReminderMixin:
     def test_get_generic_task_reminders(self):
         """Given some reminders for generic tasks, these should be returned without any references to
-        other task types
+        other task types.
         """
         reminder_count = 3
         reminders = self.factory.create_batch(
@@ -192,7 +192,7 @@ class TaskReminderMixin:
 
     def test_get_investment_project_task_reminders(self):
         """Given some reminders for tasks with an investment project, these should be returned with
-        the correct investment project data
+        the correct investment project data.
         """
         investment_project = InvestmentProjectFactory()
         task = TaskFactory(investment_project=investment_project)
@@ -238,7 +238,7 @@ class TaskReminderMixin:
 
     def test_get_company_task_reminders(self):
         """Given some reminders for tasks with a company, these should be returned with
-        the correct company data
+        the correct company data.
         """
         company = CompanyFactory()
         task = TaskFactory(company=company)
@@ -274,7 +274,7 @@ class TaskReminderMixin:
 
     def test_get_interaction_task_reminders(self):
         """Given some reminders for tasks with an interaction, these should be returned with
-        the correct interaction data
+        the correct interaction data.
         """
         interaction = InteractionFactoryBase()
         task = TaskFactory(interaction=interaction)
@@ -320,7 +320,7 @@ class TestNewExportInteractionReminderViewset(APITestMixin, ReminderTestMixin):
     tested_model = NewExportInteractionReminder
 
     def test_get_reminders(self):
-        """Given some reminders, these should be returned"""
+        """Given some reminders, these should be returned."""
         reminder_count = 3
         export_company = CompanyFactory()
         export_interaction = CompaniesInteractionFactory()
@@ -395,7 +395,7 @@ class TestNewExportInteractionReminderViewset(APITestMixin, ReminderTestMixin):
         }
 
     def test_get_reminders_no_team(self):
-        """Should be returning reminders of interactions created by users with no DIT team"""
+        """Should be returning reminders of interactions created by users with no DIT team."""
         interaction_adviser = AdviserFactory(dit_team=None)
         export_interaction = CompaniesInteractionFactory(created_by=interaction_adviser)
 
@@ -422,7 +422,7 @@ class TestNoRecentExportInteractionReminderViewset(APITestMixin, ReminderTestMix
     tested_model = NoRecentExportInteractionReminder
 
     def test_get_reminders(self):
-        """Given some reminders, these should be returned"""
+        """Given some reminders, these should be returned."""
         reminder_count = 3
         export_company = CompanyFactory()
         export_interaction = CompaniesInteractionFactory()
@@ -497,7 +497,7 @@ class TestNoRecentExportInteractionReminderViewset(APITestMixin, ReminderTestMix
         }
 
     def test_get_reminders_no_interaction(self):
-        """Should return reminders for companies with no interactions"""
+        """Should return reminders for companies with no interactions."""
         reminder_count = 3
         export_company = CompanyFactory()
         reminders = NoRecentExportInteractionReminderFactory.create_batch(
@@ -542,7 +542,7 @@ class TestNoRecentExportInteractionReminderViewset(APITestMixin, ReminderTestMix
         }
 
     def test_get_reminders_no_team(self):
-        """Should be returning reminders of interactions created by users with no DIT team"""
+        """Should be returning reminders of interactions created by users with no DIT team."""
         interaction_adviser = AdviserFactory(dit_team=None)
         export_interaction = CompaniesInteractionFactory(created_by=interaction_adviser)
 
@@ -569,7 +569,7 @@ class TestNoRecentInvestmentInteractionReminderViewset(APITestMixin, ReminderTes
     tested_model = NoRecentInvestmentInteractionReminder
 
     def test_get_reminders(self):
-        """Given some reminders, these should be returned"""
+        """Given some reminders, these should be returned."""
         reminder_count = 3
         reminders = NoRecentInvestmentInteractionReminderFactory.create_batch(
             reminder_count,
@@ -607,7 +607,7 @@ class TestUpcomingEstimatedLandDateReminderViewset(APITestMixin, ReminderTestMix
     tested_model = UpcomingEstimatedLandDateReminder
 
     def test_get_reminders(self):
-        """Given some reminders, these should be returned"""
+        """Given some reminders, these should be returned."""
         reminder_count = 3
         reminders = UpcomingEstimatedLandDateReminderFactory.create_batch(
             reminder_count,
@@ -723,7 +723,7 @@ class TestGetReminderSummaryView(APITestMixin):
     url_name = 'api-v4:reminder:summary'
 
     def test_not_authed(self):
-        """Should return Unauthorised"""
+        """Should return Unauthorised."""
         url = reverse(self.url_name)
         api_client = APIClient()
         response = api_client.get(url)
@@ -856,13 +856,13 @@ class TestGetReminderSummaryView(APITestMixin):
         }
 
     @pytest.mark.parametrize(
-        'investment,export',
-        (
+        ('investment', 'export'),
+        [
             (False, False),
             (False, True),
             (True, False),
             (True, True),
-        ),
+        ],
     )
     def test_get_summary_of_reminders_with_feature_groups(
         self,

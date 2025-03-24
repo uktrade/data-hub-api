@@ -9,8 +9,8 @@ from datahub.core.validators import AddressValidator
 class TestAddressValidator:
     """Tests for the AddressValidator."""
 
-    @pytest.mark.parametrize('values_as_data', (True, False))
-    @pytest.mark.parametrize('with_instance', (True, False))
+    @pytest.mark.parametrize('values_as_data', [True, False])
+    @pytest.mark.parametrize('with_instance', [True, False])
     def test_fails_without_any_fields_if_not_lazy(self, values_as_data, with_instance):
         """Test that the validation fails if lazy == False and the required fields
         are not specified.
@@ -47,8 +47,8 @@ class TestAddressValidator:
             'town': ['This field is required.'],
         }
 
-    @pytest.mark.parametrize('values_as_data', (True, False))
-    @pytest.mark.parametrize('with_instance', (True, False))
+    @pytest.mark.parametrize('values_as_data', [True, False])
+    @pytest.mark.parametrize('with_instance', [True, False])
     def test_passes_without_any_fields_set_if_lazy(self, values_as_data, with_instance):
         """Test that the validation passes if lazy == True and none of the fields
         are specified.
@@ -83,8 +83,8 @@ class TestAddressValidator:
         except Exception:
             pytest.fail('Should not raise a validator error.')
 
-    @pytest.mark.parametrize('values_as_data', (True, False))
-    @pytest.mark.parametrize('lazy', (True, False))
+    @pytest.mark.parametrize('values_as_data', [True, False])
+    @pytest.mark.parametrize('lazy', [True, False])
     def test_fails_without_all_required_fields_set(self, values_as_data, lazy):
         """Test that the validation fails if only some fields are set but not
         all the required ones are.

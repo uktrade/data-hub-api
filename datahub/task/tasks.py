@@ -230,7 +230,7 @@ def create_task_assigned_to_me_from_others_subscription(adviser):
 
 
 def notify_adviser_added_to_task(task, adviser_id):
-    """Send a notification to the adviser added to the task
+    """Send a notification to the adviser added to the task.
     """
     if adviser_id == task.created_by.id:
         return

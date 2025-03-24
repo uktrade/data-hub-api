@@ -10,7 +10,7 @@ from datahub.metadata.serializers import SERVICE_LEAF_NODE_NOT_SELECTED_MESSAGE
 
 
 class BaseEventSerializer(serializers.ModelSerializer):
-    """Common functionality between V3 and V4 endpoint"""
+    """Common functionality between V3 and V4 endpoint."""
 
     default_error_messages = {
         'lead_team_not_in_teams': gettext_lazy('Lead team must be in teams array.'),
@@ -171,7 +171,7 @@ class EventSerializerV4(BaseEventSerializer):
         return attrs
 
     def _validate_related_trade_agreements(self, combiner):
-        """Validates trade agreement state for consistency with has_related_trade_agreements"""
+        """Validates trade agreement state for consistency with has_related_trade_agreements."""
         errors = {}
         related_trade_agreements_count = len(
             combiner.get_value_to_many('related_trade_agreements'),

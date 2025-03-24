@@ -110,7 +110,7 @@ class ReminderStatus(models.TextChoices):
 
 
 class BaseReminderManager(models.Manager):
-    """Base reminder manager that filters out dismissed reminders
+    """Base reminder manager that filters out dismissed reminders.
     """
 
     def get_queryset(self):

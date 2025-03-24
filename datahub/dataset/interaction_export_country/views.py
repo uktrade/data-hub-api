@@ -9,7 +9,7 @@ class InteractionsExportCountryDatasetView(BaseFilterDatasetView):
     """
 
     def get_dataset(self, request):
-        """Returns list of company_export_country_history records"""
+        """Returns list of company_export_country_history records."""
         queryset = InteractionExportCountry.objects.values(
             'country__name',
             'country__iso_alpha2_code',

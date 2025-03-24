@@ -107,13 +107,13 @@ class TestUpdateFromDNB(AdminTestMixin):
 
     @pytest.mark.parametrize(
         'dnb_response_code',
-        (
+        [
             status.HTTP_400_BAD_REQUEST,
             status.HTTP_401_UNAUTHORIZED,
             status.HTTP_403_FORBIDDEN,
             status.HTTP_404_NOT_FOUND,
             status.HTTP_500_INTERNAL_SERVER_ERROR,
-        ),
+        ],
     )
     def test_post_dnb_error(self, requests_mock, dnb_response_code):
         """Tests that the users get an error message if the dnb-service
@@ -132,8 +132,8 @@ class TestUpdateFromDNB(AdminTestMixin):
         assert str(messages[0]) == 'Something went wrong in an upstream service.'
 
     @pytest.mark.parametrize(
-        'search_results, expected_message',
-        (
+        ('search_results', 'expected_message'),
+        [
             (
                 [],
                 'No matching company found in D&B database.',
@@ -146,7 +146,7 @@ class TestUpdateFromDNB(AdminTestMixin):
                 [{'duns_number': '012345678'}],
                 'Something went wrong in an upstream service.',
             ),
-        ),
+        ],
     )
     def test_post_dnb_response_invalid(
         self,

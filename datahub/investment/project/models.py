@@ -605,7 +605,7 @@ class InvestmentProject(
     def save(self, *args, **kwargs):
         """Updates the stage log after saving.
         Create a `CompanyActivity` linked to this investment project for
-        showing all activities related to a company. If no company exist then do nothing
+        showing all activities related to a company. If no company exist then do nothing.
         """
         adding = self._state.adding
 
@@ -800,7 +800,7 @@ class InvestmentActivity(BaseModel):
         ordering = ('-created_on',)
 
     def __str__(self):
-        """Human-readable representation"""
+        """Human-readable representation."""
         return self.text
 
 
@@ -833,7 +833,7 @@ class InvestmentSector(models.Model):
     )
 
     def __str__(self):
-        """Human-readable representation"""
+        """Human-readable representation."""
         return f'{self.sector} Sector - {self.fdi_sic_grouping}'
 
 
@@ -904,7 +904,7 @@ class GVAMultiplier(models.Model):
         ]
 
     def __str__(self):
-        """Human-readable representation"""
+        """Human-readable representation."""
         return f'GVA Multiplier for {self.sector} - {self.financial_year}'
 
 

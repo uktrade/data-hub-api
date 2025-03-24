@@ -125,7 +125,7 @@ def cleanup_configs(request):
     return request.param
 
 
-@pytest.mark.parametrize('model_name,config', delete_orphans.Command.CONFIGS.items())
+@pytest.mark.parametrize(('model_name', 'config'), delete_orphans.Command.CONFIGS.items())
 def test_mappings(model_name, config):
     """Test that `MAPPINGS` includes all the data necessary for covering all the cases.
     This is to avoid missing tests when new fields and models are added or changed.
@@ -173,7 +173,7 @@ def create_orphanable_model(factory, config, date_value):
         )
 
 
-@pytest.mark.parametrize('model_name,config', delete_orphans.Command.CONFIGS.items())
+@pytest.mark.parametrize(('model_name', 'config'), delete_orphans.Command.CONFIGS.items())
 def test_configs(model_name, config):
     """Test that configs for delete_orphans only specify a single filter, and do not specify any
     relation filters.
@@ -194,7 +194,7 @@ def test_configs(model_name, config):
 
 @freeze_time(FROZEN_TIME)
 @pytest.mark.parametrize(
-    'model_name,config,mapping,dep_factory,dep_field_name',
+    ('model_name', 'config', 'mapping', 'dep_factory', 'dep_field_name'),
     (
         (
             model_name,
@@ -222,7 +222,7 @@ def test_run(
     - a record without any objects referencing it but not old enough
         doesn't get deleted
     - a record without any objects referencing it and old gets deleted
-    - a record with another object referencing it doesn't get deleted
+    - a record with another object referencing it doesn't get deleted.
     """
     # Set up the state before running the command
     command = delete_orphans.Command()

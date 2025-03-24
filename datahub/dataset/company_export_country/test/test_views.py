@@ -11,7 +11,7 @@ from datahub.dataset.core.test import BaseDatasetViewTest
 
 
 def get_expected_data_from_company_export_country(company_export_country):
-    """Returns company_export_country data as a dictionary"""
+    """Returns company_export_country data as a dictionary."""
     return {
         'id': str(company_export_country.id),
         'company_id': str(company_export_country.company_id),
@@ -25,14 +25,14 @@ def get_expected_data_from_company_export_country(company_export_country):
 
 @pytest.mark.django_db
 class TestCompanyExportCountryDatasetView(BaseDatasetViewTest):
-    """Tests for CompanyExportCountryDatasetView
+    """Tests for CompanyExportCountryDatasetView.
     """
 
     factory = CompanyExportCountryFactory
     view_url = reverse('api-v4:dataset:company-export-country-dataset')
 
     def test_success(self, data_flow_api_client):
-        """Test that endpoint returns with expected data for a single event"""
+        """Test that endpoint returns with expected data for a single event."""
         company_export_country = self.factory()
         response = data_flow_api_client.get(self.view_url)
         assert response.status_code == 200
@@ -45,7 +45,7 @@ class TestCompanyExportCountryDatasetView(BaseDatasetViewTest):
         assert result == expected_result
 
     def test_with_multiple_events(self, data_flow_api_client):
-        """Test that endpoint returns correct order of event records"""
+        """Test that endpoint returns correct order of event records."""
         with freeze_time('2019-01-01 12:30:00'):
             company_export_country_1 = self.factory()
         with freeze_time('2019-01-03 12:00:00'):

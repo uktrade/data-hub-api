@@ -15,7 +15,7 @@ MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
 class TaskSerializer(serializers.ModelSerializer):
-    """Basic task serilizer that contains the fields shared among all other task serializers"""
+    """Basic task serilizer that contains the fields shared among all other task serializers."""
 
     modified_by = NestedAdviserField(read_only=True)
     archived_by = NestedAdviserField(read_only=True)

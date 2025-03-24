@@ -224,7 +224,7 @@ class SearchInvestmentProjectAPIView(SearchInvestmentProjectAPIViewMixin, Search
         return base_query
 
     def get_sibling_company_ids(self, investor_companies):
-        """Get a list of all sibling company id's"""
+        """Get a list of all sibling company id's."""
         # get all company id's where the global ultimate duns number is equal to this
         # companies duns number
         sibling_company_ids = []
@@ -246,7 +246,7 @@ class SearchInvestmentProjectAPIView(SearchInvestmentProjectAPIViewMixin, Search
         return sibling_company_ids
 
     def get_parent_company_ids(self, investor_companies):
-        """Get a list of all parent company id's"""
+        """Get a list of all parent company id's."""
         parent_company_ids = []
         global_headquarters_ids = []
         global_ultimate_duns_numbers = []
@@ -430,7 +430,7 @@ class SearchInvestmentExportAPIView(SearchInvestmentProjectAPIViewMixin, SearchE
 
     @property
     def field_titles(self):
-        """Returns field titles for CSV export
+        """Returns field titles for CSV export.
 
         There is implicit ordering here, guaranteed for python >= 3.7 to be insertion order
         This is a property because we don't want it to evaluate prior to database instantiation

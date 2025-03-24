@@ -8,7 +8,7 @@ from datahub.dataset.core.test import BaseDatasetViewTest
 
 
 def get_expected_data_from_company_objective(objective):
-    """Returns company objective data as a dictionary"""
+    """Returns company objective data as a dictionary."""
     return {
         'id': str(objective.id),
         'company_id': str(objective.company_id),
@@ -27,14 +27,14 @@ def get_expected_data_from_company_objective(objective):
 
 @pytest.mark.django_db
 class TestCompanyObjectiveDatasetViewSet(BaseDatasetViewTest):
-    """Tests for CompanyObjectiveDatasetView
+    """Tests for CompanyObjectiveDatasetView.
     """
 
     view_url = reverse('api-v4:dataset:company-objective-dataset')
     factory = ObjectiveFactory
 
     def test_success(self, data_flow_api_client):
-        """Test that endpoint returns with expected data for a single pipeline item"""
+        """Test that endpoint returns with expected data for a single pipeline item."""
         objective = ObjectiveFactory()
 
         response = data_flow_api_client.get(self.view_url)
@@ -48,7 +48,7 @@ class TestCompanyObjectiveDatasetViewSet(BaseDatasetViewTest):
         assert result == expected_result
 
     def test_with_multiple_records(self, data_flow_api_client):
-        """Test that endpoint returns correct number of records"""
+        """Test that endpoint returns correct number of records."""
         objectives = ObjectiveFactory.create_batch(4)
         response = data_flow_api_client.get(self.view_url)
         assert response.status_code == status.HTTP_200_OK

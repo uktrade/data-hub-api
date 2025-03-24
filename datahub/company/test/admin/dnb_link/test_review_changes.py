@@ -45,8 +45,8 @@ class TestReviewChangesViewGet(AdminTestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     @pytest.mark.parametrize(
-        'data_overrides,expected_errors',
-        (
+        ('data_overrides', 'expected_errors'),
+        [
             (
                 {'company': None, 'duns_number': None},  # No data
                 ['Company: This field is required.', 'Duns_number: This field is required.'],
@@ -63,7 +63,7 @@ class TestReviewChangesViewGet(AdminTestMixin):
                 },
                 ['Duns_number: Ensure this value has at least 9 characters (it has 1).'],
             ),
-        ),
+        ],
     )
     def test_validation_errors_rendered(self, data_overrides, expected_errors):
         """Test that validation errors are rendered as expected.
@@ -168,17 +168,17 @@ class TestReviewChangesViewDNBErrors(AdminTestMixin):
 
     @pytest.mark.parametrize(
         'http_method',
-        ('GET', 'POST'),
+        ['GET', 'POST'],
     )
     @pytest.mark.parametrize(
         'dnb_response_code',
-        (
+        [
             status.HTTP_400_BAD_REQUEST,
             status.HTTP_401_UNAUTHORIZED,
             status.HTTP_403_FORBIDDEN,
             status.HTTP_404_NOT_FOUND,
             status.HTTP_500_INTERNAL_SERVER_ERROR,
-        ),
+        ],
     )
     def test_dnb_service_error(self, requests_mock, http_method, dnb_response_code):
         """Tests that the users get an error message if the dnb-service
@@ -201,11 +201,11 @@ class TestReviewChangesViewDNBErrors(AdminTestMixin):
 
     @pytest.mark.parametrize(
         'http_method',
-        ('GET', 'POST'),
+        ['GET', 'POST'],
     )
     @pytest.mark.parametrize(
-        'search_results, expected_message',
-        (
+        ('search_results', 'expected_message'),
+        [
             (
                 [],
                 'No matching company found in D&B database.',
@@ -218,7 +218,7 @@ class TestReviewChangesViewDNBErrors(AdminTestMixin):
                 [{'duns_number': '012345678'}],
                 'Something went wrong in an upstream service.',
             ),
-        ),
+        ],
     )
     def test_dnb_response_invalid(
         self,

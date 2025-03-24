@@ -31,10 +31,10 @@ pytestmark = pytest.mark.django_db
 
 
 class TestAddExport(APITestMixin):
-    """Test the POST export endpoint"""
+    """Test the POST export endpoint."""
 
     def _generate_valid_json(self):
-        """Generate a json object containing valid values for a company export"""
+        """Generate a json object containing valid values for a company export."""
         company = CompanyFactory()
         owner = AdviserFactory()
         team_members = AdviserFactory.create_batch(3)
@@ -64,7 +64,7 @@ class TestAddExport(APITestMixin):
 
     def test_missing_mandatory_fields_return_expected_error(self):
         """Test when mandatory fields are not provided these fields are included in the
-        error response
+        error response.
         """
         url = reverse('api-v4:export:collection')
 
@@ -89,7 +89,7 @@ class TestAddExport(APITestMixin):
 
     def test_too_many_team_members_return_expected_error(self):
         """Test when the number of team_members provided is above the maximum allowed, the response
-        contains this error message
+        contains this error message.
         """
         url = reverse('api-v4:export:collection')
         data = self._generate_valid_json()
@@ -106,7 +106,7 @@ class TestAddExport(APITestMixin):
         assert response_data['team_members'] == ['You can only add 5 team members']
 
     def test_post_success(self):
-        """Test a POST request with correct arguments provides a success response"""
+        """Test a POST request with correct arguments provides a success response."""
         url = reverse('api-v4:export:collection')
 
         response = self.api_client.post(
@@ -121,10 +121,10 @@ class TestAddExport(APITestMixin):
 
 
 class TestGetExport(APITestMixin):
-    """Test the GET export endpoint"""
+    """Test the GET export endpoint."""
 
     def test_get_unknown_export_returns_error(self):
-        """Test a GET with an unknown export id returns a not found error"""
+        """Test a GET with an unknown export id returns a not found error."""
         ExportFactory.create_batch(3)
         url = reverse('api-v4:export:item', kwargs={'pk': uuid.uuid4()})
 
@@ -132,7 +132,7 @@ class TestGetExport(APITestMixin):
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     def test_get_success(self):
-        """Test a GET request with a known export id provides a success response"""
+        """Test a GET request with a known export id provides a success response."""
         export = ExportFactory(
             contacts=ContactFactory.create_batch(3),
             team_members=AdviserFactory.create_batch(4),
@@ -198,7 +198,7 @@ class TestGetExport(APITestMixin):
 
 
 class TestListExport(APITestMixin):
-    """Test the LIST export endpoint"""
+    """Test the LIST export endpoint."""
 
     def _assert_export_list_success(self, exports, count=1):
         url = reverse('api-v4:export:collection')
@@ -212,7 +212,7 @@ class TestListExport(APITestMixin):
             assert result['id'] in export_ids
 
     def test_list_export_request_user_not_owner_user_not_team_member_returns_empty_results(self):
-        """Test a LIST with an unknown export id returns a not found error"""
+        """Test a LIST with an unknown export id returns a not found error."""
         ExportFactory(owner=AdviserFactory(), team_members=[AdviserFactory()])
         url = reverse('api-v4:export:collection')
 
@@ -224,7 +224,7 @@ class TestListExport(APITestMixin):
         self,
     ):
         """Test a LIST with an export that has the current user as a team member returns only that
-        item
+        item.
         """
         export = ExportFactory(
             owner=AdviserFactory(),
@@ -240,7 +240,7 @@ class TestListExport(APITestMixin):
         self,
     ):
         """Test a LIST with an export that has the current user as the owner returns only that
-        item
+        item.
         """
         export = ExportFactory(owner=self.user, team_members=[AdviserFactory()])
         ExportFactory.create_batch(2)
@@ -248,7 +248,7 @@ class TestListExport(APITestMixin):
 
     def test_list_export_request_user_is_owner_user_is_a_team_member_returns_success(self):
         """Test a LIST with an export that has the current user as the owner and a team member
-        returns only that item
+        returns only that item.
         """
         export = ExportFactory(
             owner=self.user,
@@ -264,7 +264,7 @@ class TestListExport(APITestMixin):
         self,
     ):
         """Test a LIST with a combination of exports where the current user is the owner, team member
-        and both returns only those items
+        and both returns only those items.
         """
         export_owner_only = ExportFactory(
             owner=self.user,
@@ -297,12 +297,12 @@ class TestListExport(APITestMixin):
         )
 
     @pytest.mark.parametrize(
-        'batch_size,offset,limit,expected_count',
-        (
+        ('batch_size', 'offset', 'limit', 'expected_count'),
+        [
             (5, 0, 5, 5),
             (5, 3, 10, 2),
             (2, 2, 1, 0),
-        ),
+        ],
     )
     def test_list_request_user_is_owner_user_is_a_team_member_with_pagination_success(
         self,
@@ -311,7 +311,7 @@ class TestListExport(APITestMixin):
         limit,
         expected_count,
     ):
-        """Test a request with pagination criteria returns expected export results
+        """Test a request with pagination criteria returns expected export results.
         """
         ExportFactory.create_batch(batch_size, owner=self.user, team_members=[self.user])
 
@@ -330,10 +330,10 @@ class TestListExport(APITestMixin):
 
 
 class TestPatchExport(APITestMixin):
-    """Test the PATCH export endpoint"""
+    """Test the PATCH export endpoint."""
 
     def test_patch_unknown_export_returns_error(self):
-        """Test a PATCH with an unknown export id returns a not found error"""
+        """Test a PATCH with an unknown export id returns a not found error."""
         ExportFactory.create_batch(3)
         url = reverse('api-v4:export:item', kwargs={'pk': uuid.uuid4()})
 
@@ -342,7 +342,7 @@ class TestPatchExport(APITestMixin):
 
     def test_patch_too_many_team_members_return_expected_error(self):
         """Test when the number of team_members provided is above the maximum allowed, the response
-        contains this error message
+        contains this error message.
         """
         export = ExportFactory()
         url = reverse('api-v4:export:item', kwargs={'pk': export.id})
@@ -354,7 +354,7 @@ class TestPatchExport(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_patch_success(self):
-        """Test a PATCH request with a known export id provides a success response
+        """Test a PATCH request with a known export id provides a success response.
         """
         modified_date = now()
         with freeze_time(modified_date):
@@ -420,10 +420,10 @@ class TestPatchExport(APITestMixin):
 
 
 class TestDeleteExport(APITestMixin):
-    """Test the DELETE export endpoint"""
+    """Test the DELETE export endpoint."""
 
     def test_delete_unknown_export_returns_error(self):
-        """Test a DELETE with an unknown export id returns a not found error"""
+        """Test a DELETE with an unknown export id returns a not found error."""
         ExportFactory.create_batch(3)
         url = reverse('api-v4:export:item', kwargs={'pk': uuid.uuid4()})
 
@@ -432,7 +432,7 @@ class TestDeleteExport(APITestMixin):
 
     def test_delete_success(self):
         """Test a DELETE request with a known export id provides a success response, and
-        request with the same id returns the item archived
+        request with the same id returns the item archived.
         """
         export = ExportFactory()
         url = reverse('api-v4:export:item', kwargs={'pk': export.id})
@@ -445,7 +445,7 @@ class TestDeleteExport(APITestMixin):
 
 
 class TestExportFilters(APITestMixin):
-    """Test the filters on the GET export endpoint"""
+    """Test the filters on the GET export endpoint."""
 
     def test_filtered_by_status(self):
         """List of exports filtered by status."""
@@ -563,7 +563,7 @@ class TestExportFilters(APITestMixin):
         assert response_data['results'][0]['destination_country']['id'] == str(country3.pk)
 
     def test_filtered_by_export_team_members(self):
-        """List of exports filtered by team members"""
+        """List of exports filtered by team members."""
         team_member_1 = AdviserFactory()
         team_member_2 = AdviserFactory()
         team_member_3 = AdviserFactory()
@@ -604,7 +604,7 @@ class TestExportFilters(APITestMixin):
         assert response_data['results'][0]['team_members'][0]['id'] == str(team_member_1.id)
 
     def test_filtered_by_other_owner(self):
-        """List of exports filtered by other owner"""
+        """List of exports filtered by other owner."""
         other_owner = AdviserFactory()
 
         ExportFactory(
@@ -631,8 +631,8 @@ class TestExportFilters(APITestMixin):
         assert response_data['results'][0]['owner']['id'] == str(other_owner.id)
 
     @pytest.mark.parametrize(
-        'query,num_results',
-        (
+        ('query', 'num_results'),
+        [
             (
                 {
                     'estimated_win_date_before': '2023-08-01',
@@ -665,7 +665,7 @@ class TestExportFilters(APITestMixin):
                 },
                 0,
             ),
-        ),
+        ],
     )
     def test_filtered_by_estimated_win_date(
         self,
@@ -712,7 +712,7 @@ class TestExportFilters(APITestMixin):
                     assert estimated_win_date >= date
 
     def test_filtered_by_archived(self):
-        """List of exports filtered by archive value"""
+        """List of exports filtered by archive value."""
         archived = ExportFactory(
             archived=True,
             owner=self.user,
@@ -749,11 +749,11 @@ class TestExportFilters(APITestMixin):
 
 
 class TestExportSortBy(APITestMixin):
-    """Test the sorting on the GET export endpoint"""
+    """Test the sorting on the GET export endpoint."""
 
     @pytest.mark.parametrize(
-        'data,results',
-        (
+        ('data', 'results'),
+        [
             (  # sort by title ASC
                 {'sortby': 'title'},
                 ['Title A', 'Title B', 'Title C'],
@@ -770,10 +770,10 @@ class TestExportSortBy(APITestMixin):
                 {'sortby': '-created_on'},
                 ['Title B', 'Title A', 'Title C'],
             ),
-        ),
+        ],
     )
     def test_sort_by_export_title(self, data, results):
-        """Test sort by title (ascending)"""
+        """Test sort by title (ascending)."""
         ExportFactory(
             title='Title C',
             owner=self.user,
@@ -796,8 +796,8 @@ class TestExportSortBy(APITestMixin):
         assert [result['title'] for result in response_data['results']] == results
 
     @pytest.mark.parametrize(
-        'data,expected_results',
-        (
+        ('data', 'expected_results'),
+        [
             (  # sort by company name ASC
                 {'sortby': 'company__name'},
                 ['Abridge Ltd', 'Moon Ltd', 'Neon Ltd'],
@@ -806,10 +806,10 @@ class TestExportSortBy(APITestMixin):
                 {'sortby': '-company__name'},
                 ['Neon Ltd', 'Moon Ltd', 'Abridge Ltd'],
             ),
-        ),
+        ],
     )
     def test_sort_by_company_name(self, data, expected_results):
-        """Test sort by company"""
+        """Test sort by company."""
         ExportFactory(
             owner=self.user,
             company=CompanyFactory(name='Moon Ltd'),
@@ -836,8 +836,8 @@ class TestExportSortBy(APITestMixin):
         assert sort_results == expected_results
 
     @pytest.mark.parametrize(
-        'data,expected_results',
-        (
+        ('data', 'expected_results'),
+        [
             (  # sort by earliest expected date for export win
                 {'sortby': 'estimated_win_date'},
                 ['2024-11-01', '2024-11-02', '2024-11-03'],
@@ -846,10 +846,10 @@ class TestExportSortBy(APITestMixin):
                 {'sortby': '-estimated_win_date'},
                 ['2024-11-03', '2024-11-02', '2024-11-01'],
             ),
-        ),
+        ],
     )
     def test_sort_by_win_date(self, data, expected_results):
-        """Test sort estimated win date"""
+        """Test sort estimated win date."""
         ExportFactory(
             owner=self.user,
             estimated_win_date=datetime.date(2024, 11, 3),
@@ -876,8 +876,8 @@ class TestExportSortBy(APITestMixin):
         assert sort_results == expected_results
 
     @pytest.mark.parametrize(
-        'data,expected_results',
-        (
+        ('data', 'expected_results'),
+        [
             (  # sort by value increasing
                 {'sortby': 'estimated_export_value_amount'},
                 ['1000', '2000', '3000'],
@@ -886,10 +886,10 @@ class TestExportSortBy(APITestMixin):
                 {'sortby': '-estimated_export_value_amount'},
                 ['3000', '2000', '1000'],
             ),
-        ),
+        ],
     )
     def test_sort_by_estimated_export_value_amount(self, data, expected_results):
-        """Test sort estimated win date"""
+        """Test sort estimated win date."""
         ExportFactory(
             owner=self.user,
             estimated_export_value_amount=3000,
@@ -919,7 +919,7 @@ class TestExportSortBy(APITestMixin):
 
 
 class TestExportOwnerList(APITestMixin):
-    """Test a list of export owners"""
+    """Test a list of export owners."""
 
     def test_a_list_of_owners(self):
         other_owner = AdviserFactory()

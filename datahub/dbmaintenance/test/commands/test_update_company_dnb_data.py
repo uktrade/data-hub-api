@@ -47,7 +47,7 @@ def mock_time(monkeypatch):
 
 @pytest.fixture
 def mock_job_scheduler(monkeypatch):
-    """Mock sync_company_with_dnb
+    """Mock sync_company_with_dnb.
     """
     mocked_job_scheduler = mock.Mock()
     monkeypatch.setattr(
@@ -60,10 +60,10 @@ def mock_job_scheduler(monkeypatch):
 
 @pytest.mark.parametrize(
     'fields',
-    (
+    [
         None,
         ['global_ultimate_duns_number', 'name'],
-    ),
+    ],
 )
 @mock.patch('datahub.dbmaintenance.management.commands.update_company_dnb_data.log_to_sentry')
 @freeze_time('2019-01-01 11:12:13')

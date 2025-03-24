@@ -77,7 +77,7 @@ class TestEYBCompanyContactLinking:
         user_object_processor,
     ):
         """Test ingests triage and user data without any pre existing company and contacts
-        and verifies that their creation + linking to the EYB lead happens correctly
+        and verifies that their creation + linking to the EYB lead happens correctly.
         """
         initial_eyb_lead_count = EYBLead.objects.count()
         initial_company_count = Company.objects.count()
@@ -119,7 +119,7 @@ class TestEYBCompanyContactLinking:
         user_object_processor,
     ):
         """Test ingests triage and user data with pre existing company and contacts
-        and verifies that their match + linking to the EYB lead happens correctly
+        and verifies that their match + linking to the EYB lead happens correctly.
         """
         company = CompanyFactory(duns_number='123')
         contact = ContactFactory(

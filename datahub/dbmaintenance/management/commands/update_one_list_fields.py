@@ -14,7 +14,7 @@ logger = getLogger(__name__)
 class Command(CSVBaseCommand):
     """Command to update:
     - Company.one_list_tier
-    - Company.one_list_account_owner
+    - Company.one_list_account_owner.
 
     If --reset-unmatched=true, all the records not in the CSV will have
     the fields above set to None.

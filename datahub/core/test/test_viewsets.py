@@ -44,7 +44,7 @@ class EmptyModelViewSet(CoreViewSet):
 
 
 class TestCoreViewSet(APITestMixin):
-    """Tests for CoreViewSet"""
+    """Tests for CoreViewSet."""
 
     def test_create_populates_created_modified_by_if_they_exist(self):
         """Tests that if the view extends CoreViewSet and the model

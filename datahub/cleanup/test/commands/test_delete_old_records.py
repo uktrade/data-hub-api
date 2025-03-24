@@ -965,7 +965,7 @@ MAPPING = {
 
 
 @pytest.mark.parametrize(
-    'model_label,config',
+    ('model_label', 'config'),
     delete_old_records.Command.CONFIGS.items(),
 )
 def test_mappings(model_label, config):
@@ -987,7 +987,7 @@ def test_mappings(model_label, config):
         ), f'Missing test cases for relation filters for model {model_label} detected'
 
 
-@pytest.mark.parametrize('model_label,config', delete_old_records.Command.CONFIGS.items())
+@pytest.mark.parametrize(('model_label', 'config'), delete_old_records.Command.CONFIGS.items())
 def test_configs(model_label, config):
     """Test that configs for delete_old_records cover all relations for the model.
     This is to make sure any new relations that are added are not missed from the
@@ -1040,7 +1040,7 @@ def _generate_run_args():
 
 @freeze_time(FROZEN_TIME)
 @pytest.mark.parametrize(
-    'model_label,factory_kwargs,relation_mapping,relation_factory_kwargs,is_expired',
+    ('model_label', 'factory_kwargs', 'relation_mapping', 'relation_factory_kwargs', 'is_expired'),
     _generate_run_args(),
 )
 @pytest.mark.django_db
@@ -1122,7 +1122,7 @@ def test_run(
 
 
 @freeze_time(FROZEN_TIME)
-@pytest.mark.parametrize('model_name,config', delete_old_records.Command.CONFIGS.items())
+@pytest.mark.parametrize(('model_name', 'config'), delete_old_records.Command.CONFIGS.items())
 @pytest.mark.usefixtures('disconnect_delete_search_signal_receivers')
 @pytest.mark.django_db
 def test_simulate(
@@ -1182,7 +1182,7 @@ def test_simulate(
 
 
 @freeze_time(FROZEN_TIME)
-@pytest.mark.parametrize('model_name,config', delete_old_records.Command.CONFIGS.items())
+@pytest.mark.parametrize(('model_name', 'config'), delete_old_records.Command.CONFIGS.items())
 @pytest.mark.django_db
 def test_only_print_queries(model_name, config, monkeypatch, caplog):
     """Test that if --only-print-queries is passed, the SQL query is printed but no deletions or

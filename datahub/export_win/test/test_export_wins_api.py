@@ -40,8 +40,8 @@ class TestExportWinsDatasetApi(APITestMixin):
             next(get_legacy_export_wins_dataset('/data-hub-wins'))
 
     @pytest.mark.parametrize(
-        'request_exception,expected_exception',
-        (
+        ('request_exception', 'expected_exception'),
+        [
             (
                 ConnectionError,
                 ExportWinsAPIConnectionError,
@@ -58,7 +58,7 @@ class TestExportWinsDatasetApi(APITestMixin):
                 ReadTimeout,
                 ExportWinsAPITimeoutError,
             ),
-        ),
+        ],
     )
     def test_export_wins_api_request_error(
         self,
@@ -79,14 +79,14 @@ class TestExportWinsDatasetApi(APITestMixin):
 
     @pytest.mark.parametrize(
         'response_status',
-        (
+        [
             status.HTTP_400_BAD_REQUEST,
             status.HTTP_401_UNAUTHORIZED,
             status.HTTP_403_FORBIDDEN,
             status.HTTP_404_NOT_FOUND,
             status.HTTP_405_METHOD_NOT_ALLOWED,
             status.HTTP_500_INTERNAL_SERVER_ERROR,
-        ),
+        ],
     )
     def test_export_wins_api_error(
         self,
@@ -109,7 +109,7 @@ class TestExportWinsDatasetApi(APITestMixin):
         self,
         requests_mock,
     ):
-        """Check GET call will be made
+        """Check GET call will be made.
         """
         dynamic_response = HawkMockJSONResponse(
             api_id=settings.EXPORT_WINS_HAWK_ID,
@@ -133,7 +133,7 @@ class TestExportWinsDatasetApi(APITestMixin):
         requests_mock,
         mock_sleep,
     ):
-        """Check GET call will be retried
+        """Check GET call will be retried.
         """
         dynamic_response = HawkMockJSONResponse(
             api_id=settings.EXPORT_WINS_HAWK_ID,
@@ -168,7 +168,7 @@ class TestExportWinsDatasetApi(APITestMixin):
         requests_mock,
         mock_sleep,
     ):
-        """Check GET call will be aborted
+        """Check GET call will be aborted.
         """
         dynamic_response = HawkMockJSONResponse(
             api_id=settings.EXPORT_WINS_HAWK_ID,

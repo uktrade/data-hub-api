@@ -146,7 +146,7 @@ class TestNotifyOrderCreated:
     def test_email_sent_to_managers(self, mocked_notify_client):
         """Test that `.order_created` sends an email to
         - the overseas manager of the market related to the order
-        - the regional managers of the UK region related to the order
+        - the regional managers of the UK region related to the order.
         """
         market = Market.objects.first()
         market.manager_email = 'test@test.com'

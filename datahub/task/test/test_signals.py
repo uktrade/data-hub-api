@@ -92,7 +92,7 @@ class TestTaskAdviserCompletedSubscriptions:
         self,
         send_task_email,
     ):
-        """Calling with adviser completed should result in sending of TaskCompletedReminder
+        """Calling with adviser completed should result in sending of TaskCompletedReminder.
         """
         adviser = AdviserFactory()
         task = TaskFactory(advisers=[adviser], status=Task.Status.COMPLETE)

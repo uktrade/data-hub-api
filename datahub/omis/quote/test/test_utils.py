@@ -134,7 +134,7 @@ class TestGenerateQuoteContent:
 
     @freeze_time('2017-04-18 13:00:00.000000')
     def test_pricing_format(self):
-        """Test that the pricing is formatted as expected (xx.yy)"""
+        """Test that the pricing is formatted as expected (xx.yy)."""
         hourly_rate = HourlyRateFactory(rate_value=1250, vat_value=Decimal(20))
         order = OrderFactory(
             discount_value=0,
@@ -162,7 +162,7 @@ class TestCalculateQuoteExpiryDate:
     @freeze_time('2017-04-18 13:00:00.000000')
     def test_with_delivery_date_in_far_future(self):
         """Now = 18/04/2017
-        delivery date = 20/06/2017 (in 2 months)
+        delivery date = 20/06/2017 (in 2 months).
 
         Therefore expiry date = 18/05/2017 (in 30 days)
         """
@@ -175,7 +175,7 @@ class TestCalculateQuoteExpiryDate:
     @freeze_time('2017-04-18 13:00:00.000000')
     def test_with_close_delivery_date(self):
         """Now = 18/04/2017
-        delivery date = 11/05/2017 (in 23 days)
+        delivery date = 11/05/2017 (in 23 days).
 
         Therefore expiry date = 20/04/2017 (in 2 days)
         """
@@ -188,7 +188,7 @@ class TestCalculateQuoteExpiryDate:
     @freeze_time('2017-04-18 13:00:00.000000')
     def test_with_too_close_delivery_date(self):
         """Now = 18/04/2017
-        delivery date = 08/05/2017 (in 20 days)
+        delivery date = 08/05/2017 (in 20 days).
 
         Therefore expiry date would be passed so an exception is raised.
         """

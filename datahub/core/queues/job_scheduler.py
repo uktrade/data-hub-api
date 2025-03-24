@@ -23,7 +23,7 @@ def job_scheduler(
     job_timeout=THREE_MINUTES_IN_SECONDS,
     description=None,
 ):
-    """Job scheduler for setting up Jobs that run tasks
+    """Job scheduler for setting up Jobs that run tasks.
 
     Args:
         function (function): Any function or task definition that can be executed

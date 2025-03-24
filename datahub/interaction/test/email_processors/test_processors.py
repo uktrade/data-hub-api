@@ -129,8 +129,8 @@ class TestCalendarInteractionEmailProcessor:
         return email_parser_mock
 
     @pytest.mark.parametrize(
-        'interaction_data_overrides,expected_subject',
-        (
+        ('interaction_data_overrides', 'expected_subject'),
+        [
             # Simple case; just the base interaction data
             (
                 {},
@@ -156,7 +156,7 @@ class TestCalendarInteractionEmailProcessor:
                 },
                 'Meeting between Adviser 1 and Bill Adama',
             ),
-        ),
+        ],
     )
     def test_process_email_successful(
         self,
@@ -256,8 +256,8 @@ class TestCalendarInteractionEmailProcessor:
         assert all_interactions_by_sender[0].id == interaction_id
 
     @pytest.mark.parametrize(
-        'invalid_invite_exception_class,expected_to_notify',
-        (
+        ('invalid_invite_exception_class', 'expected_to_notify'),
+        [
             (
                 BadCalendarInviteError,
                 True,
@@ -278,7 +278,7 @@ class TestCalendarInteractionEmailProcessor:
                 UnconfirmedCalendarInviteError,
                 False,
             ),
-        ),
+        ],
     )
     def test_process_email_parser_validation_error(
         self,
@@ -333,8 +333,8 @@ class TestCalendarInteractionEmailProcessor:
             mock_notify_adviser_by_email.assert_not_called()
 
     @pytest.mark.parametrize(
-        'interaction_data_overrides,expected_message',
-        (
+        ('interaction_data_overrides', 'expected_message'),
+        [
             # No contacts present
             (
                 {
@@ -342,7 +342,7 @@ class TestCalendarInteractionEmailProcessor:
                 },
                 'contacts: This list may not be empty.',
             ),
-        ),
+        ],
     )
     def test_process_email_validation(
         self,
@@ -412,8 +412,8 @@ class TestInteractionPlainEmailProcessor:
         return email_parser_mock
 
     @pytest.mark.parametrize(
-        'interaction_data_overrides,expected_subject',
-        (
+        ('interaction_data_overrides', 'expected_subject'),
+        [
             # Simple case; just the base interaction data
             (
                 {},
@@ -441,7 +441,7 @@ class TestInteractionPlainEmailProcessor:
                 },
                 'Fwd: Meeting',
             ),
-        ),
+        ],
     )
     def test_process_email_successful(
         self,
@@ -511,8 +511,8 @@ class TestInteractionPlainEmailProcessor:
         )
 
     @pytest.mark.parametrize(
-        'interaction_data_overrides,expected_message',
-        (
+        ('interaction_data_overrides', 'expected_message'),
+        [
             # No contacts present
             (
                 {
@@ -520,7 +520,7 @@ class TestInteractionPlainEmailProcessor:
                 },
                 'contacts: This list may not be empty.',
             ),
-        ),
+        ],
     )
     def test_process_email_validation(
         self,

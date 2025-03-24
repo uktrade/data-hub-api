@@ -152,8 +152,8 @@ class TestDuplicateCompanyMerger:
     }
 
     @pytest.mark.parametrize(
-        'source_company_factory,expected_result,expected_should_archive',
-        (
+        ('source_company_factory', 'expected_result', 'expected_should_archive'),
+        [
             (
                 CompanyFactory,
                 base_expected_results,
@@ -232,7 +232,7 @@ class TestDuplicateCompanyMerger:
                 },
                 False,
             ),
-        ),
+        ],
     )
     @pytest.mark.usefixtures('unrelated_objects')
     def test_get_planned_changes(
@@ -251,17 +251,17 @@ class TestDuplicateCompanyMerger:
         assert merge_results == expected_planned_merge_results
 
     @pytest.mark.parametrize(
-        'factory_relation_kwarg,creates_contacts',
-        (
+        ('factory_relation_kwarg', 'creates_contacts'),
+        [
             ('num_company_list_items', False),
             ('num_contacts', True),
             ('num_interactions', True),
             ('num_orders', True),
             ('num_referrals', False),
             ('num_pipeline_items', False),
-        ),
+        ],
     )
-    @pytest.mark.parametrize('num_related_objects', (0, 1, 3))
+    @pytest.mark.parametrize('num_related_objects', [0, 1, 3])
     @pytest.mark.usefixtures('unrelated_objects')
     def test_merge_interactions_contacts_succeeds(
             self,
@@ -344,7 +344,7 @@ class TestDuplicateCompanyMerger:
 
     @pytest.mark.parametrize(
         'fields',
-        (
+        [
             (),
             ('investor_company',),
             ('intermediate_company',),
@@ -353,7 +353,7 @@ class TestDuplicateCompanyMerger:
             ('investor_company', 'uk_company'),
             ('intermediate_company', 'uk_company'),
             ('investor_company', 'intermediate_company', 'uk_company'),
-        ),
+        ],
     )
     @pytest.mark.usefixtures('unrelated_objects')
     def test_merge_investment_projects_succeeds(self, fields):
@@ -447,11 +447,11 @@ class TestDuplicateCompanyMerger:
         assert CompanyListItem.objects.filter(list=company_list, company=target_company).exists()
 
     @pytest.mark.parametrize(
-        'source_status,target_status',
-        (
+        ('source_status', 'target_status'),
+        [
             (PipelineItem.Status.LEADS, PipelineItem.Status.LEADS),
             (PipelineItem.Status.LEADS, PipelineItem.Status.IN_PROGRESS),
-        ),
+        ],
     )
     def test_merge_when_both_companies_are_on_pipeline_for_same_adviser(
         self,
@@ -555,12 +555,12 @@ class TestDuplicateCompanyMerger:
         assert source_company.transferred_to == target_company
 
     @pytest.mark.parametrize(
-        'valid_source_return_value, valid_target',
-        (
+        ('valid_source_return_value', 'valid_target'),
+        [
             ((False, ['field1', 'field2']), True),
             ((True, []), False),
             ((False, ['field1']), False),
-        ),
+        ],
     )
     @patch('datahub.company.merge_company.is_model_a_valid_merge_target')
     @patch('datahub.company.merge_company.is_model_a_valid_merge_source')
@@ -584,7 +584,7 @@ class TestDuplicateCompanyMerger:
             merge_companies(source_company, target_company, user)
 
     def test_rollback(self):
-        """Test that rollback_merge_companies() rolls back a merge of companies
+        """Test that rollback_merge_companies() rolls back a merge of companies.
         """
         with reversion.create_revision():
             source_company = _company_factory(2, 2, 2, 2, 2, 2)

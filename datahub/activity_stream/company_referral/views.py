@@ -12,7 +12,7 @@ class CompanyReferralCursorPagination(ActivityCursorPagination):
 
 
 class CompanyReferralActivityViewSet(ActivityViewSet):
-    """Interaction ViewSet for the activity stream
+    """Interaction ViewSet for the activity stream.
     """
 
     pagination_class = CompanyReferralCursorPagination

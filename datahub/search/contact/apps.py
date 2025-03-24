@@ -5,7 +5,7 @@ from datahub.search.contact.models import Contact
 
 
 class ContactSearchApp(SearchApp):
-    """SearchApp for contacts"""
+    """SearchApp for contacts."""
 
     name = 'contact'
     search_model = Contact

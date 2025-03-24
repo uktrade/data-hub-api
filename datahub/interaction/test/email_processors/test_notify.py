@@ -23,10 +23,10 @@ def mock_logger(monkeypatch):
 
 
 @pytest.mark.parametrize(
-    'domain, label',
-    (
+    ('domain', 'label'),
+    [
         ('dit.gov.uk', 'dit_gov_uk'),
-    ),
+    ],
 )
 def test_get_domain_label(domain, label):
     """Test if the `get_domain_label` function converts
@@ -38,7 +38,7 @@ def test_get_domain_label(domain, label):
 
 @pytest.mark.django_db
 def test_notify_email_ingest_failure(mock_logger):
-    """Test that the `notify_email_ingest_failure` logs failures
+    """Test that the `notify_email_ingest_failure` logs failures.
     """
     adviser = AdviserFactory(contact_email='adviser@dit.gov.uk')
     notify_meeting_ingest_failure(adviser, (), ())
@@ -51,7 +51,7 @@ def test_notify_email_ingest_failure(mock_logger):
 
 @pytest.mark.django_db
 def test_notify_email_ingest_success(mock_logger):
-    """Test that the `notify_email_ingest_success` logs success
+    """Test that the `notify_email_ingest_success` logs success.
     """
     adviser = AdviserFactory(contact_email='adviser@dit.gov.uk')
     notify_meeting_ingest_success(adviser, Mock(), ())

@@ -340,7 +340,7 @@ class TestAddOrder(APITestMixin):
 
     @pytest.mark.parametrize(
         'vat_status',
-        (VATStatus.OUTSIDE_EU, VATStatus.UK),
+        [VATStatus.OUTSIDE_EU, VATStatus.UK],
     )
     def test_vat_number_and_verified_reset_if_vat_status_not_eu(self, vat_status):
         """Test that if vat_number and vat_verified are set but vat_status != 'eu',
@@ -481,7 +481,7 @@ class TestGeneralChangeOrder(APITestMixin):
     @freeze_time('2017-01-01 11:00:00.000000')
     def test_can_update_service_type_with_another_disabled_if_wasnt_at_creation_time(self):
         """Test that if I have an order created on 01/01/2017
-        with a service type which got disabled on 10/01/2017
+        with a service type which got disabled on 10/01/2017.
 
         If I update the order
         with a service type that got disabled on  01/02/2017
@@ -577,7 +577,7 @@ class TestGeneralChangeOrder(APITestMixin):
 
     @pytest.mark.parametrize(
         'vat_status',
-        (VATStatus.OUTSIDE_EU, VATStatus.UK),
+        [VATStatus.OUTSIDE_EU, VATStatus.UK],
     )
     def test_vat_number_and_verified_reset_if_vat_status_not_eu(self, vat_status):
         """Test that if vat_number and vat_verified are set but vat_status != 'eu',
@@ -755,11 +755,11 @@ class TestChangeOrderInDraft(APITestMixin):
         }
 
     @pytest.mark.parametrize(
-        'field,value',
-        (
+        ('field', 'value'),
+        [
             ('company', lambda o: CompanyFactory().pk),
             ('primary_market', Country.greece.value.id),
-        ),
+        ],
     )
     def test_cannot_change_disallowed_fields(self, field, value):
         """Test that disallowed fields cannot be changed."""
@@ -793,10 +793,10 @@ class TestChangeOrderInQuoteStatuses(APITestMixin):
 
     @pytest.mark.parametrize(
         'order_factory',
-        (
+        [
             OrderWithOpenQuoteFactory,
             OrderWithAcceptedQuoteFactory,
-        ),
+        ],
     )
     def test_can_change_allowed_fields(self, order_factory):
         """Test that allowed fields can be changed."""
@@ -841,14 +841,14 @@ class TestChangeOrderInQuoteStatuses(APITestMixin):
 
     @pytest.mark.parametrize(
         'order_factory',
-        (
+        [
             OrderWithOpenQuoteFactory,
             OrderWithAcceptedQuoteFactory,
-        ),
+        ],
     )
     @pytest.mark.parametrize(
-        'field,value',
-        (
+        ('field', 'value'),
+        [
             ('company', lambda o: CompanyFactory().pk),
             ('primary_market', Country.greece.value.id),
 
@@ -863,7 +863,7 @@ class TestChangeOrderInQuoteStatuses(APITestMixin):
             ('contacts_not_to_approach', 'lorem ipsum'),
             ('description', 'lorem ipsum'),
             ('delivery_date', '2017-04-20'),
-        ),
+        ],
     )
     def test_cannot_change_disallowed_fields(self, order_factory, field, value):
         """Test that disallowed fields cannot be changed."""
@@ -877,10 +877,10 @@ class TestChangeOrderInQuoteStatuses(APITestMixin):
 
     @pytest.mark.parametrize(
         'order_factory',
-        (
+        [
             OrderWithOpenQuoteFactory,
             OrderWithAcceptedQuoteFactory,
-        ),
+        ],
     )
     def test_ok_with_unchanged_disallowed_fields(self, order_factory):
         """Test that disallowed fields can be passed in if their values don't change."""
@@ -906,8 +906,8 @@ class TestChangeOrderInQuoteStatuses(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
 
     @pytest.mark.parametrize(
-        'field,value',
-        (
+        ('field', 'value'),
+        [
             ('billing_address_1', 'New billing address 1'),
             ('billing_address_2', 'New billing address 2'),
             ('billing_address_town', 'New billing town'),
@@ -918,7 +918,7 @@ class TestChangeOrderInQuoteStatuses(APITestMixin):
             ('vat_number', '987654321'),
             ('vat_verified', False),
             ('po_number', 'New po number'),
-        ),
+        ],
     )
     def test_new_invoice_generated_if_quote_accepted(self, field, value):
         """Test that if the order is in status 'Quote accepted' and one of the
@@ -973,8 +973,8 @@ class TestChangeOrderInQuoteStatuses(APITestMixin):
         assert new_invoice.total_cost > old_invoice.total_cost
 
     @pytest.mark.parametrize(
-        'order_factory,data',
-        (
+        ('order_factory', 'data'),
+        [
             (OrderWithOpenQuoteFactory, {'vat_verified': False}),
             (
                 OrderWithOpenQuoteFactory,
@@ -988,7 +988,7 @@ class TestChangeOrderInQuoteStatuses(APITestMixin):
                 OrderPaidFactory,
                 {'contact': lambda o: ContactFactory(company=o.company).pk},
             ),
-        ),
+        ],
     )
     def test_invoice_not_generated(self, order_factory, data):
         """Test that changing `data` does not generate a new invoice."""
@@ -1032,8 +1032,8 @@ class TestChangeOrderInPaid(APITestMixin):
         }
 
     @pytest.mark.parametrize(
-        'field,value',
-        (
+        ('field', 'value'),
+        [
             ('company', lambda o: CompanyFactory().pk),
             ('primary_market', Country.greece.value.id),
 
@@ -1059,7 +1059,7 @@ class TestChangeOrderInPaid(APITestMixin):
             ('vat_number', '987654321'),
             ('vat_verified', False),
             ('po_number', 'New po number'),
-        ),
+        ],
     )
     def test_cannot_change_disallowed_fields(self, field, value):
         """Test that disallowed fields cannot be changed."""
@@ -1112,14 +1112,14 @@ class TestChangeOrderInEndStatuses(APITestMixin):
 
     @pytest.mark.parametrize(
         'order_factory',
-        (
+        [
             OrderCompleteFactory,
             OrderCancelledFactory,
-        ),
+        ],
     )
     @pytest.mark.parametrize(
-        'field,value',
-        (
+        ('field', 'value'),
+        [
             ('company', lambda o: CompanyFactory().pk),
             ('primary_market', Country.greece.value.id),
 
@@ -1147,7 +1147,7 @@ class TestChangeOrderInEndStatuses(APITestMixin):
             ('po_number', 'New po number'),
 
             ('contact', lambda o: ContactFactory(company=o.company).pk),
-        ),
+        ],
     )
     def test_cannot_change_disallowed_fields(self, order_factory, field, value):
         """Test that disallowed fields cannot be changed."""
@@ -1161,10 +1161,10 @@ class TestChangeOrderInEndStatuses(APITestMixin):
 
     @pytest.mark.parametrize(
         'order_factory',
-        (
+        [
             OrderCompleteFactory,
             OrderCancelledFactory,
-        ),
+        ],
     )
     def test_ok_with_unchanged_disallowed_fields(self, order_factory):
         """Test that disallowed fields can be passed in if their values don't change."""
@@ -1210,7 +1210,7 @@ class TestMarkOrderAsComplete(APITestMixin):
     @freeze_time('2017-04-18 13:00')
     @pytest.mark.parametrize(
         'allowed_status',
-        (OrderStatus.PAID,),
+        [OrderStatus.PAID],
     )
     def test_ok_if_order_in_allowed_status(self, allowed_status):
         """Test marking an order as complete."""
@@ -1236,13 +1236,13 @@ class TestMarkOrderAsComplete(APITestMixin):
 
     @pytest.mark.parametrize(
         'disallowed_status',
-        (
+        [
             OrderStatus.DRAFT,
             OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
             OrderStatus.QUOTE_ACCEPTED,
             OrderStatus.COMPLETE,
             OrderStatus.CANCELLED,
-        ),
+        ],
     )
     def test_409_if_order_not_in_allowed_status(self, disallowed_status):
         """Test that if the order is in a disallowed status, the order cannot be marked as complete.
@@ -1282,7 +1282,7 @@ class TestCancelOrder(APITestMixin):
     @freeze_time('2017-04-18 13:00')
     @pytest.mark.parametrize(
         'allowed_status',
-        (OrderStatus.DRAFT, OrderStatus.QUOTE_AWAITING_ACCEPTANCE),
+        [OrderStatus.DRAFT, OrderStatus.QUOTE_AWAITING_ACCEPTANCE],
     )
     def test_ok_if_order_in_allowed_status(self, allowed_status):
         """Test cancelling an order."""
@@ -1320,12 +1320,12 @@ class TestCancelOrder(APITestMixin):
 
     @pytest.mark.parametrize(
         'disallowed_status',
-        (
+        [
             OrderStatus.QUOTE_ACCEPTED,
             OrderStatus.PAID,
             OrderStatus.COMPLETE,
             OrderStatus.CANCELLED,
-        ),
+        ],
     )
     def test_409_if_order_not_in_allowed_status(self, disallowed_status):
         """Test that if the order is in a disallowed status, the order cannot be cancelled.
@@ -1348,8 +1348,8 @@ class TestCancelOrder(APITestMixin):
         assert order.status == disallowed_status
 
     @pytest.mark.parametrize(
-        'data,errors',
-        (
+        ('data', 'errors'),
+        [
             (
                 {},
                 {'cancellation_reason': ['This field is required.']},
@@ -1360,7 +1360,7 @@ class TestCancelOrder(APITestMixin):
                     'Invalid pk "2f68875c-35a5-4c3d-8160-9ddc104260c2" - object does not exist.',
                 ]},
             ),
-        ),
+        ],
     )
     def test_validation_errors(self, data, errors):
         """Test that if cancellation_reason is invalid, the endpoint returns 400.
@@ -1468,7 +1468,7 @@ class TestViewOrderDetails(APITestMixin):
         }
 
     def test_not_found(self):
-        """Test 404 when getting a non-existing order"""
+        """Test 404 when getting a non-existing order."""
         url = reverse(
             'api-v3:omis:order:detail',
             kwargs={'pk': '00000000-0000-0000-0000-000000000000'},

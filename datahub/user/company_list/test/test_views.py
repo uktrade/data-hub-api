@@ -55,11 +55,11 @@ class TestListCompanyListsView(APITestMixin):
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     @pytest.mark.parametrize(
-        'permission_codenames,expected_status',
-        (
+        ('permission_codenames', 'expected_status'),
+        [
             ([], status.HTTP_403_FORBIDDEN),
             (['view_companylist'], status.HTTP_200_OK),
-        ),
+        ],
     )
     def test_permission_checking(self, permission_codenames, expected_status, api_client):
         """Test that the expected status is returned for various user permissions."""
@@ -103,7 +103,7 @@ class TestListCompanyListsView(APITestMixin):
             'created_on': format_date_or_datetime(company_list.created_on),
         }
 
-    @pytest.mark.parametrize('num_items', (0, 5, 10))
+    @pytest.mark.parametrize('num_items', [0, 5, 10])
     def test_includes_accurate_item_count(self, num_items):
         """Test that the correct item count is returned."""
         company_list = CompanyListFactory(adviser=self.user)
@@ -226,11 +226,11 @@ class TestGetCompanyListView(APITestMixin):
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     @pytest.mark.parametrize(
-        'permission_codenames,expected_status',
-        (
+        ('permission_codenames', 'expected_status'),
+        [
             ([], status.HTTP_403_FORBIDDEN),
             (['view_companylist'], status.HTTP_200_OK),
-        ),
+        ],
     )
     def test_permission_checking(self, permission_codenames, expected_status, api_client):
         """Test that the expected status is returned for various user permissions."""
@@ -282,11 +282,11 @@ class TestAddCompanyListView(APITestMixin):
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     @pytest.mark.parametrize(
-        'permission_codenames,expected_status',
-        (
+        ('permission_codenames', 'expected_status'),
+        [
             ([], status.HTTP_403_FORBIDDEN),
             (['add_companylist'], status.HTTP_201_CREATED),
-        ),
+        ],
     )
     def test_permission_checking(self, permission_codenames, expected_status, api_client):
         """Test that the expected status is returned for various user permissions."""
@@ -301,8 +301,8 @@ class TestAddCompanyListView(APITestMixin):
         assert response.status_code == expected_status
 
     @pytest.mark.parametrize(
-        'request_data,expected_errors',
-        (
+        ('request_data', 'expected_errors'),
+        [
             pytest.param(
                 {},
                 {
@@ -328,7 +328,7 @@ class TestAddCompanyListView(APITestMixin):
                 },
                 id='name is empty string',
             ),
-        ),
+        ],
     )
     def test_validation(self, request_data, expected_errors):
         """Test validation."""
@@ -376,11 +376,11 @@ class TestUpdateCompanyListView(APITestMixin):
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     @pytest.mark.parametrize(
-        'permission_codenames,expected_status',
-        (
+        ('permission_codenames', 'expected_status'),
+        [
             ([], status.HTTP_403_FORBIDDEN),
             (['change_companylist'], status.HTTP_200_OK),
-        ),
+        ],
     )
     def test_permission_checking(self, permission_codenames, expected_status, api_client):
         """Test that the expected status is returned for various user permissions."""
@@ -398,8 +398,8 @@ class TestUpdateCompanyListView(APITestMixin):
         assert response.status_code == expected_status
 
     @pytest.mark.parametrize(
-        'request_data,expected_errors',
-        (
+        ('request_data', 'expected_errors'),
+        [
             pytest.param(
                 {
                     'name': None,
@@ -418,7 +418,7 @@ class TestUpdateCompanyListView(APITestMixin):
                 },
                 id='name is empty string',
             ),
-        ),
+        ],
     )
     def test_validation(self, request_data, expected_errors):
         """Test validation."""
@@ -482,11 +482,11 @@ class TestDeleteCompanyListView(APITestMixin):
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     @pytest.mark.parametrize(
-        'permission_codenames,expected_status',
-        (
+        ('permission_codenames', 'expected_status'),
+        [
             ([], status.HTTP_403_FORBIDDEN),
             (['delete_companylist'], status.HTTP_204_NO_CONTENT),
-        ),
+        ],
     )
     def test_permission_checking(self, permission_codenames, expected_status, api_client):
         """Test that the expected status is returned for various user permissions."""
@@ -546,7 +546,7 @@ class TestDeleteCompanyListView(APITestMixin):
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
-@pytest.mark.parametrize('http_method', ('delete', 'put'))
+@pytest.mark.parametrize('http_method', ['delete', 'put'])
 class TestCompanyListItemAuth(APITestMixin):
     """Tests authentication and authorisation for the company list item views."""
 
@@ -816,7 +816,7 @@ class TestCompanyListItemViewSet(APITestMixin):
 
     @pytest.mark.parametrize(
         'company_factory',
-        (
+        [
             CompanyFactory,
             ArchivedCompanyFactory,
             partial(company_with_interactions_factory, 1),
@@ -833,7 +833,7 @@ class TestCompanyListItemViewSet(APITestMixin):
             ),
             # Interaction with no participants
             partial(company_with_interactions_factory, 1, dit_participants=[]),
-        ),
+        ],
     )
     def test_with_item(self, company_factory):
         """Test serialisation of various companies."""

@@ -156,11 +156,11 @@ class Country(BaseConstantModel):
 
 
 class TradeAgreement(BaseConstantModel):
-    """Trade agreements for events"""
+    """Trade agreements for events."""
 
 
 class ExchangeRate(BaseModel):
-    """Exchange rates"""
+    """Exchange rates."""
 
     id = models.UUIDField(primary_key=True, default=uuid4)
     from_currency_code = models.CharField(max_length=3)
@@ -191,7 +191,7 @@ class AdministrativeArea(BaseConstantModel):
     area_name = models.CharField(blank=True, max_length=255)
 
     def __str__(self):
-        """To make this clearer for anyone using the admin drop down on this data
+        """To make this clearer for anyone using the admin drop down on this data.
         """
         return f'{self.name} ({self.country.name})'
 

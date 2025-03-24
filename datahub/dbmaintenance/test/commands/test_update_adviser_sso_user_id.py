@@ -28,8 +28,8 @@ class TestUpdateAdviserSSOUserIDCommand:
     """Tests for the update_adviser_sso_user_id management command."""
 
     @pytest.mark.parametrize(
-        'adviser_factory,get_user_by_email_mock,expected_sso_user_id,expected_log_messages',
-        (
+        ('adviser_factory', 'get_user_by_email_mock', 'expected_sso_user_id', 'expected_log_messages'),
+        [
             # If sso_user_id is None and SSO returns a user with a matching
             # primary email (ignoring case), sso_user_id should be updated
             pytest.param(
@@ -91,7 +91,7 @@ class TestUpdateAdviserSSOUserIDCommand:
                 ['0 advisers updated', '0 advisers skipped', '1 advisers with errors'],
                 id='no-match',
             ),
-        ),
+        ],
     )
     def test_updates_sso_user_if_appropriate(
         self,

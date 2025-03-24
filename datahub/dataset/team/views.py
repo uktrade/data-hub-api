@@ -12,7 +12,7 @@ class TeamsDatasetView(BaseDatasetView):
     pagination_class = TeamsDatasetViewCursorPagination
 
     def get_dataset(self):
-        """Returns list of Teams Dataset records"""
+        """Returns list of Teams Dataset records."""
         return Team.objects.values(
             'country__name',
             'disabled_on',

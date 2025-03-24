@@ -517,7 +517,7 @@ def search_support_user():
 
 
 def pytest_addoption(parser):
-    """Adds a new flag to pytest to skip excluded tests"""
+    """Adds a new flag to pytest to skip excluded tests."""
     parser.addoption(
         '--skip-excluded', '--se',
         action='store_true',
@@ -527,7 +527,7 @@ def pytest_addoption(parser):
 
 
 def pytest_collection_modifyitems(config, items):
-    """Skip excluded tests"""
+    """Skip excluded tests."""
     if config.getoption('--skip-excluded') is False:
         return
     for item in items:
@@ -558,7 +558,7 @@ def async_queue():
 
 @pytest.fixture
 def fork_queue():
-    """Don't use this if you are going to do work as this will block any tests running"""
+    """Don't use this if you are going to do work as this will block any tests running."""
     with DataHubScheduler('fork') as queue:
         try:
             yield queue

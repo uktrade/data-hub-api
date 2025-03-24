@@ -74,14 +74,14 @@ DNB_HIERARCHY_COUNT_URL = urljoin(DNB_HIERARCHY_SEARCH_URL, 'count')
 class TestCompanySearch:
     @pytest.mark.parametrize(
         'dnb_response_status',
-        (
+        [
             status.HTTP_400_BAD_REQUEST,
             status.HTTP_401_UNAUTHORIZED,
             status.HTTP_403_FORBIDDEN,
             status.HTTP_404_NOT_FOUND,
             status.HTTP_405_METHOD_NOT_ALLOWED,
             status.HTTP_500_INTERNAL_SERVER_ERROR,
-        ),
+        ],
     )
     def test_get_company_dnb_service_error(
         self,
@@ -108,8 +108,8 @@ class TestCompanySearch:
         assert caplog.records[0].getMessage() == expected_message
 
     @pytest.mark.parametrize(
-        'request_exception,expected_exception,expected_message',
-        (
+        ('request_exception', 'expected_exception', 'expected_message'),
+        [
             (
                 ConnectionError,
                 DNBServiceConnectionError,
@@ -130,7 +130,7 @@ class TestCompanySearch:
                 DNBServiceTimeoutError,
                 'Encountered a timeout interacting with DNB service',
             ),
-        ),
+        ],
     )
     def test_get_company_dnb_service_request_error(
         self,
@@ -154,8 +154,8 @@ class TestCompanySearch:
         assert str(e.value) == str(expected_message)
 
     @pytest.mark.parametrize(
-        'search_results, expected_exception, expected_message',
-        (
+        ('search_results', 'expected_exception', 'expected_message'),
+        [
             (
                 [],
                 DNBServiceInvalidRequestError,
@@ -172,7 +172,7 @@ class TestCompanySearch:
                 'DUNS number of the company: 012345678 '
                 'did not match searched DUNS number: 123456789',
             ),
-        ),
+        ],
     )
     def test_get_company_invalid_request_response(
         self,
@@ -253,17 +253,17 @@ class TestUpdateCompanyFromDNB:
 
     @pytest.mark.parametrize(
         'adviser_callable',
-        (
+        [
             lambda: None,
             lambda: AdviserFactory(),
-        ),
+        ],
     )
     @pytest.mark.parametrize(
         'update_descriptor',
-        (
+        [
             None,
             'automatic',
-        ),
+        ],
     )
     @freeze_time('2019-01-01 11:12:13')
     def test_update_company_from_dnb_all_fields(
@@ -350,10 +350,10 @@ class TestUpdateCompanyFromDNB:
 
     @pytest.mark.parametrize(
         'adviser_callable',
-        (
+        [
             lambda: None,
             lambda: AdviserFactory(),
-        ),
+        ],
     )
     def test_update_company_from_dnb_partial_fields_single(
         self,
@@ -382,10 +382,10 @@ class TestUpdateCompanyFromDNB:
 
     @pytest.mark.parametrize(
         'adviser_callable',
-        (
+        [
             lambda: None,
             lambda: AdviserFactory(),
-        ),
+        ],
     )
     def test_update_company_from_dnb_partial_fields_multiple(
         self,
@@ -437,17 +437,17 @@ class TestGetCompanyUpdatePage:
 
     @pytest.mark.parametrize(
         'last_updated_after',
-        (
+        [
             '2019-11-11T12:00:00',
             '2019-11-11',
-        ),
+        ],
     )
     @pytest.mark.parametrize(
         'next_page',
-        (
+        [
             None,
             'http://some.url/endpoint?cursor=some-cursor',
-        ),
+        ],
     )
     def test_valid(self, requests_mock, last_updated_after, next_page):
         """Test if `get_company_update_page` returns the right response
@@ -476,14 +476,14 @@ class TestGetCompanyUpdatePage:
 
     @pytest.mark.parametrize(
         'dnb_response_status',
-        (
+        [
             status.HTTP_400_BAD_REQUEST,
             status.HTTP_401_UNAUTHORIZED,
             status.HTTP_403_FORBIDDEN,
             status.HTTP_404_NOT_FOUND,
             status.HTTP_405_METHOD_NOT_ALLOWED,
             status.HTTP_500_INTERNAL_SERVER_ERROR,
-        ),
+        ],
     )
     def test_dnb_service_error(
         self,
@@ -510,8 +510,8 @@ class TestGetCompanyUpdatePage:
         assert caplog.records[0].getMessage() == expected_message
 
     @pytest.mark.parametrize(
-        'request_exception, expected_exception, expected_message',
-        (
+        ('request_exception', 'expected_exception', 'expected_message'),
+        [
             (
                 ConnectionError,
                 DNBServiceConnectionError,
@@ -532,7 +532,7 @@ class TestGetCompanyUpdatePage:
                 DNBServiceTimeoutError,
                 'Encountered a timeout interacting with DNB service',
             ),
-        ),
+        ],
     )
     def test_get_company_dnb_service_request_error(
         self,
@@ -561,11 +561,11 @@ class TestRollbackDNBCompanyUpdate:
     """
 
     @pytest.mark.parametrize(
-        'fields, expected_fields',
-        (
+        ('fields', 'expected_fields'),
+        [
             (None, ALL_DNB_UPDATED_MODEL_FIELDS),
             (['name'], ['name']),
-        ),
+        ],
     )
     def test_rollback(
         self,
@@ -601,11 +601,11 @@ class TestRollbackDNBCompanyUpdate:
         assert latest_version.revision.comment == 'Reverted D&B update from: foo'
 
     @pytest.mark.parametrize(
-        'update_comment, error_message',
-        (
+        ('update_comment', 'error_message'),
+        [
             ('foo', 'Revision with comment: foo is the base version.'),
             ('bar', 'Revision with comment: bar not found.'),
-        ),
+        ],
     )
     def test_rollback_error(
         self,
@@ -673,7 +673,7 @@ class TestDNBFullHierarchyData:
     @pytest.mark.usefixtures('local_memory_cache')
     def test_when_dnb_data_not_in_cache_dnb_api_is_called(self, requests_mock):
         """Test when the dnb family tree data is missing from the cache, a call is made to the dnb
-        api to get the data and saved into the cache
+        api to get the data and saved into the cache.
         """
         matcher = requests_mock.post(
             DNB_HIERARCHY_SEARCH_URL,
@@ -691,7 +691,7 @@ class TestDNBFullHierarchyData:
         requests_mock,
     ):
         """Test that after a successful call to the dnb api, all subsequent calls to the
-        get_full_company_hierarchy_data function get the data from the cache
+        get_full_company_hierarchy_data function get the data from the cache.
         """
         matcher = requests_mock.post(
             DNB_HIERARCHY_SEARCH_URL,
@@ -706,7 +706,7 @@ class TestDNBFullHierarchyData:
 
     @pytest.mark.usefixtures('local_memory_cache')
     def test_when_dnb_data_in_cache_this_is_returned_instead_of_calling_api(self, requests_mock):
-        """Test when a value is stored in the cache the dnb api is not called
+        """Test when a value is stored in the cache the dnb api is not called.
         """
         cache.set(self.FAMILY_TREE_CACHE_KEY, 'cached')
 
@@ -725,8 +725,8 @@ class TestDNBFullHierarchyData:
 
     @pytest.mark.usefixtures('local_memory_cache')
     @pytest.mark.parametrize(
-        'request_exception,expected_exception',
-        (
+        ('request_exception', 'expected_exception'),
+        [
             (
                 ConnectionError,
                 DNBServiceConnectionError,
@@ -743,7 +743,7 @@ class TestDNBFullHierarchyData:
                 ReadTimeout,
                 DNBServiceTimeoutError,
             ),
-        ),
+        ],
     )
     def test_when_dnb_api_error_response_is_not_cached(
         self,
@@ -751,7 +751,7 @@ class TestDNBFullHierarchyData:
         request_exception,
         expected_exception,
     ):
-        """Test when the dnb api doesn't return a success http status code the value is not cached
+        """Test when the dnb api doesn't return a success http status code the value is not cached.
         """
         with pytest.raises(expected_exception):
             requests_mock.post(DNB_HIERARCHY_SEARCH_URL, exc=request_exception)
@@ -762,7 +762,7 @@ class TestDNBFullHierarchyData:
         self,
         requests_mock,
     ):
-        """Test when the dnb api doesn't return a success http status code the value is not cached
+        """Test when the dnb api doesn't return a success http status code the value is not cached.
         """
         with pytest.raises(DNBServiceError):
             requests_mock.post(
@@ -777,7 +777,7 @@ class TestDNBFullHierarchyData:
 class TestCompanyHierarchyDataframe:
     def test_single_company_with_nested_opensearch_field_is_null(self, opensearch_with_signals):
         """Test when a single company contains a nested field in opensearch that is null the
-        datatable is created with the correct column value
+        datatable is created with the correct column value.
         """
         faker = Faker()
 
@@ -805,7 +805,7 @@ class TestCompanyHierarchyDataframe:
         opensearch_with_signals,
     ):
         """Test when a single company contains a deeply nested field in opensearch that is null the
-        datatable is created with the correct column value
+        datatable is created with the correct column value.
         """
         faker = Faker()
 
@@ -833,7 +833,7 @@ class TestCompanyHierarchyDataframe:
     ):
         """Test when a multiple companies are returned from an opensearch query, that contain a
         nested field where some companies have a null value but other companies have a populated
-        value, the datatable is created with the correct column value for each company
+        value, the datatable is created with the correct column value for each company.
         """
         faker = Faker()
 
@@ -879,7 +879,7 @@ class TestCompanyHierarchyDataframe:
     ):
         """Test when a multiple companies are returned from an opensearch query, that contain a
         deeply nested field where some companies have a null value but other companies have a
-        populated value, the datatable is created with the correct column value for each company
+        populated value, the datatable is created with the correct column value for each company.
         """
         faker = Faker()
 
@@ -938,7 +938,7 @@ class TestRelatedCompanyDataframe:
     ):
         """Test when a dataframe is created using multiple companies where the parent
         relationship is both directly linked and indirectly linked value, the datatable
-        is created with the correct column value for each company
+        is created with the correct column value for each company.
         """
         faker = Faker()
 
@@ -1009,7 +1009,7 @@ class TestRelatedCompanyDataframe:
     ):
         """Test when a dataframe is created using multiple companies where the parent
         relationship is both directly linked and indirectly linked value, the datatable
-        is created with the correct column value for each company
+        is created with the correct column value for each company.
         """
         faker = Faker()
 
@@ -1045,7 +1045,7 @@ class TestDNBHierarchyCount:
     @pytest.mark.usefixtures('local_memory_cache')
     def test_when_dnb_data_not_in_cache_dnb_api_is_called(self, requests_mock):
         """Test when the dnb family tree count is missing from the cache, a call is made to the dnb
-        api to get the count and saved into the cache
+        api to get the count and saved into the cache.
         """
         matcher = requests_mock.post(
             DNB_HIERARCHY_COUNT_URL,
@@ -1062,7 +1062,7 @@ class TestDNBHierarchyCount:
         requests_mock,
     ):
         """Test that after a successful call to the dnb api, all subsequent calls to the
-        get_company_hierarchy_count function get the data from the cache
+        get_company_hierarchy_count function get the data from the cache.
         """
         matcher = requests_mock.post(
             DNB_HIERARCHY_COUNT_URL,
@@ -1077,7 +1077,7 @@ class TestDNBHierarchyCount:
 
     @pytest.mark.usefixtures('local_memory_cache')
     def test_when_dnb_data_in_cache_this_is_returned_instead_of_calling_api(self, requests_mock):
-        """Test when a value is stored in the cache the dnb api is not called
+        """Test when a value is stored in the cache the dnb api is not called.
         """
         cache.set(self.FAMILY_TREE_CACHE_KEY, 'cached')
 
@@ -1096,8 +1096,8 @@ class TestDNBHierarchyCount:
 
     @pytest.mark.usefixtures('local_memory_cache')
     @pytest.mark.parametrize(
-        'request_exception,expected_exception',
-        (
+        ('request_exception', 'expected_exception'),
+        [
             (
                 ConnectionError,
                 DNBServiceConnectionError,
@@ -1114,7 +1114,7 @@ class TestDNBHierarchyCount:
                 ReadTimeout,
                 DNBServiceTimeoutError,
             ),
-        ),
+        ],
     )
     def test_when_dnb_api_error_response_is_not_cached(
         self,
@@ -1122,7 +1122,7 @@ class TestDNBHierarchyCount:
         request_exception,
         expected_exception,
     ):
-        """Test when the dnb api raises an error the value is not cached
+        """Test when the dnb api raises an error the value is not cached.
         """
         with pytest.raises(expected_exception):
             requests_mock.post(DNB_HIERARCHY_COUNT_URL, exc=request_exception)
@@ -1133,7 +1133,7 @@ class TestDNBHierarchyCount:
         self,
         requests_mock,
     ):
-        """Test when the dnb api doesn't return a success http status code the value is not cached
+        """Test when the dnb api doesn't return a success http status code the value is not cached.
         """
         with pytest.raises(DNBServiceError):
             requests_mock.post(
@@ -1147,12 +1147,12 @@ class TestDNBHierarchyCount:
 
 class TestReducedHierarchyData:
     def test_when_no_duns_number_provided_empty_array_returned(self):
-        """Test when no duns number is provided an empty array of hierarchy data is returned
+        """Test when no duns number is provided an empty array of hierarchy data is returned.
         """
         assert get_reduced_company_hierarchy_data(duns_number='').data == []
 
     def test_when_company_has_no_parent_1_company_returned(self, requests_mock):
-        """Test when a company has no parent only that company is returned
+        """Test when a company has no parent only that company is returned.
         """
         requests_mock.post(
             DNB_V2_SEARCH_URL,
@@ -1167,7 +1167,7 @@ class TestReducedHierarchyData:
     @pytest.mark.usefixtures('local_memory_cache')
     def test_when_company_has_3_parents_all_4_companies_are_returned(self):
         """Test when a company has 3 levels of parents above them, all 4 companies are returned in
-        the hierarchy data
+        the hierarchy data.
         """
         responses = [
             {
@@ -1217,7 +1217,7 @@ class TestCompanyCaching:
     @pytest.mark.usefixtures('local_memory_cache')
     def test_when_company_data_not_in_cache_dnb_api_is_called(self, requests_mock):
         """Test when the dnb company data is missing from the cache, a call is made to the dnb
-        api to get the data and saved into the cache
+        api to get the data and saved into the cache.
         """
         matcher = requests_mock.post(
             DNB_V2_SEARCH_URL,
@@ -1234,7 +1234,7 @@ class TestCompanyCaching:
         requests_mock,
     ):
         """Test that after a successful call to the dnb api, all subsequent calls to the
-        get_cached_company function get the data from the cache
+        get_cached_company function get the data from the cache.
         """
         matcher = requests_mock.post(
             DNB_V2_SEARCH_URL,
@@ -1250,7 +1250,7 @@ class TestCompanyCaching:
 
 class TestFormatCompanyForFamilyTree:
     def test_no_company_returns_empty_object(self):
-        """Test when the company provided is none, an object is still returned
+        """Test when the company provided is none, an object is still returned.
         """
         assert format_company_for_family_tree(None) == {
             'duns': None,
@@ -1259,7 +1259,7 @@ class TestFormatCompanyForFamilyTree:
         }
 
     def test_company_with_no_parent_duns_returns_none_for_corporate_linkage_parent(self):
-        """Test a company without a parent duns number returns none for the corporate linkage
+        """Test a company without a parent duns number returns none for the corporate linkage.
         """
         assert format_company_for_family_tree({'duns_number': '1', 'primary_name': 'abc'}) == {
             'duns': '1',
@@ -1268,7 +1268,7 @@ class TestFormatCompanyForFamilyTree:
         }
 
     def test_company_with_parent_duns_returns_id_for_corporate_linkage_parent(self):
-        """Test a company with a parent duns number returns that number for the corporate linkage
+        """Test a company with a parent duns number returns that number for the corporate linkage.
         """
         assert format_company_for_family_tree(
             {'duns_number': '1', 'parent_duns_number': '2', 'primary_name': 'abc'},
@@ -1305,7 +1305,7 @@ class TestCreateCompanyTree:
         opensearch_with_signals,
     ):
         """When a requested company is the ultimate parent, no changes should be made to the
-        subsidiaries
+        subsidiaries.
         """
         faker = Faker()
 
@@ -1340,7 +1340,7 @@ class TestCreateCompanyTree:
         opensearch_with_signals,
     ):
         """When a requested company is a parent with subsidaries and no siblings, no changes should
-        be made to the subsidiaries
+        be made to the subsidiaries.
         """
         faker = Faker()
 
@@ -1384,7 +1384,7 @@ class TestCreateCompanyTree:
         opensearch_with_signals,
     ):
         """When a requested company is a subsidiary company in the tree, and it is already the first
-        company in the list, check it remains at the start of the list
+        company in the list, check it remains at the start of the list.
         """
         faker = Faker()
 
@@ -1428,7 +1428,7 @@ class TestCreateCompanyTree:
         opensearch_with_signals,
     ):
         """When a requested company is a subsidiary company in the tree, check it is moved to the
-        top of the list of subsidiaries
+        top of the list of subsidiaries.
         """
         faker = Faker()
 

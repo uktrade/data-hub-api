@@ -98,4 +98,4 @@ class SoftDeleteCoreViewSet(
     BaseViewSet,
     SoftDeleteViaArchiveMixin,
 ):
-    """Base class for view sets that need to delete using archive as a soft delete"""
+    """Base class for view sets that need to delete using archive as a soft delete."""

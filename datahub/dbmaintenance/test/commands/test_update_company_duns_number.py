@@ -146,7 +146,7 @@ def test_audit_log(s3_stubber):
 
 
 def test_companies_which_already_have_the_target_duns_are_logged(s3_stubber, caplog):
-    """Tests log contains company error for company which already has duns"""
+    """Tests log contains company error for company which already has duns."""
     caplog.set_level('INFO')
     company_with_duns = CompanyFactory(
         duns_number='132589',

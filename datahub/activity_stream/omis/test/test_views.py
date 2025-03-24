@@ -12,17 +12,17 @@ from datahub.omis.order.test.factories import OrderFactory
 
 @pytest.mark.parametrize(
     'order_overrides',
-    (
+    [
         {},
         {'created_by_id': None},
         {'primary_market_id': None},
         {'uk_region_id': None},
-    ),
+    ],
 )
 @pytest.mark.django_db
 def test_omis_order_added_activity(api_client, order_overrides):
     """Get a list of OMIS Orders added and test the JSON returned is valid as per:
-    https://www.w3.org/TR/activitystreams-core/
+    https://www.w3.org/TR/activitystreams-core/.
     """
     start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
     with freeze_time(start) as frozen_datetime:

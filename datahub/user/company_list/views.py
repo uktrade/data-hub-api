@@ -213,7 +213,7 @@ class PipelineItemViewSet(ArchivableViewSetMixin, CoreViewSet, DestroyModelMixin
         return super().get_queryset().filter(adviser=self.request.user)
 
     def perform_destroy(self, instance):
-        """Perform destroy validation ensuring that the instance is archived before deleting"""
+        """Perform destroy validation ensuring that the instance is archived before deleting."""
         if not instance.archived:
             errors = {
                 api_settings.NON_FIELD_ERRORS_KEY: CANT_DELETE_NON_ARCHIVED_PIPELINE_ITEM_MESSAGE,

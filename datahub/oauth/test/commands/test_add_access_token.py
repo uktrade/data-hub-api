@@ -26,13 +26,13 @@ class TestAddAccessTokenCommand:
         assert str(excinfo.value) == 'No adviser with SSO email user ID test@test.invalid found.'
 
     @pytest.mark.parametrize(
-        'command_kwargs,expected_timeout',
-        (
+        ('command_kwargs', 'expected_timeout'),
+        [
             # Default timeout
             ({}, timedelta(hours=10)),
             # With custom timeout
             ({'hours': 1}, timedelta(hours=1)),
-        ),
+        ],
     )
     def test_adds_access_token_to_cache(self, command_kwargs, expected_timeout):
         """The command should add the generated access token to the cache."""

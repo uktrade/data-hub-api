@@ -15,7 +15,7 @@ from datahub.task.tasks import (
 )
 def set_task_subscriptions_and_schedule_notifications(sender, **kwargs):
     """Checks to see if a Task has any advisers. If there are advisers then this is
-    passed to the task for processing to add task reminder subscriptions
+    passed to the task for processing to add task reminder subscriptions.
     """
     task = kwargs.pop('instance', None)
     pk_set = kwargs.pop('pk_set', None)
@@ -34,7 +34,7 @@ def set_task_subscriptions_and_schedule_notifications(sender, **kwargs):
     dispatch_uid='save_task',
 )
 def save_task(sender, instance, created, **kwargs):
-    """Triggers when a task is saved
+    """Triggers when a task is saved.
     """
     # As the adviser field is an m2m field, it will never contain the changed value in this signal.
     # Adviser changes are reflected in a separate m2m changed signal. As the scheduled jobs run in

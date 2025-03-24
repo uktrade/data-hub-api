@@ -504,7 +504,7 @@ class Company(ArchivableModel, BaseModel):
 
     @property
     def related_companies(self):
-        """All companies that share the same global ultimate duns number
+        """All companies that share the same global ultimate duns number.
         """
         return (
             Company.objects.filter(
@@ -516,14 +516,14 @@ class Company(ArchivableModel, BaseModel):
 
     @property
     def is_global_headquarters(self):
-        """Whether this company is the global headquarters or not"""
+        """Whether this company is the global headquarters or not."""
         if not self.headquarter_type:
             return False
         return self.headquarter_type.name == HeadquarterType.ghq.value.name
 
     @property
     def global_ultimate_country(self):
-        """The country of the global ultimate company"""
+        """The country of the global ultimate company."""
         if self.global_ultimate_duns_number:
             return (
                 Company.objects.filter(
@@ -691,7 +691,7 @@ class Company(ArchivableModel, BaseModel):
 
     @transaction.atomic
     def delete_export_country(self, country_id, adviser):
-        """Delete export country and send signal for tracking history"""
+        """Delete export country and send signal for tracking history."""
         export_country = self.export_countries.filter(country_id=country_id).first()
         if export_country:
             export_country_delete_signal.send(
@@ -754,7 +754,7 @@ class CompanyExportCountry(BaseModel):
     Status is expressed as:
         - 'currently exporting to'
         - 'future interest'
-        - 'not interested'
+        - 'not interested'.
 
     This will eventually replace company fields:
         - export_to_countries
@@ -795,7 +795,7 @@ class CompanyExportCountry(BaseModel):
         verbose_name_plural = 'company export countries'
 
     def __str__(self):
-        """Admin displayed human readable name"""
+        """Admin displayed human readable name."""
         return f'{self.company} {self.country} {self.status}'
 
 
@@ -853,5 +853,5 @@ class CompanyExportCountryHistory(models.Model):
         verbose_name_plural = 'company export country history'
 
     def __str__(self):
-        """Admin displayed human readable name"""
+        """Admin displayed human readable name."""
         return f'{self.company} {self.country} {self.status}'

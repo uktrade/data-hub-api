@@ -18,7 +18,7 @@ class InteractionsDatasetView(BaseFilterDatasetView):
     """
 
     def get_dataset(self, request):
-        """Returns a list of all interaction records"""
+        """Returns a list of all interaction records."""
         queryset = get_base_interaction_queryset().annotate(
             adviser_ids=get_aggregate_subquery(
                 Interaction,

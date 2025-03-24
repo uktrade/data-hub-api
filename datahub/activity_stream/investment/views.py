@@ -15,7 +15,7 @@ class IProjectCreatedPagination(ActivityCursorPagination):
 
 
 class IProjectCreatedViewSet(ActivityViewSet):
-    """Investment Project added ViewSet for activity stream
+    """Investment Project added ViewSet for activity stream.
     """
 
     pagination_class = IProjectCreatedPagination

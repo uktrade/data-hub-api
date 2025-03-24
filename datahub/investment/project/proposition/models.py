@@ -138,7 +138,7 @@ class Proposition(BaseModel):
         self.save()
 
     def complete(self, by, details):
-        """Complete a proposition
+        """Complete a proposition.
 
         :param by: the adviser who marked the proposition as complete
         :param details: details of completion
@@ -152,7 +152,7 @@ class Proposition(BaseModel):
         self._change_status(PropositionStatus.COMPLETED, by, details)
 
     def abandon(self, by, details):
-        """Abandon a proposition
+        """Abandon a proposition.
 
         :param by: the adviser who marked the proposition as abandoned
         :param details: reason of abandonment

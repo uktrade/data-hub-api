@@ -26,8 +26,8 @@ class TestContactV4Serializer:
     """
 
     @pytest.mark.parametrize(
-        'country_id, expected_response, is_valid, address_area',
-        (
+        ('country_id', 'expected_response', 'is_valid', 'address_area'),
+        [
             (
                 constants.Country.united_states.value.id,
                 {
@@ -59,7 +59,7 @@ class TestContactV4Serializer:
                 True,
                 None,
             ),
-        ),
+        ],
     )
     def test_area_required_validation_on_respective_countries(
         self,
@@ -69,7 +69,7 @@ class TestContactV4Serializer:
         address_area,
     ):
         """Ensure that area required validation is called for appropriate countries
-        and excluded for others
+        and excluded for others.
         """
         company = CompanyFactory()
         data = {

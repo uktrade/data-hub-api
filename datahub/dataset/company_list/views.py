@@ -9,7 +9,7 @@ class PipelineItemsDatasetView(BaseDatasetView):
     """
 
     def get_dataset(self):
-        """Returns list of PipelineItem records"""
+        """Returns list of PipelineItem records."""
         return PipelineItem.objects.annotate(
             sector_name=get_sector_name_subquery('sector'),
             contact_ids=get_array_agg_subquery(

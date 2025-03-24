@@ -15,7 +15,7 @@ from datahub.omis.order.models import Order, OrderAssignee
 
 
 def power_set(s):
-    """Returns a *power set* for the set ``s``"""
+    """Returns a *power set* for the set ``s``."""
     return set(map(frozenset, product(*repeat(s, len(s))))) | {frozenset()}
 
 
@@ -42,7 +42,7 @@ def with_empty_teams():
 # We are not using the existing model factories, because they pollute the
 # metadata.Team model with lot of records, complicating assertions about them.
 def order_assignee_factory(team):
-    """Creates a :class:`datahub.omis.order.models.OrderAssignee` instance related to ``team``
+    """Creates a :class:`datahub.omis.order.models.OrderAssignee` instance related to ``team``.
     """
     adviser = Advisor.objects.create(
         first_name='John',
@@ -118,7 +118,7 @@ RELATIONS_POWER_SET = power_set({OrderAssignee, Event, Advisor, EVENT_TEAMS})
 ])
 @pytest.mark.django_db
 def test_command(teams, with_empty_teams):
-    """Tests the :class:`datahub.cleanup.management.commands.delete_orphaned_teams.Command`
+    """Tests the :class:`datahub.cleanup.management.commands.delete_orphaned_teams.Command`.
     """
     should_be_deleted = set()
     should_stay = set()

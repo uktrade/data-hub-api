@@ -49,8 +49,8 @@ class TestSSOIntrospectionAuthentication:
     """Tests for SSOIntrospectionAuthentication."""
 
     @pytest.mark.parametrize(
-        'request_kwargs,expected_error',
-        (
+        ('request_kwargs', 'expected_error'),
+        [
             pytest.param(
                 {},
                 'Authentication credentials were not provided.',
@@ -71,7 +71,7 @@ class TestSSOIntrospectionAuthentication:
                 'Authentication credentials were not provided.',
                 id='no-token',
             ),
-        ),
+        ],
     )
     def test_rejects_malformed_headers(
         self,
@@ -90,7 +90,7 @@ class TestSSOIntrospectionAuthentication:
 
     @pytest.mark.parametrize(
         'response_kwargs',
-        (
+        [
             pytest.param(
                 {
                     'status_code': status.HTTP_401_UNAUTHORIZED,
@@ -120,7 +120,7 @@ class TestSSOIntrospectionAuthentication:
                 },
                 id='expired-token',
             ),
-        ),
+        ],
     )
     def test_authentication_fails_on_introspection_failure(
         self,

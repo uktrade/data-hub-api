@@ -71,8 +71,8 @@ class TestCancelOrderAdmin(AdminTestMixin):
         assert response.status_code == 400
 
     @pytest.mark.parametrize(
-        'data,errors',
-        (
+        ('data', 'errors'),
+        [
             (
                 {'reason': ''},
                 {'reason': ['This field is required.']},
@@ -83,7 +83,7 @@ class TestCancelOrderAdmin(AdminTestMixin):
                     'Select a valid choice. That choice is not one of the available choices.',
                 ]},
             ),
-        ),
+        ],
     )
     def test_400_validaton_error(self, data, errors):
         """Test validation errors."""
@@ -100,10 +100,10 @@ class TestCancelOrderAdmin(AdminTestMixin):
 
     @pytest.mark.parametrize(
         'order_factory',
-        (
+        [
             OrderCompleteFactory,
             OrderCancelledFactory,
-        ),
+        ],
     )
     def test_400_if_in_disallowed_status(self, order_factory):
         """Test that the action fails if the order is not in one of the allowed statuses.
@@ -145,12 +145,12 @@ class TestCancelOrderAdmin(AdminTestMixin):
 
     @pytest.mark.parametrize(
         'order_factory',
-        (
+        [
             OrderFactory,
             OrderWithOpenQuoteFactory,
             OrderWithAcceptedQuoteFactory,
             OrderPaidFactory,
-        ),
+        ],
     )
     def test_200_if_in_allowed_status(self, order_factory):
         """Test that the order gets cancelled if it's in one of the allowed statuses.

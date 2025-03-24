@@ -130,7 +130,7 @@ class TestInteractionEntitySearchView(APITestMixin):
     """Tests interaction search views."""
 
     def test_interaction_search_no_permissions(self):
-        """Should return 403"""
+        """Should return 403."""
         user = create_test_user(dit_team=TeamFactory())
         api_client = self.create_api_client(user=user)
         url = reverse('api-v3:search:interaction')
@@ -236,11 +236,11 @@ class TestInteractionEntitySearchView(APITestMixin):
         assert [item['subject'] for item in response_data['results']] == expected_subjects
 
     @pytest.mark.parametrize(
-        'sortby,error',
-        (
+        ('sortby', 'error'),
+        [
             ('date:backwards', '"backwards" is not a valid sort direction.'),
             ('gyratory:asc', '"gyratory" is not a valid choice for the sort field.'),
-        ),
+        ],
     )
     def test_sort_by_invalid_field(self, opensearch_with_collector, sortby, error):
         """Tests attempting to sort by an invalid field and direction."""
@@ -259,7 +259,7 @@ class TestInteractionEntitySearchView(APITestMixin):
 
     @pytest.mark.parametrize(
         'term',
-        (
+        [
             'exports',
             'meeting',
             'exports meeting',
@@ -273,7 +273,7 @@ class TestInteractionEntitySearchView(APITestMixin):
             'ela',
             'za',
             'QA',
-        ),
+        ],
     )
     def test_search_original_query(self, interactions, term):
         """Tests searching across fields for a particular interaction."""
@@ -418,8 +418,8 @@ class TestInteractionEntitySearchView(APITestMixin):
         assert results[0]['company']['id'] == str(companies[5].id)
 
     @pytest.mark.parametrize(
-        'name_term,matched_company_name',
-        (
+        ('name_term', 'matched_company_name'),
+        [
             # name
             ('whiskers', 'whiskers and tabby'),
             ('whi', 'whiskers and tabby'),
@@ -442,7 +442,7 @@ class TestInteractionEntitySearchView(APITestMixin):
             ('tiger', None),
             ('panda', None),
             ('moine', None),
-        ),
+        ],
     )
     def test_filter_by_company_name(
         self, opensearch_with_collector, name_term, matched_company_name,
@@ -579,7 +579,7 @@ class TestInteractionEntitySearchView(APITestMixin):
 
     @pytest.mark.parametrize(
         'created_on_exists',
-        (True, False),
+        [True, False],
     )
     def test_filter_by_created_on_exists(self, opensearch_with_collector, created_on_exists):
         """Tests filtering interaction by created_on exists."""
@@ -607,7 +607,7 @@ class TestInteractionEntitySearchView(APITestMixin):
             for result in results
         )
 
-    @pytest.mark.parametrize('dit_participant_field', ('adviser', 'team'))
+    @pytest.mark.parametrize('dit_participant_field', ['adviser', 'team'])
     def test_filter_by_dit_participant(self, opensearch_with_collector, dit_participant_field):
         """Test filtering interaction by DIT participant adviser and team IDs."""
         interactions = CompanyInteractionFactory.create_batch(10, dit_participants=[])
@@ -665,16 +665,16 @@ class TestInteractionEntitySearchView(APITestMixin):
         assert result_ids == {str(communication_channels[1].pk)}
 
     @pytest.mark.parametrize(
-        'field,field_model',
-        (
+        ('field', 'field_model'),
+        [
             ('policy_areas', PolicyArea),
             ('policy_issue_types', PolicyIssueType),
-        ),
+        ],
     )
     def test_filter_by_policy_fields(self, opensearch_with_collector, field, field_model):
         """Tests filtering interactions by:
         - policy area
-        - policy issue type
+        - policy issue type.
         """
         values = list(field_model.objects.order_by('?')[:2])
         expected_field_value = values[0]
@@ -755,7 +755,7 @@ class TestInteractionEntitySearchView(APITestMixin):
         result_ids = {result['service']['id'] for result in results}
         assert result_ids == {str(service_id)}
 
-    @pytest.mark.parametrize('was_policy_feedback_provided', (False, True))
+    @pytest.mark.parametrize('was_policy_feedback_provided', [False, True])
     def test_filter_by_was_policy_feedback_provided(
         self,
         opensearch_with_collector,
@@ -788,8 +788,8 @@ class TestInteractionEntitySearchView(APITestMixin):
         assert result_ids == {str(interaction.pk) for interaction in expected_interactions}
 
     @pytest.mark.parametrize(
-        'data,results',
-        (
+        ('data', 'results'),
+        [
             (
                 {
                     'date_after': '2017-12-01',
@@ -816,7 +816,7 @@ class TestInteractionEntitySearchView(APITestMixin):
                     'Email about exhibition',
                 },
             ),
-        ),
+        ],
     )
     def test_filter_by_date(self, interactions, data, results):
         """Tests filtering interaction by date."""
@@ -831,7 +831,7 @@ class TestInteractionEntitySearchView(APITestMixin):
 
     @pytest.mark.parametrize(
         'sector_level',
-        (0, 1, 2),
+        [0, 1, 2],
     )
     def test_sector_descends_filter_for_company_interaction(
             self,
@@ -881,7 +881,7 @@ class TestInteractionEntitySearchView(APITestMixin):
 
     @pytest.mark.parametrize(
         'sector_level',
-        (0, 1, 2),
+        [0, 1, 2],
     )
     def test_sector_descends_filter_for_investment_project_interaction(
             self,
@@ -937,11 +937,11 @@ class TestInteractionExportView(APITestMixin):
 
     @pytest.mark.parametrize(
         'permissions',
-        (
+        [
             (),
             (InteractionPermission.view_all,),
             (InteractionPermission.export,),
-        ),
+        ],
     )
     def test_user_without_permission_cannot_export(self, opensearch_with_collector, permissions):
         """Test that a user without the correct permissions cannot export data."""
@@ -953,12 +953,12 @@ class TestInteractionExportView(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     @pytest.mark.parametrize(
-        'request_sortby,orm_ordering',
-        (
+        ('request_sortby', 'orm_ordering'),
+        [
             (None, '-date'),
             ('date', 'date'),
             ('company.name', 'company__name'),
-        ),
+        ],
     )
     def test_interaction_export(
         self,
@@ -1087,12 +1087,12 @@ class TestInteractionExportView(APITestMixin):
         assert actual_row_data == format_csv_data(expected_row_data)
 
     @pytest.mark.parametrize(
-        'request_sortby,orm_ordering',
-        (
+        ('request_sortby', 'orm_ordering'),
+        [
             (None, '-date'),
             ('date', 'date'),
             ('company.name', 'company__name'),
-        ),
+        ],
     )
     def test_policy_feedback_export(
         self,
@@ -1100,7 +1100,7 @@ class TestInteractionExportView(APITestMixin):
         request_sortby,
         orm_ordering,
     ):
-        """Test export of interaction policy feedback
+        """Test export of interaction policy feedback.
         """
         # Faker generates job titles containing commas which complicates comparisons,
         # so all contact job titles are explicitly set
@@ -1258,7 +1258,7 @@ class TestInteractionBasicSearch(APITestMixin):
 
     @pytest.mark.parametrize(
         'term',
-        (
+        [
             'exports',
             'meeting',
             'exports meeting',
@@ -1272,7 +1272,7 @@ class TestInteractionBasicSearch(APITestMixin):
             'ela',
             'za',
             'QA',
-        ),
+        ],
     )
     def test_search(self, interactions, term):
         """Tests searching for various search terms."""

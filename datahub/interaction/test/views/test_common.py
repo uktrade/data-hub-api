@@ -44,7 +44,7 @@ from datahub.metadata.test.factories import TeamFactory
 class TestAddInteraction(APITestMixin):
     """Tests for the add interaction view."""
 
-    @pytest.mark.parametrize('kind', ('policy_feedback', 'invalid-kind'))
+    @pytest.mark.parametrize('kind', ['policy_feedback', 'invalid-kind'])
     def test_invalid_kind_is_rejected(self, kind):
         """Test that invalid kind values are rejected."""
         adviser = self.user
@@ -82,8 +82,8 @@ class TestAddInteraction(APITestMixin):
         }
 
     @pytest.mark.parametrize(
-        'data,errors',
-        (
+        ('data', 'errors'),
+        [
             # empty string not allowed for theme
             (
                 {
@@ -123,7 +123,7 @@ class TestAddInteraction(APITestMixin):
                     'theme': ['"not_valid" is not a valid choice.'],
                 },
             ),
-        ),
+        ],
     )
     def test_validation(self, data, errors):
         """Test validation errors."""
@@ -293,7 +293,7 @@ class TestGetInteraction(APITestMixin):
     """Base tests for the get interaction view."""
 
     def test_fails_without_permissions(self):
-        """Should return 403"""
+        """Should return 403."""
         interaction = CompanyInteractionFactory()
         user = create_test_user(dit_team=TeamFactory())
         api_client = self.create_api_client(user=user)
@@ -336,8 +336,8 @@ class TestUpdateInteraction(APITestMixin):
         assert response.data['archived_reason'] is None
 
     @pytest.mark.parametrize(
-        'data,errors',
-        (
+        ('data', 'errors'),
+        [
             # empty string not allowed for theme
             (
                 {
@@ -381,7 +381,7 @@ class TestUpdateInteraction(APITestMixin):
                     },
                 },
             ),
-        ),
+        ],
     )
     def test_validation(self, data, errors):
         """Test validation when an invalid date is provided."""
@@ -395,7 +395,7 @@ class TestUpdateInteraction(APITestMixin):
 
     @pytest.mark.parametrize(
         'request_data',
-        (
+        [
             {
                 'company': CompanyFactory,
             },
@@ -405,7 +405,7 @@ class TestUpdateInteraction(APITestMixin):
             {
                 'contacts': [ContactFactory],
             },
-        ),
+        ],
     )
     def test_error_returned_if_contacts_dont_belong_to_company(self, request_data):
         """Test that an error is returned if an update makes the contacts and company
@@ -422,8 +422,8 @@ class TestUpdateInteraction(APITestMixin):
             'non_field_errors': ['The interaction contacts must belong to the specified company.'],
         }
 
-    @pytest.mark.parametrize('include_company', (True, False))
-    @pytest.mark.parametrize('include_contacts', (True, False))
+    @pytest.mark.parametrize('include_company', [True, False])
+    @pytest.mark.parametrize('include_contacts', [True, False])
     def test_inconsistent_interaction_can_be_updated(self, include_company, include_contacts):
         """Test that an interaction with inconsistent company and contact fields can still be
         updated.
@@ -609,12 +609,12 @@ class TestUpdateInteraction(APITestMixin):
         ]
 
     @pytest.mark.parametrize(
-        'current_status,new_status',
-        (
+        ('current_status', 'new_status'),
+        [
             (Interaction.Status.DRAFT, Interaction.Status.DRAFT),
             (Interaction.Status.DRAFT, Interaction.Status.COMPLETE),
             (Interaction.Status.COMPLETE, Interaction.Status.COMPLETE),
-        ),
+        ],
     )
     @freeze_time('2017-04-18 13:25:30.986208')
     def test_status_change_valid(self, current_status, new_status):
@@ -634,8 +634,8 @@ class TestUpdateInteraction(APITestMixin):
         assert response.data['status'] == new_status
 
     @pytest.mark.parametrize(
-        'current_status,new_status,response_body',
-        (
+        ('current_status', 'new_status', 'response_body'),
+        [
             (
                 Interaction.Status.DRAFT,
                 None,
@@ -651,7 +651,7 @@ class TestUpdateInteraction(APITestMixin):
                 None,
                 {'status': ['This field may not be null.']},
             ),
-        ),
+        ],
     )
     @freeze_time('2017-04-18 13:25:30.986208')
     def test_status_change_invalid(self, current_status, new_status, response_body):
@@ -675,7 +675,7 @@ class TestListInteractions(APITestMixin):
     """Tests for the list interactions view."""
 
     def test_filtered_by_company(self):
-        """List of interactions filtered by company"""
+        """List of interactions filtered by company."""
         company1 = CompanyFactory()
         company2 = CompanyFactory()
 
@@ -705,7 +705,7 @@ class TestListInteractions(APITestMixin):
         assert {i['id'] for i in response.data['results']} == {str(i.id) for i in interactions}
 
     def test_filtered_by_investment_project(self):
-        """List of interactions filtered by investment project"""
+        """List of interactions filtered by investment project."""
         contact = ContactFactory()
         project = InvestmentProjectFactory()
         company = CompanyFactory()
@@ -732,7 +732,7 @@ class TestListInteractions(APITestMixin):
         assert actual_ids == expected_ids
 
     def test_filtered_by_event(self):
-        """List of interactions filtered by event"""
+        """List of interactions filtered by event."""
         contact = ContactFactory()
         event = EventFactory()
 
@@ -752,7 +752,7 @@ class TestListInteractions(APITestMixin):
         assert actual_ids == expected_ids
 
     def test_filtered_by_company_export(self):
-        """List of interactions filtered by company export"""
+        """List of interactions filtered by company export."""
         contact = ContactFactory()
         export = ExportFactory()
         company = CompanyFactory()
@@ -780,11 +780,11 @@ class TestListInteractions(APITestMixin):
 
     @pytest.mark.parametrize(
         'field',
-        (
+        [
             'company.name',
             'created_on',
             'subject',
-        ),
+        ],
     )
     def test_sorting(self, field):
         """Test sorting interactions by various fields."""
@@ -841,11 +841,11 @@ class TestListInteractions(APITestMixin):
         assert expected == actual
 
     @pytest.mark.parametrize(
-        'primary_field,secondary_field',
-        (
+        ('primary_field', 'secondary_field'),
+        [
             ('first_name', 'last_name'),
             ('last_name', 'first_name'),
-        ),
+        ],
     )
     def test_sort_by_first_and_last_name_of_first_contact(self, primary_field, secondary_field):
         """Test sorting interactions by the first and last names of the first contact."""
@@ -1053,8 +1053,8 @@ class TestArchiveViews(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     @pytest.mark.parametrize(
-        'data,response_data',
-        (
+        ('data', 'response_data'),
+        [
             (
                 {},
                 {'reason': ['This field is required.']},
@@ -1067,7 +1067,7 @@ class TestArchiveViews(APITestMixin):
                 {'reason': None},
                 {'reason': ['This field may not be null.']},
             ),
-        ),
+        ],
     )
     def test_archive_failures(self, data, response_data):
         """Test archive an interaction without providing a reason.

@@ -23,11 +23,11 @@ from datahub.core.validators import (
 
 
 @pytest.mark.parametrize(
-    'data,field,op,res',
-    (
+    ('data', 'field', 'op', 'res'),
+    [
         ({'colour': 'red'}, 'colour', lambda val: val == 'red', True),
         ({'colour': 'red'}, 'colour', lambda val: val == 'blue', False),
-    ),
+    ],
 )
 def test_operator_rule(data, field, op, res):
     """Tests ValidationCondition for various cases."""
@@ -37,11 +37,11 @@ def test_operator_rule(data, field, op, res):
 
 
 @pytest.mark.parametrize(
-    'data,field,test_value,res',
-    (
+    ('data', 'field', 'test_value', 'res'),
+    [
         ({'colour': 'red'}, 'colour', 'red', True),
         ({'colour': 'red'}, 'colour', 'blue', False),
-    ),
+    ],
 )
 def test_equals_rule(data, field, test_value, res):
     """Tests ValidationCondition for various cases."""
@@ -51,13 +51,13 @@ def test_equals_rule(data, field, test_value, res):
 
 
 @pytest.mark.parametrize(
-    'data,instance,expected_result',
-    (
+    ('data', 'instance', 'expected_result'),
+    [
         ({}, Mock(my_date=None), False),
         ({'my_date': 1}, Mock(my_date=None), True),
         ({'my_date': None}, Mock(my_date=None), False),
         ({'my_date': 1}, Mock(my_date=1), False),
-    ),
+    ],
 )
 def test_is_field_being_updated_rule(data, instance, expected_result):
     """Tests IsFieldBeingUpdatedRule for various cases."""
@@ -67,12 +67,12 @@ def test_is_field_being_updated_rule(data, instance, expected_result):
 
 
 @pytest.mark.parametrize(
-    'data,expected_result',
-    (
+    ('data', 'expected_result'),
+    [
         ({}, False),
         ({'my_date': 1}, True),
         ({'my_date': None}, False),
-    ),
+    ],
 )
 def test_is_field_being_updated_and_is_not_blank_rule(data, expected_result):
     """Tests IsFieldBeingUpdatedRuleAndIsNotBlankRule for various cases."""
@@ -82,12 +82,12 @@ def test_is_field_being_updated_and_is_not_blank_rule(data, expected_result):
 
 
 @pytest.mark.parametrize(
-    'data,field,expected_result',
-    (
+    ('data', 'field', 'expected_result'),
+    [
         ({}, 'my_date', False),
         ({'my_date': 1}, 'my_date', True),
         ({'my_date': None}, 'my_date', False),
-    ),
+    ],
 )
 @freeze_time('2019-05-01')
 def test_is_field_rule(data, field, expected_result):
@@ -98,11 +98,11 @@ def test_is_field_rule(data, field, expected_result):
 
 
 @pytest.mark.parametrize(
-    'data,field,test_value,res',
-    (
+    ('data', 'field', 'test_value', 'res'),
+    [
         ({'colour': 'red'}, 'colour', ['red', 'green'], True),
         ({'colour': 'red'}, 'colour', ['blue', 'green'], False),
-    ),
+    ],
 )
 def test_in_rule(data, field, test_value, res):
     """Tests InRule for various cases."""
@@ -112,13 +112,13 @@ def test_in_rule(data, field, test_value, res):
 
 
 @pytest.mark.parametrize(
-    'rule_res,when_res,res',
-    (
+    ('rule_res', 'when_res', 'res'),
+    [
         (True, True, True),
         (False, True, False),
         (True, False, True),
         (False, False, True),
-    ),
+    ],
 )
 def test_conditional_rule(rule_res, when_res, res):
     """Tests ConditionalRule for various cases."""
@@ -135,8 +135,8 @@ def _make_stub_rule(field, is_valid):
     return Mock(return_value=is_valid, field=field)
 
 
-@pytest.mark.parametrize('subrule1_res', (True, False))
-@pytest.mark.parametrize('subrule2_res', (True, False))
+@pytest.mark.parametrize('subrule1_res', [True, False])
+@pytest.mark.parametrize('subrule2_res', [True, False])
 def test_and_rule_combines_other_rules(subrule1_res, subrule2_res):
     """Test that AndRule combines sub-rules using the AND operator."""
     rule = AndRule(
@@ -148,15 +148,15 @@ def test_and_rule_combines_other_rules(subrule1_res, subrule2_res):
 
 
 @pytest.mark.parametrize(
-    'subrule_res,rule_res',
-    (
+    ('subrule_res', 'rule_res'),
+    [
         (True, False),
         (False, True),
         (None, True),
-    ),
+    ],
 )
 def test_not_rule(subrule_res, rule_res):
-    """Test that NotRule nagates sub-rule"""
+    """Test that NotRule nagates sub-rule."""
     rule = NotRule(_make_stub_rule('field1', subrule_res))
     combiner = Mock(spec_set=DataCombiner)
     assert rule(combiner) == rule_res
@@ -164,8 +164,8 @@ def test_not_rule(subrule_res, rule_res):
 
 
 @pytest.mark.parametrize(
-    'rules,when,res',
-    (
+    ('rules', 'when', 'res'),
+    [
         (
             (_make_stub_rule('field1', False),),
             _make_stub_rule('field_when', True),
@@ -196,7 +196,7 @@ def test_not_rule(subrule_res, rule_res):
             _make_stub_rule('field_when', True),
             [FieldAndError('non_field_errors', 'error')],
         ),
-    ),
+    ],
 )
 def test_validation_rule(rules, when, res):
     """Tests ValidationRule for various cases."""
@@ -214,10 +214,10 @@ class TestRulesBasedValidator:
 
     @pytest.mark.parametrize(
         'rules',
-        (
+        [
             (_make_stub_validation_rule([]),),
             (_make_stub_validation_rule([]), _make_stub_validation_rule([])),
-        ),
+        ],
     )
     def test_validation_passes(self, rules):
         """Test that validation passes when the rules pass."""
@@ -227,8 +227,8 @@ class TestRulesBasedValidator:
         assert validator({}, serializer) is None
 
     @pytest.mark.parametrize(
-        'rules,errors',
-        (
+        ('rules', 'errors'),
+        [
             (
                 (
                     _make_stub_validation_rule([FieldAndError('field1', 'error')]),
@@ -256,7 +256,7 @@ class TestRulesBasedValidator:
                 ),
                 {'field1': ['test error', 'test error 2']},
             ),
-        ),
+        ],
     )
     def test_validation_fails(self, rules, errors):
         """Test that validation fails when any rule fails."""
@@ -278,8 +278,8 @@ class TestRequiredUnlessAlreadyBlankValidator:
     """RequiredUnlessAlreadyBlank tests."""
 
     @pytest.mark.parametrize(
-        'create_data,update_data,partial,should_raise',
-        (
+        ('create_data', 'update_data', 'partial', 'should_raise'),
+        [
             ({'field1': None}, {'field1': None}, False, False),
             ({'field1': None}, {'field1': None}, True, False),
             ({'field1': None}, {'field1': 'blah'}, False, False),
@@ -292,7 +292,7 @@ class TestRequiredUnlessAlreadyBlankValidator:
             ({'field1': 'blah'}, {'field1': 'blah'}, True, False),
             ({'field1': 'blah'}, {}, False, True),
             ({'field1': 'blah'}, {}, True, False),
-        ),
+        ],
     )
     def test_update(self, create_data, update_data, partial, should_raise):
         """Tests validation during updates."""
@@ -308,12 +308,12 @@ class TestRequiredUnlessAlreadyBlankValidator:
             validator(update_data, serializer)
 
     @pytest.mark.parametrize(
-        'create_data,should_raise',
-        (
+        ('create_data', 'should_raise'),
+        [
             ({}, True),
             ({'field1': None}, True),
             ({'field1': 'blah'}, False),
-        ),
+        ],
     )
     def test_create(self, create_data, should_raise):
         """Tests validation during instance creation."""

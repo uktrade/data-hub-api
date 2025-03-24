@@ -5,7 +5,7 @@ from datahub.search.models import BaseSearchModel
 
 
 class Task(BaseSearchModel):
-    """Task model"""
+    """Task model."""
 
     id = Keyword()
     archived = Boolean()

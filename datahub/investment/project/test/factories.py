@@ -192,7 +192,7 @@ class VerifyWinInvestmentProjectFactory(ActiveInvestmentProjectFactory):
 
     @to_many_field
     def specific_programmes(self):
-        """Sets default specific programmes"""
+        """Sets default specific programmes."""
         return [SpecificProgramme.space.value.id]
 
 

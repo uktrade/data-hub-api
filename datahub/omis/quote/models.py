@@ -38,7 +38,7 @@ class TermsAndConditions(models.Model):
         verbose_name_plural = 'terms and conditions'
 
     def __str__(self):
-        """Human-readable representation"""
+        """Human-readable representation."""
         return self.name
 
 
@@ -115,5 +115,5 @@ class Quote(BaseModel):
         return self.accepted_on
 
     def __str__(self):
-        """Human-readable representation"""
+        """Human-readable representation."""
         return self.reference

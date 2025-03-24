@@ -136,7 +136,7 @@ class EqualsRule(OperatorRule):
 
 
 class InRule(OperatorRule):
-    """Contains operator-based rule for a field. Checks that field value is in values"""
+    """Contains operator-based rule for a field. Checks that field value is in values."""
 
     def __init__(self, field: str, value: Iterable[Any]):
         """Initialises the rule.
@@ -259,7 +259,7 @@ class NotRule(AbstractRule):
 
     @property
     def field(self):
-        """Field on which the rule is being applied"""
+        """Field on which the rule is being applied."""
         self._rule.field
 
     def __call__(self, combiner) -> bool:

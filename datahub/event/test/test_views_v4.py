@@ -24,7 +24,7 @@ class TestGetEventView(APITestMixin):
     """Get single event view tests."""
 
     def test_event_details_no_permissions(self):
-        """Should return 403"""
+        """Should return 403."""
         event = EventFactory()
         user = create_test_user(dit_team=TeamFactory())
         api_client = self.create_api_client(user=user)
@@ -112,7 +112,7 @@ class TestListEventView(APITestMixin):
     """List events view tests."""
 
     def test_event_list_no_permissions(self):
-        """Should return 403"""
+        """Should return 403."""
         user = create_test_user(dit_team=TeamFactory())
         api_client = self.create_api_client(user=user)
         url = reverse('api-v4:event:collection')

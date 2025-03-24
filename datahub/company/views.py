@@ -567,7 +567,7 @@ class CompanyExportEstimatedWinDateFilterSet(FilterSet):
 
 
 class CompanyExportViewSet(SoftDeleteCoreViewSet):
-    """View for company exports"""
+    """View for company exports."""
 
     queryset = CompanyExport.objects.select_related(
         'company',
@@ -597,7 +597,7 @@ class CompanyExportViewSet(SoftDeleteCoreViewSet):
     )
 
     def get_queryset(self):
-        """Filter the queryset to the authenticated user"""
+        """Filter the queryset to the authenticated user."""
         if self.action == 'list':
             return (
                 super()
@@ -637,7 +637,7 @@ class CompanyObjectiveV4ViewSet(ArchivableViewSetMixin, CoreViewSet):
 
     def get_queryset(self):
         """This view is return a list of all the objectives associated
-        with a specific company
+        with a specific company.
         """
         company_id = self.kwargs['company_id']
         return Objective.objects.filter(company=company_id).select_related(
@@ -648,7 +648,7 @@ class CompanyObjectiveV4ViewSet(ArchivableViewSetMixin, CoreViewSet):
 
 
 class CompanyObjectiveArchivedCountV4ViewSet(APIView):
-    """Objectives for getting archived counts of objectives for a company"""
+    """Objectives for getting archived counts of objectives for a company."""
 
     permission_classes = [
         IsAuthenticated,

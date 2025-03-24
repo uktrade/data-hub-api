@@ -9,7 +9,7 @@ from datahub.task.models import Task
 
 
 class TaskFactory(factory.django.DjangoModelFactory):
-    """Factory for creating tasks"""
+    """Factory for creating tasks."""
 
     created_by = factory.SubFactory(AdviserFactory)
     modified_by = factory.SelfAttribute('created_by')

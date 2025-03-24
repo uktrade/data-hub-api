@@ -10,7 +10,7 @@ from datahub.investment_lead.test.factories import EYBLeadFactory
 
 
 def get_expected_data_from_eyb(eyb_lead):
-    """Returns EYB Lead data as a dictionary"""
+    """Returns EYB Lead data as a dictionary."""
     investment_projects = eyb_lead.investment_projects.all().order_by(
         'name',
         'id',
@@ -76,7 +76,7 @@ def get_expected_data_from_eyb(eyb_lead):
 
 @pytest.mark.django_db
 class TestEYBLeadsDatasetViewSet(BaseDatasetViewTest):
-    """Tests for EYBDatasetView
+    """Tests for EYBDatasetView.
     """
 
     view_url = reverse('api-v4:dataset:expand-your-business-dataset')

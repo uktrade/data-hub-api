@@ -94,8 +94,8 @@ class TestDuplicateContactMerger:
     """Tests DuplicateContactMerger."""
 
     @pytest.mark.parametrize(
-        'source_contact_factory,expected_result,expected_should_archive',
-        (
+        ('source_contact_factory', 'expected_result', 'expected_should_archive'),
+        [
             (
                 ContactFactory,
                 {
@@ -192,7 +192,7 @@ class TestDuplicateContactMerger:
                 },
                 False,
             ),
-        ),
+        ],
     )
     @pytest.mark.usefixtures('unrelated_objects')
     def test_get_planned_changes(
@@ -212,7 +212,7 @@ class TestDuplicateContactMerger:
 
     def test_merge_succeeds_when_target_has_minimal_info_and_source_has_complete_info(self):
         """Tests that source contact values get transferred to target contact values
-        when the target contact doesn't have values that the source contact does
+        when the target contact doesn't have values that the source contact does.
         """
         target_contact = ContactFactory(
             job_title=None,
@@ -263,7 +263,7 @@ class TestDuplicateContactMerger:
 
     def test_merge_succeeds_when_target_contact_and_source_contact_have_complete_info(self):
         """Tests that source contact values don't get transferred to target contact values
-        when the target contact and source contact have values for the same fields
+        when the target contact and source contact have values for the same fields.
         """
         target_contact = ContactFactory(
             notes="This is the target's string",
@@ -313,7 +313,7 @@ class TestDuplicateContactMerger:
 
     def test_merge_succeeds_when_target_contact_and_source_contact_have_incomplete_info(self):
         """Tests that source contact values only get transferred to target contact values
-        when the target contact has no corresponding value in that field
+        when the target contact has no corresponding value in that field.
         """
         target_contact = ContactFactory(
             notes="This is the target's string",
@@ -365,7 +365,7 @@ class TestDuplicateContactMerger:
 
     def test_merge_succeeds_when_source_contact_has_an_address_and_target_contact_does_not(self):
         """Tests that source contact values for the address get transferred to the target contact
-        when the target contact doesn't have an address or a address_same_as_company value
+        when the target contact doesn't have an address or a address_same_as_company value.
         """
         target_contact = ContactFactory(address_same_as_company=False)
         source_contact = ContactWithOwnAreaFactory()
@@ -400,7 +400,7 @@ class TestDuplicateContactMerger:
 
     def test_merge_succeeds_when_target_contact_has_address_same_as_company_set_to_true(self):
         """Tests that target contact address fields don't get overwritten by the source contact
-        address fields when the target contact has address_same_as_company set to True
+        address fields when the target contact has address_same_as_company set to True.
         """
         target_contact = ContactFactory(address_same_as_company=True)
         source_contact = ContactWithOwnAreaFactory()
@@ -435,7 +435,7 @@ class TestDuplicateContactMerger:
 
     def test_merge_succeeds_when_target_contact_has_an_address(self):
         """Tests that target contact address fields don't get overwritten when
-        the source contact has address_same_as_company set to True
+        the source contact has address_same_as_company set to True.
         """
         target_contact = ContactWithOwnAreaFactory()
         source_contact = ContactFactory(address_same_as_company=True)
@@ -470,16 +470,16 @@ class TestDuplicateContactMerger:
 
     @pytest.mark.parametrize(
         'factory_relation_kwarg',
-        (
+        [
             'num_interactions',
             'num_orders',
             'num_referrals',
             'num_pipeline_items',
             'num_exports',
             'num_investment_projects',
-        ),
+        ],
     )
-    @pytest.mark.parametrize('num_related_objects', (0, 1, 3))
+    @pytest.mark.parametrize('num_related_objects', [0, 1, 3])
     @pytest.mark.usefixtures('unrelated_objects')
     def test_merge_succeeds(
             self,
@@ -557,12 +557,12 @@ class TestDuplicateContactMerger:
         assert source_contact.transferred_to == target_contact
 
     @pytest.mark.parametrize(
-        'valid_source_return_value,valid_target',
-        (
+        ('valid_source_return_value', 'valid_target'),
+        [
             ((False, ['field1', 'field2']), True),
             ((True, []), False),
             ((False, ['field']), False),
-        ),
+        ],
     )
     @patch('datahub.company.merge_contact.is_model_a_valid_merge_target')
     @patch('datahub.company.merge_contact.is_model_a_valid_merge_source')
@@ -574,7 +574,7 @@ class TestDuplicateContactMerger:
         valid_target,
     ):
         """Test that merge_contacts raises MergeNotAllowedError when the merge is
-        not allowed
+        not allowed.
         """
         is_contact_a_valid_merge_source_mock.return_value = valid_source_return_value
         is_contact_a_valid_merge_target_mock.return_value = valid_target

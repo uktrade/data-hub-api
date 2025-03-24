@@ -54,14 +54,14 @@ class TestPayClientCreatePayment:
         }
 
     @pytest.mark.parametrize(
-        'status_code,error_msg',
-        (
+        ('status_code', 'error_msg'),
+        [
             (400, '400 Client Error'),
             (401, '401 Client Error'),
             (404, '404 Client Error'),
             (409, '409 Client Error'),
             (500, '500 Server Error'),
-        ),
+        ],
     )
     def test_http_error(self, status_code, error_msg, requests_mock):
         """Test that if GOV.UK Pay returns an HTTP error, an exception is raised."""
@@ -109,12 +109,12 @@ class TestPayClientGetPaymentById:
         assert requests_mock.request_history[-1].url == url
 
     @pytest.mark.parametrize(
-        'status_code,error_msg',
-        (
+        ('status_code', 'error_msg'),
+        [
             (401, '401 Client Error'),
             (404, '404 Client Error'),
             (500, '500 Server Error'),
-        ),
+        ],
     )
     def test_http_error(self, status_code, error_msg, requests_mock):
         """Test that if GOV.UK Pay returns an HTTP error, an exception is raised."""
@@ -147,14 +147,14 @@ class TestPayClientCancelPayment:
         assert requests_mock.request_history[-1].url == url
 
     @pytest.mark.parametrize(
-        'status_code,error_msg',
-        (
+        ('status_code', 'error_msg'),
+        [
             (400, '400 Client Error'),
             (401, '401 Client Error'),
             (404, '404 Client Error'),
             (409, '409 Client Error'),
             (500, '500 Server Error'),
-        ),
+        ],
     )
     def test_http_error(self, status_code, error_msg, requests_mock):
         """Test that if GOV.UK Pay returns an HTTP error, an exception is raised."""

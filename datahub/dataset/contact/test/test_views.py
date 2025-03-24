@@ -18,7 +18,7 @@ from datahub.dataset.core.test import BaseDatasetViewTest
 
 
 def get_expected_data_from_contact(contact):
-    """Returns expected dictionary based on given contact"""
+    """Returns expected dictionary based on given contact."""
     return {
         'address_1': contact.address_1,
         'address_2': contact.address_2,
@@ -48,7 +48,7 @@ def get_expected_data_from_contact(contact):
 
 @pytest.mark.django_db
 class TestContactsDatasetViewSet(BaseDatasetViewTest):
-    """Tests for ContactsDatasetView
+    """Tests for ContactsDatasetView.
     """
 
     view_url = reverse('api-v4:dataset:contacts-dataset')
@@ -56,14 +56,14 @@ class TestContactsDatasetViewSet(BaseDatasetViewTest):
 
     @pytest.mark.parametrize(
         'contact_factory',
-        (
+        [
             ArchivedContactFactory,
             ContactFactory,
             ContactWithOwnAddressFactory,
-        ),
+        ],
     )
     def test_success(self, data_flow_api_client, contact_factory):
-        """Test that endpoint returns with expected data for a single order"""
+        """Test that endpoint returns with expected data for a single order."""
         contact = contact_factory()
         response = data_flow_api_client.get(self.view_url)
         assert response.status_code == status.HTTP_200_OK
@@ -74,7 +74,7 @@ class TestContactsDatasetViewSet(BaseDatasetViewTest):
         assert result == expected_result
 
     def test_with_multiple_contacts(self, data_flow_api_client):
-        """Test that endpoint returns correct number of record in expected contact"""
+        """Test that endpoint returns correct number of record in expected contact."""
         with freeze_time('2019-01-01 12:30:00'):
             contact_1 = ContactFactory()
         with freeze_time('2019-01-03 12:00:00'):

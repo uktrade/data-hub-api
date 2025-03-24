@@ -431,7 +431,7 @@ def construct_mock(**props):
 
 
 def str_or_none(value):
-    """Returns string casted value if given value is not None"""
+    """Returns string casted value if given value is not None."""
     return str(value) if value is not None else value
 
 
@@ -485,7 +485,7 @@ def resolve_objects(data, object_resolver=attrgetter('pk')):  # noqa: B008
 def has_reversion_version(model_db, version_count=1):
     """Check a model db object is stored as a reversion version
     :param model_db: Database model that is being audited with reversion
-    :param version_count: Count the amount of versions found by model data
+    :param version_count: Count the amount of versions found by model data.
     """
     versions = Version.objects.get_for_object(model_db)
     return versions.count() == version_count
@@ -493,7 +493,7 @@ def has_reversion_version(model_db, version_count=1):
 
 def has_reversion_comment(comment):
     """Check for comment in the version
-    :param comment: Comment to do a case insensitive search of comment value
+    :param comment: Comment to do a case insensitive search of comment value.
     """
     revisions = Revision.objects.filter(comment__icontains=comment)
     return revisions.count() > 0
@@ -541,7 +541,7 @@ class HawkMockJSONResponse:
             self._response = {}
 
     def __call__(self, request, context):
-        """Mock the server authorization response for validating the response content
+        """Mock the server authorization response for validating the response content.
         """
         response = json.dumps(self._response)
         credentials = (lambda key: self.credentials)
@@ -565,6 +565,6 @@ class HawkMockJSONResponse:
 def mock_environ(**env_variables):
     """Allow for multiple settings inline
     :param env_variables: as dictionary values
-    :return: mock.patch.dict of os.environ values
+    :return: mock.patch.dict of os.environ values.
     """
     return mock.patch.dict(os.environ, env_variables)

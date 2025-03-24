@@ -50,7 +50,7 @@ def admin():
 
 @pytest.mark.django_db
 def test_get_actions():
-    """Test for actions"""
+    """Test for actions."""
     user = AdviserFactory()
     admin = WinAdmin(Win, AdminSite())
     request_factory = RequestFactory()
@@ -62,7 +62,7 @@ def test_get_actions():
 
 @pytest.mark.django_db
 def test_soft_delete():
-    """Test soft delete"""
+    """Test soft delete."""
     user = AdviserFactory()
     win1 = WinFactory()
     win2 = WinFactory()
@@ -84,7 +84,7 @@ def test_soft_delete():
 
 @pytest.mark.django_db
 def test_undelete():
-    """Test undelete"""
+    """Test undelete."""
     user = AdviserFactory()
     deleted_win1 = WinFactory(is_deleted=True)
     deleted_win2 = WinFactory(is_deleted=True)
@@ -107,7 +107,7 @@ def test_undelete():
 
 @pytest.mark.django_db
 def test_get_queryset_soft_deleted():
-    """Test for get softdeleted queryset"""
+    """Test for get softdeleted queryset."""
     WinFactory(is_deleted=True)
     WinFactory(is_deleted=True)
     WinFactory(is_deleted=False)
@@ -124,7 +124,7 @@ def test_get_queryset_soft_deleted():
 
 @pytest.mark.django_db
 def test_get_company(admin):
-    """Test for get company"""
+    """Test for get company."""
     company = CompanyFactory()
     obj = WinFactory(company=company)
     result = admin.get_company(obj)
@@ -134,7 +134,7 @@ def test_get_company(admin):
 
 @pytest.mark.django_db
 def test_get_adviser(admin):
-    """Test for get adviser"""
+    """Test for get adviser."""
     adviser = AdviserFactory()
     obj = WinFactory(adviser=adviser)
     result = admin.get_adviser(obj)
@@ -145,7 +145,7 @@ def test_get_adviser(admin):
 
 @pytest.mark.django_db
 def test_get_date_confirmed(admin):
-    """Test for get date confirmed"""
+    """Test for get date confirmed."""
     win = WinFactory()
     CustomerResponseFactory(responded_on='2024-04-01', win=win)
     result = admin.get_date_confirmed(win)
@@ -156,7 +156,7 @@ def test_get_date_confirmed(admin):
 
 @pytest.mark.django_db
 def test_get_contact_names(admin):
-    """Test for get contact names"""
+    """Test for get contact names."""
     contact1 = ContactFactory(first_name='John', last_name='Doe')
     contact2 = ContactFactory(first_name='Jane', last_name='Smith')
     obj = WinFactory()
@@ -170,7 +170,7 @@ def test_get_contact_names(admin):
 
 @pytest.mark.django_db
 def test_has_view_permission(admin):
-    """Test for has view permission in deleted win"""
+    """Test for has view permission in deleted win."""
     regular_user = AdviserFactory()
     export_win_admin_group = Group.objects.create(name='ExportWinAdmin')
     regular_user.groups.add(export_win_admin_group)
@@ -190,7 +190,7 @@ def test_has_view_permission(admin):
 
 @pytest.mark.django_db
 def test_has_view_permission_for_anonymous_wins(admin):
-    """Test for has view permission for anonymous wins"""
+    """Test for has view permission for anonymous wins."""
     regular_user = AdviserFactory()
     export_win_admin_group = Group.objects.create(name='ExportWinAdmin')
     regular_user.groups.add(export_win_admin_group)
@@ -211,7 +211,7 @@ def test_has_view_permission_for_anonymous_wins(admin):
 @pytest.mark.django_db
 def test_get_queryset():
     """Test to get winadviser
-    And only show winadviser where win is not deleted
+    And only show winadviser where win is not deleted.
     """
     deleted_win1 = WinFactory(is_deleted=False)
     deleted_win2 = WinFactory(is_deleted=True)
@@ -226,7 +226,7 @@ def test_get_queryset():
 
 @pytest.mark.django_db
 def test_get_computed_adviser_name_adviser():
-    """Test for get adviser name"""
+    """Test for get adviser name."""
     adviser = AdviserFactory(first_name='John', last_name='Smith')
     win_adviser = WinAdviserFactory(adviser=adviser)
     admin_instance = WinAdviserAdmin(model=WinAdviser, admin_site=AdminSite())
@@ -235,7 +235,7 @@ def test_get_computed_adviser_name_adviser():
 
 @pytest.mark.django_db
 def test_get_computed_adviser_name_legacy_adviser():
-    """Test for get legacy adviser name"""
+    """Test for get legacy adviser name."""
     win_adviser = WinAdviserFactory(adviser=None, name='John Smith')
     admin_instance = WinAdviserAdmin(model=WinAdviser, admin_site=AdminSite())
     assert admin_instance.get_computed_adviser_name(win_adviser) == 'John Smith'
@@ -253,7 +253,7 @@ def mock_job_scheduler(monkeypatch):
 
 @pytest.mark.django_db
 class TestWinSoftDeletedAdminForm:
-    """Test for WinSoftDeletedAdminForm"""
+    """Test for WinSoftDeletedAdminForm."""
 
     def test_init_method(self):
         form = WinSoftDeletedAdminForm()
@@ -262,7 +262,7 @@ class TestWinSoftDeletedAdminForm:
 
 @pytest.mark.django_db
 class TestWinAdminForm:
-    """Test for WinAdminForm"""
+    """Test for WinAdminForm."""
 
     def test_win_admin_form(self):
         form = WinAdminForm()
@@ -286,7 +286,7 @@ class TestWinAdminForm:
 
 @pytest.mark.django_db
 class TestAnonymousWinAdminForm:
-    """Test for AnonymousWinAdminForm"""
+    """Test for AnonymousWinAdminForm."""
 
     def test_anonymous_win_admin_form_with_mandatory_fields(self):
         form = AnonymousWinAdminForm()
@@ -321,7 +321,7 @@ class TestAnonymousWinAdminForm:
         self,
         mock_job_scheduler,
     ):
-        """Test for notify anonymous wins adviser as contact
+        """Test for notify anonymous wins adviser as contact.
 
         It should schedule a task to:
             * notify an adviser
@@ -378,7 +378,7 @@ class TestAnonymousWinAdminForm:
 
 @pytest.mark.django_db
 class TestWinBreakdownInlineForm:
-    """Test for Breakdown in line form"""
+    """Test for Breakdown in line form."""
 
     def test_init_method(self):
         form = BreakdownInlineForm()
@@ -387,7 +387,7 @@ class TestWinBreakdownInlineForm:
 
 @pytest.mark.django_db
 class TestAdvisorInlineForm:
-    """Test for Adviser in line form"""
+    """Test for Adviser in line form."""
 
     def test_init_method(self):
         form = AdvisorInlineForm()
@@ -410,7 +410,7 @@ class InstanceMock:
 @pytest.mark.django_db
 class TestCustomerResponseInlineForm:
     """Test for Customer Response in line form
-    Field name is not required and field id should be read-only
+    Field name is not required and field id should be read-only.
     """
 
     def test_init_method(self):

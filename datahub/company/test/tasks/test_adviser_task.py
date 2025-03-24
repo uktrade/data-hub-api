@@ -33,7 +33,7 @@ from datahub.omis.order.test.factories import (
 
 
 def deactivateable_adviser(**kwargs):
-    """Creates and returns an adviser that is by default deactivatable
+    """Creates and returns an adviser that is by default deactivatable.
 
     The adviser is created just over two years ago. However, any keyword arguments
     are passed to the Adviser constructor, which can override this and other
@@ -51,15 +51,15 @@ def deactivateable_adviser(**kwargs):
 
 @pytest.mark.django_db
 class TestAdviserDeactivateTask:
-    """Tests for the task that deactivate advisers
+    """Tests for the task that deactivate advisers.
     """
 
     @pytest.mark.parametrize(
-        'lock_acquired, call_count',
-        (
+        ('lock_acquired', 'call_count'),
+        [
             (False, 0),
             (True, 1),
-        ),
+        ],
     )
     def test_lock(
         self,
@@ -67,7 +67,7 @@ class TestAdviserDeactivateTask:
         lock_acquired,
         call_count,
     ):
-        """Test that the task doesn't run if it cannot acquire the advisory_lock
+        """Test that the task doesn't run if it cannot acquire the advisory_lock.
         """
         mock_advisory_lock = mock.MagicMock()
         mock_advisory_lock.return_value.__enter__.return_value = lock_acquired
@@ -84,7 +84,7 @@ class TestAdviserDeactivateTask:
         assert mock_automatic_adviser_deactivate.call_count == call_count
 
     def test_limit(self):
-        """Test adviser deactivating query limit
+        """Test adviser deactivating query limit.
         """
         limit = 2
         advisers = [deactivateable_adviser() for _ in range(3)]
@@ -97,9 +97,9 @@ class TestAdviserDeactivateTask:
                 count += 1
         assert count == limit
 
-    @pytest.mark.parametrize('simulate', (True, False))
+    @pytest.mark.parametrize('simulate', [True, False])
     def test_simulate(self, caplog, simulate):
-        """Test adviser deactivating simulate flag
+        """Test adviser deactivating simulate flag.
         """
         caplog.set_level(logging.INFO, logger='datahub.company.tasks.adviser')
         date = datetime.now() - relativedelta(days=10)
@@ -116,8 +116,8 @@ class TestAdviserDeactivateTask:
             assert caplog.messages == [f'Automatically de-activate adviser: {adviser1.id}']
 
     @pytest.mark.parametrize(
-        'advisers, message',
-        (
+        ('advisers', 'message'),
+        [
             (
                 (False, False, False),
                 'datahub.company.tasks.automatic_adviser_deactivate deactivated: 0',
@@ -130,7 +130,7 @@ class TestAdviserDeactivateTask:
                 (True, True, True),
                 'datahub.company.tasks.automatic_adviser_deactivate deactivated: 3',
             ),
-        ),
+        ],
     )
     def test_realtime_messages_sent(
         self,
@@ -138,7 +138,7 @@ class TestAdviserDeactivateTask:
         advisers,
         message,
     ):
-        """Test that appropriate realtime messaging is sent which reflects the deactivating actions
+        """Test that appropriate realtime messaging is sent which reflects the deactivating actions.
         """
         for deactivate in advisers:
             deactivateable_adviser(is_active=deactivate)
@@ -152,7 +152,7 @@ class TestAdviserDeactivateTask:
         mock_send_realtime_message.assert_called_once_with(message)
 
     def test_recently_joined_adviser_does_not_deactivate(self):
-        """Test adviser does not deactivate if recently joined
+        """Test adviser does not deactivate if recently joined.
         """
         with freeze_time('2017-02-21'):
             two_years_ago = date.today() - relativedelta(years=2)
@@ -178,7 +178,7 @@ class TestAdviserDeactivateTask:
 
     def test_adviser_with_sso_email_id_does_not_deactivate(self):
         """Test adviser with an SSO user email ID does not deactivate if it has
-        logged in within the last 2 years
+        logged in within the last 2 years.
 
         The plan would be to have logic to properly deactivate these, but since
         we don't have this logic for now, we test that we don't deactivate these
@@ -210,8 +210,8 @@ class TestAdviserDeactivateTask:
                 assert adviser4.is_active is True
 
     @pytest.mark.parametrize(
-        'factory, attribute_name',
-        (
+        ('factory', 'attribute_name'),
+        [
             (CompanyInteractionFactory, 'created_by'),
             (CompanyInteractionFactory, 'modified_by'),
             (CompanyInteractionFactory, 'archived_by'),
@@ -247,10 +247,10 @@ class TestAdviserDeactivateTask:
             (EventFactory, 'created_by'),
             (EventFactory, 'modified_by'),
             (EventFactory, 'organiser'),
-        ),
+        ],
     )
     def test_adviser_with_recent_activity_does_not_deactivate(self, factory, attribute_name):
-        """Test adviser with recent activity doesn't deactivate
+        """Test adviser with recent activity doesn't deactivate.
         """
         with freeze_time('2017-02-21'):
             two_years_ago = date.today() - relativedelta(years=2)
@@ -282,8 +282,8 @@ class TestAdviserDeactivateTask:
                 assert adviser3.is_active is True
 
     @pytest.mark.parametrize(
-        'factory, adviser_attribute_name, date_attribute_name',
-        (
+        ('factory', 'adviser_attribute_name', 'date_attribute_name'),
+        [
             (InteractionDITParticipantFactory, 'adviser', 'interaction__date'),
             (EventFactory, 'organiser', 'start_date'),
             (EventFactory, 'organiser', 'end_date'),
@@ -293,7 +293,7 @@ class TestAdviserDeactivateTask:
             (OrderAssigneeFactory, 'adviser', 'order__paid_on'),
             (OrderAssigneeFactory, 'adviser', 'order__completed_on'),
             (OrderAssigneeFactory, 'adviser', 'order__cancelled_on'),
-        ),
+        ],
     )
     def test_adviser_with_old_activity_but_recently_dated_object_does_not_deactivate(
             self,
@@ -301,7 +301,7 @@ class TestAdviserDeactivateTask:
             adviser_attribute_name,
             date_attribute_name,
     ):
-        """Test adviser with recently dated object doesn't deactivate
+        """Test adviser with recently dated object doesn't deactivate.
 
         Make sure that even if the changes were done a long time ago, the recently dated objects
         prevent the adviser from being deactivated
@@ -343,16 +343,16 @@ class TestAdviserDeactivateTask:
                 assert adviser3.is_active is True
 
     @pytest.mark.parametrize(
-        'factory, attribute_name',
-        (
+        ('factory', 'attribute_name'),
+        [
             (OneListCoreTeamMemberFactory, 'adviser'),
             (InvestmentProjectTeamMemberFactory, 'adviser'),
-        ),
+        ],
     )
     def test_adviser_that_is_a_member_of_team_does_not_deactivate(
         self, factory, attribute_name,
     ):
-        """Test adviser that is a member of a team does not deactivate, even if old
+        """Test adviser that is a member of a team does not deactivate, even if old.
         """
         with freeze_time('2017-02-21'):
             three_years_ago = date.today() - relativedelta(years=3)

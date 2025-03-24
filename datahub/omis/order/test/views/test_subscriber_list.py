@@ -149,19 +149,19 @@ class TestChangeSubscriberList(APITestMixin):
         assert {adv['id'] for adv in response.json()} == {str(adv.id) for adv in advisers}
 
     @pytest.mark.parametrize(
-        'allowed_status', (
+        'allowed_status', [
             OrderStatus.DRAFT,
             OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
             OrderStatus.QUOTE_ACCEPTED,
             OrderStatus.PAID,
-        ),
+        ],
     )
     def test_change_existing_list(self, allowed_status):
         """Test that calling PUT with a different list of advisers completely changes
         the subscriber list:
         - advisers not in the list will be removed
         - new advisers will be added
-        - existing advisers will be kept
+        - existing advisers will be kept.
         """
         previous_advisers = AdviserFactory.create_batch(2)
         order = OrderFactory(status=allowed_status)
@@ -191,12 +191,12 @@ class TestChangeSubscriberList(APITestMixin):
         assert order.subscribers.filter(id=subscriptions[1].id).exists()
 
     @pytest.mark.parametrize(
-        'allowed_status', (
+        'allowed_status', [
             OrderStatus.DRAFT,
             OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
             OrderStatus.QUOTE_ACCEPTED,
             OrderStatus.PAID,
-        ),
+        ],
     )
     def test_remove_all(self, allowed_status):
         """Test that calling PUT with an empty list, removes all the subscribers.
@@ -239,10 +239,10 @@ class TestChangeSubscriberList(APITestMixin):
         ]
 
     @pytest.mark.parametrize(
-        'disallowed_status', (
+        'disallowed_status', [
             OrderStatus.COMPLETE,
             OrderStatus.CANCELLED,
-        ),
+        ],
     )
     def test_409_if_order_in_disallowed_status(self, disallowed_status):
         """Test that if the order is not in one of the allowed statuses, the endpoint

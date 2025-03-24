@@ -68,9 +68,9 @@ class TestCreatePayments(APITestMixin):
     @freeze_time('2017-04-25 13:00:00')
     @pytest.mark.parametrize(
         'order_status',
-        (
+        [
             OrderStatus.QUOTE_ACCEPTED,
-        ),
+        ],
     )
     def test_create(self, order_status):
         """Test a successful call to create a list of payments."""
@@ -120,8 +120,8 @@ class TestCreatePayments(APITestMixin):
         assert order.paid_on == dateutil_parse('2017-04-21T00:00:00Z')
 
     @pytest.mark.parametrize(
-        'data,errors',
-        (
+        ('data', 'errors'),
+        [
             # amount != from order total cost
             (
                 [
@@ -158,7 +158,7 @@ class TestCreatePayments(APITestMixin):
                     {'method': ['"cheque" is not a valid choice.']},
                 ],
             ),
-        ),
+        ],
     )
     def test_400_validation(self, data, errors):
         """Test validation errors."""
@@ -194,13 +194,13 @@ class TestCreatePayments(APITestMixin):
         assert response.status_code == status.HTTP_201_CREATED
 
     @pytest.mark.parametrize(
-        'disallowed_status', (
+        'disallowed_status', [
             OrderStatus.DRAFT,
             OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
             OrderStatus.PAID,
             OrderStatus.COMPLETE,
             OrderStatus.CANCELLED,
-        ),
+        ],
     )
     def test_409_if_order_in_disallowed_status(self, disallowed_status):
         """Test that if the order is not in one of the allowed statuses, the endpoint
