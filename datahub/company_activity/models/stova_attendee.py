@@ -46,7 +46,7 @@ class StovaAttendee(models.Model):
     created_on = models.DateTimeField(auto_now_add=True)
     company = models.ForeignKey(
         Company,
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name='stova_attendee',
@@ -54,7 +54,7 @@ class StovaAttendee(models.Model):
     )
     contact = models.ForeignKey(
         Contact,
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name='stova_attendee',
