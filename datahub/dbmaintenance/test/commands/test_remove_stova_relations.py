@@ -1,0 +1,171 @@
+from unittest import mock
+
+import pytest
+
+from django.core.management import call_command
+
+from reversion.models import Version
+
+from datahub.company.models import Company, Contact
+from datahub.company.test.factories import (
+    CompanyFactory,
+    ContactFactory,
+)
+from datahub.company_activity.tasks.ingest_stova_attendees import (
+    StovaAttendeeIngestionTask,
+)
+from datahub.company_activity.tests.factories import StovaEventFactory
+from datahub.interaction.models import Interaction
+from datahub.interaction.test.factories import CompanyInteractionFactory
+
+
+@pytest.fixture
+def test_base_stova_attendee():
+    event_id = 1234
+    StovaEventFactory(stova_event_id=event_id)
+
+    return {
+        'id': 2367,
+        'event_id': event_id,
+        'email': 'test@test.com',
+        'first_name': 'John',
+        'last_name': 'Smith',
+        'company_name': 'Test Stova Attendee company',
+        'category': 'performance',
+        'registration_status': 'blah',
+        'created_by': 'Jane',
+        'language': 'English',
+        'created_date': '2024-10-08 10:46:24.978381+00:00',
+        'modified_date': '2024-10-08 10:46:24.978381+00:00',
+        'virtual_event_attendance': 'yes',
+        'last_lobby_login': '2024-10-08 10:46:24.978381+00:00',
+        'attendee_questions': 'What is this event for?',
+        'modified_by': 'Jane',
+    }
+
+
+@pytest.mark.django_db
+class TestRemoveStovaRelationsCommand:
+    @pytest.mark.parametrize(
+        ('simulate'),
+        (
+            False,
+            pytest.param(True, marks=pytest.mark.xfail(strict=True)),
+        ),
+    )
+    def test_interactions_from_stova_are_removed(self, test_base_stova_attendee, simulate):
+        """
+        Test interactions created by Stova Attendees are removed and interactions not created by
+        stova are not removed.
+        """
+        s3_processor_mock = mock.Mock()
+        task = StovaAttendeeIngestionTask('dummy-prefix', s3_processor_mock)
+        data = test_base_stova_attendee
+        task._process_record(data)
+        data['id'] = 9876
+        task._process_record(data)
+        data['id'] = 8907
+        data['company_name'] = 'a new company'
+        task._process_record(data)
+        CompanyInteractionFactory.create_batch(5)
+
+        assert Interaction.objects.count() == 8
+
+        call_command('remove_stova_relations', simulate=simulate)
+
+        assert Interaction.objects.count() == 5
+
+    @pytest.mark.parametrize(
+        ('simulate'),
+        (
+            False,
+            pytest.param(True, marks=pytest.mark.xfail(strict=True)),
+        ),
+    )
+    def test_contacts_from_stova_are_removed(self, test_base_stova_attendee, simulate):
+        """
+        Test contacts created by Stova Attendees are removed and contacts not created by stova are
+        not removed.
+        """
+        s3_processor_mock = mock.Mock()
+        task = StovaAttendeeIngestionTask('dummy-prefix', s3_processor_mock)
+        data = test_base_stova_attendee
+        task._process_record(data)
+        data['id'] = 9876
+        task._process_record(data)
+        data['id'] = 8907
+        data['company_name'] = 'a new company'
+        task._process_record(data)
+        ContactFactory.create_batch(5)
+
+        assert Contact.objects.count() == 7
+
+        call_command('remove_stova_relations', simulate=simulate)
+
+        assert Contact.objects.count() == 5
+
+    @pytest.mark.parametrize(
+        ('simulate'),
+        (
+            False,
+            pytest.param(True, marks=pytest.mark.xfail(strict=True)),
+        ),
+    )
+    def test_companies_from_stova_are_removed(self, test_base_stova_attendee, simulate):
+        """
+        Test companies created by Stova Attendees are removed and companies not created by stova
+        are not removed.
+        """
+        s3_processor_mock = mock.Mock()
+        task = StovaAttendeeIngestionTask('dummy-prefix', s3_processor_mock)
+        data = test_base_stova_attendee
+        task._process_record(data)
+        data['id'] = 9876
+        data['company_name'] = 'a new company'
+        task._process_record(data)
+        CompanyFactory.create_batch(5)
+
+        assert Company.objects.count() == 7
+
+        call_command('remove_stova_relations', simulate=simulate)
+
+        assert Company.objects.count() == 5
+
+    def test_revision_can_recover_deleted_ids(self, test_base_stova_attendee):
+        s3_processor_mock = mock.Mock()
+        task = StovaAttendeeIngestionTask('dummy-prefix', s3_processor_mock)
+        data = test_base_stova_attendee
+        task._process_record(data)
+        data['id'] = 9876
+        data['company_name'] = 'a new company'
+        task._process_record(data)
+
+        assert Company.objects.count() == 2
+        assert Interaction.objects.count() == 2
+        assert Contact.objects.count() == 2
+
+        call_command('remove_stova_relations', simulate=False)
+
+        assert Company.objects.count() == 0
+        assert Interaction.objects.count() == 0
+        assert Contact.objects.count() == 0
+
+        # Check previous versions exist
+        interaction_versions = Version.objects.get_for_model(Interaction)
+        assert interaction_versions.count() == 2
+        company_versions = Version.objects.get_for_model(Company)
+        assert company_versions.count() == 2
+        contact_versions = Version.objects.get_for_model(Contact)
+        assert contact_versions.count() == 2
+
+        # Check they can be restored
+        for version in company_versions:
+            version.revision.revert()
+        for version in contact_versions:
+            version.revision.revert()
+        for version in interaction_versions:
+            version.revision.revert()
+
+        assert Company.objects.count() == 2
+        assert Interaction.objects.count() == 2
+        assert Contact.objects.count() == 2
