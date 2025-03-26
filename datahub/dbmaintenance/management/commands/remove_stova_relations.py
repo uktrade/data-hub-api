@@ -7,7 +7,7 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 
 from datahub.company.models import Company, Contact
-from datahub.company_activity.models import StovaAttendee
+from datahub.company_activity.models import StovaAttendee, TempRelationStorage
 from datahub.interaction.models import Interaction
 
 
@@ -17,6 +17,9 @@ logger = getLogger(__name__)
 class Command(BaseCommand):
     """
     Command to remove contacts, companies and interactions created from Stova.
+
+    Uses TempRelationStorage model to track object IDs which have been deleted. This will make it
+    possible to restore them by their ID from reversion.
     """
 
     removal_log: dict
@@ -103,9 +106,6 @@ class Command(BaseCommand):
 
         interactions_deleted = 0
         for interaction in interactions:
-            if is_simulation:
-                continue
-
             # Double try/except, outer to catch inner. Inner to rollback the transaction and
             # prevent save to the archived_reason field. Outer to still continue deleting the
             # remaining fields.
@@ -119,11 +119,24 @@ class Command(BaseCommand):
                         reversion.set_comment('Interaction deletion as created from Stova.')
 
                     try:
+                        interaction_id = interaction.id
                         interaction.delete()
                         interactions_deleted += 1
                         self.removal_log['interaction_removal_log']['deleted'] = (
                             interactions_deleted
                         )
+                        # For restoring by ID from reversion.
+                        if not TempRelationStorage.objects.filter(
+                            model_name='Interaction',
+                            object_id=interaction_id,
+                        ).exists():
+                            TempRelationStorage.objects.create(
+                                model_name='Interaction',
+                                object_id=interaction_id,
+                            )
+                        if is_simulation:
+                            # Raising an error rolls the transaction back
+                            raise Exception("Simulating, don't delete.")
                     except Exception as error:
                         self.removal_log['interaction_removal_log']['errors'].append(
                             {
@@ -150,9 +163,6 @@ class Command(BaseCommand):
 
         contacts_deleted = 0
         for contact in stova_contacts:
-            if is_simulation:
-                continue
-
             # Double try/except, outer to catch inner. Inner to rollback the transaction and
             # prevent save to the archived_reason field. Outer to still continue deleting the
             # remaining fields.
@@ -166,9 +176,22 @@ class Command(BaseCommand):
                         reversion.set_comment('Contact deletion as created from Stova.')
 
                     try:
+                        contact_id = contact.id
                         contact.delete()
                         contacts_deleted += 1
                         self.removal_log['contact_removal_log']['deleted'] = contacts_deleted
+                        if is_simulation:
+                            # Raising an error rolls the transaction back
+                            raise Exception("Simulating, don't delete.")
+                        # For restoring by ID from reversion.
+                        if not TempRelationStorage.objects.filter(
+                            model_name='Contact',
+                            object_id=contact_id,
+                        ).exists():
+                            TempRelationStorage.objects.create(
+                                model_name='Contact',
+                                object_id=contact_id,
+                            )
                     except Exception as error:
                         self.removal_log['contact_removal_log']['errors'].append(
                             {
@@ -195,9 +218,6 @@ class Command(BaseCommand):
 
         companies_deleted = 0
         for company in stova_companies:
-            if is_simulation:
-                continue
-
             # Double try/except, outer to catch inner. Inner to rollback the transaction and
             # prevent save to the archived_reason field. Outer to still continue deleting the
             # remaining fields.
@@ -211,9 +231,22 @@ class Command(BaseCommand):
                         reversion.set_comment('Company deletion as created from Stova.')
 
                     try:
+                        company_id = company.id
                         company.delete()
                         companies_deleted += 1
                         self.removal_log['company_removal_log']['deleted'] = companies_deleted
+                        if is_simulation:
+                            # Raising an error rolls the transaction back
+                            raise Exception("Simulating, don't delete.")
+                        # For restoring by ID from reversion.
+                        if not TempRelationStorage.objects.filter(
+                            model_name='Company',
+                            object_id=company_id,
+                        ).exists():
+                            TempRelationStorage.objects.create(
+                                model_name='Company',
+                                object_id=company_id,
+                            )
                     except Exception as error:
                         self.removal_log['company_removal_log']['errors'].append(
                             {

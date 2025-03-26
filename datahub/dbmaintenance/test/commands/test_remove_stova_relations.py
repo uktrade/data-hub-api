@@ -13,6 +13,7 @@ from datahub.company.test.factories import (
     CompanyFactory,
     ContactFactory,
 )
+from datahub.company_activity.models import TempRelationStorage
 from datahub.company_activity.tasks.ingest_stova_attendees import (
     StovaAttendeeIngestionTask,
 )
@@ -144,7 +145,7 @@ class TestRemoveStovaRelationsCommand:
 
         assert Company.objects.count() == 5
 
-    def test_revision_can_recover_deleted_ids(self, test_base_stova_attendee):
+    def test_reversion_can_recover_deleted_objects(self, test_base_stova_attendee):
         s3_processor_mock = mock.Mock()
         task = StovaAttendeeIngestionTask('dummy-prefix', s3_processor_mock)
         data = test_base_stova_attendee
@@ -231,10 +232,61 @@ class TestRemoveStovaRelationsCommand:
         assert Company.objects.first().archived_reason is None
         assert Contact.objects.first().archived_reason is None
 
-        # Check previous versions exist
+        # Check no revisions created as transaction rolled back the changes
         interaction_versions = Version.objects.get_for_model(Interaction)
         assert interaction_versions.count() == 0
         company_versions = Version.objects.get_for_model(Company)
         assert company_versions.count() == 0
         contact_versions = Version.objects.get_for_model(Contact)
         assert contact_versions.count() == 0
+
+    def test_reversion_recover_by_object_id(self, test_base_stova_attendee):
+        s3_processor_mock = mock.Mock()
+        task = StovaAttendeeIngestionTask('dummy-prefix', s3_processor_mock)
+        data = test_base_stova_attendee
+        task._process_record(data)
+
+        assert Company.objects.count() == 1
+        assert Interaction.objects.count() == 1
+        assert Contact.objects.count() == 1
+
+        company_id = Company.objects.first().id
+        interaction_id = Interaction.objects.first().id
+        contact_id = Contact.objects.first().id
+
+        call_command('remove_stova_relations', simulate=False)
+
+        assert TempRelationStorage.objects.count() == 3
+
+        stored_company_id = TempRelationStorage.objects.get(
+            model_name='Company',
+            object_id=company_id,
+        )
+        company_reversion = Version.objects.get_for_model(Company).get(
+            object_id=stored_company_id.object_id,
+        )
+        stored_contact_id = TempRelationStorage.objects.get(
+            model_name='Contact',
+            object_id=contact_id,
+        )
+        contact_reversion = Version.objects.get_for_model(Contact).get(
+            object_id=stored_contact_id.object_id,
+        )
+        stored_interaction_id = TempRelationStorage.objects.get(
+            model_name='Interaction',
+            object_id=interaction_id,
+        )
+        interaction_reversion = Version.objects.get_for_model(Interaction).get(
+            object_id=stored_interaction_id.object_id,
+        )
+        assert Company.objects.count() == 0
+        company_reversion.revision.revert()
+        assert Company.objects.count() == 1
+
+        assert Contact.objects.count() == 0
+        contact_reversion.revision.revert()
+        assert Contact.objects.count() == 1
+
+        assert Interaction.objects.count() == 0
+        interaction_reversion.revision.revert()
+        assert Interaction.objects.count() == 1

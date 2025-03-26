@@ -73,3 +73,15 @@ class StovaAttendee(models.Model):
             'stova_attendee_id. This field is the FK to the ingested Stova Event in Data Hub.',
         ),
     )
+
+
+class TempRelationStorage(models.Model):
+    """
+    Temporary model to store the deleted IDs of companies, interactions and contacts created
+    from Stova. This is so there is a way to roll these back if the deletion fails.
+
+    This will be removed shortly after all these stova created relations are deleted.
+    """
+
+    model_name = models.CharField(max_length=MAX_LENGTH)
+    object_id = models.CharField(max_length=MAX_LENGTH)
