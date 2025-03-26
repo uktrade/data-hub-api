@@ -290,3 +290,22 @@ class TestRemoveStovaRelationsCommand:
         assert Interaction.objects.count() == 0
         interaction_reversion.revision.revert()
         assert Interaction.objects.count() == 1
+
+    def test_batch_size(self, test_base_stova_attendee):
+        """
+        Test objects are deleted based on their batch_size from the management command.
+        """
+        s3_processor_mock = mock.Mock()
+        task = StovaAttendeeIngestionTask('dummy-prefix', s3_processor_mock)
+        data = test_base_stova_attendee
+        task._process_record(data)
+        data['id'] = 9876
+        task._process_record(data)
+        data['id'] = 8907
+        data['company_name'] = 'a new company'
+        task._process_record(data)
+        ContactFactory.create_batch(5)
+
+        assert Contact.objects.count() == 7
+        call_command('remove_stova_relations', simulate=False, batch_size=1)
+        assert Contact.objects.count() == 6

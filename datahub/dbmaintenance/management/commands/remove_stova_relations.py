@@ -39,17 +39,19 @@ class Command(BaseCommand):
             action='store_true',
             help='Simulate the command and only log expected changes without doing the change.',
         )
+        parser.add_argument('batch_size', type=int, nargs='?', default=5000)
 
     def handle(self, *args, **options):
         """
         Process the CSV file and logs some additional logging to help with the company duns update.
         """
         is_simulation = options['simulate']
+        batch_size = options['batch_size']
         logger.info(f'Simulation is: {is_simulation}')
 
-        self.delete_interactions(is_simulation)
-        self.delete_contacts(is_simulation)
-        self.delete_companies(is_simulation)
+        self.delete_interactions(is_simulation, batch_size)
+        self.delete_contacts(is_simulation, batch_size)
+        self.delete_companies(is_simulation, batch_size)
 
         logger.info(self.removal_log['interaction_removal_log']['errors'])
         logger.info(self.removal_log['contact_removal_log']['errors'])
@@ -81,13 +83,14 @@ class Command(BaseCommand):
             f'out of {self.removal_log["company_removal_log"]["to_delete"]}',
         )
 
-    def delete_interactions(self, is_simulation: bool) -> None:
+    def delete_interactions(self, is_simulation: bool, batch_size: int) -> None:
         """
         Delete each Interaction one at a time to process signals and catch each deletion
         fail individually.
 
         :param is_simulation: If True, does not perform deletions and only logs. If False deletes
             from DB.
+        :param batch_size: How many records to delete at a time.
         :returns: List of interaction deletion failures or empty list if there are none.
         """
         stova_attendee_contact_ids = set(
@@ -99,7 +102,7 @@ class Command(BaseCommand):
                 contacts__in=stova_attendee_contact_ids,
             )
             .annotate(contact_ids=ArrayAgg('contacts'))
-            .distinct()
+            .distinct()[:batch_size]
         )
         logger.info(f'About to delete {interactions.count()} interactions created from Stova')
         self.removal_log['interaction_removal_log']['to_delete'] = interactions.count()
@@ -148,16 +151,17 @@ class Command(BaseCommand):
             except Exception:
                 continue
 
-    def delete_contacts(self, is_simulation: bool) -> None:
+    def delete_contacts(self, is_simulation: bool, batch_size: int) -> None:
         """
         Delete each Contact one at a time to process signals and catch each deletion
         fail individually.
 
         :param is_simulation: If True, does not perform deletions and only logs. If False deletes
             from DB.
+        :param batch_size: How many records to delete at a time.
         :returns: List of contact deletion failures or empty list if there are none.
         """
-        stova_contacts = Contact.objects.filter(source='Stova')
+        stova_contacts = Contact.objects.filter(source='Stova')[:batch_size]
         logger.info(f'About to delete {stova_contacts.count()} contacts created from Stova')
         self.removal_log['contact_removal_log']['to_delete'] = stova_contacts.count()
 
@@ -203,16 +207,17 @@ class Command(BaseCommand):
             except Exception:
                 continue
 
-    def delete_companies(self, is_simulation: bool) -> None:
+    def delete_companies(self, is_simulation: bool, batch_size: int) -> None:
         """
         Delete each Company one at a time to process signals and catch each deletion
         fail individually.
 
         :param is_simulation: If True, does not perform deletions and only logs. If False deletes
             from DB.
+        :param batch_size: How many records to delete at a time.
         :returns: List of company deletion failures or empty list if there are none.
         """
-        stova_companies = Company.objects.filter(source='Stova')
+        stova_companies = Company.objects.filter(source='Stova')[:batch_size]
         logger.info(f'About to delete {stova_companies.count()} companies created from Stova')
         self.removal_log['company_removal_log']['to_delete'] = stova_companies.count()
 
