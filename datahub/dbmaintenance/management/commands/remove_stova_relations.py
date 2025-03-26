@@ -4,6 +4,7 @@ import reversion
 
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.core.management.base import BaseCommand
+from django.db import transaction
 
 from datahub.company.models import Company, Contact
 from datahub.company_activity.models import StovaAttendee
@@ -17,6 +18,16 @@ class Command(BaseCommand):
     """
     Command to remove contacts, companies and interactions created from Stova.
     """
+
+    removal_log: dict
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.removal_log = {
+            'interaction_removal_log': {'to_delete': 0, 'deleted': 0, 'errors': []},
+            'contact_removal_log': {'to_delete': 0, 'deleted': 0, 'errors': []},
+            'company_removal_log': {'to_delete': 0, 'deleted': 0, 'errors': []},
+        }
 
     def add_arguments(self, parser):
         """Define extra arguments."""
@@ -33,19 +44,41 @@ class Command(BaseCommand):
         is_simulation = options['simulate']
         logger.info(f'Simulation is: {is_simulation}')
 
-        interaction_delete_failures = self.delete_interactions(is_simulation)
-        contact_delete_failures = self.delete_contacts(is_simulation)
-        company_delete_failures = self.delete_companies(is_simulation)
+        self.delete_interactions(is_simulation)
+        self.delete_contacts(is_simulation)
+        self.delete_companies(is_simulation)
 
-        logger.info(interaction_delete_failures)
-        logger.info(contact_delete_failures)
-        logger.info(company_delete_failures)
+        logger.info(self.removal_log['interaction_removal_log']['errors'])
+        logger.info(self.removal_log['contact_removal_log']['errors'])
+        logger.info(self.removal_log['company_removal_log']['errors'])
 
-        logger.info(f'There were {len(interaction_delete_failures)} interaction deletion failures')
-        logger.info(f'There were {len(contact_delete_failures)} contact deletion failures')
-        logger.info(f'There were {len(company_delete_failures)} company deletion failures')
+        logger.info(
+            f'There were {len(self.removal_log["interaction_removal_log"]["errors"])} '
+            'interaction deletion failures',
+        )
+        logger.info(
+            f'There were {len(self.removal_log["contact_removal_log"]["errors"])} contact '
+            'deletion failures',
+        )
+        logger.info(
+            f'There were {len(self.removal_log["company_removal_log"]["errors"])} company '
+            'deletion failures',
+        )
 
-    def delete_interactions(self, is_simulation: bool) -> list:
+        logger.info(
+            f'There were {self.removal_log["interaction_removal_log"]["deleted"]} interactions '
+            f'deleted out of {self.removal_log["interaction_removal_log"]["to_delete"]}',
+        )
+        logger.info(
+            f'There were {self.removal_log["contact_removal_log"]["deleted"]} contacts deleted '
+            f'out of {self.removal_log["contact_removal_log"]["to_delete"]}',
+        )
+        logger.info(
+            f'There were {self.removal_log["company_removal_log"]["deleted"]} companies deleted '
+            f'out of {self.removal_log["company_removal_log"]["to_delete"]}',
+        )
+
+    def delete_interactions(self, is_simulation: bool) -> None:
         """
         Delete each Interaction one at a time to process signals and catch each deletion
         fail individually.
@@ -66,40 +99,43 @@ class Command(BaseCommand):
             .distinct()
         )
         logger.info(f'About to delete {interactions.count()} interactions created from Stova')
+        self.removal_log['interaction_removal_log']['to_delete'] = interactions.count()
 
-        interactions_to_delete = 0
-        interactions_with_more_than_one_contact = 0
-        failures = []
+        interactions_deleted = 0
         for interaction in interactions:
-            interactions_to_delete += 1
-
             if is_simulation:
                 continue
 
-            # Modify the fields to create revisions. Without this the delete cannot be
-            # reverted to the previous state.
-            with reversion.create_revision():
-                interaction.archived_reason = 'About to be deleted'
-                interaction.save()
-                reversion.set_comment('Interaction deletion as created from Stova.')
-
+            # Double try/except, outer to catch inner. Inner to rollback the transaction and
+            # prevent save to the archived_reason field. Outer to still continue deleting the
+            # remaining fields.
             try:
-                interaction.delete()
-            except Exception as error:
-                failures.append(
-                    {
-                        'interaction_id': interaction.id,
-                        'error': error,
-                    },
-                )
+                with transaction.atomic():
+                    # Modify the fields to create revisions. Without this the delete cannot be
+                    # reverted to the previous state.
+                    with reversion.create_revision():
+                        interaction.archived_reason = 'About to be deleted'
+                        interaction.save()
+                        reversion.set_comment('Interaction deletion as created from Stova.')
 
-        logger.info(
-            f'There were {interactions_with_more_than_one_contact} with more than one contact',
-        )
-        logger.info(f'Deleted {interactions_to_delete} interactions')
-        return failures
+                    try:
+                        interaction.delete()
+                        interactions_deleted += 1
+                        self.removal_log['interaction_removal_log']['deleted'] = (
+                            interactions_deleted
+                        )
+                    except Exception as error:
+                        self.removal_log['interaction_removal_log']['errors'].append(
+                            {
+                                'interaction_id': interaction.id,
+                                'error': error,
+                            },
+                        )
+                        raise
+            except Exception:
+                continue
 
-    def delete_contacts(self, is_simulation: bool) -> dict:
+    def delete_contacts(self, is_simulation: bool) -> None:
         """
         Delete each Contact one at a time to process signals and catch each deletion
         fail individually.
@@ -110,35 +146,41 @@ class Command(BaseCommand):
         """
         stova_contacts = Contact.objects.filter(source='Stova')
         logger.info(f'About to delete {stova_contacts.count()} contacts created from Stova')
+        self.removal_log['contact_removal_log']['to_delete'] = stova_contacts.count()
 
-        contacts_to_delete = 0
-        failures = []
+        contacts_deleted = 0
         for contact in stova_contacts:
-            contacts_to_delete += 1
-
             if is_simulation:
                 continue
 
-            # Modify the fields to create revisions. Without this the delete cannot be
-            # reverted to the previous state.
-            with reversion.create_revision():
-                contact.archived_reason = 'About to be deleted'
-                contact.save()
-                reversion.set_comment('Contact deletion as created from Stova.')
-
+            # Double try/except, outer to catch inner. Inner to rollback the transaction and
+            # prevent save to the archived_reason field. Outer to still continue deleting the
+            # remaining fields.
             try:
-                contact.delete()
-            except Exception as error:
-                failures.append(
-                    {
-                        'contact_id': contact.id,
-                        'error': error,
-                    },
-                )
+                with transaction.atomic():
+                    # Modify the fields to create revisions. Without this the delete cannot be
+                    # reverted to the previous state.
+                    with reversion.create_revision():
+                        contact.archived_reason = 'About to be deleted'
+                        contact.save()
+                        reversion.set_comment('Contact deletion as created from Stova.')
 
-        return failures
+                    try:
+                        contact.delete()
+                        contacts_deleted += 1
+                        self.removal_log['contact_removal_log']['deleted'] = contacts_deleted
+                    except Exception as error:
+                        self.removal_log['contact_removal_log']['errors'].append(
+                            {
+                                'contact_id': contact.id,
+                                'error': error,
+                            },
+                        )
+                        raise
+            except Exception:
+                continue
 
-    def delete_companies(self, is_simulation: bool) -> dict:
+    def delete_companies(self, is_simulation: bool) -> None:
         """
         Delete each Company one at a time to process signals and catch each deletion
         fail individually.
@@ -149,30 +191,36 @@ class Command(BaseCommand):
         """
         stova_companies = Company.objects.filter(source='Stova')
         logger.info(f'About to delete {stova_companies.count()} companies created from Stova')
+        self.removal_log['company_removal_log']['to_delete'] = stova_companies.count()
 
-        companies_to_delete = 0
-        failures = []
+        companies_deleted = 0
         for company in stova_companies:
-            companies_to_delete += 1
-
             if is_simulation:
                 continue
 
-            # Modify the fields to create revisions. Without this the delete cannot be
-            # reverted to the previous state.
-            with reversion.create_revision():
-                company.archived_reason = 'About to be deleted'
-                company.save()
-                reversion.set_comment('Company deletion as created from Stova.')
-
+            # Double try/except, outer to catch inner. Inner to rollback the transaction and
+            # prevent save to the archived_reason field. Outer to still continue deleting the
+            # remaining fields.
             try:
-                company.delete()
-            except Exception as error:
-                failures.append(
-                    {
-                        'company_id': company.id,
-                        'error': error,
-                    },
-                )
+                with transaction.atomic():
+                    # Modify the fields to create revisions. Without this the delete cannot be
+                    # reverted to the previous state.
+                    with reversion.create_revision():
+                        company.archived_reason = 'About to be deleted'
+                        company.save()
+                        reversion.set_comment('Company deletion as created from Stova.')
 
-        return failures
+                    try:
+                        company.delete()
+                        companies_deleted += 1
+                        self.removal_log['company_removal_log']['deleted'] = companies_deleted
+                    except Exception as error:
+                        self.removal_log['company_removal_log']['errors'].append(
+                            {
+                                'company_id': company.id,
+                                'error': error,
+                            },
+                        )
+                        raise
+            except Exception:
+                continue

@@ -1,8 +1,10 @@
 from unittest import mock
+from unittest.mock import patch
 
 import pytest
 
 from django.core.management import call_command
+from django.db import DatabaseError
 
 from reversion.models import Version
 
@@ -53,7 +55,7 @@ class TestRemoveStovaRelationsCommand:
             pytest.param(True, marks=pytest.mark.xfail(strict=True)),
         ),
     )
-    def test_interactions_from_stova_are_removed(self, test_base_stova_attendee, simulate):
+    def test_interactions_from_stova_are_removed(self, test_base_stova_attendee, simulate, caplog):
         """
         Test interactions created by Stova Attendees are removed and interactions not created by
         stova are not removed.
@@ -71,8 +73,11 @@ class TestRemoveStovaRelationsCommand:
 
         assert Interaction.objects.count() == 8
 
+        caplog.set_level('INFO')
         call_command('remove_stova_relations', simulate=simulate)
 
+        log_text = caplog.text
+        assert 'There were 3 interactions deleted out of 3' in log_text
         assert Interaction.objects.count() == 5
 
     @pytest.mark.parametrize(
@@ -82,7 +87,7 @@ class TestRemoveStovaRelationsCommand:
             pytest.param(True, marks=pytest.mark.xfail(strict=True)),
         ),
     )
-    def test_contacts_from_stova_are_removed(self, test_base_stova_attendee, simulate):
+    def test_contacts_from_stova_are_removed(self, test_base_stova_attendee, simulate, caplog):
         """
         Test contacts created by Stova Attendees are removed and contacts not created by stova are
         not removed.
@@ -100,7 +105,11 @@ class TestRemoveStovaRelationsCommand:
 
         assert Contact.objects.count() == 7
 
+        caplog.set_level('INFO')
         call_command('remove_stova_relations', simulate=simulate)
+
+        log_text = caplog.text
+        assert 'There were 2 contacts deleted out of 2' in log_text
 
         assert Contact.objects.count() == 5
 
@@ -111,7 +120,7 @@ class TestRemoveStovaRelationsCommand:
             pytest.param(True, marks=pytest.mark.xfail(strict=True)),
         ),
     )
-    def test_companies_from_stova_are_removed(self, test_base_stova_attendee, simulate):
+    def test_companies_from_stova_are_removed(self, test_base_stova_attendee, simulate, caplog):
         """
         Test companies created by Stova Attendees are removed and companies not created by stova
         are not removed.
@@ -127,7 +136,11 @@ class TestRemoveStovaRelationsCommand:
 
         assert Company.objects.count() == 7
 
+        caplog.set_level('INFO')
         call_command('remove_stova_relations', simulate=simulate)
+
+        log_text = caplog.text
+        assert 'There were 2 companies deleted out of 2' in log_text
 
         assert Company.objects.count() == 5
 
@@ -169,3 +182,59 @@ class TestRemoveStovaRelationsCommand:
         assert Company.objects.count() == 2
         assert Interaction.objects.count() == 2
         assert Contact.objects.count() == 2
+
+    @patch('datahub.interaction.models.Interaction.delete')
+    @patch('datahub.company.models.Contact.delete')
+    @patch('datahub.company.models.Company.delete')
+    def test_transaction(
+        self,
+        mocked_interaction_delete,
+        mocked_contact_delete,
+        mocked_company_delete,
+        test_base_stova_attendee,
+        caplog,
+    ):
+        """
+        Tests the transaction is rolled back if there is an issue deleting an object.
+        This transaction creates a reversion which should not happen if the delete fails.
+        """
+        s3_processor_mock = mock.Mock()
+        task = StovaAttendeeIngestionTask('dummy-prefix', s3_processor_mock)
+        data = test_base_stova_attendee
+        task._process_record(data)
+
+        assert Company.objects.count() == 1
+        assert Interaction.objects.count() == 1
+        assert Contact.objects.count() == 1
+
+        mocked_interaction_delete.side_effect = DatabaseError('Error deleting interaction')
+        mocked_contact_delete.side_effect = DatabaseError('Error deleting contact')
+        mocked_company_delete.side_effect = DatabaseError('Error deleting company')
+
+        caplog.set_level('INFO')
+        call_command('remove_stova_relations', simulate=False)
+
+        log_text = caplog.text
+        assert 'Error deleting interaction' in log_text
+        assert 'Error deleting contact' in log_text
+        assert 'Error deleting company' in log_text
+
+        assert 'There were 0 interactions deleted out of 1' in log_text
+        assert 'There were 0 contacts deleted out of 1' in log_text
+        assert 'There were 0 companies deleted out of 1' in log_text
+
+        assert Interaction.objects.count() == 1
+        assert Company.objects.count() == 1
+        assert Contact.objects.count() == 1
+
+        assert Interaction.objects.first().archived_reason is None
+        assert Company.objects.first().archived_reason is None
+        assert Contact.objects.first().archived_reason is None
+
+        # Check previous versions exist
+        interaction_versions = Version.objects.get_for_model(Interaction)
+        assert interaction_versions.count() == 0
+        company_versions = Version.objects.get_for_model(Company)
+        assert company_versions.count() == 0
+        contact_versions = Version.objects.get_for_model(Contact)
+        assert contact_versions.count() == 0
