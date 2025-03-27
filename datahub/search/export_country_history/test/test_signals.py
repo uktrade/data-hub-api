@@ -1,4 +1,5 @@
 import pytest
+from opensearchpy.exceptions import NotFoundError
 
 from datahub.company.models import CompanyExportCountryHistory
 from datahub.company.test.factories import CompanyExportCountryHistoryFactory
@@ -53,3 +54,27 @@ def test_updated_interaction_synced(opensearch_with_signals):
         'date': export_country_history.history_date.isoformat(),
         'status': str(export_country_history.status),
     }
+
+
+def test_deleting_export_country_history_removes_from_opensearch(opensearch_with_signals):
+    company_export_country_history = CompanyExportCountryHistoryFactory()
+
+    opensearch_with_signals.indices.refresh()
+
+    doc = opensearch_with_signals.get(
+        index=ExportCountryHistoryApp.search_model.get_read_alias(),
+        id=company_export_country_history.pk,
+    )
+    assert doc['_source']['company']['name'] == company_export_country_history.company.name
+    assert doc['_source']['company']['id'] == str(company_export_country_history.company_id)
+
+    company_export_country_history_id = company_export_country_history.id
+    company_export_country_history.delete()
+
+    opensearch_with_signals.indices.refresh()
+
+    with pytest.raises(NotFoundError):
+        doc = opensearch_with_signals.get(
+            index=ExportCountryHistoryApp.search_model.get_read_alias(),
+            id=company_export_country_history_id,
+        )
