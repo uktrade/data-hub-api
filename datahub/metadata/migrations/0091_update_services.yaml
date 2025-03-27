@@ -1,0 +1,12 @@
+- model: metadata.service
+  pk: 05290a83-a517-4442-8f13-d56dd1535e0d
+  fields:
+    disabled_on: ~
+    order: 5255
+    segment: Made in the UK, Sold to the World Roadshow 2025
+    parent:
+    contexts: ["export_service_delivery", "export_interaction"]    
+    lft: 2
+    rght: 3
+    tree_id: 19
+    level: 1
