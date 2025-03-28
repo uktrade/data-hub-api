@@ -1,4 +1,5 @@
 import pytest
+from opensearchpy.exceptions import NotFoundError
 
 from datahub.event.test.factories import EventFactory
 from datahub.search.event.apps import EventSearchApp
@@ -30,3 +31,26 @@ def test_updated_event_synced(opensearch_with_signals):
         id=event.pk,
     )
     assert result['_source']['name'] == new_name
+
+
+def test_deleting_event_removes_from_opensearch(opensearch_with_signals):
+    event = EventFactory()
+
+    opensearch_with_signals.indices.refresh()
+
+    doc = opensearch_with_signals.get(
+        index=EventSearchApp.search_model.get_read_alias(),
+        id=event.pk,
+    )
+    assert doc['_source']['name'] == event.name
+
+    event_id = event.id
+    event.delete()
+
+    opensearch_with_signals.indices.refresh()
+
+    with pytest.raises(NotFoundError):
+        doc = opensearch_with_signals.get(
+            index=EventSearchApp.search_model.get_read_alias(),
+            id=event_id,
+        )
