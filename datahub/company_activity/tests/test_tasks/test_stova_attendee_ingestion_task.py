@@ -566,7 +566,7 @@ class TestStovaIngestionTasks:
             None,
         ),
     )
-    def test_get_or_create_company__returns_when_company_name_empty(
+    def test_create_company__returns_when_company_has_no_name(
         self, s3_object_processor, test_file_path, caplog, company_name,
     ):
         """Tests empty company names are logged and no company is created."""
@@ -574,12 +574,15 @@ class TestStovaIngestionTasks:
         ingestion_task = StovaAttendeeIngestionTask(test_file_path, s3_object_processor)
 
         with caplog.at_level(logging.INFO):
-            company = ingestion_task.get_or_create_company(data, None)
-            assert 'No company name available, skipping attendee 1234' in caplog.text
+            company = ingestion_task.create_company(data, None)
+            assert (
+                'No match found and cannot create company without a name skipping attendee 1234'
+                in caplog.text
+            )
             assert company is None
 
     @pytest.mark.django_db
-    def test_get_or_create_company__returns_when_stova_event_has_no_datahub_event(
+    def test_create_company__returns_when_stova_event_has_no_datahub_event(
         self, s3_object_processor, test_file_path, caplog,
     ):
         """Tests stova events without datahub events are logged and no company is created."""
@@ -590,11 +593,61 @@ class TestStovaIngestionTasks:
         stova_event.datahub_event.clear()
 
         with caplog.at_level(logging.INFO):
-            company = ingestion_task.get_or_create_company(data, stova_event)
+            company = ingestion_task.create_company(data, stova_event)
             assert (
                 'No event associated with the StovaEvent. Skipping attendee: 1234' in caplog.text
             )
             assert company is None
+
+    @pytest.mark.parametrize(
+        'stova_attendee_email,contact_email',
+        (
+            pytest.param('', 'random@contact.com', marks=pytest.mark.xfail),
+            pytest.param('dont@find.me', 'existing@contact.com', marks=pytest.mark.xfail),
+            ('this@is.match', 'this@is.match'),
+        ),
+    )
+    @pytest.mark.django_db
+    def test_find_company_by_attendee_email(
+        self, s3_object_processor, test_file_path, stova_attendee_email, contact_email,
+    ):
+        data = {'email': stova_attendee_email}
+        contact = ContactFactory(email=contact_email)
+        ingestion_task = StovaAttendeeIngestionTask(test_file_path, s3_object_processor)
+        company = ingestion_task._find_company_by_attendee_email(data)
+        assert company == contact.company
+
+    @pytest.mark.parametrize(
+        'stova_company_name,company_name,stova_attendee_email,contact_email',
+        (
+            pytest.param('', 'A Company', '', 'random@contact.com', marks=pytest.mark.xfail),
+            pytest.param(
+                'C Company',
+                'A Company',
+                'dont@find.me',
+                'existing@contact.com',
+                marks=pytest.mark.xfail,
+            ),
+            ('Match By Company', 'Match By Company', 'no@contact.match', 'random@contact.com'),
+            ('Company', 'Different Company', 'this@is.match', 'this@is.match'),
+        ),
+    )
+    @pytest.mark.django_db
+    def test_find_company(
+        self,
+        s3_object_processor,
+        test_file_path,
+        stova_company_name,
+        company_name,
+        stova_attendee_email,
+        contact_email,
+    ):
+        data = {'company_name': stova_company_name, 'email': stova_attendee_email}
+        company = CompanyFactory(name=company_name)
+        ContactFactory(email=contact_email, company=company)
+        ingestion_task = StovaAttendeeIngestionTask(test_file_path, s3_object_processor)
+        company = ingestion_task.find_company(data)
+        assert company == company
 
     @pytest.mark.django_db
     def test_created_companies_have_country_matching_stova_event_country(
