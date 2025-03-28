@@ -69,6 +69,7 @@ class InteractionsDatasetView(BaseFilterDatasetView):
             'id',
             'interaction_link',
             'investment_project_id',
+            'company_export_id',
             'kind',
             'modified_on',
             'net_company_receipt',
