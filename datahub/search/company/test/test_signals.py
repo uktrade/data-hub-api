@@ -1,5 +1,6 @@
 import pytest
 from dateutil.parser import parse as dateutil_parse
+from opensearchpy.exceptions import NotFoundError
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
@@ -120,3 +121,26 @@ def test_adding_interaction_updates_company(opensearch_with_signals):
     )
     assert updated_doc['_source']['name'] == test_name
     assert updated_doc['_source']['latest_interaction_date'] == '2018-04-05T00:00:00+00:00'
+
+
+def test_deleting_company_removes_from_opensearch(opensearch_with_signals):
+    company = CompanyFactory()
+
+    opensearch_with_signals.indices.refresh()
+
+    doc = opensearch_with_signals.get(
+        index=CompanySearchApp.search_model.get_read_alias(),
+        id=company.pk,
+    )
+    assert doc['_source']['name'] == company.name
+
+    company_id = company.id
+    company.delete()
+
+    opensearch_with_signals.indices.refresh()
+
+    with pytest.raises(NotFoundError):
+        doc = opensearch_with_signals.get(
+            index=CompanySearchApp.search_model.get_read_alias(),
+            id=company_id,
+        )
