@@ -1,5 +1,5 @@
 import pytest
-
+from opensearchpy.exceptions import NotFoundError
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.search.adviser.apps import AdviserSearchApp
@@ -43,3 +43,26 @@ def test_updated_interaction_synced(opensearch_with_signals):
         'first_name': adviser.first_name,
         'name': adviser.name,
     }
+
+
+def test_deleting_event_removes_from_opensearch(opensearch_with_signals):
+    adviser = AdviserFactory()
+
+    opensearch_with_signals.indices.refresh()
+
+    doc = opensearch_with_signals.get(
+        index=AdviserSearchApp.search_model.get_read_alias(),
+        id=adviser.pk,
+    )
+    assert doc['_source']['first_name'] == adviser.first_name
+
+    adviser_id = adviser.id
+    adviser.delete()
+
+    opensearch_with_signals.indices.refresh()
+
+    with pytest.raises(NotFoundError):
+        doc = opensearch_with_signals.get(
+            index=AdviserSearchApp.search_model.get_read_alias(),
+            id=adviser_id,
+        )
