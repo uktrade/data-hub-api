@@ -12,6 +12,7 @@ from datahub.core.test_utils import format_date_or_datetime, get_attr_or_none
 from datahub.dataset.core.test import BaseDatasetViewTest
 from datahub.interaction.test.factories import (
     CompaniesInteractionWithExportBarrierOtherFactory,
+    CompanyExportInteractionFactory,
     CompanyInteractionFactory,
     CompanyInteractionFactoryWithPolicyFeedback,
     CompanyInteractionFactoryWithRelatedTradeAgreements,
@@ -31,6 +32,11 @@ def get_expected_data_from_interaction(interaction):
         'communication_channel__name': get_attr_or_none(
             interaction,
             'communication_channel.name',
+        ),
+        'company_export_id': (
+            str(interaction.company_export_id)
+            if interaction.company_export_id is not None
+            else None
         ),
         'company_id': str(interaction.company.id),
         'contact_ids': [str(x.id) for x in interaction.contacts.all().order_by('pk')],
@@ -103,6 +109,7 @@ class TestInteractionsDatasetViewSet(BaseDatasetViewTest):
 
     @pytest.mark.parametrize(
         'interaction_factory', (
+            CompanyExportInteractionFactory,
             CompanyInteractionFactory,
             CompanyInteractionFactoryWithPolicyFeedback,
             CompaniesInteractionWithExportBarrierOtherFactory,
