@@ -416,7 +416,7 @@ class AddressSerializer(serializers.ModelSerializer):
         )
 
     def get_validators(self):
-        """Append ValidationRule for area/postcode depending on feature flag/context
+        """Append ValidationRule for area/postcode depending on feature flag/context.
 
         Only mark area/postcode required if country is US/Canada & called from context where area
         is safe to require, and if feature flag enabled. Currently the only context where area is
@@ -461,7 +461,7 @@ class AddressSerializer(serializers.ModelSerializer):
                 'postcode': '',
                 'country': None
             }
-        }
+        }.
         """
         address_dict = super().to_representation(value)
         if not any(address_dict.values()):

@@ -19,8 +19,8 @@ from datahub.search.utils import SortDirection
 
 
 @pytest.mark.parametrize(
-    'field,value,expected',
-    (
+    ('field', 'value', 'expected'),
+    [
         (
             'field_name',
             'field value',
@@ -156,7 +156,7 @@ from datahub.search.utils import SortDirection
                 },
             },
         ),
-    ),
+    ],
 )
 def test_build_field_query(field, value, expected):
     """Test for the _build_field_query function."""
@@ -165,8 +165,8 @@ def test_build_field_query(field, value, expected):
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    'term,expected',
-    (
+    ('term', 'expected'),
+    [
         (
             'hello',
             {
@@ -198,7 +198,7 @@ def test_build_field_query(field, value, expected):
                 'match_all': {},
             },
         ),
-    ),
+    ],
 )
 def test_build_term_query(term, expected):
     """Tests search term query."""
@@ -207,8 +207,8 @@ def test_build_term_query(term, expected):
 
 
 @pytest.mark.parametrize(
-    'term,expected',
-    (
+    ('term', 'expected'),
+    [
         (
             'hello',
             {
@@ -286,7 +286,7 @@ def test_build_term_query(term, expected):
                 'match_all': {},
             },
         ),
-    ),
+    ],
 )
 def test_build_fuzzy_term_query(term, expected):
     """Tests search term query."""
@@ -334,12 +334,12 @@ def test_build_fuzzy_term_query_no_fields():
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    'offset,limit,expected_size',
-    (
+    ('offset', 'limit', 'expected_size'),
+    [
         (8950, 1000, 1000),
         (9950, 1000, 50),
         (10000, 1000, 0),
-    ),
+    ],
 )
 def test_offset_near_max_results(offset, limit, expected_size):
     """Tests limit clipping when near max_results."""
@@ -378,8 +378,8 @@ def test_date_range_fields():
 
 
 @pytest.mark.parametrize(
-    'filters,expected',
-    (
+    ('filters', 'expected'),
+    [
         # An empty list of conditions should mean that there are no conditions
         # that would permit access.
         (
@@ -418,7 +418,7 @@ def test_date_range_fields():
                 },
             },
         ),
-    ),
+    ],
 )
 def test_build_entity_permission_query_no_conditions(filters, expected):
     """Test for the _build_entity_permission_query function."""
@@ -441,7 +441,7 @@ def test_build_entity_permission_query_no_conditions(filters, expected):
         'fields_to_exclude',
         'expected_query',
     ),
-    (
+    [
         # minimal
         (
             None,
@@ -605,7 +605,7 @@ def test_build_entity_permission_query_no_conditions(filters, expected):
                 },
             },
         ),
-    ),
+    ],
 )
 def test_get_search_by_entities_query(
     term,

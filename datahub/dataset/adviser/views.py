@@ -12,7 +12,7 @@ class AdvisersDatasetView(BaseDatasetView):
     pagination_class = AdvisersDatasetViewCursorPagination
 
     def get_dataset(self):
-        """Returns list of Advisers Dataset records"""
+        """Returns list of Advisers Dataset records."""
         return Adviser.objects.values(
             'id',
             'date_joined',

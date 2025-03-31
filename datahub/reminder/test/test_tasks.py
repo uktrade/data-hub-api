@@ -128,7 +128,7 @@ def adviser(
     no_recent_interaction_reminders_user_feature_flag,
     estimated_land_date_reminders_user_feature_flag,
 ):
-    """An adviser with the relevant feature flags enabled
+    """An adviser with the relevant feature flags enabled.
     """
     adviser = AdviserFactory()
     adviser.features.set(
@@ -149,7 +149,7 @@ def inactive_adviser(
     no_recent_interaction_reminders_user_feature_flag,
     estimated_land_date_reminders_user_feature_flag,
 ):
-    """An inactive adviser with the relevant feature flags enabled
+    """An inactive adviser with the relevant feature flags enabled.
     """
     inactive_adviser = AdviserFactory(is_active=False)
     inactive_adviser.features.set(
@@ -580,21 +580,21 @@ class TestGenerateEstimatedLandDateReminderTask:
 
     @pytest.mark.parametrize(
         'role',
-        (
+        [
             'project_manager',
             'project_assurance_adviser',
             'client_relationship_manager',
             'referral_source_adviser',
-        ),
+        ],
     )
     @pytest.mark.parametrize(
-        'days,email_reminders_enabled',
-        (
+        ('days', 'email_reminders_enabled'),
+        [
             (30, True),
             (60, True),
             (30, False),
             (60, False),
-        ),
+        ],
     )
     def test_generate_estimated_land_date_reminders_for_subscription(
         self,
@@ -645,21 +645,21 @@ class TestGenerateEstimatedLandDateReminderTask:
 
     @pytest.mark.parametrize(
         'role',
-        (
+        [
             'project_manager',
             'project_assurance_adviser',
             'client_relationship_manager',
             'referral_source_adviser',
-        ),
+        ],
     )
     @pytest.mark.parametrize(
-        'days,email_reminders_enabled',
-        (
+        ('days', 'email_reminders_enabled'),
+        [
             (30, True),
             (60, True),
             (30, False),
             (60, False),
-        ),
+        ],
     )
     def test_sends_estimated_land_date_summary_notification_for_subscription(
         self,
@@ -1172,7 +1172,7 @@ class TestGenerateNoRecentExportInteractionReminderTask:
 
     @pytest.mark.parametrize(
         'lock_acquired',
-        (False, True),
+        [False, True],
     )
     def test_lock(
         self,
@@ -1245,13 +1245,13 @@ class TestGenerateNoRecentExportInteractionReminderTask:
         )
 
     @pytest.mark.parametrize(
-        'days,email_reminders_enabled, one_list_tier',
-        (
+        ('days', 'email_reminders_enabled', 'one_list_tier'),
+        [
             (5, True, OneListTierID.tier_d_international_trade_advisers.value),
             (10, True, OneListTierID.tier_d_overseas_post_accounts.value),
             (3, False, OneListTierID.tier_d_international_trade_advisers.value),
             (15, False, OneListTierID.tier_d_overseas_post_accounts.value),
-        ),
+        ],
     )
     def test_generate_no_recent_export_interaction_reminders_for_subscription(
         self,
@@ -1296,10 +1296,10 @@ class TestGenerateNoRecentExportInteractionReminderTask:
 
     @pytest.mark.parametrize(
         'one_list_tier',
-        (
+        [
             (OneListTierID.tier_d_international_trade_advisers.value),
             (OneListTierID.tier_d_overseas_post_accounts.value),
-        ),
+        ],
     )
     def test_generate_no_recent_export_interaction_reminders_for_subscription_for_core_member(
         self,
@@ -1375,7 +1375,7 @@ class TestGenerateNoRecentExportInteractionReminderTask:
         adviser,
         mock_create_no_recent_export_interaction_reminder,
     ):
-        """A reminder should be sent if no interactions at all in given timeframe
+        """A reminder should be sent if no interactions at all in given timeframe.
         """
         day = 15
         subscription = NoRecentExportInteractionSubscriptionFactory(
@@ -1411,7 +1411,7 @@ class TestGenerateNoRecentExportInteractionReminderTask:
         )
         mock_create_no_recent_export_interaction_reminder.assert_not_called()
 
-    @pytest.mark.parametrize('day_offset', (0, 1))
+    @pytest.mark.parametrize('day_offset', [0, 1])
     def test_dont_send_reminder_if_recent_interaction_exists(
         self,
         adviser,
@@ -1642,12 +1642,12 @@ class TestCreateNewExportInteractionReminder:
 
     @pytest.mark.parametrize(
         'when',
-        (
+        [
             '2022-11-22T16:00:00',
             # If the queue is still processing tasks from yesterday and a reminder
             # was already sent, do not send another one.
             '2022-11-23T16:00:00',
-        ),
+        ],
     )
     def test_create_existing_reminder(
         self,
@@ -1695,7 +1695,7 @@ class TestGenerateNewExportInteractionReminderTask:
 
     @pytest.mark.parametrize(
         'lock_acquired',
-        (False, True),
+        [False, True],
     )
     def test_lock(
         self,
@@ -1768,13 +1768,13 @@ class TestGenerateNewExportInteractionReminderTask:
         )
 
     @pytest.mark.parametrize(
-        'days,email_reminders_enabled',
-        (
+        ('days', 'email_reminders_enabled'),
+        [
             (5, True),
             (10, True),
             (3, False),
             (15, False),
-        ),
+        ],
     )
     def test_generate_new_export_interaction_reminders_for_subscription(
         self,
@@ -1822,7 +1822,7 @@ class TestGenerateNewExportInteractionReminderTask:
         mock_create_new_export_interaction_reminder,
     ):
         """New Export Interaction reminders should not be sent to the advisor who created the
-        interaction, they should only go to an advisor when they did not create the interaction
+        interaction, they should only go to an advisor when they did not create the interaction.
         """
 
         def _export_interaction_advisor(day):
@@ -1929,7 +1929,7 @@ class TestGenerateNewExportInteractionReminderTask:
         mock_create_new_export_interaction_reminder,
     ):
         """New Export Interaction reminders should not be sent to the advisor who modified the
-        interaction
+        interaction.
         """
         creator_advisor = AdviserFactory()
         creator_advisor.features.set(
@@ -1974,7 +1974,7 @@ class TestGenerateNewExportInteractionReminderTask:
 
         assert mock_create_new_export_interaction_reminder.call_count == 0
 
-    @pytest.mark.parametrize('day_offset', (0, 1))
+    @pytest.mark.parametrize('day_offset', [0, 1])
     def test_dont_send_reminder_if_no_new_interactions(
         self,
         adviser,
@@ -2315,21 +2315,21 @@ class TestGenerateNoRecentInteractionReminderTask:
 
     @pytest.mark.parametrize(
         'role',
-        (
+        [
             'project_manager',
             'project_assurance_adviser',
             'client_relationship_manager',
             'referral_source_adviser',
-        ),
+        ],
     )
     @pytest.mark.parametrize(
-        'days,email_reminders_enabled',
-        (
+        ('days', 'email_reminders_enabled'),
+        [
             (5, True),
             (10, True),
             (3, False),
             (15, False),
-        ),
+        ],
     )
     def test_generate_no_recent_interaction_reminders_for_subscription(
         self,
@@ -2442,7 +2442,7 @@ class TestGenerateNoRecentInteractionReminderTask:
         adviser,
         mock_create_no_recent_interaction_reminder,
     ):
-        """A reminder should be sent if no interactions at all in given timeframe
+        """A reminder should be sent if no interactions at all in given timeframe.
         """
         day = 15
         subscription = NoRecentInvestmentInteractionSubscriptionFactory(
@@ -2477,7 +2477,7 @@ class TestGenerateNoRecentInteractionReminderTask:
         )
         mock_create_no_recent_interaction_reminder.assert_not_called()
 
-    @pytest.mark.parametrize('day_offset', (0, 1))
+    @pytest.mark.parametrize('day_offset', [0, 1])
     def test_dont_send_reminder_if_recent_interaction_exists(
         self,
         adviser,
@@ -2815,7 +2815,7 @@ class TestUpdateEmailDeliveryStatusTask:
 
     @pytest.mark.parametrize(
         'lock_acquired',
-        (False, True),
+        [False, True],
     )
     def test_lock_for_no_recent_export_interaction_status(
         self,
@@ -2932,7 +2932,7 @@ class TestUpdateEmailDeliveryStatusTask:
 
     @pytest.mark.parametrize(
         'lock_acquired',
-        (False, True),
+        [False, True],
     )
     def test_lock_for_new_export_interaction_status(
         self,

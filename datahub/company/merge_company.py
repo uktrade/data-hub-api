@@ -187,7 +187,7 @@ def merge_companies(source_company: Company, target_company: Company, user):
 
 
 def rollback_merge_companies(former_source_company: Company):
-    """Rolls back a company merge of what was the "source_company" passed to merge_companies
+    """Rolls back a company merge of what was the "source_company" passed to merge_companies.
     """
     rollback_version = _get_rollback_version(former_source_company, 'Company merged')
     rollback_version.revision.revert()

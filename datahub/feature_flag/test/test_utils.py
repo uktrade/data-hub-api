@@ -20,13 +20,13 @@ pytestmark = pytest.mark.django_db
 
 
 @pytest.mark.parametrize(
-    'code,is_active,lookup,expected',
-    (
+    ('code', 'is_active', 'lookup', 'expected'),
+    [
         ('test_flag', True, 'test_flag', True),
         ('test_flag', False, 'test_flag', False),
         ('', None, 'test_flag', False),
         ('test_flag', True, 'test', False),
-    ),
+    ],
 )
 def test_is_feature_flag(code, is_active, lookup, expected):
     """Tests if is_feature_flag returns correct state of feature flag."""
@@ -66,8 +66,8 @@ class TestFeatureFlaggedView:
 
 
 @pytest.mark.parametrize(
-    'code,assigned,is_active,lookup,expected',
-    (
+    ('code', 'assigned', 'is_active', 'lookup', 'expected'),
+    [
         ('test_user_flag', True, True, 'test_user_flag', True),
         ('test_user_flag', False, True, 'test_user_flag', False),
         ('test_user_flag', True, False, 'test_user_flag', False),
@@ -75,7 +75,7 @@ class TestFeatureFlaggedView:
         ('other', False, None, 'test_user_flag', False),
         ('test_user_flag', True, True, 'test', False),
         ('test_user_flag', False, True, 'test', False),
-    ),
+    ],
 )
 def test_is_user_feature_flag(code, assigned, is_active, lookup, expected):
     """Tests if is_user_feature_flag_active returns correct state of feature flag."""
@@ -90,8 +90,8 @@ def test_is_user_feature_flag(code, assigned, is_active, lookup, expected):
 
 
 @pytest.mark.parametrize(
-    'code,assigned,is_active,lookup,expected',
-    (
+    ('code', 'assigned', 'is_active', 'lookup', 'expected'),
+    [
         ('test_user_flag', True, True, 'test_user_flag', True),
         ('test_user_flag', False, True, 'test_user_flag', False),
         ('test_user_flag', True, False, 'test_user_flag', False),
@@ -99,7 +99,7 @@ def test_is_user_feature_flag(code, assigned, is_active, lookup, expected):
         ('other', False, None, 'test_user_flag', False),
         ('test_user_flag', True, True, 'test', False),
         ('test_user_flag', False, True, 'test', False),
-    ),
+    ],
 )
 def test_is_user_feature_flag_group(code, assigned, is_active, lookup, expected):
     """Tests if is_user_feature_flag_active returns correct state of feature flag group."""

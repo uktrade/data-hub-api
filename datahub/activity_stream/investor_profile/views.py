@@ -14,7 +14,7 @@ class LargeCapitalInvestorProfileCursorPagination(ActivityCursorPagination):
 
 
 class LargeCapitalInvestorProfileActivityViewSet(ActivityViewSet):
-    """Large Capital Investor Profile ViewSet for the activity stream
+    """Large Capital Investor Profile ViewSet for the activity stream.
     """
 
     pagination_class = LargeCapitalInvestorProfileCursorPagination

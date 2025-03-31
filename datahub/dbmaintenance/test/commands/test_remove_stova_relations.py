@@ -49,10 +49,10 @@ def test_base_stova_attendee():
 class TestRemoveStovaRelationsCommand:
     @pytest.mark.parametrize(
         ('simulate'),
-        (
+        [
             False,
             pytest.param(True, marks=pytest.mark.xfail(strict=True)),
-        ),
+        ],
     )
     def test_interactions_from_stova_are_removed(self, test_base_stova_attendee, simulate, caplog):
         """Test interactions created by Stova Attendees are removed and interactions not created by
@@ -80,10 +80,10 @@ class TestRemoveStovaRelationsCommand:
 
     @pytest.mark.parametrize(
         ('simulate'),
-        (
+        [
             False,
             pytest.param(True, marks=pytest.mark.xfail(strict=True)),
-        ),
+        ],
     )
     def test_contacts_from_stova_are_removed(self, test_base_stova_attendee, simulate, caplog):
         """Test contacts created by Stova Attendees are removed and contacts not created by stova are
@@ -112,10 +112,10 @@ class TestRemoveStovaRelationsCommand:
 
     @pytest.mark.parametrize(
         ('simulate'),
-        (
+        [
             False,
             pytest.param(True, marks=pytest.mark.xfail(strict=True)),
-        ),
+        ],
     )
     def test_companies_from_stova_are_removed(self, test_base_stova_attendee, simulate, caplog):
         """Test companies created by Stova Attendees are removed and companies not created by stova

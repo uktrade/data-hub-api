@@ -48,7 +48,7 @@ class TestCreateLargeCapitalOpportunityView(APITestMixin):
     """Test creating a large capital opportunity."""
 
     def test_large_capital_unauthorized_user(self, api_client):
-        """Should return 401"""
+        """Should return 401."""
         url = reverse('api-v4:large-capital-opportunity:collection')
         user = create_test_user()
         response = api_client.get(url, user=user)

@@ -13,7 +13,7 @@ from datahub.user.company_list.test.factories import (
 
 
 def get_expected_data_from_pipeline_item(item):
-    """Returns pipeline item data as a dictionary"""
+    """Returns pipeline item data as a dictionary."""
     return {
         'adviser_id': str(item.adviser_id),
         'archived': item.archived,
@@ -36,20 +36,20 @@ def get_expected_data_from_pipeline_item(item):
 
 @pytest.mark.django_db
 class TestPipelineItemDatasetViewSet(BaseDatasetViewTest):
-    """Tests for PipelineItemsDatasetView
+    """Tests for PipelineItemsDatasetView.
     """
 
     view_url = reverse('api-v4:dataset:pipeline-items-dataset')
     factory = PipelineItemFactory
 
     @pytest.mark.parametrize(
-        'item_factory', (
+        'item_factory', [
             PipelineItemFactory,
             ArchivedPipelineItemFactory,
-        ),
+        ],
     )
     def test_success(self, data_flow_api_client, item_factory):
-        """Test that endpoint returns with expected data for a single pipeline item"""
+        """Test that endpoint returns with expected data for a single pipeline item."""
         item = item_factory()
         item.contacts.add(ContactFactory())
         response = data_flow_api_client.get(self.view_url)
@@ -61,7 +61,7 @@ class TestPipelineItemDatasetViewSet(BaseDatasetViewTest):
         assert result == expected_result
 
     def test_with_multiple_records(self, data_flow_api_client):
-        """Test that endpoint returns correct number of records"""
+        """Test that endpoint returns correct number of records."""
         with freeze_time('2019-01-01 12:30:00'):
             item1 = PipelineItemFactory()
         with freeze_time('2019-01-03 12:00:00'):

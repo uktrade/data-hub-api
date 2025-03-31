@@ -35,10 +35,10 @@ def test_updated_large_investor_profile_synced(
 
 
 @pytest.mark.parametrize(
-    'investor_profile_factory,expected_in_index,expected_to_call_delete',
-    (
+    ('investor_profile_factory', 'expected_in_index', 'expected_to_call_delete'),
+    [
         (LargeCapitalInvestorProfileFactory, True, True),
-    ),
+    ],
 )
 def test_delete_from_opensearch(
     investor_profile_factory,

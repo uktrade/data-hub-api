@@ -18,7 +18,7 @@ from datahub.investment.project.test.factories import (
 @pytest.mark.django_db
 def test_investment_project_added(api_client):
     """Get a list of investment project and test the returned JSON is valid as per:
-    https://www.w3.org/TR/activitystreams-core/
+    https://www.w3.org/TR/activitystreams-core/.
     """
     start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
     with freeze_time(start) as frozen_datetime:
@@ -88,7 +88,7 @@ def test_investment_project_added(api_client):
 @pytest.mark.django_db
 def test_investment_project_with_pm_added(api_client):
     """Get a list of investment project and test the returned JSON is valid as per:
-    https://www.w3.org/TR/activitystreams-core/
+    https://www.w3.org/TR/activitystreams-core/.
 
     Investment Project with PM will have fields such as totalInvestment.
     """
@@ -161,7 +161,7 @@ def test_investment_project_with_pm_added(api_client):
 @pytest.mark.django_db
 def test_investment_project_verify_win_added(api_client):
     """Get a list of investment project and test the returned JSON is valid as per:
-    https://www.w3.org/TR/activitystreams-core/
+    https://www.w3.org/TR/activitystreams-core/.
 
     Investment Project with verified win will have fields such as totalInvestment,
     numberNewJobs and foreignEquityInvestment.

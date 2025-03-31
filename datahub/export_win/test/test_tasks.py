@@ -78,7 +78,7 @@ class TestUpdateEmailDeliveryStatusTask:
         self,
         mock_export_win_tasks_notify_gateway,
     ):
-        """Test email notification id being saved into customer response model
+        """Test email notification id being saved into customer response model.
         """
         notification_id = uuid.uuid4()
         mock_export_win_tasks_notify_gateway.send_email_notification = mock.Mock(
@@ -159,11 +159,11 @@ class TestUpdateEmailDeliveryStatusTask:
         )
 
     @pytest.mark.parametrize(
-        'lock_acquired,call_count',
-        (
+        ('lock_acquired', 'call_count'),
+        [
             (False, 0),
             (True, 1),
-        ),
+        ],
     )
     def test_lock_for_customer_response_token_email_delivery_status(
         self,
@@ -171,7 +171,7 @@ class TestUpdateEmailDeliveryStatusTask:
         lock_acquired,
         call_count,
     ):
-        """Test that the task doesn't run if it cannot acquire the advisory_lock
+        """Test that the task doesn't run if it cannot acquire the advisory_lock.
         """
         mock_advisory_lock = mock.MagicMock()
         mock_advisory_lock.return_value.__enter__.return_value = lock_acquired
@@ -191,7 +191,7 @@ class TestUpdateEmailDeliveryStatusTask:
         self,
         mock_export_win_tasks_notify_gateway,
     ):
-        """Test email delivery status being updated into customer response token model
+        """Test email delivery status being updated into customer response token model.
         """
         customer_response = CustomerResponseFactory()
         mock_export_win_tasks_notify_gateway.get_notification_by_id = mock.Mock(
@@ -235,11 +235,11 @@ class TestUpdateEmailDeliveryStatusTask:
         )
 
     @pytest.mark.parametrize(
-        'lock_acquired,call_count',
-        (
+        ('lock_acquired', 'call_count'),
+        [
             (False, 0),
             (True, 1),
-        ),
+        ],
     )
     def test_lock_for_customer_response_email_delivery_status(
         self,
@@ -247,7 +247,7 @@ class TestUpdateEmailDeliveryStatusTask:
         lock_acquired,
         call_count,
     ):
-        """Test that the task doesn't run if it cannot acquire the advisory_lock
+        """Test that the task doesn't run if it cannot acquire the advisory_lock.
         """
         mock_advisory_lock = mock.MagicMock()
         mock_advisory_lock.return_value.__enter__.return_value = lock_acquired
@@ -267,7 +267,7 @@ class TestUpdateEmailDeliveryStatusTask:
         self,
         mock_export_win_tasks_notify_gateway,
     ):
-        """Test email delivery status being updated into customer response model
+        """Test email delivery status being updated into customer response model.
         """
         mock_export_win_tasks_notify_gateway.get_notification_by_id = mock.Mock(
             return_value={'status': 'delivered'},
@@ -478,7 +478,7 @@ class TestAutoResendClientEmailFromUnconfirmedWinTask:
 
     @pytest.mark.parametrize(
         'is_deleted',
-        (True, False),
+        [True, False],
     )
     def test_auto_resend_to_ensure_soft_deleted_win_excluded_when_generating_new_token(
         self,
@@ -551,7 +551,7 @@ def test_get_all_fields_for_client_email_receipt_as_adviser_success():
 @pytest.mark.django_db
 @freeze_time('2023-12-11')
 def test_create_token_for_contact_without_existing_unexpired_token():
-    """Testing the create token for contact where no existing unexpired token
+    """Testing the create token for contact where no existing unexpired token.
     """
     mock_customer_response = CustomerResponseFactory()
     mock_contact = ContactFactory()
@@ -570,7 +570,7 @@ def test_create_token_for_contact_without_existing_unexpired_token():
 @pytest.mark.django_db
 @freeze_time('2023-12-14')
 def test_create_token_for_contact_as_adviser_without_existing_unexpired_token():
-    """Testing the create token for contact as adviser where no existing unexpired token
+    """Testing the create token for contact as adviser where no existing unexpired token.
     """
     mock_customer_response = CustomerResponseFactory()
     mock_adviser = AdviserFactory()
@@ -589,7 +589,7 @@ def test_create_token_for_contact_as_adviser_without_existing_unexpired_token():
 @pytest.mark.django_db
 @freeze_time('2023-12-11')
 def test_create_token_for_contact_with_existing_unexpired_token():
-    """Testing the creation token for contact where there is existing unexpired token
+    """Testing the creation token for contact where there is existing unexpired token.
     """
     mock_customer_response = CustomerResponseFactory()
     mock_contact = ContactFactory()
@@ -612,7 +612,7 @@ def test_create_token_for_contact_with_existing_unexpired_token():
 @pytest.mark.django_db
 @freeze_time('2023-12-14')
 def test_create_token_for_contact_as_adviser_with_existing_unexpired_token():
-    """Testing the creation token for contact as adviser where there is existing unexpired token
+    """Testing the creation token for contact as adviser where there is existing unexpired token.
     """
     mock_customer_response = CustomerResponseFactory()
     mock_adviser = AdviserFactory()
@@ -636,7 +636,7 @@ def test_create_token_for_contact_as_adviser_with_existing_unexpired_token():
 @freeze_time('2023-12-11')
 def test_create_token_for_contact_with_existing_expired_and_unexpired_tokens():
     """Testing the creation of a token for company contact where there are existing
-    multiple tokens, both in expired and unexpired states
+    multiple tokens, both in expired and unexpired states.
     """
     mock_customer_response = CustomerResponseFactory()
     mock_contact = ContactFactory()
@@ -668,7 +668,7 @@ def test_create_token_for_contact_with_existing_expired_and_unexpired_tokens():
 @freeze_time('2023-12-14')
 def test_create_token_for_contact_as_adviser_with_existing_expired_and_unexpired_tokens():
     """Testing the creation of a token for contact as adviser where there are existing
-    multiple tokens, both in expired and unexpired states
+    multiple tokens, both in expired and unexpired states.
     """
     mock_customer_response = CustomerResponseFactory()
     mock_adviser = AdviserFactory()

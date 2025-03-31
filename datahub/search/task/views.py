@@ -45,7 +45,7 @@ class SearchTaskAPIView(SearchTaskAPIViewMixin, SearchAPIView):
     """Filtered company search view."""
 
     def deep_get(self, dictionary, keys, default=None):
-        """Perform a deep search on a dictionary to find the item at the location provided in the keys
+        """Perform a deep search on a dictionary to find the item at the location provided in the keys.
         """
         return reduce(
             lambda d, key: d.get(key, default) if isinstance(d, dict) else default,

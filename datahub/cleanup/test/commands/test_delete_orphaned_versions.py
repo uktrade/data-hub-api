@@ -127,7 +127,7 @@ def test_mappings():
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    'model_label,model_factory',
+    ('model_label', 'model_factory'),
     MAPPINGS.items(),
 )
 def test_with_one_model(model_label, model_factory):

@@ -92,7 +92,7 @@ class PipelineItemSerializer(serializers.ModelSerializer):
     )
 
     def validate_company(self, company):
-        """Make sure company is not archived"""
+        """Make sure company is not archived."""
         if company.archived:
             raise serializers.ValidationError(
                 self.error_messages['archived_company'],
@@ -101,7 +101,7 @@ class PipelineItemSerializer(serializers.ModelSerializer):
         return company
 
     def validate_name(self, name):
-        """Make sure name is not blank"""
+        """Make sure name is not blank."""
         if not name:
             raise serializers.ValidationError(
                 self.error_messages['field_cannot_be_empty'],
@@ -112,7 +112,7 @@ class PipelineItemSerializer(serializers.ModelSerializer):
         """Raise a validation error if:
         - anything else other than allowed fields is updated.
         - name field is empty when editing.
-        - contact doesn't belong to the company being added
+        - contact doesn't belong to the company being added.
         """
         if self.instance is None:
             if (data.get('name') in (None, '')):
@@ -146,7 +146,7 @@ class PipelineItemSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         """Update modified_on field with current date time
-        during PATCH transactions
+        during PATCH transactions.
         """
         if self.partial and self.instance:
             self.instance.modified_on = now().isoformat()

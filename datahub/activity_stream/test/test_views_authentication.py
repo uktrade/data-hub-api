@@ -109,7 +109,7 @@ def test_403_returned(api_client, endpoint):
 @pytest.mark.django_db
 def test_succeeds_with_valid_credentials(api_client, endpoint):
     """If the Authorization and X-Forwarded-For headers are correct, then
-    the correct, and authentic, data is returned
+    the correct, and authentic, data is returned.
     """
     url = get_url(endpoint)
     sender = hawk.sender(url)

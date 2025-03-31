@@ -21,7 +21,7 @@ class CompanyActivity(models.Model):
     """
 
     class ActivitySource(models.TextChoices):
-        """The type of activity, whether its an interaction, referral, event, investment etc"""
+        """The type of activity, whether its an interaction, referral, event, investment etc."""
 
         interaction = ('interaction', 'interaction')
         referral = ('referral', 'referral')
@@ -128,5 +128,5 @@ class CompanyActivity(models.Model):
     )
 
     def __str__(self):
-        """Readable name for CompanyActivity"""
+        """Readable name for CompanyActivity."""
         return f'Activity from "{self.activity_source}" for company: {self.company.name}'

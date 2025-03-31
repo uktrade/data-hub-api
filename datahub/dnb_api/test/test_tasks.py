@@ -41,10 +41,10 @@ DNB_V2_SEARCH_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'v2/companies/s
 
 @pytest.mark.parametrize(
     'update_descriptor',
-    (
+    [
         None,
         'command:foo:bar',
-    ),
+    ],
 )
 @freeze_time('2019-01-01 11:12:13')
 def test_sync_company_with_dnb_all_fields(
@@ -176,7 +176,7 @@ def test_sync_company_with_dnb_partial_fields(
 
 @pytest.mark.parametrize(
     'error',
-    (
+    [
         DNBServiceError('An error occurred', status_code=504),
         DNBServiceError('An error occurred', status_code=503),
         DNBServiceError('An error occurred', status_code=502),
@@ -185,7 +185,7 @@ def test_sync_company_with_dnb_partial_fields(
         DNBServiceError('An error occurred', status_code=400),
         DNBServiceConnectionError('An error occurred'),
         DNBServiceTimeoutError('An error occurred'),
-    ),
+    ],
 )
 def test_sync_company_with_dnb_bubbles_up_errors(monkeypatch, error):
     """Test the sync_company_with_dnb task retries server errors.
@@ -204,7 +204,7 @@ def test_sync_company_with_dnb_bubbles_up_errors(monkeypatch, error):
 class TestGetCompanyUpdates:
     @pytest.mark.parametrize(
         'error',
-        (
+        [
             DNBServiceError(
                 'An error occurred',
                 status_code=status.HTTP_504_GATEWAY_TIMEOUT,
@@ -235,7 +235,7 @@ class TestGetCompanyUpdates:
             DNBServiceTimeoutError(
                 'An error occurred',
             ),
-        ),
+        ],
     )
     def test_errors(self, monkeypatch, error):
         """Test the schedule_get_company_updates task retries server errors.
@@ -251,7 +251,7 @@ class TestGetCompanyUpdates:
 
     @pytest.mark.parametrize(
         'data',
-        (
+        [
             {
                 None: {
                     'next': 'http://foo.bar/companies?cursor=page2',
@@ -271,14 +271,14 @@ class TestGetCompanyUpdates:
                     ],
                 },
             },
-        ),
+        ],
     )
     @pytest.mark.parametrize(
         'fields_to_update',
-        (
+        [
             None,
             ['foo', 'bar'],
-        ),
+        ],
     )
     @freeze_time('2019-01-02T2:00:00')
     def test_updates(self, monkeypatch, data, fields_to_update):
@@ -317,11 +317,11 @@ class TestGetCompanyUpdates:
         assert str(record_audit) in str(job_scheduler_mock.call_args_list)
 
     @pytest.mark.parametrize(
-        'lock_acquired, call_count',
-        (
+        ('lock_acquired', 'call_count'),
+        [
             (False, 0),
             (True, 1),
-        ),
+        ],
     )
     def test_lock(self, monkeypatch, lock_acquired, call_count):
         """Test that the task doesn't run if it cannot acquire
@@ -345,7 +345,7 @@ class TestGetCompanyUpdates:
 
     @pytest.mark.parametrize(
         'data',
-        (
+        [
             # Test limit works correctly on the first page
             {
                 None: {
@@ -379,7 +379,7 @@ class TestGetCompanyUpdates:
                     ],
                 },
             },
-        ),
+        ],
     )
     @freeze_time('2019-01-02T2:00:00')
     @override_settings(DNB_AUTOMATIC_UPDATE_LIMIT=2)
@@ -675,10 +675,10 @@ def test_update_company_from_dnb_data_fails_validation(dnb_response_uk, caplog):
 
 @pytest.mark.parametrize(
     'existing_company_dnb_modified_on',
-    (
+    [
         now,
         None,
-    ),
+    ],
 )
 @freeze_time('2019-01-01 11:12:13')
 def test_sync_outdated_companies_with_dnb_all_fields(
@@ -746,10 +746,10 @@ def test_sync_outdated_companies_with_dnb_all_fields(
 
 @pytest.mark.parametrize(
     'existing_company_dnb_modified_on',
-    (
+    [
         now,
         None,
-    ),
+    ],
 )
 @freeze_time('2019-01-01 11:12:13')
 def test_sync_outdated_companies_with_dnb_partial_fields(

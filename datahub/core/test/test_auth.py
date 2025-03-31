@@ -13,8 +13,8 @@ class TestPaaSIPAuthentication:
     """Tests PaaS IP authentication when using PaaSIPAuthentication."""
 
     @pytest.mark.parametrize(
-        'get_kwargs,expected_json',
-        (
+        ('get_kwargs', 'expected_json'),
+        [
             (
                 # If second-to-last X-Forwarded-For header isn't allowlisted
                 {
@@ -50,7 +50,7 @@ class TestPaaSIPAuthentication:
                 },
                 {'detail': 'Incorrect authentication credentials.'},
             ),
-        ),
+        ],
     )
     def test_401_returned_when_invalid_ip(self, api_client, get_kwargs, expected_json):
         """If the client IP is not authorised to access, then a 401 is returned.

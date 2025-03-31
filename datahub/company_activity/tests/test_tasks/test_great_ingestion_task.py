@@ -72,7 +72,7 @@ class TestGreatIngestionTasks:
     @mock_aws
     def test_great_data_file_ingestion(self, caplog, test_file, test_file_path):
         """Test that a Great data file is ingested correctly and the ingested file
-        is added to the IngestedFile table
+        is added to the IngestedFile table.
         """
         initial_great_activity_count = GreatExportEnquiry.objects.count()
         initial_ingested_count = IngestedFile.objects.count()
@@ -88,7 +88,7 @@ class TestGreatIngestionTasks:
     @pytest.mark.django_db
     @mock_aws
     def test_skip_previously_ingested_records(self, test_file_path):
-        """Test that we skip updating records that have already been ingested
+        """Test that we skip updating records that have already been ingested.
         """
         GreatExportEnquiryFactory(form_id=5249)
         record = json.dumps(dict({
@@ -104,7 +104,7 @@ class TestGreatIngestionTasks:
     @pytest.mark.django_db
     @mock_aws
     def test_invalid_file(self, test_file_path):
-        """Test that an exception is raised when the file is not valid
+        """Test that an exception is raised when the file is not valid.
         """
         mock_transport = MockSentryTransport()
         init(transport=mock_transport)
@@ -120,7 +120,7 @@ class TestGreatIngestionTasks:
     @pytest.mark.django_db
     def test_company_house_number_mapping(self):
         """Test that Company is mapped correctly based on Company House number if
-        supplied
+        supplied.
         """
         company = CompanyFactory(company_number='123')
         data = f"""
@@ -140,7 +140,7 @@ class TestGreatIngestionTasks:
     @pytest.mark.django_db
     def test_company_name_mapping(self):
         """Test that Company is mapped correctly based on Company name if no
-        number is supplied or matched
+        number is supplied or matched.
         """
         company = CompanyFactory(company_number='123')
         data = f"""
@@ -230,7 +230,7 @@ class TestGreatIngestionTasks:
     def test_company_contact_mapping(self):
         """Test that Company is mapped correctly based on contact details if
         no Companies House number is matched and the business name is not
-        matched
+        matched.
         """
         company = CompanyFactory(company_number='123')
         contact = ContactFactory(company=company)
@@ -256,7 +256,7 @@ class TestGreatIngestionTasks:
 
     @pytest.mark.django_db
     def test_company_contact_first_name_filtering(self):
-        """Test that contact is filtered on first name correctly
+        """Test that contact is filtered on first name correctly.
         """
         company = CompanyFactory(company_number='123')
         contact = ContactFactory(company=company)
@@ -280,7 +280,7 @@ class TestGreatIngestionTasks:
 
     @pytest.mark.django_db
     def test_company_contact_last_name_filtering(self):
-        """Test that contact is filtered on last name correctly
+        """Test that contact is filtered on last name correctly.
         """
         company = CompanyFactory(company_number='123')
         contact = ContactFactory(company=company)
@@ -304,7 +304,7 @@ class TestGreatIngestionTasks:
 
     @pytest.mark.django_db
     def test_company_contact_email_filtering(self):
-        """Test that contact is filtered on email correctly
+        """Test that contact is filtered on email correctly.
         """
         company = CompanyFactory(company_number='123')
         contact = ContactFactory(company=company, email='valid@example.com')
@@ -328,7 +328,7 @@ class TestGreatIngestionTasks:
 
     @pytest.mark.django_db
     def test_company_contact_phone_filtering(self):
-        """Test that contact is filtered on phone correctly
+        """Test that contact is filtered on phone correctly.
         """
         company = CompanyFactory(company_number='123')
         contact = ContactFactory(company=company, full_telephone_number='1234')
@@ -354,7 +354,7 @@ class TestGreatIngestionTasks:
     def test_unmapped_company(self, caplog):
         """Test that when a company can't be mapped based on Companies
         House number, name, or contact, then a new company record
-        and a new contact record are created
+        and a new contact record are created.
         """
         name = 'Some non-existent business'
         first_name = 'Ada'
@@ -403,7 +403,7 @@ class TestGreatIngestionTasks:
     @pytest.mark.django_db
     def test_company_contact_creation(self):
         """Test that when the company exists already but the contact doesn't
-        the contact is created
+        the contact is created.
         """
         company = CompanyFactory(company_number='123')
         first_name = 'Ada'
@@ -437,7 +437,7 @@ class TestGreatIngestionTasks:
 
     @pytest.mark.django_db
     def test_company_contact_name_handling(self):
-        """Test handling withheld names
+        """Test handling withheld names.
         """
         company = CompanyFactory(company_number='123')
         email = 'test@example.com'
@@ -465,7 +465,7 @@ class TestGreatIngestionTasks:
     def test_company_contact_when_match_not_definitive(self):
         """Test that if we're unable to match the contact to a single record
         we create an additional record rather than risking assigning the
-        wrong contact
+        wrong contact.
         """
         company = CompanyFactory(company_number='123')
         first_name = 'John'
@@ -490,7 +490,7 @@ class TestGreatIngestionTasks:
 
     @pytest.mark.django_db
     def test_upper_business_size(self):
-        """Test that the upper business size range is mapped correctly
+        """Test that the upper business size range is mapped correctly.
         """
         name = 'Some non-existent business'
         first_name = 'Ada'
@@ -523,7 +523,7 @@ class TestGreatIngestionTasks:
     @pytest.mark.django_db
     def test_invalid_business_size(self):
         """Test that business size that doesn't match our range returns None
-        and does not throw an error
+        and does not throw an error.
         """
         name = 'Some non-existent business'
         first_name = 'Ada'
@@ -554,7 +554,7 @@ class TestGreatIngestionTasks:
 
     @pytest.mark.django_db
     def test_sector_mapping(self):
-        """Test that sectors are mapped correctly
+        """Test that sectors are mapped correctly.
         """
         primary = Sector.objects.get(segment='Aerospace', level=0)
         secondary = Sector.objects.get(segment='Defence and Security', level=0)
@@ -579,7 +579,7 @@ class TestGreatIngestionTasks:
 
     @pytest.mark.django_db
     def test_invalid_sector(self):
-        """Test that invalid sectors raise a Sentry alert
+        """Test that invalid sectors raise a Sentry alert.
         """
         data = """
             {
@@ -629,7 +629,7 @@ class TestGreatIngestionTasks:
     def test_invalid_country_code(self):
         """Test that when the country code provided in the data file cannot be found
         in the metadata countries table, we save the record with data_country: None
-        and trigger a Sentry alert
+        and trigger a Sentry alert.
         """
         data = """
             {
@@ -665,7 +665,7 @@ class TestGreatIngestionTasks:
 
     @pytest.mark.django_db
     def test_boolean_field_mapping(self):
-        """Test that boolean fields are mapped correctly
+        """Test that boolean fields are mapped correctly.
         """
         data = """
             {
@@ -703,7 +703,7 @@ class TestGreatIngestionTasks:
     @pytest.mark.django_db
     @mock_aws
     def test_long_field_values(self):
-        """Test that we can ingest records with long field values
+        """Test that we can ingest records with long field values.
         """
         initial_count = GreatExportEnquiry.objects.count()
         long_text = (

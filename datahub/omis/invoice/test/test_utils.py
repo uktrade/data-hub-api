@@ -66,7 +66,7 @@ class TestCalculatePaymentDueDate:
 
     def test_with_delivery_date_in_far_future(self):
         """Quote accepted on = 18/04/2017
-        delivery date = 20/06/2017 (in 2 months)
+        delivery date = 20/06/2017 (in 2 months).
 
         Therefore payment due date = 18/05/2017 (after 30 days)
         """
@@ -82,7 +82,7 @@ class TestCalculatePaymentDueDate:
 
     def test_with_close_delivery_date(self):
         """Quote accepted on = 18/04/2017
-        delivery date = 08/05/2017 (in 20 days)
+        delivery date = 08/05/2017 (in 20 days).
 
         Therefore payment due date = 24/04/2017 (delivery date - 14 days)
         """

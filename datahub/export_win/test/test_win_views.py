@@ -127,7 +127,7 @@ class TestGetWinView(APITestMixin):
     """Get single win view tests."""
 
     def test_win_details_no_permissions(self):
-        """Should return 403"""
+        """Should return 403."""
         win = WinFactory()
         user = create_test_user(dit_team=TeamFactory())
         api_client = self.create_api_client(user=user)
@@ -381,8 +381,8 @@ class TestGetWinView(APITestMixin):
         assert response_data == expected_response_data
 
     @pytest.mark.parametrize(
-        'params,related_objects,status_code',
-        (
+        ('params', 'related_objects', 'status_code'),
+        [
             (
                 lambda self: {'adviser': self.user},
                 lambda self, win: None,
@@ -443,7 +443,7 @@ class TestGetWinView(APITestMixin):
                 ],
                 status.HTTP_404_NOT_FOUND,
             ),
-        ),
+        ],
     )
     def test_get_visibility(self, params, related_objects, status_code):
         """Test getting a single win for different users."""
@@ -461,7 +461,7 @@ class TestListWinView(APITestMixin):
     """List export wins view tests."""
 
     def test_event_list_no_permissions(self):
-        """Should return 403"""
+        """Should return 403."""
         user = create_test_user(dit_team=TeamFactory())
         api_client = self.create_api_client(user=user)
         url = reverse('api-v4:export-win:collection')
@@ -520,8 +520,8 @@ class TestListWinView(APITestMixin):
         assert result_ids == [str(win4.id), str(win3.id), str(win2.id), str(win1.id)]
 
     @pytest.mark.parametrize(
-        'confirmed,results_length',
-        (
+        ('confirmed', 'results_length'),
+        [
             (
                 'true',
                 2,
@@ -534,10 +534,10 @@ class TestListWinView(APITestMixin):
                 'null',
                 1,
             ),
-        ),
+        ],
     )
     def test_list_filtered_by_agree_with_win(self, export_wins, confirmed, results_length):
-        """Test the HVC view when filtered by financial year"""
+        """Test the HVC view when filtered by financial year."""
         Win.objects.update(adviser=self.user)
         url = reverse('api-v4:export-win:collection')
 
@@ -564,8 +564,8 @@ class TestListWinView(APITestMixin):
         ) is True
 
     @pytest.mark.parametrize(
-        'params,related_objects,results_length',
-        (
+        ('params', 'related_objects', 'results_length'),
+        [
             (
                 lambda self: {'adviser': self.user},
                 lambda self, win: None,
@@ -626,7 +626,7 @@ class TestListWinView(APITestMixin):
                 ],
                 0,
             ),
-        ),
+        ],
     )
     def test_list_visibility(self, params, related_objects, results_length):
         """Test getting a list of wins for different users."""
@@ -892,7 +892,7 @@ class TestCreateWinView(APITestMixin):
 
     @pytest.mark.parametrize(
         'advisers_field',
-        ('advisers', 'contributing_advisers'),
+        ['advisers', 'contributing_advisers'],
     )
     def test_create_win_all_fields(self, mock_export_win_serializer_notify, advisers_field):
         """Tests successfully creating an export win with all fields only."""
@@ -1235,10 +1235,10 @@ class TestCreateWinView(APITestMixin):
 
     @pytest.mark.parametrize(
         'request_data',
-        (
+        [
             'test',
             {'abc': 'def'},
-        ),
+        ],
     )
     def test_create_win_bad_request(self, request_data, caplog):
         """Tests bad requests are being logged."""
@@ -1319,7 +1319,7 @@ class TestUpdateWinView(APITestMixin):
 
     @pytest.mark.parametrize(
         'advisers_field',
-        ('advisers', 'contributing_advisers'),
+        ['advisers', 'contributing_advisers'],
     )
     def test_update_win_all_fields(self, advisers_field):
         """Tests successfully updating an export win with all fields only."""
@@ -1926,8 +1926,8 @@ class TestUpdateWinView(APITestMixin):
         assert version.revision.comment == 'Win updated'
 
     @pytest.mark.parametrize(
-        'params,related_objects,status_code',
-        (
+        ('params', 'related_objects', 'status_code'),
+        [
             (
                 lambda self: {'adviser': self.user},
                 lambda self, win: None,
@@ -1988,7 +1988,7 @@ class TestUpdateWinView(APITestMixin):
                 ],
                 status.HTTP_404_NOT_FOUND,
             ),
-        ),
+        ],
     )
     def test_only_users_involved_in_the_win_can_update(self, params, related_objects, status_code):
         """Test only users involved in the win can update."""
@@ -2015,10 +2015,10 @@ class TestUpdateWinView(APITestMixin):
 
     @pytest.mark.parametrize(
         'request_data',
-        (
+        [
             'test',
             {'adviser': 'def'},
-        ),
+        ],
     )
     def test_update_win_bad_request(self, request_data, caplog):
         """Tests bad requests are being logged."""
@@ -2039,7 +2039,7 @@ class TestUpdateWinView(APITestMixin):
         ])
 
     def test_update_win_with_html_and_script_tags(self):
-        """Tests updating an export win with HTML and script tags"""
+        """Tests updating an export win with HTML and script tags."""
         win = WinFactory(adviser=self.user)
         customer_response = CustomerResponse(win=win)
         customer_response.save()
@@ -2172,8 +2172,8 @@ class TestResendExportWinView(APITestMixin):
         assert 'You do not have permission to perform this action.' in response.data['detail']
 
     @pytest.mark.parametrize(
-        'params,related_objects,resent',
-        (
+        ('params', 'related_objects', 'resent'),
+        [
             (
                 lambda self: {'adviser': self.user},
                 lambda self, win: [
@@ -2232,7 +2232,7 @@ class TestResendExportWinView(APITestMixin):
                 lambda self, win: None,
                 False,
             ),
-        ),
+        ],
     )
     def test_resend_export_win_success(
             self,
@@ -2241,7 +2241,7 @@ class TestResendExportWinView(APITestMixin):
             related_objects,
             resent,
     ):
-        """Test to resend win to the right contact"""
+        """Test to resend win to the right contact."""
         contact = ContactFactory()
         resolved_params = params(self)
         win = WinFactory(**resolved_params, company_contacts=[contact])

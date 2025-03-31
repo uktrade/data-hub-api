@@ -63,12 +63,12 @@ class TestUnarchiveCompanyLink(AdminTestMixin):
 
     @pytest.mark.parametrize(
         'company_creator',
-        (
+        [
             # A company that has not been archived
             CompanyFactory,
             # A company that was archived as part of the merge process
             DuplicateCompanyFactory,
-        ),
+        ],
     )
     def test_link_does_not_exist_company_not_unarchivable(self, company_creator):
         """Test that the link does not exist when the company is not unarchivable.
@@ -91,8 +91,8 @@ class TestUnarchiveCompanyViewGet(AdminTestMixin):
     """Tests GET requests for the 'unarchive company' view."""
 
     @pytest.mark.parametrize(
-        'company_callable,expected_status_code,expected_archived_value',
-        (
+        ('company_callable', 'expected_status_code', 'expected_archived_value'),
+        [
             # Unarchive of an archived company is successful
             (
                 ArchivedCompanyFactory,
@@ -112,7 +112,7 @@ class TestUnarchiveCompanyViewGet(AdminTestMixin):
                 status.HTTP_302_FOUND,
                 True,
             ),
-        ),
+        ],
     )
     def test_unarchive_view(
         self,

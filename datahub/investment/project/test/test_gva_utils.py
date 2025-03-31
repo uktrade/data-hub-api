@@ -39,7 +39,7 @@ class TestGrossValueAddedCalculator:
     """Test for Gross Value Added Calculator."""
 
     @pytest.mark.parametrize(
-        'business_activities,fdi_type,investment_type,sector',
+        ('business_activities', 'fdi_type', 'investment_type', 'sector'),
         [
             # Non-FDI investment type
             (
@@ -87,7 +87,7 @@ class TestGrossValueAddedCalculator:
         assert project.gva_multiplier is None
 
     @pytest.mark.parametrize(
-        'investment_type,sector,business_activities,expected_multiplier_value',
+        ('investment_type', 'sector', 'business_activities', 'expected_multiplier_value'),
         [
             #  FDI investment project with retail business activity
             (
@@ -221,7 +221,7 @@ class TestGrossValueAddedCalculator:
         assert project.gva_multiplier is None
 
     @pytest.mark.parametrize(
-        'sector_classification, foreign_equity_investment, number_new_jobs',
+        ('sector_classification', 'foreign_equity_investment', 'number_new_jobs'),
         [
             (
                 CAPITAL,
@@ -279,7 +279,7 @@ class TestGrossValueAddedCalculator:
         assert project.gross_value_added is None
 
     @pytest.mark.parametrize(
-        'sector_classification, foreign_equity_investment, number_new_jobs, expected_gva_value',
+        ('sector_classification', 'foreign_equity_investment', 'number_new_jobs', 'expected_gva_value'),
         [
             (
                 CAPITAL,
@@ -333,7 +333,7 @@ class TestGrossValueAddedCalculator:
         assert project.gross_value_added is None
 
     @pytest.mark.parametrize(
-        'sector_classification, multiplier_value, foreign_equity_investment, number_new_jobs',
+        ('sector_classification', 'multiplier_value', 'foreign_equity_investment', 'number_new_jobs'),
         [
             (CAPITAL, Decimal('0.5'), None, 200),  # Capital intensive, no FEI
             (LABOUR, Decimal('0.5'), 1200, None),  # Labour intensive, no jobs
@@ -349,7 +349,7 @@ class TestGrossValueAddedCalculator:
         foreign_equity_investment,
         number_new_jobs,
     ):
-        """Test various scenarios for correct GVA calculation when gva value is expected to be none
+        """Test various scenarios for correct GVA calculation when gva value is expected to be none.
         """
         sector = SectorFactory()
         if multiplier_value is None:

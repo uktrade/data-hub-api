@@ -64,7 +64,7 @@ class ExportCountryHistoryView(SearchAPIView):
     serializer_class = SearchExportCountryHistorySerializer
 
     def get_entities(self):
-        """Overriding to provide multiple entities
+        """Overriding to provide multiple entities.
         """
         return [self.search_app.search_model, Interaction]
 

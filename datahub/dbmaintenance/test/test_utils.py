@@ -21,11 +21,11 @@ class TestParseChoiceValue:
     """Tests for parse_choice()."""
 
     @pytest.mark.parametrize(
-        'input_value,choices,expected_value',
-        (
+        ('input_value', 'choices', 'expected_value'),
+        [
             ('one', SampleTextChoice.choices, SampleTextChoice.ONE),
             ('2', SampleIntegerChoice.choices, SampleIntegerChoice._2),
-        ),
+        ],
     )
     def test_accepts_and_transforms_valid_values(self, input_value, choices, expected_value):
         """Test that valid values are accepted and transformed to the internal value."""

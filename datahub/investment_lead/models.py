@@ -166,7 +166,7 @@ class EYBLead(InvestmentLead):
         return f'EYB Lead ({shortened_pk}...)'
 
     def save(self, *args, **kwargs):
-        """Creates a CompanyActivity when a EYB Lead is saved
+        """Creates a CompanyActivity when a EYB Lead is saved.
         """
         with transaction.atomic():
             super().save(*args, **kwargs)

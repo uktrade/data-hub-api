@@ -67,7 +67,7 @@ class NotifyGateway:
         )
 
     def get_notification_by_id(self, notification_id, notify_service_name=None):
-        """Gets notification status by notification id
+        """Gets notification status by notification id.
         """
         if not notify_service_name:
             notify_service_name = DEFAULT_SERVICE_NAME

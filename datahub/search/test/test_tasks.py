@@ -58,10 +58,10 @@ def test_sync_object_task_syncs(opensearch):
 
 @pytest.mark.parametrize(
     'related_obj_filter',
-    (
+    [
         None,
         {'simpleton__name': 'hello'},
-    ),
+    ],
 )
 @pytest.mark.django_db
 def test_sync_related_objects_task_syncs(related_obj_filter, opensearch):
@@ -85,10 +85,10 @@ def test_sync_related_objects_task_syncs(related_obj_filter, opensearch):
 
 @pytest.mark.parametrize(
     'related_obj_filter',
-    (
+    [
         None,
         {'simpleton__name': 'hello'},
-    ),
+    ],
 )
 @pytest.mark.django_db
 def test_sync_related_objects_task_syncs_for_given_search_app(related_obj_filter, opensearch):

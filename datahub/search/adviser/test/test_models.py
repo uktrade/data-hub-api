@@ -8,7 +8,7 @@ pytestmark = pytest.mark.django_db
 
 
 def test_adviser_to_dict(opensearch):
-    """Test for adviser search model"""
+    """Test for adviser search model."""
     adviser = AdviserFactory()
     result = Adviser.db_object_to_dict(adviser)
 

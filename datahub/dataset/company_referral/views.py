@@ -9,7 +9,7 @@ class CompanyReferralDatasetView(BaseFilterDatasetView):
     """
 
     def get_dataset(self, request):
-        """Returns list of CompanyReferral records"""
+        """Returns list of CompanyReferral records."""
         queryset = CompanyReferral.objects.values(
             'company_id',
             'completed_by_id',

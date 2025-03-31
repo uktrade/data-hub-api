@@ -28,7 +28,7 @@ class SearchExportCountryHistorySerializer(EntitySearchQuerySerializer):
     company = SingleOrListField(child=StringUUIDField(), required=False)
 
     def validate(self, data):
-        """Serializer should have at least one parameter"""
+        """Serializer should have at least one parameter."""
         if not data.keys() & {'company', 'country'}:
             raise serializers.ValidationError(
                 self.error_messages['no_empty_field'],

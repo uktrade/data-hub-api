@@ -20,7 +20,7 @@ from datahub.interaction.test.factories import (
 
 
 def get_expected_data_from_interaction(interaction):
-    """Returns expected API response dictionary for an interaction"""
+    """Returns expected API response dictionary for an interaction."""
     return {
         'adviser_ids': [
             str(x.adviser_id)
@@ -97,14 +97,14 @@ def get_expected_data_from_interaction(interaction):
 
 @pytest.mark.django_db
 class TestInteractionsDatasetViewSet(BaseDatasetViewTest):
-    """Tests for InteractionsDatasetView
+    """Tests for InteractionsDatasetView.
     """
 
     view_url = reverse('api-v4:dataset:interactions-dataset')
     factory = CompanyInteractionFactoryWithRelatedTradeAgreements
 
     @pytest.mark.parametrize(
-        'interaction_factory', (
+        'interaction_factory', [
             CompanyExportInteractionFactory,
             CompanyInteractionFactory,
             CompanyInteractionFactoryWithPolicyFeedback,
@@ -112,10 +112,10 @@ class TestInteractionsDatasetViewSet(BaseDatasetViewTest):
             EventServiceDeliveryFactory,
             InvestmentProjectInteractionFactory,
             ServiceDeliveryFactory,
-        ),
+        ],
     )
     def test_success(self, data_flow_api_client, interaction_factory):
-        """Test that endpoint returns with expected data for a single interaction"""
+        """Test that endpoint returns with expected data for a single interaction."""
         interaction = interaction_factory()
         response = data_flow_api_client.get(self.view_url)
         assert response.status_code == status.HTTP_200_OK
@@ -126,7 +126,7 @@ class TestInteractionsDatasetViewSet(BaseDatasetViewTest):
         assert result == expected_result
 
     def test_with_multiple_interactions(self, data_flow_api_client):
-        """Test that the correct number of records are returned in the right order"""
+        """Test that the correct number of records are returned in the right order."""
         with freeze_time('2019-01-01 12:30:00'):
             interaction1 = CompanyInteractionFactory()
         with freeze_time('2019-01-03 12:00:00'):

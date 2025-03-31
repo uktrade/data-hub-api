@@ -56,7 +56,7 @@ class TestPublicCompanyViewSet:
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    @pytest.mark.parametrize('method', ('delete', 'patch', 'post', 'put'))
+    @pytest.mark.parametrize('method', ['delete', 'patch', 'post', 'put'])
     def test_other_methods_not_allowed(self, method, public_company_api_client):
         """Test that various HTTP methods are not allowed."""
         company = CompanyFactory()
@@ -200,14 +200,14 @@ class TestPublicCompanyViewSet:
         assert response.json()['uk_based'] is None
 
     @pytest.mark.parametrize(
-        'input_website,expected_website',
-        (
+        ('input_website', 'expected_website'),
+        [
             ('www.google.com', 'http://www.google.com'),
             ('http://www.google.com', 'http://www.google.com'),
             ('https://www.google.com', 'https://www.google.com'),
             ('', ''),
             (None, None),
-        ),
+        ],
     )
     def test_get_company_with_website(
         self,
@@ -229,7 +229,7 @@ class TestPublicCompanyViewSet:
 
     @pytest.mark.parametrize(
         'build_company',
-        (
+        [
             # subsidiary with Global Headquarters on the One List
             lambda one_list_tier: CompanyFactory(
                 one_list_tier=None,
@@ -250,7 +250,7 @@ class TestPublicCompanyViewSet:
                 one_list_tier=None,
                 global_headquarters=None,
             ),
-        ),
+        ],
         ids=(
             'as_subsidiary_of_one_list_company',
             'as_subsidiary_of_non_one_list_company',

@@ -60,12 +60,12 @@ URL_PARENT_FALSE_SUBSIDIARY_FALSE = (
 
 @pytest.mark.parametrize(
     'url',
-    (
+    [
         reverse('api-v4:dnb-api:company-search'),
         reverse('api-v4:dnb-api:company-create'),
         reverse('api-v4:dnb-api:company-link'),
         reverse('api-v4:dnb-api:company-change-request'),
-    ),
+    ],
 )
 class TestDNBAPICommon(APITestMixin):
     """Test common functionality in company-search as well
@@ -109,11 +109,11 @@ class TestDNBCompanySearchAPI(APITestMixin):
             )
 
     @pytest.mark.parametrize(
-        'content_type,expected_status_code',
-        (
+        ('content_type', 'expected_status_code'),
+        [
             (None, status.HTTP_406_NOT_ACCEPTABLE),
             ('text/html', status.HTTP_406_NOT_ACCEPTABLE),
-        ),
+        ],
     )
     def test_content_type(
         self,
@@ -138,8 +138,8 @@ class TestDNBCompanySearchAPI(APITestMixin):
         assert response.status_code == expected_status_code
 
     @pytest.mark.parametrize(
-        'request_data,response_status_code,upstream_response_content,response_data',
-        (
+        ('request_data', 'response_status_code', 'upstream_response_content', 'response_data'),
+        [
             pytest.param(
                 b'{"arg": "value"}',
                 200,
@@ -183,7 +183,7 @@ class TestDNBCompanySearchAPI(APITestMixin):
                 },
                 id='successful call to proxied API with company that can be hydrated',
             ),
-        ),
+        ],
     )
     def test_post_success(
         self,
@@ -223,8 +223,8 @@ class TestDNBCompanySearchAPI(APITestMixin):
         assert requests_mock.last_request.body == request_data
 
     @pytest.mark.parametrize(
-        'request_data,response_status_code,upstream_response_content',
-        (
+        ('request_data', 'response_status_code', 'upstream_response_content'),
+        [
             pytest.param(
                 b'{"arg": "value"}',
                 400,
@@ -235,7 +235,7 @@ class TestDNBCompanySearchAPI(APITestMixin):
                 500,
                 b'{"error":"msg"}',
             ),
-        ),
+        ],
     )
     def test_post_errors(
         self,
@@ -273,8 +273,8 @@ class TestDNBCompanySearchAPI(APITestMixin):
         assert requests_mock.last_request.body == request_data
 
     @pytest.mark.parametrize(
-        'response_status_code,upstream_response_content,response_data,permission_codenames',
-        (
+        ('response_status_code', 'upstream_response_content', 'response_data', 'permission_codenames'),
+        [
             pytest.param(
                 200,
                 b'{"results":[{"duns_number":"7654321"}]}',
@@ -330,7 +330,7 @@ class TestDNBCompanySearchAPI(APITestMixin):
                     'a fully hydrated response'
                 ),
             ),
-        ),
+        ],
     )
     def test_post_permissions(
         self,
@@ -562,13 +562,13 @@ class TestDNBCompanyCreateAPI(APITestMixin):
 
     @pytest.mark.parametrize(
         'data',
-        (
+        [
             {'duns_number': None},
             {'duns_number': 'foobarbaz'},
             {'duns_number': '12345678'},
             {'duns_number': '1234567890'},
             {'not_duns_number': '123456789'},
-        ),
+        ],
     )
     def test_post_invalid(
         self,
@@ -584,8 +584,8 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     @pytest.mark.parametrize(
-        'results, expected_status_code, expected_message',
-        (
+        ('results', 'expected_status_code', 'expected_message'),
+        [
             (
                 [],
                 400,
@@ -602,7 +602,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
                 'DUNS number of the company: 012345678 '
                 'did not match searched DUNS number: 123456789',
             ),
-        ),
+        ],
     )
     def test_post_none_or_multiple_companies_found(
         self,
@@ -631,14 +631,14 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         assert response.json()['detail'] == expected_message
 
     @pytest.mark.parametrize(
-        'missing_required_field, expected_error',
-        (
+        ('missing_required_field', 'expected_error'),
+        [
             ('primary_name', {'name': ['This field may not be null.']}),
             ('trading_names', {'trading_names': ['This field may not be null.']}),
             ('address_line_1', {'address': {'line_1': ['This field is required.']}}),
             ('address_town', {'address': {'town': ['This field is required.']}}),
             ('address_country', {'address': {'country': ['This field is required.']}}),
-        ),
+        ],
     )
     def test_post_missing_required_fields(
         self,
@@ -668,7 +668,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
 
     @pytest.mark.parametrize(
         'field_overrides',
-        (
+        [
             {'domain': None},
             {'trading_names': []},
             {'annual_sales': None},
@@ -684,7 +684,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
             {'address_county': ''},
             {'address_postcode': ''},
             {'global_ultimate_duns_number': None},
-        ),
+        ],
     )
     def test_post_missing_optional_fields(
         self,
@@ -767,11 +767,11 @@ class TestDNBCompanyCreateAPI(APITestMixin):
 
     @pytest.mark.parametrize(
         'global_ultimate_override',
-        (
+        [
             {'global_ultimate_duns_number': 'foobarbaz'},
             {'global_ultimate_duns_number': '12345678'},
             {'global_ultimate_duns_number': '1234567890'},
-        ),
+        ],
     )
     def test_post_invalid_global_ultimate(
         self,
@@ -799,7 +799,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
 
     @pytest.mark.parametrize(
         'status_code',
-        (
+        [
             status.HTTP_400_BAD_REQUEST,
             status.HTTP_401_UNAUTHORIZED,
             status.HTTP_403_FORBIDDEN,
@@ -807,7 +807,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
             status.HTTP_405_METHOD_NOT_ALLOWED,
             status.HTTP_500_INTERNAL_SERVER_ERROR,
             status.HTTP_502_BAD_GATEWAY,
-        ),
+        ],
     )
     def test_post_dnb_service_error(
         self,
@@ -854,11 +854,11 @@ class TestDNBCompanyCreateAPI(APITestMixin):
 
     @pytest.mark.parametrize(
         'permissions',
-        (
+        [
             [],
             [CompanyPermission.add_company],
             [CompanyPermission.view_company],
-        ),
+        ],
     )
     def test_post_no_permission(
         self,
@@ -891,11 +891,11 @@ class TestCompanyLinkView(APITestMixin):
     """
 
     @pytest.mark.parametrize(
-        'content_type,expected_status_code',
-        (
+        ('content_type', 'expected_status_code'),
+        [
             (None, status.HTTP_406_NOT_ACCEPTABLE),
             ('text/html', status.HTTP_406_NOT_ACCEPTABLE),
-        ),
+        ],
     )
     def test_content_type(
         self,
@@ -913,11 +913,11 @@ class TestCompanyLinkView(APITestMixin):
 
     @pytest.mark.parametrize(
         'permissions',
-        (
+        [
             [],
             [CompanyPermission.change_company],
             [CompanyPermission.view_company],
-        ),
+        ],
     )
     def test_no_permission(
         self,
@@ -936,7 +936,7 @@ class TestCompanyLinkView(APITestMixin):
 
     @pytest.mark.parametrize(
         'override',
-        (
+        [
             {'duns_number': None},
             {'duns_number': 'foobarbaz'},
             {'duns_number': '12345678'},
@@ -944,7 +944,7 @@ class TestCompanyLinkView(APITestMixin):
             {'company_id': None},
             {'company_id': 'does-not-exist'},
             {'company_id': '11111111-2222-3333-4444-555555555555'},
-        ),
+        ],
     )
     def test_invalid(
         self,
@@ -965,7 +965,7 @@ class TestCompanyLinkView(APITestMixin):
 
     @pytest.mark.parametrize(
         'status_code',
-        (
+        [
             status.HTTP_400_BAD_REQUEST,
             status.HTTP_401_UNAUTHORIZED,
             status.HTTP_403_FORBIDDEN,
@@ -973,7 +973,7 @@ class TestCompanyLinkView(APITestMixin):
             status.HTTP_405_METHOD_NOT_ALLOWED,
             status.HTTP_500_INTERNAL_SERVER_ERROR,
             status.HTTP_502_BAD_GATEWAY,
-        ),
+        ],
     )
     def test_dnb_service_error(
         self,
@@ -1097,11 +1097,11 @@ class TestCompanyChangeRequestView(APITestMixin):
     """
 
     @pytest.mark.parametrize(
-        'content_type,expected_status_code',
-        (
+        ('content_type', 'expected_status_code'),
+        [
             (None, status.HTTP_406_NOT_ACCEPTABLE),
             ('text/html', status.HTTP_406_NOT_ACCEPTABLE),
-        ),
+        ],
     )
     def test_content_type(
         self,
@@ -1119,11 +1119,11 @@ class TestCompanyChangeRequestView(APITestMixin):
 
     @pytest.mark.parametrize(
         'permissions',
-        (
+        [
             [],
             [CompanyPermission.change_company],
             [CompanyPermission.view_company],
-        ),
+        ],
     )
     def test_no_permission(
         self,
@@ -1162,8 +1162,8 @@ class TestCompanyChangeRequestView(APITestMixin):
         }
 
     @pytest.mark.parametrize(
-        'change_request,expected_response',
-        (
+        ('change_request', 'expected_response'),
+        [
             # No changes
             (
                 {
@@ -1208,7 +1208,7 @@ class TestCompanyChangeRequestView(APITestMixin):
                     },
                 },
             ),
-        ),
+        ],
     )
     def test_invalid_fields(
         self,
@@ -1229,8 +1229,8 @@ class TestCompanyChangeRequestView(APITestMixin):
         assert response.json() == expected_response
 
     @pytest.mark.parametrize(
-        'change_request,dnb_request,dnb_response,datahub_response,address_area_id',
-        (
+        ('change_request', 'dnb_request', 'dnb_response', 'datahub_response', 'address_area_id'),
+        [
             # All valid fields
             (
                 # change_request
@@ -1504,7 +1504,7 @@ class TestCompanyChangeRequestView(APITestMixin):
                 # Address Area id (of initial Company)
                 None,
             ),
-        ),
+        ],
     )
     def test_valid(
         self,
@@ -1541,7 +1541,7 @@ class TestCompanyChangeRequestView(APITestMixin):
 
     @pytest.mark.parametrize(
         'status_code',
-        (
+        [
             status.HTTP_400_BAD_REQUEST,
             status.HTTP_401_UNAUTHORIZED,
             status.HTTP_403_FORBIDDEN,
@@ -1549,7 +1549,7 @@ class TestCompanyChangeRequestView(APITestMixin):
             status.HTTP_405_METHOD_NOT_ALLOWED,
             status.HTTP_500_INTERNAL_SERVER_ERROR,
             status.HTTP_502_BAD_GATEWAY,
-        ),
+        ],
     )
     def test_dnb_service_error(
         self,
@@ -1596,8 +1596,8 @@ class TestCompanyChangeRequestView(APITestMixin):
             )
 
     @pytest.mark.parametrize(
-        'request_exception, expected_exception, expected_message',
-        (
+        ('request_exception', 'expected_exception', 'expected_message'),
+        [
             (
                 ConnectionError,
                 DNBServiceConnectionError,
@@ -1608,7 +1608,7 @@ class TestCompanyChangeRequestView(APITestMixin):
                 DNBServiceTimeoutError,
                 'Encountered a timeout interacting with DNB service',
             ),
-        ),
+        ],
     )
     def test_request_error(
         self,
@@ -1702,8 +1702,8 @@ class TestCompanyChangeRequestView(APITestMixin):
         }
 
     @pytest.mark.parametrize(
-        'request_exception, expected_exception, expected_message',
-        (
+        ('request_exception', 'expected_exception', 'expected_message'),
+        [
             (
                 ConnectionError,
                 DNBServiceConnectionError,
@@ -1714,7 +1714,7 @@ class TestCompanyChangeRequestView(APITestMixin):
                 DNBServiceTimeoutError,
                 'Encountered a timeout interacting with DNB service',
             ),
-        ),
+        ],
     )
     def test_get_request_error(
         self,
@@ -1740,8 +1740,8 @@ class TestCompanyChangeRequestView(APITestMixin):
         assert response.status_code == status.HTTP_502_BAD_GATEWAY
 
     @pytest.mark.parametrize(
-        'dnb_request,dnb_response',
-        (
+        ('dnb_request', 'dnb_response'),
+        [
             (
                 # dnb_request
                 {
@@ -1795,7 +1795,7 @@ class TestCompanyChangeRequestView(APITestMixin):
                     },
                 },
             ),
-        ),
+        ],
     )
     def test_that_pending_request_returns_correctly(
         self,
@@ -1823,8 +1823,8 @@ class TestCompanyChangeRequestView(APITestMixin):
         assert response.json() == dnb_response
 
     @pytest.mark.parametrize(
-        'change_request,expected_response',
-        (
+        ('change_request', 'expected_response'),
+        [
             # No duns_number
             (
                 {
@@ -1857,7 +1857,7 @@ class TestCompanyChangeRequestView(APITestMixin):
                     'status': ['"something invalid" is not a valid choice.'],
                 },
             ),
-        ),
+        ],
     )
     def test_invalid_fields_for_get(
         self,
@@ -1884,11 +1884,11 @@ class TestCompanyInvestigationView(APITestMixin):
     """
 
     @pytest.mark.parametrize(
-        'content_type,expected_status_code',
-        (
+        ('content_type', 'expected_status_code'),
+        [
             (None, status.HTTP_406_NOT_ACCEPTABLE),
             ('text/html', status.HTTP_406_NOT_ACCEPTABLE),
-        ),
+        ],
     )
     def test_content_type(
         self,
@@ -1919,11 +1919,11 @@ class TestCompanyInvestigationView(APITestMixin):
 
     @pytest.mark.parametrize(
         'permissions',
-        (
+        [
             [],
             [CompanyPermission.change_company],
             [CompanyPermission.view_company],
-        ),
+        ],
     )
     def test_no_permission(
         self,
@@ -1971,8 +1971,8 @@ class TestCompanyInvestigationView(APITestMixin):
         }
 
     @pytest.mark.parametrize(
-        'investigation_request_overrides,expected_response',
-        (
+        ('investigation_request_overrides', 'expected_response'),
+        [
             # No name
             (
                 {
@@ -2027,7 +2027,7 @@ class TestCompanyInvestigationView(APITestMixin):
                     'website': ['Enter a valid URL.'],
                 },
             ),
-        ),
+        ],
     )
     def test_invalid_fields(
         self,
@@ -2133,11 +2133,11 @@ class TestCompanyInvestigationView(APITestMixin):
         assert company.pending_dnb_investigation is True
 
     @pytest.mark.parametrize(
-        'missing_field_data_hub, missing_field_dnb_service',
-        (
+        ('missing_field_data_hub', 'missing_field_dnb_service'),
+        [
             ('website', 'domain'),
             ('telephone_number', 'telephone_number'),
-        ),
+        ],
     )
     def test_valid_minimum_data(
         self,
@@ -2200,7 +2200,7 @@ class TestCompanyInvestigationView(APITestMixin):
 
     @pytest.mark.parametrize(
         'status_code',
-        (
+        [
             status.HTTP_400_BAD_REQUEST,
             status.HTTP_401_UNAUTHORIZED,
             status.HTTP_403_FORBIDDEN,
@@ -2208,7 +2208,7 @@ class TestCompanyInvestigationView(APITestMixin):
             status.HTTP_405_METHOD_NOT_ALLOWED,
             status.HTTP_500_INTERNAL_SERVER_ERROR,
             status.HTTP_502_BAD_GATEWAY,
-        ),
+        ],
     )
     def test_dnb_service_error(
         self,
@@ -2270,8 +2270,8 @@ class TestCompanyInvestigationView(APITestMixin):
             )
 
     @pytest.mark.parametrize(
-        'request_exception, expected_exception, expected_message',
-        (
+        ('request_exception', 'expected_exception', 'expected_message'),
+        [
             (
                 ConnectionError,
                 DNBServiceConnectionError,
@@ -2282,7 +2282,7 @@ class TestCompanyInvestigationView(APITestMixin):
                 DNBServiceTimeoutError,
                 'Encountered a timeout interacting with DNB service',
             ),
-        ),
+        ],
     )
     def test_request_error(
         self,
@@ -2378,7 +2378,7 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
         opensearch_with_signals,
     ):
         """Test when a company has no dnb related companies and no manually linked an empty response
-        is returned
+        is returned.
         """
         api_client = self.create_api_client()
         company = CompanyFactory(duns_number='123456789')
@@ -2412,7 +2412,7 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
         opensearch_with_signals,
     ):
         """Test when empty results are returned from dnb but the company has manually linked
-        subsidiaries the requested company is returned as the global ultimate of the tree
+        subsidiaries the requested company is returned as the global ultimate of the tree.
         """
         api_client = self.create_api_client()
         company = CompanyFactory(duns_number='123456789')
@@ -2519,7 +2519,7 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
         opensearch_with_signals,
     ):
         """Test the scenario where the company returned by the DnB service does match a company found
-        in the Data Hub dataset and then return the correct id for that company
+        in the Data Hub dataset and then return the correct id for that company.
         """
         faker = Faker()
 
@@ -2615,7 +2615,7 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
         opensearch_with_signals,
     ):
         """Test the scenario where the ultimate parent is the only company in the response from the
-        proxy service that matches a duns number in the datahub dataset
+        proxy service that matches a duns number in the datahub dataset.
         """
         faker = Faker()
 
@@ -2775,10 +2775,10 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
 
     @pytest.mark.parametrize(
         'request_exception',
-        ((ConnectionError), (DNBServiceTimeoutError)),
+        [(ConnectionError), (DNBServiceTimeoutError)],
     )
     def test_dnb_request_connection_error(self, requests_mock, request_exception):
-        """Test dnb api request exceptopn
+        """Test dnb api request exceptopn.
         """
         api_client = self.create_api_client()
         company = CompanyFactory(duns_number='123456789')
@@ -2957,7 +2957,7 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
         opensearch_with_signals,
     ):
         """Test the scenario where the count of companies returned by the dnb service is above the
-        maximum allowed, so a reduced company tree is returned instead
+        maximum allowed, so a reduced company tree is returned instead.
         """
         faker = Faker()
 
@@ -3022,7 +3022,7 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
         opensearch_with_signals,
     ):
         """Call the endpoint multiple times, and ensure only the first gets through the django
-        caching layer
+        caching layer.
         """
         faker = Faker()
 
@@ -3092,7 +3092,7 @@ class TestRelatedCompanyView(APITestMixin, TestHierarchyAPITestMixin):
     )
     @pytest.mark.parametrize(
         'request_exception',
-        ((ConnectionError), (DNBServiceTimeoutError)),
+        [(ConnectionError), (DNBServiceTimeoutError)],
     )
     def test_related_companies_request_connection_error(
         self,
@@ -3155,7 +3155,7 @@ class TestRelatedCompanyView(APITestMixin, TestHierarchyAPITestMixin):
     ):
         """Test the scenario where the company returned by the DnB service does
         match a child company found in the Data Hub dataset and then return
-        the correct id for that company
+        the correct id for that company.
         """
         faker = Faker()
         ultimate_company_dnb = {
@@ -3209,7 +3209,7 @@ class TestRelatedCompanyView(APITestMixin, TestHierarchyAPITestMixin):
     ):
         """Test the scenario where the company returned by the DnB service does
         match a parent company found in the Data Hub dataset and then return
-        the correct id for that company
+        the correct id for that company.
         """
         faker = Faker()
 
@@ -3264,7 +3264,7 @@ class TestRelatedCompanyView(APITestMixin, TestHierarchyAPITestMixin):
         opensearch_with_signals,
     ):
         """Test the scenario where the companies returned by the DnB service all have
-        Data Hub ids
+        Data Hub ids.
         """
         faker = Faker()
 
@@ -3368,7 +3368,7 @@ class TestRelatedCompanyView(APITestMixin, TestHierarchyAPITestMixin):
         opensearch_with_signals,
     ):
         """Test the scenario where not all the companies returned by the DnB service have
-        a Data Hub id so only those that do should have their ID returned
+        a Data Hub id so only those that do should have their ID returned.
         """
         faker = Faker()
 
@@ -3457,7 +3457,7 @@ class TestRelatedCompanyView(APITestMixin, TestHierarchyAPITestMixin):
         opensearch_with_signals,
     ):
         """Test the scenario where the no companies returned by the DnB service have
-        IDs in a Data Hub
+        IDs in a Data Hub.
         """
         faker = Faker()
 
@@ -3536,7 +3536,7 @@ class TestRelatedCompanyView(APITestMixin, TestHierarchyAPITestMixin):
         opensearch_with_signals,
     ):
         """Test the scenario where the many companies returned by the DnB service does match
-        for companies IDs in Data Hub but only those directly related are returned
+        for companies IDs in Data Hub but only those directly related are returned.
         """
         faker = Faker()
 
@@ -3638,7 +3638,7 @@ class TestRelatedCompanyView(APITestMixin, TestHierarchyAPITestMixin):
         opensearch_with_signals,
     ):
         """Test the scenario where the companies returned by the DnB service all have
-        Data Hub ids
+        Data Hub ids.
         """
         faker = Faker()
 
@@ -3737,7 +3737,7 @@ class TestRelatedCompanyView(APITestMixin, TestHierarchyAPITestMixin):
         opensearch_with_signals,
     ):
         """Test the scenario where the companies returned by the DnB service all have
-        Data Hub ids
+        Data Hub ids.
         """
         faker = Faker()
 
@@ -3835,7 +3835,7 @@ class TestRelatedCompanyView(APITestMixin, TestHierarchyAPITestMixin):
         opensearch_with_signals,
     ):
         """Test the scenario where the companies returned by the DnB service all have
-        Data Hub ids
+        Data Hub ids.
         """
         faker = Faker()
 
@@ -3961,12 +3961,12 @@ class TestRelatedCompanyView(APITestMixin, TestHierarchyAPITestMixin):
     @pytest.mark.usefixtures('local_memory_cache')
     @pytest.mark.parametrize(
         'query_param',
-        (
+        [
             URL_PARENT_TRUE_SUBSIDIARY_TRUE,
             URL_PARENT_TRUE_SUBSIDIARY_FALSE,
             URL_PARENT_FALSE_SUBSIDIARY_FALSE,
             URL_PARENT_FALSE_SUBSIDIARY_TRUE,
-        ),
+        ],
     )
     def test_view_is_cached(
         self,
@@ -3976,7 +3976,7 @@ class TestRelatedCompanyView(APITestMixin, TestHierarchyAPITestMixin):
         query_param,
     ):
         """Call the endpoint multiple times with different query params, and ensure only the first
-        gets through the django caching layer
+        gets through the django caching layer.
         """
         faker = Faker()
 
@@ -4250,7 +4250,7 @@ class TestCompanyHierarchyReducedView(APITestMixin, TestHierarchyAPITestMixin):
         self,
         requests_mock,
     ):
-        """Test empty results from dnb proxy returns error
+        """Test empty results from dnb proxy returns error.
         """
         company = CompanyFactory(duns_number='123456789')
 
@@ -4271,7 +4271,7 @@ class TestCompanyHierarchyReducedView(APITestMixin, TestHierarchyAPITestMixin):
         self,
         requests_mock,
     ):
-        """Test more than 1 result from dnb proxy returns error
+        """Test more than 1 result from dnb proxy returns error.
         """
         company = CompanyFactory(duns_number='123456789')
 
@@ -4292,7 +4292,7 @@ class TestCompanyHierarchyReducedView(APITestMixin, TestHierarchyAPITestMixin):
         self,
         requests_mock,
     ):
-        """Test when the result from dnb proxy does not match requested duns number
+        """Test when the result from dnb proxy does not match requested duns number.
         """
         company = CompanyFactory(duns_number='123456789')
 
@@ -4310,7 +4310,7 @@ class TestCompanyHierarchyReducedView(APITestMixin, TestHierarchyAPITestMixin):
         self,
         opensearch_with_signals,
     ):
-        """Test when the result from dnb proxy is ok a valid tree is generated
+        """Test when the result from dnb proxy is ok a valid tree is generated.
         """
         global_company = CompanyFactory(duns_number='111111111')
         company = CompanyFactory(duns_number='222222222', global_ultimate_duns_number='111111111')

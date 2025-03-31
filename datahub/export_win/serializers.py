@@ -155,7 +155,7 @@ class CustomerResponseSerializer(ModelSerializer):
 
 
 class LegacyCustomerResponseSerializer(ModelSerializer):
-    """Serializer for CustomerResponse to expose confirmation status and date"""
+    """Serializer for CustomerResponse to expose confirmation status and date."""
 
     confirmed = BooleanField(source='agree_with_win', read_only=True)
     date = DateTimeField(source='responded_on', read_only=True)
@@ -539,7 +539,7 @@ class DataHubLegacyExportWinSerializer(ModelSerializer):
 
     def get_value(self, win):
         """Return breakdown vaules in a value nested dict.
-        Use only breakdown type EXPORT
+        Use only breakdown type EXPORT.
         """
         breakdowns_exports = win.breakdowns.filter(type__name='Export')
         breakdowns = LegacyBreakdownSerializer(breakdowns_exports, many=True)

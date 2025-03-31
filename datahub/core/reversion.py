@@ -39,7 +39,7 @@ class NonAtomicRevisionMiddleware(RevisionMiddleware):
     Therefore the resulting atomic value depends on:
     - the `ATOMIC_REQUESTS` settings
     - whether `transaction.atomic()` is used
-    - whether `transaction.non_atomic_requests()` is used
+    - whether `transaction.non_atomic_requests()` is used.
     """
 
     atomic = False

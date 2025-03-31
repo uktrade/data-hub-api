@@ -155,7 +155,7 @@ DELETE_PERMISSIONS = (
 class TestEvidenceDocumentViews(APITestMixin):
     """Tests for the evidence document views."""
 
-    @pytest.mark.parametrize('http_method', ('get', 'post'))
+    @pytest.mark.parametrize('http_method', ['get', 'post'])
     def test_collection_view_returns_404_if_project_doesnt_exist(self, http_method):
         """Test that the collection view returns a 404 if the project ID specified in the URL path
         doesn't exist.
@@ -170,13 +170,13 @@ class TestEvidenceDocumentViews(APITestMixin):
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     @pytest.mark.parametrize(
-        'viewname,http_method',
-        (
+        ('viewname', 'http_method'),
+        [
             ('api-v3:investment:evidence-document:document-item', 'get'),
             ('api-v3:investment:evidence-document:document-item', 'delete'),
             ('api-v3:investment:evidence-document:document-item-callback', 'post'),
             ('api-v3:investment:evidence-document:document-item-download', 'get'),
-        ),
+        ],
     )
     def test_item_views_return_404_if_project_doesnt_exist(self, viewname, http_method):
         """Test that the various item views return a 404 if the project ID specified in the URL
@@ -193,7 +193,7 @@ class TestEvidenceDocumentViews(APITestMixin):
         response = self.api_client.generic(http_method, url)
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    @pytest.mark.parametrize('permissions,associated,allowed', ADD_PERMISSIONS)
+    @pytest.mark.parametrize(('permissions', 'associated', 'allowed'), ADD_PERMISSIONS)
     @patch.object(Document, 'get_signed_upload_url')
     def test_document_creation(self, get_signed_upload_url_mock, permissions, associated, allowed):
         """Test document creation."""
@@ -266,7 +266,7 @@ class TestEvidenceDocumentViews(APITestMixin):
             'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
         }
 
-    @pytest.mark.parametrize('permissions,associated,allowed', VIEW_PERMISSIONS)
+    @pytest.mark.parametrize(('permissions', 'associated', 'allowed'), VIEW_PERMISSIONS)
     def test_documents_list(self, permissions, associated, allowed):
         """Tests list endpoint."""
         user = create_test_user(permission_codenames=permissions, dit_team=TeamFactory())
@@ -329,7 +329,7 @@ class TestEvidenceDocumentViews(APITestMixin):
             'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
         }
 
-    @pytest.mark.parametrize('permissions,associated,allowed', VIEW_PERMISSIONS)
+    @pytest.mark.parametrize(('permissions', 'associated', 'allowed'), VIEW_PERMISSIONS)
     def test_document_retrieval(self, permissions, associated, allowed):
         """Tests retrieval of individual document."""
         user = create_test_user(permission_codenames=permissions, dit_team=TeamFactory())
@@ -385,7 +385,7 @@ class TestEvidenceDocumentViews(APITestMixin):
             'uploaded_on': format_date_or_datetime(entity_document.document.uploaded_on),
         }
 
-    @pytest.mark.parametrize('permissions,associated,allowed', VIEW_PERMISSIONS)
+    @pytest.mark.parametrize(('permissions', 'associated', 'allowed'), VIEW_PERMISSIONS)
     def test_document_with_deletion_pending_retrieval(self, permissions, associated, allowed):
         """Tests retrieval of individual document that is pending deletion."""
         user = create_test_user(permission_codenames=permissions, dit_team=TeamFactory())
@@ -414,13 +414,13 @@ class TestEvidenceDocumentViews(APITestMixin):
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     @pytest.mark.parametrize(
-        'av_clean,expected_status',
-        (
+        ('av_clean', 'expected_status'),
+        [
             (True, status.HTTP_200_OK),
             (False, status.HTTP_403_FORBIDDEN),
-        ),
+        ],
     )
-    @pytest.mark.parametrize('permissions,associated,allowed', VIEW_PERMISSIONS)
+    @pytest.mark.parametrize(('permissions', 'associated', 'allowed'), VIEW_PERMISSIONS)
     @patch('datahub.documents.models.sign_s3_url')
     def test_document_download(
         self, sign_s3_url, permissions, associated, allowed, av_clean, expected_status,
@@ -485,7 +485,7 @@ class TestEvidenceDocumentViews(APITestMixin):
                 'document_url': 'http://what',
             }
 
-    @pytest.mark.parametrize('permissions,associated,allowed', VIEW_PERMISSIONS)
+    @pytest.mark.parametrize(('permissions', 'associated', 'allowed'), VIEW_PERMISSIONS)
     def test_document_download_when_not_scanned(self, permissions, associated, allowed):
         """Tests download of individual document when not yet virus scanned."""
         user = create_test_user(permission_codenames=permissions, dit_team=TeamFactory())
@@ -512,7 +512,7 @@ class TestEvidenceDocumentViews(APITestMixin):
 
         assert response.status_code == status.HTTP_503_SERVICE_UNAVAILABLE
 
-    @pytest.mark.parametrize('permissions,associated,allowed', CHANGE_PERMISSIONS)
+    @pytest.mark.parametrize(('permissions', 'associated', 'allowed'), CHANGE_PERMISSIONS)
     def test_document_upload_schedule_virus_scan(
         self,
         monkeypatch,
@@ -588,7 +588,7 @@ class TestEvidenceDocumentViews(APITestMixin):
             str(entity_document.document.pk),
         )
 
-    @pytest.mark.parametrize('permissions,associated,allowed', DELETE_PERMISSIONS)
+    @pytest.mark.parametrize(('permissions', 'associated', 'allowed'), DELETE_PERMISSIONS)
     def test_document_delete(self, monkeypatch, permissions, associated, allowed):
         """Tests schedule of document deletion."""
         mock_schedule_delete_document = Mock()
@@ -653,7 +653,7 @@ class TestEvidenceDocumentViews(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
         assert mock_schedule_delete_document.called is False
 
-    @pytest.mark.parametrize('permissions,associated,allowed', DELETE_PERMISSIONS)
+    @pytest.mark.parametrize(('permissions', 'associated', 'allowed'), DELETE_PERMISSIONS)
     def test_document_delete_creates_user_event_log(
         self,
         monkeypatch,

@@ -38,8 +38,8 @@ class TestIntrospectToken:
     """Tests for introspect_token()."""
 
     @pytest.mark.parametrize(
-        'mock_kwargs,expected_exception',
-        (
+        ('mock_kwargs', 'expected_exception'),
+        [
             (
                 {'status_code': status.HTTP_400_BAD_REQUEST},
                 SSORequestError('SSO request failed'),
@@ -71,7 +71,7 @@ class TestIntrospectToken:
                 {'json': {}},
                 SSORequestError('SSO response validation failed'),
             ),
-        ),
+        ],
     )
     def test_error_handling(self, requests_mock, mock_kwargs, expected_exception):
         """Test that various errors are handled as expected."""
@@ -104,8 +104,8 @@ class TestGetUserByEmail:
     """Tests for get_user_by_email()."""
 
     @pytest.mark.parametrize(
-        'mock_kwargs,expected_exception',
-        (
+        ('mock_kwargs', 'expected_exception'),
+        [
             (
                 {'status_code': status.HTTP_400_BAD_REQUEST},
                 SSORequestError('SSO request failed'),
@@ -122,7 +122,7 @@ class TestGetUserByEmail:
                 {'text': '{"invalid-json}'},
                 SSORequestError('SSO response parsing failed'),
             ),
-        ),
+        ],
     )
     def test_error_handling(self, requests_mock, mock_kwargs, expected_exception):
         """Test that various errors are handled as expected."""
@@ -148,8 +148,8 @@ class TestGetUserByEmailUserID:
     """Tests for get_user_by_email_user_id()."""
 
     @pytest.mark.parametrize(
-        'mock_kwargs,expected_exception',
-        (
+        ('mock_kwargs', 'expected_exception'),
+        [
             (
                 {'status_code': status.HTTP_400_BAD_REQUEST},
                 SSORequestError('SSO request failed'),
@@ -166,7 +166,7 @@ class TestGetUserByEmailUserID:
                 {'text': '{"invalid-json}'},
                 SSORequestError('SSO response parsing failed'),
             ),
-        ),
+        ],
     )
     def test_error_handling(self, requests_mock, mock_kwargs, expected_exception):
         """Test that various errors are handled as expected."""

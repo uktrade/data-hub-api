@@ -31,7 +31,7 @@ class TestOneListGroupCoreTeam(APITestMixin):
 
     @pytest.mark.parametrize(
         'build_company',
-        (
+        [
             # as subsidiary
             lambda: CompanyFactory(
                 global_headquarters=CompanyFactory(one_list_account_owner=None),
@@ -41,7 +41,7 @@ class TestOneListGroupCoreTeam(APITestMixin):
                 global_headquarters=None,
                 one_list_account_owner=None,
             ),
-        ),
+        ],
         ids=('as_subsidiary', 'as_non_subsidiary'),
     )
     def test_empty_list(self, build_company):
@@ -62,7 +62,7 @@ class TestOneListGroupCoreTeam(APITestMixin):
 
     @pytest.mark.parametrize(
         'build_company',
-        (
+        [
             # as subsidiary
             lambda gam: CompanyFactory(
                 global_headquarters=CompanyFactory(one_list_account_owner=gam),
@@ -72,7 +72,7 @@ class TestOneListGroupCoreTeam(APITestMixin):
                 global_headquarters=None,
                 one_list_account_owner=gam,
             ),
-        ),
+        ],
         ids=('as_subsidiary', 'as_non_subsidiary'),
     )
     def test_with_only_global_account_manager(self, build_company):
@@ -117,7 +117,7 @@ class TestOneListGroupCoreTeam(APITestMixin):
 
     @pytest.mark.parametrize(
         'build_company',
-        (
+        [
             # as subsidiary
             lambda gam: CompanyFactory(
                 global_headquarters=CompanyFactory(one_list_account_owner=gam),
@@ -127,12 +127,12 @@ class TestOneListGroupCoreTeam(APITestMixin):
                 global_headquarters=None,
                 one_list_account_owner=gam,
             ),
-        ),
+        ],
         ids=('as_subsidiary', 'as_non_subsidiary'),
     )
     @pytest.mark.parametrize(
         'with_global_account_manager',
-        (True, False),
+        [True, False],
         ids=lambda val: f'{"With" if val else "Without"} global account manager',
     )
     def test_with_core_team_members(self, build_company, with_global_account_manager):
@@ -282,11 +282,11 @@ class TestUpdateOneListCoreTeam(APITestMixin):
 
     @pytest.mark.parametrize(
         'permission_codenames',
-        (
+        [
             (),
             (CompanyPermission.change_company,),
             (CompanyPermission.change_regional_account_manager,),
-        ),
+        ],
     )
     def test_returns_403_if_without_permission(self, permission_codenames):
         """Test that a 403 is returned if the user does not have all of the required
@@ -301,12 +301,12 @@ class TestUpdateOneListCoreTeam(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     @pytest.mark.parametrize(
-        'existing_team_count,new_team_count',
-        (
+        ('existing_team_count', 'new_team_count'),
+        [
             (0, 2),
             (2, 2),
             (2, 0),
-        ),
+        ],
     )
     def test_can_update_core_team_members(
         self,
@@ -322,12 +322,12 @@ class TestUpdateOneListCoreTeam(APITestMixin):
             one_list_company, existing_team_count, new_team_count, api_client)
 
     @pytest.mark.parametrize(
-        'existing_team_count,new_team_count',
-        (
+        ('existing_team_count', 'new_team_count'),
+        [
             (0, 2),
             (2, 2),
             (2, 0),
-        ),
+        ],
     )
     def test_account_manage_can_update_core_team_members(
         self,

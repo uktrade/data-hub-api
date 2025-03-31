@@ -181,7 +181,7 @@ def setup_headquarters_data(opensearch_with_collector):
 
 @pytest.fixture
 def setup_interactions_data(opensearch_with_collector):
-    """Sets up data for interaction related tests"""
+    """Sets up data for interaction related tests."""
     company_1 = CompanyFactory(
         name='abc',
     )
@@ -235,7 +235,7 @@ def setup_interactions_data(opensearch_with_collector):
 
 @pytest.fixture
 def setup_us_areas(opensearch_with_collector):
-    """Sets up company data with New York and Alabama address areas"""
+    """Sets up company data with New York and Alabama address areas."""
     CompanyFactory(
         address_town='New York',
         address_country_id=constants.Country.united_states.value.id,
@@ -261,7 +261,7 @@ class TestSearch(APITestMixin):
     """Tests search views."""
 
     def test_company_search_no_permissions(self):
-        """Should return 403"""
+        """Should return 403."""
         user = create_test_user(dit_team=TeamFactory())
         api_client = self.create_api_client(user=user)
         url = reverse('api-v4:search:company')
@@ -396,8 +396,8 @@ class TestSearch(APITestMixin):
         }
 
     @pytest.mark.parametrize(
-        'filters,expected_companies',
-        (
+        ('filters', 'expected_companies'),
+        [
             # no filter
             (
                 {},
@@ -459,7 +459,7 @@ class TestSearch(APITestMixin):
                 },
                 ['abc defg ltd'],
             ),
-        ),
+        ],
     )
     def test_filters(self, setup_data, filters, expected_companies):
         """Tests different filters."""
@@ -479,7 +479,7 @@ class TestSearch(APITestMixin):
         assert [result['name'] for result in response_data['results']] == expected_companies
 
     @pytest.mark.parametrize(
-        'search_term,expected_companies',
+        ('search_term', 'expected_companies'),
         [
             # Single postcode prefixes searched
             # Postcode area
@@ -534,8 +534,8 @@ class TestSearch(APITestMixin):
         assert result_names == sorted(expected_companies)
 
     @pytest.mark.parametrize(
-        'query,results',
-        (
+        ('query', 'results'),
+        [
             (
                 {
                     'headquarter_type': None,
@@ -567,7 +567,7 @@ class TestSearch(APITestMixin):
                 },
                 {'ehq', 'ghq', 'none'},
             ),
-        ),
+        ],
     )
     def test_headquarter_type_filter(self, setup_headquarters_data, query, results):
         """Test headquarter type filter."""
@@ -709,7 +709,7 @@ class TestSearch(APITestMixin):
 
     @pytest.mark.parametrize(
         'num_account_managers',
-        (1, 2, 3),
+        [1, 2, 3],
     )
     def test_one_list_account_manager_filter(
         self,
@@ -782,7 +782,7 @@ class TestSearch(APITestMixin):
 
     @pytest.mark.parametrize(
         'sector_level',
-        (0, 1, 2),
+        [0, 1, 2],
     )
     def test_sector_descends_filter(
         self,
@@ -824,13 +824,13 @@ class TestSearch(APITestMixin):
         assert actual_ids == expected_ids
 
     @pytest.mark.parametrize(
-        'country,match',
-        (
+        ('country', 'match'),
+        [
             (constants.Country.cayman_islands.value.id, True),
             (constants.Country.montserrat.value.id, True),
             (constants.Country.azerbaijan.value.id, False),
             (constants.Country.anguilla.value.id, False),
-        ),
+        ],
     )
     def test_composite_country_filter(self, opensearch_with_collector, country, match):
         """Tests composite country filter."""
@@ -858,8 +858,8 @@ class TestSearch(APITestMixin):
             assert len(response.data['results']) == 0
 
     @pytest.mark.parametrize(
-        'name_term,matched_company_name',
-        (
+        ('name_term', 'matched_company_name'),
+        [
             # name
             ('whiskers', 'whiskers and tabby'),
             ('whi', 'whiskers and tabby'),
@@ -880,7 +880,7 @@ class TestSearch(APITestMixin):
             ('tiger', None),
             ('panda', None),
             ('moine', None),
-        ),
+        ],
     )
     def test_composite_name_filter(
         self,
@@ -958,8 +958,8 @@ class TestSearch(APITestMixin):
             assert [UUID(company['id']) for company in response.data['results']] == ids[start:end]
 
     @pytest.mark.parametrize(
-        'filters,expected_companies,expected_dates',
-        (
+        ('filters', 'expected_companies', 'expected_dates'),
+        [
             # no filter, sort by name
             (
                 {},
@@ -1001,7 +1001,7 @@ class TestSearch(APITestMixin):
                     '2017-12-10T00:00:00+00:00',
                 ],
             ),
-        ),
+        ],
     )
     def test_latest_interaction_filters(
         self,
@@ -1031,8 +1031,8 @@ class TestSearch(APITestMixin):
         ] == expected_dates
 
     @pytest.mark.parametrize(
-        'sort_by,expected_companies,expected_dates',
-        (
+        ('sort_by', 'expected_companies', 'expected_dates'),
+        [
             # no filter, sort by interaction date
             (
                 {'sortby': 'latest_interaction_date'},
@@ -1057,7 +1057,7 @@ class TestSearch(APITestMixin):
                     None,
                 ],
             ),
-        ),
+        ],
     )
     def test_latest_interaction_date_sort(
         self,
@@ -1104,7 +1104,7 @@ class TestSearch(APITestMixin):
         assert address_area['name'] == constants.AdministrativeArea.new_york.value.name
 
     def test_registered_address_area_filters_one_area(self, setup_us_areas):
-        """Test registered area filters on US company"""
+        """Test registered area filters on US company."""
         url = reverse('api-v4:search:company')
 
         response = self.api_client.post(
@@ -1122,7 +1122,7 @@ class TestSearch(APITestMixin):
         assert registered_address_area['name'] == constants.AdministrativeArea.new_york.value.name
 
     def test_address_area_filters_two_areas(self, setup_us_areas):
-        """Test filters multiple areas for US Companies"""
+        """Test filters multiple areas for US Companies."""
         url = reverse('api-v4:search:company')
 
         response = self.api_client.post(
@@ -1143,7 +1143,7 @@ class TestSearch(APITestMixin):
             self.assert_area_in_alabama_or_new_york(area)
 
     def test_registered_address_area_filters_two_areas(self, setup_us_areas):
-        """Test filters multiple areas for US Companies"""
+        """Test filters multiple areas for US Companies."""
         url = reverse('api-v4:search:company')
 
         response = self.api_client.post(
@@ -1164,7 +1164,7 @@ class TestSearch(APITestMixin):
             self.assert_area_in_alabama_or_new_york(area)
 
     def assert_area_in_alabama_or_new_york(self, area):
-        """Validate id and name has alabama or new york"""
+        """Validate id and name has alabama or new york."""
         ids = [
             constants.AdministrativeArea.alabama.value.id,
             constants.AdministrativeArea.new_york.value.id,
@@ -1177,7 +1177,7 @@ class TestSearch(APITestMixin):
         assert area['name'] in names
 
     def test_company_ids(self, opensearch_with_collector):
-        """Validate searching by multiple id's returns all matches"""
+        """Validate searching by multiple id's returns all matches."""
         company1 = CompanyFactory(
             name='abc',
         )
@@ -1211,11 +1211,11 @@ class TestCompanyExportView(APITestMixin):
 
     @pytest.mark.parametrize(
         'permissions',
-        (
+        [
             (),
             (CompanyPermission.view_company,),
             (CompanyPermission.export_company,),
-        ),
+        ],
     )
     def test_user_without_permission_cannot_export(self, opensearch, permissions):
         """Test that a user without the correct permissions cannot export data."""
@@ -1227,12 +1227,12 @@ class TestCompanyExportView(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     @pytest.mark.parametrize(
-        'request_sortby,orm_ordering',
-        (
+        ('request_sortby', 'orm_ordering'),
+        [
             ('name', 'name'),
             ('modified_on', 'modified_on'),
             ('modified_on:desc', '-modified_on'),
-        ),
+        ],
     )
     def test_export(
         self,

@@ -224,11 +224,11 @@ class TestSearch(APITestMixin):
         assert response.data['results'][0]['investor_company']['name'] == 'large abcdef'
 
     @pytest.mark.parametrize(
-        'country,number_of_results',
-        (
+        ('country', 'number_of_results'),
+        [
             (CountryConstant.argentina, 2),
             (CountryConstant.ireland, 0),
-        ),
+        ],
     )
     def test_country_of_origin_filter(self, country, number_of_results):
         """Test for country of origin filter."""
@@ -251,8 +251,8 @@ class TestSearch(APITestMixin):
         )
 
     @pytest.mark.parametrize(
-        'search,check_response_item,expected_results',
-        (
+        ('search', 'check_response_item', 'expected_results'),
+        [
             (
                 {
                     'investable_capital_start': 1000,
@@ -408,7 +408,7 @@ class TestSearch(APITestMixin):
                 ['frozen in 2010', 'North Project'],
             ),
 
-        ),
+        ],
     )
     def test_filters(self, search, check_response_item, expected_results):
         """Test filters."""
@@ -441,8 +441,8 @@ class TestSearch(APITestMixin):
         assert response.data == {'investable_capital_start': ['A valid integer is required.']}
 
     @pytest.mark.parametrize(
-        'sort_by,check_item_key,expected_results',
-        (
+        ('sort_by', 'check_item_key', 'expected_results'),
+        [
             (
                 'investable_capital:desc',
                 'investable_capital',
@@ -574,7 +574,7 @@ class TestSearch(APITestMixin):
                 ],
             ),
 
-        ),
+        ],
     )
     def test_sorts(self, sort_by, check_item_key, expected_results):
         """Test search sorts."""
@@ -604,8 +604,8 @@ class TestLargeInvestorProfileExportView(APITestMixin):
     """Tests large capital investor profile export view."""
 
     @pytest.mark.parametrize(
-        'permissions,expected_status_code',
-        (
+        ('permissions', 'expected_status_code'),
+        [
             (
                 (),
                 status.HTTP_403_FORBIDDEN,
@@ -629,7 +629,7 @@ class TestLargeInvestorProfileExportView(APITestMixin):
                 ),
                 status.HTTP_200_OK,
             ),
-        ),
+        ],
     )
     def test_user_needs_correct_permissions_to_export_data(
         self, opensearch, permissions, expected_status_code,
@@ -643,14 +643,14 @@ class TestLargeInvestorProfileExportView(APITestMixin):
         assert response.status_code == expected_status_code
 
     @pytest.mark.parametrize(
-        'request_sortby,orm_ordering',
-        (
+        ('request_sortby', 'orm_ordering'),
+        [
             ('created_on:desc', '-created_on'),
             ('modified_on:desc', '-modified_on'),
             ('investable_capital:asc', 'investable_capital'),
             ('global_assets_under_management:desc', '-global_assets_under_management'),
             ('investor_company.name', 'investor_company__name'),
-        ),
+        ],
     )
     def test_export(self, opensearch_with_collector, request_sortby, orm_ordering):
         """Test export large capital investor profile search results."""

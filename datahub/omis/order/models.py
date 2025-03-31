@@ -43,7 +43,7 @@ MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 class ServiceType(BaseOrderedConstantModel):
     """Order service type.
-    E.g. 'Validated contacts', 'Event', 'Market Research'
+    E.g. 'Validated contacts', 'Event', 'Market Research'.
     """
 
 
@@ -305,7 +305,7 @@ class Order(BaseModel):
         ]
 
     def __str__(self):
-        """Human-readable representation"""
+        """Human-readable representation."""
         return self.reference
 
     def get_absolute_url(self):
@@ -585,7 +585,7 @@ class OrderSubscriber(BaseModel):
         )
 
     def __str__(self):
-        """Human-readable representation"""
+        """Human-readable representation."""
         return f'{self.order} – {self.adviser}'
 
 
@@ -625,7 +625,7 @@ class OrderAssignee(BaseModel):
         self.__adviser = self.adviser
 
     def __str__(self):
-        """Human-readable representation"""
+        """Human-readable representation."""
         return (
             f'{"" if self.is_lead else "Not "}Lead Assignee '
             f'{self.adviser} for order {self.order}'

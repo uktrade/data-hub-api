@@ -60,7 +60,7 @@ class TestMergeWithAnotherCompanyViewGet(AdminTestMixin):
 
     @pytest.mark.parametrize(
         'data',
-        (
+        [
             {},
             {
                 'company_1': '',
@@ -68,7 +68,7 @@ class TestMergeWithAnotherCompanyViewGet(AdminTestMixin):
             {
                 'company_1': '12345',
             },
-        ),
+        ],
     )
     def test_returns_400_if_invalid_company_passed(self, data):
         """Test that a 400 is returned when an invalid value is passed in the query string.
@@ -142,8 +142,8 @@ class TestMergeWithAnotherCompanyViewPost(AdminTestMixin):
         assert response.redirect_chain[0][0] == select_primary_url
 
     @pytest.mark.parametrize(
-        'company_2,expected_error',
-        (
+        ('company_2', 'expected_error'),
+        [
             (
                 SAME_COMPANY,
                 'The two companies to merge cannot be the same. Please select a different '
@@ -157,7 +157,7 @@ class TestMergeWithAnotherCompanyViewPost(AdminTestMixin):
                 '',
                 'This field is required.',
             ),
-        ),
+        ],
     )
     def test_error_if_invalid_company_selected(self, company_2, expected_error):
         """Test that an error is displayed if the an invalid company is selected."""

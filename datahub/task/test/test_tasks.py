@@ -228,10 +228,10 @@ def mock_notify_adviser_archived_completed_or_amended_task_call(task, adviser, t
 class TestTaskReminders:
     @pytest.mark.parametrize(
         'lock_acquired',
-        (
+        [
             False,
             True,
-        ),
+        ],
     )
     def test_lock(
         self,
@@ -1206,10 +1206,10 @@ class TestTaskScheduler:
 class TestTasksOverdue:
     @pytest.mark.parametrize(
         'lock_acquired',
-        (
+        [
             False,
             True,
-        ),
+        ],
     )
     def test_lock(
         self,

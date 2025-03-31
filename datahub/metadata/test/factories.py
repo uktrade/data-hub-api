@@ -122,7 +122,7 @@ class AdministrativeAreasFactory(factory.django.DjangoModelFactory):
 
 
 class PostcodeDataFactory(factory.django.DjangoModelFactory):
-    """Postcode data factory"""
+    """Postcode data factory."""
 
     id = 2656
     ccg = 'S03000012'

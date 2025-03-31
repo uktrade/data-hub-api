@@ -17,7 +17,7 @@ class OMISDatasetView(BaseFilterDatasetView):
     """
 
     def get_dataset(self, request):
-        """Returns list of OMIS Dataset records"""
+        """Returns list of OMIS Dataset records."""
         queryset = Order.objects.annotate(
             refund_created=get_aggregate_subquery(Order, Max('refunds__created_on')),
             refund_total_amount=get_aggregate_subquery(Order, Sum('refunds__total_amount')),

@@ -9,14 +9,14 @@ class TestHasPermissions:
     """Tests the HasPermissions permissions class."""
 
     @pytest.mark.parametrize(
-        'required_permissions,user_permissions,expected_result',
-        (
+        ('required_permissions', 'user_permissions', 'expected_result'),
+        [
             ({'perm1', 'perm2'}, {'perm1', 'perm2', 'perm3'}, True),
             ({'perm1', 'perm2'}, {'perm1', 'perm2'}, True),
             ({'perm1', 'perm2'}, {'perm2', 'perm3'}, False),
             ({'perm1', 'perm2'}, {'perm2'}, False),
             ({'perm1', 'perm2'}, (), False),
-        ),
+        ],
     )
     def test_has_permissions(self, required_permissions, user_permissions, expected_result):
         """Tests has_permission() for various cases."""

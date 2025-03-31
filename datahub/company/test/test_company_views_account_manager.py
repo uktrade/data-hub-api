@@ -51,11 +51,11 @@ class TestAssignRegionalCompanyAccountManagerView(APITestMixin):
 
     @pytest.mark.parametrize(
         'permission_codenames',
-        (
+        [
             (),
             (CompanyPermission.change_company,),
             (CompanyPermission.change_regional_account_manager,),
-        ),
+        ],
     )
     def test_returns_403_if_without_permission(self, permission_codenames):
         """Test that a 403 is returned if the user does not have all of the required
@@ -72,7 +72,7 @@ class TestAssignRegionalCompanyAccountManagerView(APITestMixin):
 
     @pytest.mark.parametrize(
         'company_factory',
-        (
+        [
             pytest.param(
                 lambda: CompanyFactory(one_list_account_owner=None, one_list_tier=None),
                 id='no-existing-account-manager',
@@ -84,7 +84,7 @@ class TestAssignRegionalCompanyAccountManagerView(APITestMixin):
                 ),
                 id='existing-international-trade-adviser-account-manager',
             ),
-        ),
+        ],
     )
     def test_assigns_account_manager(self, company_factory, international_trade_adviser):
         """Test that an account manager can be assigned to:
@@ -107,8 +107,8 @@ class TestAssignRegionalCompanyAccountManagerView(APITestMixin):
         assert company.modified_by == international_trade_adviser
 
     @pytest.mark.parametrize(
-        'company_factory,expected_errors,regional_account_manager_fn',
-        (
+        ('company_factory', 'expected_errors', 'regional_account_manager_fn'),
+        [
             pytest.param(
                 lambda: SubsidiaryFactory(
                     global_headquarters__one_list_tier=random_obj_for_model(OneListTier),
@@ -144,7 +144,7 @@ class TestAssignRegionalCompanyAccountManagerView(APITestMixin):
                 },
                 lambda: None,
             ),
-        ),
+        ],
     )
     def test_validation(
         self,
@@ -191,11 +191,11 @@ class TestSelfAssignCompanyAccountManagerView(APITestMixin):
 
     @pytest.mark.parametrize(
         'permission_codenames',
-        (
+        [
             (),
             (CompanyPermission.change_company,),
             (CompanyPermission.change_regional_account_manager,),
-        ),
+        ],
     )
     def test_returns_403_if_without_permission(self, permission_codenames):
         """Test that a 403 is returned if the user does not have all of the required
@@ -211,7 +211,7 @@ class TestSelfAssignCompanyAccountManagerView(APITestMixin):
 
     @pytest.mark.parametrize(
         'company_factory',
-        (
+        [
             pytest.param(
                 lambda: CompanyFactory(one_list_account_owner=None, one_list_tier=None),
                 id='no-existing-account-manager',
@@ -223,7 +223,7 @@ class TestSelfAssignCompanyAccountManagerView(APITestMixin):
                 ),
                 id='existing-international-trade-adviser-account-manager',
             ),
-        ),
+        ],
     )
     @pytest.mark.django_db
     def test_assigns_account_manager(self, company_factory, international_trade_adviser):
@@ -245,8 +245,8 @@ class TestSelfAssignCompanyAccountManagerView(APITestMixin):
         assert company.modified_by == international_trade_adviser
 
     @pytest.mark.parametrize(
-        'company_factory,expected_errors',
-        (
+        ('company_factory', 'expected_errors'),
+        [
             pytest.param(
                 lambda: SubsidiaryFactory(
                     global_headquarters__one_list_tier=random_obj_for_model(OneListTier),
@@ -271,7 +271,7 @@ class TestSelfAssignCompanyAccountManagerView(APITestMixin):
                 },
                 id='already-on-another-one-list-tier',
             ),
-        ),
+        ],
     )
     @pytest.mark.django_db
     def test_validation(self, company_factory, expected_errors, international_trade_adviser):
@@ -308,11 +308,11 @@ class TestRemoveCompanyAccountManagerView(APITestMixin):
 
     @pytest.mark.parametrize(
         'permission_codenames',
-        (
+        [
             (),
             (CompanyPermission.change_company,),
             (CompanyPermission.change_regional_account_manager,),
-        ),
+        ],
     )
     def test_returns_403_if_without_permission(self, permission_codenames):
         """Test that a 403 is returned if the user does not have all of the required
@@ -328,7 +328,7 @@ class TestRemoveCompanyAccountManagerView(APITestMixin):
 
     @pytest.mark.parametrize(
         'company_factory',
-        (
+        [
             pytest.param(
                 lambda: CompanyFactory(one_list_account_owner=None, one_list_tier=None),
                 id='no-existing-account-manager',
@@ -340,7 +340,7 @@ class TestRemoveCompanyAccountManagerView(APITestMixin):
                 ),
                 id='existing-international-trade-adviser-account-manager',
             ),
-        ),
+        ],
     )
     @pytest.mark.django_db
     def test_removes_account_manager_and_tier(self, company_factory, international_trade_adviser):

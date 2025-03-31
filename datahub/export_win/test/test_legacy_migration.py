@@ -984,8 +984,8 @@ def test_legacy_migration(mock_legacy_wins_pages):
 
 
 @pytest.mark.parametrize(
-    'email,expected',
-    (
+    ('email', 'expected'),
+    [
         ('test@trade.gov.uk', {'test@businessandtrade.gov.uk',
          'test@trade.gov.uk'}),
         ('test@mobile.trade.gov.uk', {
@@ -994,7 +994,7 @@ def test_legacy_migration(mock_legacy_wins_pages):
             'test@businessandtrade.gov.uk',
         }),
         ('test@ukti', {'test@trade', 'test@ukti'}),
-    ),
+    ],
 )
 def test_email_mapping(email, expected):
     result = _email_mapping(email)

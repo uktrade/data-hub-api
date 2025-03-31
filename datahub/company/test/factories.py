@@ -117,7 +117,7 @@ class CompanyFactory(factory.django.DjangoModelFactory):
 
 
 class CompanyWithAreaFactory(CompanyFactory):
-    """Company factory with `address_area_id` populated"""
+    """Company factory with `address_area_id` populated."""
 
     address_area_id = constants.AdministrativeArea.texas.value.id
 
@@ -165,7 +165,7 @@ def _get_random_company_category():
 
 
 class ContactFactory(factory.django.DjangoModelFactory):
-    """Contact factory"""
+    """Contact factory."""
 
     created_by = factory.SubFactory(AdviserFactory)
     modified_by = factory.SelfAttribute('created_by')
@@ -200,7 +200,7 @@ class ContactWithOwnAddressFactory(ContactFactory):
 
 class ContactWithOwnAreaFactory(ContactWithOwnAddressFactory):
     """Factory for a contact with an address different from the contact's
-    company that includes an area
+    company that includes an area.
     """
 
     address_country_id = constants.Country.united_states.value.id
@@ -217,7 +217,7 @@ class ArchivedContactFactory(ContactFactory):
 
 
 class CompanyExportCountryFactory(factory.django.DjangoModelFactory):
-    """Factory for Company export country"""
+    """Factory for Company export country."""
 
     company = factory.SubFactory(CompanyFactory)
     country = factory.Iterator(Country.objects.all())
@@ -229,7 +229,7 @@ class CompanyExportCountryFactory(factory.django.DjangoModelFactory):
 
 
 class CompanyExportCountryHistoryFactory(factory.django.DjangoModelFactory):
-    """Factory for Company export country history"""
+    """Factory for Company export country history."""
 
     history_id = factory.LazyFunction(uuid.uuid4)
     id = factory.LazyFunction(uuid.uuid4)
@@ -254,21 +254,21 @@ class OneListTierFactory(factory.django.DjangoModelFactory):
 
 
 class ExportExperienceFactory(factory.django.DjangoModelFactory):
-    """Export experience factory"""
+    """Export experience factory."""
 
     class Meta:
         model = 'company.ExportExperience'
 
 
 class ExportYearFactory(factory.django.DjangoModelFactory):
-    """Export year factory"""
+    """Export year factory."""
 
     class Meta:
         model = 'company.ExportYear'
 
 
 class ExportFactory(factory.django.DjangoModelFactory):
-    """Export factory"""
+    """Export factory."""
 
     company = factory.SubFactory(CompanyFactory)
     title = factory.Faker('name')
@@ -293,7 +293,7 @@ class ExportFactory(factory.django.DjangoModelFactory):
 
 
 class ObjectiveFactory(factory.django.DjangoModelFactory):
-    """Objective factory"""
+    """Objective factory."""
 
     company = factory.SubFactory(CompanyFactory)
     subject = factory.Faker('name')

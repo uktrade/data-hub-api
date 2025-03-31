@@ -21,7 +21,7 @@ class BaseDatasetView(HawkResponseSigningMixin, APIView):
     pagination_class = DatasetCursorPagination
 
     def get(self, request):
-        """Endpoint which serves all records for a specific Dataset"""
+        """Endpoint which serves all records for a specific Dataset."""
         self._get_request_params(request)
         dataset = self.get_dataset()
         paginator = self.pagination_class()
@@ -44,7 +44,7 @@ class BaseDatasetView(HawkResponseSigningMixin, APIView):
         return dataset
 
     def get_dataset(self):
-        """Return a list of records"""
+        """Return a list of records."""
         raise NotImplementedError
 
 
@@ -59,7 +59,7 @@ class BaseFilterDatasetView(HawkResponseSigningMixin, APIView):
     pagination_class = DatasetCursorPagination
 
     def get(self, request):
-        """Endpoint which serves all records for a specific Dataset"""
+        """Endpoint which serves all records for a specific Dataset."""
         dataset = self.get_dataset(request=request)
         paginator = self.pagination_class()
         page = paginator.paginate_queryset(dataset, request, view=self)
@@ -74,5 +74,5 @@ class BaseFilterDatasetView(HawkResponseSigningMixin, APIView):
         return dataset
 
     def get_dataset(self, request=None):
-        """Return a list of records"""
+        """Return a list of records."""
         raise NotImplementedError

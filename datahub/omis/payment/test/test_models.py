@@ -15,8 +15,8 @@ class TestPaymentGatewaySessionIsFinished:
     """Tests for the `is_finished` method."""
 
     @pytest.mark.parametrize(
-        'status,finished',
-        (
+        ('status', 'finished'),
+        [
             (PaymentGatewaySessionStatus.CREATED, False),
             (PaymentGatewaySessionStatus.STARTED, False),
             (PaymentGatewaySessionStatus.SUBMITTED, False),
@@ -24,7 +24,7 @@ class TestPaymentGatewaySessionIsFinished:
             (PaymentGatewaySessionStatus.FAILED, True),
             (PaymentGatewaySessionStatus.CANCELLED, True),
             (PaymentGatewaySessionStatus.ERROR, True),
-        ),
+        ],
     )
     def test_value(self, status, finished):
         """Test the return value of `is_finished` with different values of session.status.
@@ -81,12 +81,12 @@ class TestPaymentGatewaySessionGetPaymentURL:
 
     @pytest.mark.parametrize(
         'session_status',
-        (
+        [
             PaymentGatewaySessionStatus.SUCCESS,
             PaymentGatewaySessionStatus.FAILED,
             PaymentGatewaySessionStatus.CANCELLED,
             PaymentGatewaySessionStatus.ERROR,
-        ),
+        ],
     )
     def test_doesnt_call_govuk_pay_if_finished(self, session_status, requests_mock):
         """Test that if the payment gateway session is finished, no call to GOV.UK Pay is made
@@ -105,12 +105,12 @@ class TestPaymentGatewaySessionRefresh:
     """Tests for the `refresh_from_govuk_payment` method."""
 
     @pytest.mark.parametrize(
-        'status', (
+        'status', [
             PaymentGatewaySessionStatus.SUCCESS,
             PaymentGatewaySessionStatus.FAILED,
             PaymentGatewaySessionStatus.CANCELLED,
             PaymentGatewaySessionStatus.ERROR,
-        ),
+        ],
     )
     def test_already_finished_doesnt_do_anything(self, status, requests_mock):
         """Test that if the payment gateway session is already finished, the system
@@ -123,11 +123,11 @@ class TestPaymentGatewaySessionRefresh:
 
     @pytest.mark.parametrize(
         'status',
-        (
+        [
             PaymentGatewaySessionStatus.CREATED,
             PaymentGatewaySessionStatus.STARTED,
             PaymentGatewaySessionStatus.SUBMITTED,
-        ),
+        ],
     )
     def test_with_unchanged_govuk_payment_status_doesnt_change_anything(
         self, status, requests_mock,

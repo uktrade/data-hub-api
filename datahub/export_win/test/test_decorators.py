@@ -18,10 +18,9 @@ class TestValidateScriptAndHtmlTags(unittest.TestCase):
         request.data = {'key': '<script>alert("XSS");</script>'}
 
         response = mock_view(None, request)
-        self.assertEqual(response.status_code, 400)
-        self.assertIn('error', response.data)
-        self.assertEqual(response.data['error'],
-                         'Input contains disallowed HTML or script tags or symbols')
+        assert response.status_code == 400
+        assert 'error' in response.data
+        assert response.data['error'] == 'Input contains disallowed HTML or script tags or symbols'
 
     def test_input_without_html_tags(self):
         """Test the decorator with input without HTML/script tags."""
@@ -31,5 +30,5 @@ class TestValidateScriptAndHtmlTags(unittest.TestCase):
         request = Mock()
         request.data = {'key': 'Hello world!'}
         response = mock_view(None, request)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['status'], 'success')
+        assert response.status_code == 200
+        assert response.data['status'] == 'success'

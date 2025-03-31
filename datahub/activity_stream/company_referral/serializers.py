@@ -10,7 +10,7 @@ class CompanyReferralActivitySerializer(ActivitySerializer):
 
     def to_representation(self, instance):
         """Serialize the interaction as per Activity Stream spec:
-        https://www.w3.org/TR/activitystreams-core/
+        https://www.w3.org/TR/activitystreams-core/.
         """
         company_referral_id = f'dit:DataHubCompanyReferral:{instance.pk}'
         company_referral = {

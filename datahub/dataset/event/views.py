@@ -17,7 +17,7 @@ class EventsDatasetView(BaseFilterDatasetView):
     """
 
     def get_dataset(self, request):
-        """Returns a list of all interaction records"""
+        """Returns a list of all interaction records."""
         queryset = Event.objects.annotate(
             service_name=get_service_name_subquery('service'),
             team_ids=get_aggregate_subquery(

@@ -62,11 +62,11 @@ class TestGetCompanyExportWins(APITestMixin):
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     @pytest.mark.parametrize(
-        'permission_codenames,expected_status',
-        (
+        ('permission_codenames', 'expected_status'),
+        [
             ([], status.HTTP_403_FORBIDDEN),
             (['view_company'], status.HTTP_403_FORBIDDEN),
-        ),
+        ],
     )
     def test_permission_checking(self, permission_codenames, expected_status):
         """Test that a 403 is returned if the user has not enough permissions."""
@@ -94,11 +94,11 @@ class TestGetCompanyExportWins(APITestMixin):
 
     @pytest.mark.parametrize(
         'not_matched',
-        (
+        [
             'adviser',
             'lead_officer',
             'contact',
-        ),
+        ],
     )
     def test_get_export_wins_success(self, not_matched):
         """Test get wins in a successful scenario."""
@@ -291,8 +291,8 @@ class TestGetCompanyExportWins(APITestMixin):
         assert result_ids == [str(win4.id), str(win3.id), str(win2.id), str(win1.id)]
 
     @pytest.mark.parametrize(
-        'confirmed,results_length',
-        (
+        ('confirmed', 'results_length'),
+        [
             (
                 'true',
                 2,
@@ -305,7 +305,7 @@ class TestGetCompanyExportWins(APITestMixin):
                 'null',
                 1,
             ),
-        ),
+        ],
     )
     def test_list_filtered_by_agree_with_win(self, export_wins, confirmed, results_length):
         """Test the export wins view when filtered by confirmation."""

@@ -10,7 +10,7 @@ from datahub.dataset.core.test import BaseDatasetViewTest
 
 
 def get_expected_data_from_adviser(adviser):
-    """Returns adviser data as a dictionary"""
+    """Returns adviser data as a dictionary."""
     return {
         'id': str(adviser.id),
         'date_joined': format_date_or_datetime(adviser.date_joined),
@@ -27,14 +27,14 @@ def get_expected_data_from_adviser(adviser):
 
 @pytest.mark.django_db
 class TestAdviserDatasetViewSet(BaseDatasetViewTest):
-    """Tests for the advisers data-flow export endpoint
+    """Tests for the advisers data-flow export endpoint.
     """
 
     view_url = reverse('api-v4:dataset:advisers-dataset')
     factory = AdviserFactory
 
     def test_success(self, data_flow_api_client):
-        """Test that endpoint returns with expected data for a single company"""
+        """Test that endpoint returns with expected data for a single company."""
         adviser = AdviserFactory()
         response = data_flow_api_client.get(self.view_url)
 
@@ -43,7 +43,7 @@ class TestAdviserDatasetViewSet(BaseDatasetViewTest):
         assert response.json()['results'] == [get_expected_data_from_adviser(adviser)]
 
     def test_with_multiple_advisers(self, data_flow_api_client):
-        """Test that endpoint returns correct order of records"""
+        """Test that endpoint returns correct order of records."""
         adviser_1 = AdviserFactory(date_joined=datetime(2019, 1, 2, tzinfo=timezone.utc))
         adviser_2 = AdviserFactory(date_joined=datetime(2019, 1, 3, tzinfo=timezone.utc))
         adviser_3 = AdviserFactory(date_joined=datetime(2019, 1, 1, tzinfo=timezone.utc))

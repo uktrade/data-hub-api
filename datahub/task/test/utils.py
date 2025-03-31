@@ -13,7 +13,7 @@ from datahub.task.test.factories import TaskFactory
 
 class BaseTaskTests(APITestMixin):
     def adviser_api_client(self, adviser):
-        """Create an api client where the adviser is the authenticated user"""
+        """Create an api client where the adviser is the authenticated user."""
         return self.create_api_client(user=adviser)
 
 
@@ -154,7 +154,7 @@ class BaseEditTaskTests(BaseTaskTests):
         self._call_task_endpoint_assert_response(adviser, task, data, status.HTTP_200_OK)
 
     def _call_task_endpoint_assert_response(self, adviser, task, data, status_code):
-        """Call the task endpoint and check the response is expected
+        """Call the task endpoint and check the response is expected.
         """
         id = task.id
 

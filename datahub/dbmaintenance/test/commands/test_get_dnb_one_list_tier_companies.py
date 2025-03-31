@@ -101,8 +101,8 @@ def one_list_companies():
 
 
 @pytest.mark.parametrize(
-    'one_list_tier_ids,account_manager_ids,expected_company_names',
-    (
+    ('one_list_tier_ids', 'account_manager_ids', 'expected_company_names'),
+    [
         # Test filtering by one tier, one manager
         (
             ONE_LIST_TIER_A_IDS,
@@ -146,7 +146,7 @@ def one_list_companies():
                 'Tier B Standalone Manager 1',
             },
         ),
-    ),
+    ],
 )
 def test_get_company_ids(
     one_list_companies,

@@ -26,7 +26,7 @@ from datahub.omis.payment.test.factories import ApprovedRefundFactory
 
 
 def get_expected_data_from_order(order):
-    """Returns expected dictionary based on given order"""
+    """Returns expected dictionary based on given order."""
     return {
         'cancellation_reason__name': get_attr_or_none(order, 'cancellation_reason.name'),
         'cancelled_on': format_date_or_datetime(order.cancelled_on),
@@ -66,14 +66,14 @@ def get_expected_data_from_order(order):
 
 @pytest.mark.django_db
 class TestOMISDatasetViewSet(BaseDatasetViewTest):
-    """Tests for OMISDatasetView
+    """Tests for OMISDatasetView.
     """
 
     view_url = reverse('api-v4:dataset:omis-dataset')
     factory = OrderFactory
 
     @pytest.mark.parametrize(
-        'order_factory', (
+        'order_factory', [
             OrderFactory,
             OrderCompleteFactory,
             OrderCancelledFactory,
@@ -83,9 +83,9 @@ class TestOMISDatasetViewSet(BaseDatasetViewTest):
             OrderWithOpenQuoteFactory,
             OrderWithoutAssigneesFactory,
             OrderWithoutLeadAssigneeFactory,
-        ))
+        ])
     def test_success(self, data_flow_api_client, order_factory):
-        """Test that endpoint returns with expected data for a single order"""
+        """Test that endpoint returns with expected data for a single order."""
         order = order_factory()
         response = data_flow_api_client.get(self.view_url)
         assert response.status_code == status.HTTP_200_OK
@@ -96,7 +96,7 @@ class TestOMISDatasetViewSet(BaseDatasetViewTest):
         assert result == expected_result
 
     def test_with_multiple_orders(self, data_flow_api_client):
-        """Test that endpoint returns correct number of record in expected order"""
+        """Test that endpoint returns correct number of record in expected order."""
         with freeze_time('2019-01-01 12:30:00'):
             order_1 = OrderFactory()
         with freeze_time('2019-01-03 12:00:00'):
@@ -115,7 +115,7 @@ class TestOMISDatasetViewSet(BaseDatasetViewTest):
             assert order.reference == response_results[index]['reference']
 
     @pytest.mark.parametrize(
-        'order_factory', (
+        'order_factory', [
             OrderFactory,
             OrderCompleteFactory,
             OrderCancelledFactory,
@@ -125,9 +125,9 @@ class TestOMISDatasetViewSet(BaseDatasetViewTest):
             OrderWithOpenQuoteFactory,
             OrderWithoutAssigneesFactory,
             OrderWithoutLeadAssigneeFactory,
-        ))
+        ])
     def test_order_with_refund(self, data_flow_api_client, order_factory):
-        """Test that endpoint returns refund data if it exists"""
+        """Test that endpoint returns refund data if it exists."""
         order = order_factory()
         ApprovedRefundFactory(
             order=order,

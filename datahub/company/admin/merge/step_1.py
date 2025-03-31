@@ -43,7 +43,7 @@ class SelectOtherCompanyForm(BaseSelectOtherModelForm):
 
 
 class SelectOtherContactForm(BaseSelectOtherModelForm):
-    """Form used for selecting a second contact when merging duplicate contacts"""
+    """Form used for selecting a second contact when merging duplicate contacts."""
 
     BOTH_MODELS_ARE_THE_SAME_MSG = gettext_lazy(
         'The two contacts to merge cannot be the same. Please select a different contact.',
@@ -56,7 +56,7 @@ class SelectOtherContactForm(BaseSelectOtherModelForm):
     )
 
     def __init__(self, contact_1, *args, **kwargs):
-        """Initialises the form, saving the ID of the contact already selected"""
+        """Initialises the form, saving the ID of the contact already selected."""
         super().__init__(*args, **kwargs)
         self._id_1 = contact_1
 

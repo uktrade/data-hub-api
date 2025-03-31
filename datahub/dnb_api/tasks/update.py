@@ -22,7 +22,7 @@ from datahub.dnb_api.utils import (
 
 def schedule_record_audit(job_ids, start_time):
     """Check all jobs every 30 minutes for the span of 4 hours
-    and then fail if not finished
+    and then fail if not finished.
     """
     max_retries = 8
     job = job_scheduler(

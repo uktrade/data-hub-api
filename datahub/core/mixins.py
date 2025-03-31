@@ -70,7 +70,7 @@ class ArchivableViewSetMixin:
 
 
 class SoftDeleteViaArchiveMixin(mixins.DestroyModelMixin):
-    """To be used with models that should be archived instead of deleted"""
+    """To be used with models that should be archived instead of deleted."""
 
     def destroy(self, request, *args, **kwargs):
         """Archive instead of deleting."""

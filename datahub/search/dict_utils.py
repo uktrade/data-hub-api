@@ -228,7 +228,7 @@ def investment_project_dict(obj):
 
 
 def task_company(obj):
-    """Creates dictionary from a task company containing id and name"""
+    """Creates dictionary from a task company containing id and name."""
     company = obj.get_company()
     if company is None:
         return None

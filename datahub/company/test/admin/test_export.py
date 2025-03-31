@@ -12,7 +12,7 @@ class TestCompanyExportAdmin(AdminTestMixin):
 
     def test_export_team_members_validation_throws_error_for_more_than_allowed_max(self):
         """Test an error is received when the number of team members being saved is above the
-        maximum allowed
+        maximum allowed.
         """
         url = reverse('admin:company_companyexport_add')
 

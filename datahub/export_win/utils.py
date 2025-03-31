@@ -4,7 +4,7 @@ from datahub.core import constants
 
 
 def calculate_totals_for_export_win(win_instance):
-    """Base class for Total Export, Non Export and ODI"""
+    """Base class for Total Export, Non Export and ODI."""
     export_type_value = constants.BreakdownType.export.value
     non_export_value = constants.BreakdownType.non_export.value
     odi_value = constants.BreakdownType.odi.value

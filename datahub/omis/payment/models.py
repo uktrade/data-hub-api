@@ -39,7 +39,7 @@ class PaymentGatewaySession(BaseModel):
         ordering = ('-created_on', )
 
     def __str__(self):
-        """Human-readable representation"""
+        """Human-readable representation."""
         return f'Payment gateway session {self.id} for order {self.order}'
 
     def _get_payment_from_govuk_pay(self):
@@ -174,7 +174,7 @@ class Payment(BaseModel):
         ordering = ('created_on', )
 
     def __str__(self):
-        """Human-readable representation"""
+        """Human-readable representation."""
         return self.reference
 
 
@@ -254,7 +254,7 @@ class Refund(BaseModel):
         ordering = ('created_on', )
 
     def __str__(self):
-        """Human-readable representation"""
+        """Human-readable representation."""
         return f'{self.reference} for order {self.order}'
 
     def save(self, *args, **kwargs):

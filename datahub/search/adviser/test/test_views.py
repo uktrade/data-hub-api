@@ -18,7 +18,7 @@ class TestSearch(APITestMixin):
     """Tests search views."""
 
     def test_adviser_search_no_permissions(self):
-        """Should return 403"""
+        """Should return 403."""
         user = create_test_user(dit_team=TeamFactory())
         api_client = self.create_api_client(user=user)
         url = reverse('api-v4:search:adviser')

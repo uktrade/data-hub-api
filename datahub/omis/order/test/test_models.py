@@ -194,13 +194,13 @@ class TestGenerateQuote:
 
     @pytest.mark.parametrize(
         'disallowed_status',
-        (
+        [
             OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
             OrderStatus.QUOTE_ACCEPTED,
             OrderStatus.PAID,
             OrderStatus.COMPLETE,
             OrderStatus.CANCELLED,
-        ),
+        ],
     )
     def test_fails_if_order_not_in_draft(self, disallowed_status):
         """Test that if the order is not in `draft`, a quote cannot be generated."""
@@ -286,10 +286,10 @@ class TestReopen:
 
     @pytest.mark.parametrize(
         'allowed_status',
-        (
+        [
             OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
             OrderStatus.QUOTE_ACCEPTED,
-        ),
+        ],
     )
     def test_ok_if_order_in_allowed_status(self, allowed_status):
         """Test that an order can be reopened if it's in one of the allowed statuses.
@@ -318,12 +318,12 @@ class TestReopen:
 
     @pytest.mark.parametrize(
         'disallowed_status',
-        (
+        [
             OrderStatus.DRAFT,
             OrderStatus.PAID,
             OrderStatus.COMPLETE,
             OrderStatus.CANCELLED,
-        ),
+        ],
     )
     def test_fails_if_order_not_in_allowed_status(self, disallowed_status):
         """Test that if the order is in a disallowed status, it cannot be reopened."""
@@ -350,13 +350,13 @@ class TestUpdateInvoiceDetails:
 
     @pytest.mark.parametrize(
         'disallowed_status',
-        (
+        [
             OrderStatus.DRAFT,
             OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
             OrderStatus.PAID,
             OrderStatus.COMPLETE,
             OrderStatus.CANCELLED,
-        ),
+        ],
     )
     def test_fails_if_order_not_in_allowed_status(self, disallowed_status):
         """Test that if the order is in a disallowed status, the invoice details cannot be updated.
@@ -373,7 +373,7 @@ class TestAcceptQuote:
 
     @pytest.mark.parametrize(
         'allowed_status',
-        (OrderStatus.QUOTE_AWAITING_ACCEPTANCE,),
+        [OrderStatus.QUOTE_AWAITING_ACCEPTANCE],
     )
     def test_ok_if_order_in_allowed_status(self, allowed_status):
         """Test that the quote of an order can be accepted if the order is
@@ -401,12 +401,12 @@ class TestAcceptQuote:
 
     @pytest.mark.parametrize(
         'disallowed_status',
-        (
+        [
             OrderStatus.QUOTE_ACCEPTED,
             OrderStatus.PAID,
             OrderStatus.COMPLETE,
             OrderStatus.CANCELLED,
-        ),
+        ],
     )
     def test_fails_if_order_not_in_allowed_status(self, disallowed_status):
         """Test that if the order is in a disallowed status, the quote cannot be accepted."""
@@ -438,7 +438,7 @@ class TestMarkOrderAsPaid:
 
     @pytest.mark.parametrize(
         'allowed_status',
-        (OrderStatus.QUOTE_ACCEPTED,),
+        [OrderStatus.QUOTE_ACCEPTED],
     )
     def test_ok_if_order_in_allowed_status(self, allowed_status):
         """Test that the order can be marked as paid if the order is in one of the allowed statuses.
@@ -472,13 +472,13 @@ class TestMarkOrderAsPaid:
 
     @pytest.mark.parametrize(
         'disallowed_status',
-        (
+        [
             OrderStatus.DRAFT,
             OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
             OrderStatus.PAID,
             OrderStatus.COMPLETE,
             OrderStatus.CANCELLED,
-        ),
+        ],
     )
     def test_fails_if_order_not_in_allowed_status(self, disallowed_status):
         """Test that if the order is in a disallowed status, the order cannot be marked as paid.
@@ -531,7 +531,7 @@ class TestCompleteOrder:
 
     @pytest.mark.parametrize(
         'allowed_status',
-        (OrderStatus.PAID,),
+        [OrderStatus.PAID],
     )
     def test_ok_if_order_in_allowed_status(self, allowed_status):
         """Test that the order can be marked as complete if it's in one of the allowed statuses.
@@ -550,13 +550,13 @@ class TestCompleteOrder:
 
     @pytest.mark.parametrize(
         'disallowed_status',
-        (
+        [
             OrderStatus.DRAFT,
             OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
             OrderStatus.QUOTE_ACCEPTED,
             OrderStatus.COMPLETE,
             OrderStatus.CANCELLED,
-        ),
+        ],
     )
     def test_fails_if_order_not_in_allowed_status(self, disallowed_status):
         """Test that if the order is in a disallowed status, the order cannot be marked as complete.
@@ -599,8 +599,8 @@ class TestCancelOrder:
     """Tests for when an order is cancelled."""
 
     @pytest.mark.parametrize(
-        'allowed_status,force',
-        (
+        ('allowed_status', 'force'),
+        [
             # force=False
             (OrderStatus.DRAFT, False),
             (OrderStatus.QUOTE_AWAITING_ACCEPTANCE, False),
@@ -610,7 +610,7 @@ class TestCancelOrder:
             (OrderStatus.QUOTE_AWAITING_ACCEPTANCE, True),
             (OrderStatus.QUOTE_ACCEPTED, True),
             (OrderStatus.PAID, True),
-        ),
+        ],
     )
     def test_ok_if_order_in_allowed_status(self, allowed_status, force):
         """Test that the order can be cancelled if it's in one of the allowed statuses.
@@ -629,8 +629,8 @@ class TestCancelOrder:
         assert order.cancelled_by == adviser
 
     @pytest.mark.parametrize(
-        'disallowed_status,force',
-        (
+        ('disallowed_status', 'force'),
+        [
             # force=False
             (OrderStatus.QUOTE_ACCEPTED, False),
             (OrderStatus.PAID, False),
@@ -640,7 +640,7 @@ class TestCancelOrder:
             # force=True
             (OrderStatus.COMPLETE, True),
             (OrderStatus.CANCELLED, True),
-        ),
+        ],
     )
     def test_fails_if_order_not_in_allowed_status(self, disallowed_status, force):
         """Test that if the order is in a disallowed status, the order cannot be cancelled.

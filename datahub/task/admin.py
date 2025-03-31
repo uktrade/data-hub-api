@@ -26,7 +26,7 @@ class TaskAdminForm(forms.ModelForm):
 
 @admin.register(Task)
 class TaskAdmin(BaseModelAdminMixin, VersionAdmin):
-    """Admin form for tasks"""
+    """Admin form for tasks."""
 
     search_fields = (
         'pk',

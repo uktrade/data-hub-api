@@ -29,7 +29,7 @@ def notify_post_save_order(sender, instance, created, raw=False, **kwargs):
 @receiver(post_save, sender=OrderAssignee, dispatch_uid='notify_post_save_assignee')
 @receiver(post_save, sender=OrderSubscriber, dispatch_uid='notify_post_save_subscriber')
 def notify_post_save_order_adviser(sender, instance, created, raw=False, **kwargs):
-    """Notify people that they have been added to the order"""
+    """Notify people that they have been added to the order."""
     if raw:  # e.g. when loading fixtures
         return
 

@@ -10,8 +10,8 @@ class TestViewUtils:
     """
 
     @pytest.mark.parametrize(
-        'enforced_content_type,content_type,passes',
-        (
+        ('enforced_content_type', 'content_type', 'passes'),
+        [
             ('application/json', 'application/json', True),
             ('application/json', 'application/j', False),
             ('application/json', None, False),
@@ -19,7 +19,7 @@ class TestViewUtils:
             ('application/json', 'text/javascript', False),
             ('application/json', 'application/ld+json', False),
             ('application/json', 'application/json; charset=utf-8', True),
-        ),
+        ],
     )
     def test_enforce_request_content_type(self, enforced_content_type, content_type, passes):
         """Test enforce_request_content_type decorator.

@@ -207,7 +207,7 @@ class SearchAPIView(APIView):
         return filters
 
     def get_entities(self):
-        """Returns entities"""
+        """Returns entities."""
         return [self.search_app.search_model]
 
     def validate_data(self, data):

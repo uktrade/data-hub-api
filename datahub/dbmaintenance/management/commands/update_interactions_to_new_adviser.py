@@ -9,7 +9,7 @@ logger = getLogger(__name__)
 
 
 class Command(BaseCommand):
-    """Command to update an interaction to new adviser
+    """Command to update an interaction to new adviser.
 
     Example of executing this command locally:
         python manage.py update_interactions_to_new_adviser <old_adviser_id> <new_adviser_id>

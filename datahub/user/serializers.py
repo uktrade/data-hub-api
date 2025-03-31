@@ -5,7 +5,7 @@ from datahub.metadata.serializers import TeamSerializer
 
 
 class WhoAmISerializer(serializers.ModelSerializer):
-    """Adviser serializer for that includes a permissions"""
+    """Adviser serializer for that includes a permissions."""
 
     permissions = serializers.SerializerMethodField()
     active_features = serializers.ListField(child=serializers.CharField(), read_only=True)

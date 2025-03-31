@@ -85,11 +85,11 @@ class TestRefundAdmin(AdminTestMixin):
 
     @pytest.mark.parametrize(
         'refund_factory',
-        (
+        [
             RequestedRefundFactory,
             ApprovedRefundFactory,
             RejectedRefundFactory,
-        ),
+        ],
     )
     def test_change(self, refund_factory):
         """Test changing a refund record, its status cannot change at this point."""
@@ -152,8 +152,8 @@ class TestRefundAdmin(AdminTestMixin):
         assert not refund.payment
 
     @pytest.mark.parametrize(
-        'data_delta,errors',
-        (
+        ('data_delta', 'errors'),
+        [
             # invalid status
             (
                 {'status': RefundStatus.REJECTED},
@@ -241,7 +241,7 @@ class TestRefundAdmin(AdminTestMixin):
                     ],
                 },
             ),
-        ),
+        ],
     )
     def test_validation_error(self, data_delta, errors):
         """Test validation errors."""
@@ -294,8 +294,8 @@ class TestRefundAdmin(AdminTestMixin):
         assert form.errors == errors
 
     @pytest.mark.parametrize(
-        'refund_factory,required_fields',
-        (
+        ('refund_factory', 'required_fields'),
+        [
             (
                 RequestedRefundFactory,
                 (
@@ -330,7 +330,7 @@ class TestRefundAdmin(AdminTestMixin):
                     'requested_amount',
                 ),
             ),
-        ),
+        ],
     )
     def test_required_fields(self, refund_factory, required_fields):
         """Test required fields depending on the status of the refund."""
@@ -371,11 +371,11 @@ class TestRefundAdmin(AdminTestMixin):
 
     @pytest.mark.parametrize(
         'refund_factory',
-        (
+        [
             RequestedRefundFactory,
             ApprovedRefundFactory,
             RejectedRefundFactory,
-        ),
+        ],
     )
     def test_cannot_change_status(self, refund_factory):
         """Test that the status field cannot be changed at any point."""

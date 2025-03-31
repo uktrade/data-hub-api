@@ -18,7 +18,7 @@ from datahub.core.test_utils import format_date_or_datetime
 @pytest.mark.django_db
 def test_company_referral_activity(api_client):
     """Get a list of company referrals and test the returned JSON is valid as per:
-    https://www.w3.org/TR/activitystreams-core/
+    https://www.w3.org/TR/activitystreams-core/.
     """
     start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
     with freeze_time(start) as frozen_datetime:
@@ -101,7 +101,7 @@ def test_company_referral_activity(api_client):
 @pytest.mark.django_db
 def test_closed_company_referral_activity(api_client):
     """Get a list of closed company referrals and test the returned JSON is valid as per:
-    https://www.w3.org/TR/activitystreams-core/
+    https://www.w3.org/TR/activitystreams-core/.
     """
     start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
     with freeze_time(start) as frozen_datetime:
@@ -184,7 +184,7 @@ def test_closed_company_referral_activity(api_client):
 @pytest.mark.django_db
 def test_complete_company_referral_activity(api_client):
     """Get a list of completed company referrals and test the returned JSON is valid as per:
-    https://www.w3.org/TR/activitystreams-core/
+    https://www.w3.org/TR/activitystreams-core/.
     """
     start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
     with freeze_time(start) as frozen_datetime:
@@ -283,7 +283,7 @@ def test_complete_company_referral_activity(api_client):
 @pytest.mark.django_db
 def test_company_referral_activity_without_team_and_contact(api_client):
     """Get a list of company referrals and test the returned JSON is valid as per:
-    https://www.w3.org/TR/activitystreams-core/
+    https://www.w3.org/TR/activitystreams-core/.
     """
     start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
     with freeze_time(start) as frozen_datetime:
@@ -353,7 +353,7 @@ def test_company_referral_activity_without_team_and_contact(api_client):
 
 @pytest.mark.django_db
 def test_company_referrals_ordering(api_client):
-    """Test that the company referrals are ordered by ('modified_on', 'pk')
+    """Test that the company referrals are ordered by ('modified_on', 'pk').
     """
     company_referrals = []
 

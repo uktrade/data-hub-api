@@ -220,13 +220,13 @@ class TestPaymentGatewaySessionManager:
         }
 
     @pytest.mark.parametrize(
-        'disallowed_status', (
+        'disallowed_status', [
             OrderStatus.DRAFT,
             OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
             OrderStatus.PAID,
             OrderStatus.COMPLETE,
             OrderStatus.CANCELLED,
-        ),
+        ],
     )
     def test_exception_if_order_in_disallowed_status(self, disallowed_status):
         """Test that if the order is not in one of the allowed statuses, the method raises
@@ -310,7 +310,7 @@ class TestPaymentGatewaySessionManager:
         assert payment.billing_email == 'email@example.com'
         assert payment.card_brand == 'Visa'
 
-    @pytest.mark.parametrize('govuk_status_code', (400, 401, 422, 500))
+    @pytest.mark.parametrize('govuk_status_code', [400, 401, 422, 500])
     def test_exception_if_govuk_pay_errors_when_creating(
         self, govuk_status_code, requests_mock,
     ):
@@ -337,7 +337,7 @@ class TestPaymentGatewaySessionManager:
 
         assert PaymentGatewaySession.objects.count() == 0
 
-    @pytest.mark.parametrize('govuk_status_code', (400, 401, 404, 409, 500))
+    @pytest.mark.parametrize('govuk_status_code', [400, 401, 404, 409, 500])
     def test_exception_if_govuk_pay_errors_when_cancelling(
         self, govuk_status_code, requests_mock,
     ):
@@ -386,7 +386,7 @@ class TestPaymentGatewaySessionManager:
             session 3 - order 1 - status failed
             session 4 - order 2 - status started
             session 5 - order 2 - status success
-            session 6 - order 2 - status cancelled
+            session 6 - order 2 - status cancelled.
 
         the method .ongoing() on the queryset only returns the sessions
         which are considered not finished.

@@ -104,7 +104,7 @@ class CompanyActivityOmisOrderFactory(CompanyActivityBaseFactory):
 
 
 class CompanyActivityIngestedFileFactory(factory.django.DjangoModelFactory):
-    """CompanyActivity ingested file factory
+    """CompanyActivity ingested file factory.
     """
 
     filepath = 'data-flow/exports/ExportGreatContactFormData/20240920T000000.jsonl.gz'
@@ -115,7 +115,7 @@ class CompanyActivityIngestedFileFactory(factory.django.DjangoModelFactory):
 
 
 class GreatExportEnquiryFactory(factory.django.DjangoModelFactory):
-    """Ingested Great Export Enquiry data factory
+    """Ingested Great Export Enquiry data factory.
     """
 
     form_id = factory.Faker('pyint', min_value=0, max_value=999999)

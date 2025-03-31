@@ -37,11 +37,11 @@ class TestUpdateOneListTierAndGlobalAccountManager(APITestMixin):
 
     @pytest.mark.parametrize(
         'permission_codenames',
-        (
+        [
             (),
             (CompanyPermission.change_company,),
             (CompanyPermission.change_one_list_tier_and_global_account_manager,),
-        ),
+        ],
     )
     def test_returns_403_if_without_permission(self, permission_codenames):
         """Test that a 403 is returned if the user does not have all of the required
@@ -57,7 +57,7 @@ class TestUpdateOneListTierAndGlobalAccountManager(APITestMixin):
 
     @pytest.mark.parametrize(
         'company_factory',
-        (
+        [
             pytest.param(
                 lambda: CompanyFactory(one_list_account_owner=None, one_list_tier=None),
                 id='no-existing-global-account-manager',
@@ -69,7 +69,7 @@ class TestUpdateOneListTierAndGlobalAccountManager(APITestMixin):
                 ),
                 id='existing-global-account-manager',
             ),
-        ),
+        ],
     )
     @pytest.mark.django_db
     def test_assigns_one_list_tier_and_account_manager(
@@ -111,11 +111,11 @@ class TestUpdateOneListTierAndGlobalAccountManager(APITestMixin):
         assert versions[0].field_dict['one_list_account_owner_id'] == global_account_manager.id
 
     @pytest.mark.parametrize(
-        'permission_codenames,allowed',
-        (
+        ('permission_codenames', 'allowed'),
+        [
             (None, False),
             (CompanyPermission.change_company, True),
-        ),
+        ],
     )
     @pytest.mark.django_db
     def test_assigns_one_list_tier_by_account_manager(
@@ -194,8 +194,8 @@ class TestUpdateOneListTierAndGlobalAccountManager(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     @pytest.mark.parametrize(
-        'company_factory,adviser_id_fn,new_one_list_tier_id_fn,expected_errors',
-        (
+        ('company_factory', 'adviser_id_fn', 'new_one_list_tier_id_fn', 'expected_errors'),
+        [
             pytest.param(
                 lambda: CompanyFactory(
                     one_list_tier=random_obj_for_model(OneListTier),
@@ -255,7 +255,7 @@ class TestUpdateOneListTierAndGlobalAccountManager(APITestMixin):
                 },
                 id='company-can-only-have-this-one-list-tier-assigned-by-ita',
             ),
-        ),
+        ],
     )
     @pytest.mark.django_db
     def test_validation(
@@ -305,11 +305,11 @@ class TestRemoveCompanyFromOneList(APITestMixin):
 
     @pytest.mark.parametrize(
         'permission_codenames',
-        (
+        [
             (),
             (CompanyPermission.change_company,),
             (CompanyPermission.change_regional_account_manager,),
-        ),
+        ],
     )
     def test_returns_403_if_without_permission(self, permission_codenames):
         """Test that a 403 is returned if the user does not have all of the required
@@ -325,7 +325,7 @@ class TestRemoveCompanyFromOneList(APITestMixin):
 
     @pytest.mark.parametrize(
         'company_factory',
-        (
+        [
             pytest.param(
                 lambda: CompanyFactory(one_list_account_owner=None, one_list_tier=None),
                 id='not-on-one-list',
@@ -337,7 +337,7 @@ class TestRemoveCompanyFromOneList(APITestMixin):
                 ),
                 id='existing-one-list-assignment',
             ),
-        ),
+        ],
     )
     @pytest.mark.django_db
     def test_removes_tier_and_global_account_manager(

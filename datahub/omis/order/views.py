@@ -24,7 +24,7 @@ from datahub.omis.order.serializers import (
 
 
 class OrderViewSet(CoreViewSet):
-    """Order ViewSet"""
+    """Order ViewSet."""
 
     serializer_class = OrderSerializer
     queryset = Order.objects.select_related(
@@ -195,7 +195,7 @@ class AssigneeView(APIView):
 
 class BaseNestedOrderViewSet(CoreViewSet):
     """Base class for nested viewsets with order as parent
-    E.g. /order/<order-id>/<child>
+    E.g. /order/<order-id>/<child>.
     """
 
     serializer_class = None

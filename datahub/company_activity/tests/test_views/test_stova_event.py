@@ -13,7 +13,7 @@ class TestGetStovaEventView(APITestMixin):
     """Get single event view tests."""
 
     def test_stova_event_details_no_permissions(self):
-        """Should return 403"""
+        """Should return 403."""
         stova_event = StovaEventFactory()
         user = create_test_user()
         api_client = self.create_api_client(user=user)

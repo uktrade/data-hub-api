@@ -43,7 +43,7 @@ class ActivityCursorPagination(BasePagination):
         return self.summary
 
     def _replace_query_param(self, url, key, vals):
-        """Replaces all of the values of `key` of the query in `url` with `vals`
+        """Replaces all of the values of `key` of the query in `url` with `vals`.
 
         The DRF version of this function is not used, since it always replaces all of the values of
         `key` with a single value.
@@ -56,7 +56,7 @@ class ActivityCursorPagination(BasePagination):
 
     def paginate_queryset(self, queryset, request, view=None):
         """Returns a page of results based on the cursor query string parameter. Designed to make the
-        last page empty
+        last page empty.
         """
         # Extract cursor from query string. Inclues partial support for DRF's base64-encoded cursor
         # of timestamp + offset, the previous pagination mechanism. This is so that at the time

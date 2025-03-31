@@ -16,13 +16,13 @@ class Command(BaseCommand):
     accordingly.
     Example of executing this command locally:
         python manage.py fix_us_company_address
-        or use the makefile for developers
+        or use the makefile for developers.
     """
 
     help = 'Fix US Company address postcodes for the purpose of setting address areas'
 
     def handle(self, *args, **options):
-        """Resolves Company address issues for the United States
+        """Resolves Company address issues for the United States.
         """
         company_address_resolver = CompanyAddressResolver(
             country_id=Country.united_states.value.id,

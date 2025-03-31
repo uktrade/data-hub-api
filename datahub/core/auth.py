@@ -13,11 +13,11 @@ PAAS_ADDED_X_FORWARDED_FOR_IPS = 2
 
 
 class TeamModelPermissionsBackend(ModelBackend):
-    """Extension of CDMSUserBackend to include a team based permissions for user"""
+    """Extension of CDMSUserBackend to include a team based permissions for user."""
 
     def _get_team_permissions(self, user_obj):
         """This method is called by the ModelBackend _get_permissions() dynamically
-        as part of aggregating user, group and team permissions
+        as part of aggregating user, group and team permissions.
         """
         if user_obj.dit_team and user_obj.dit_team.role:
             groups = user_obj.dit_team.role.groups.all()
@@ -34,7 +34,7 @@ class TeamModelPermissionsBackend(ModelBackend):
 
     def get_all_permissions(self, user_obj, obj=None):
         """Because of using cache in the parent class, its hard to extend using super()
-        so the code is slightly duplicated
+        so the code is slightly duplicated.
         """
         if not user_obj.is_active or user_obj.is_anonymous or obj is not None:
             return set()

@@ -9,13 +9,13 @@ class Command(BaseCommand):
     """Command to complete the order creation process after initial test data added to database
     by adding an assignee to the order and generating the quote.
     Example of executing the command locally:
-        python manage.py add_quote_to_order
+        python manage.py add_quote_to_order.
     """
 
     help = 'Complete order creation process once test data has been added to the database'
 
     def handle(self, *args, **options):
-        """Adds assignee with the hours and making them the lead, and generates the quote"""
+        """Adds assignee with the hours and making them the lead, and generates the quote."""
         user = Advisor.objects.get(email='Ava.Walsh@example.com')
         order = Order.objects.get(pk='59ad99d9-f589-4e5b-bea2-c1b0096671b7')
         serializer = OrderAssigneeSerializer(

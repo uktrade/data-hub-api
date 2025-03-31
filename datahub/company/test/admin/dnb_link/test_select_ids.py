@@ -109,8 +109,8 @@ class TestSelectIDsViewPost(AdminTestMixin):
         assert response['location'] == company_link_confirmation_url
 
     @pytest.mark.parametrize(
-        'data_overrides,expected_error',
-        (
+        ('data_overrides', 'expected_error'),
+        [
             (
                 # No data
                 {
@@ -131,7 +131,7 @@ class TestSelectIDsViewPost(AdminTestMixin):
                 },
                 'Ensure this value has at least 9 characters (it has 1).',
             ),
-        ),
+        ],
     )
     def test_invalid_input_responds_error(self, data_overrides, expected_error):
         """Test that some invalid POST input responds with an expected error in rendered content.

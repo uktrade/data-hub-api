@@ -12,7 +12,7 @@ from datahub.event.test.factories import EventFactory
 
 @pytest.mark.django_db
 def test_event_activity(api_client):
-    """Get a list of Events and test the returned JSON is valid
+    """Get a list of Events and test the returned JSON is valid.
     """
     start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
     with freeze_time(start) as frozen_datetime:

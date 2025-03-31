@@ -39,10 +39,10 @@ class TestAddAdviserFromSSOForm:
 
     @pytest.mark.parametrize(
         'factory_kwargs',
-        (
+        [
             {'sso_email_user_id': FAKE_SSO_USER_DATA['email_user_id']},
             {'email': FAKE_SSO_USER_DATA['email']},
-        ),
+        ],
     )
     def test_validation_fails_when_adviser_already_exists(
         self,

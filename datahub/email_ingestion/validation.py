@@ -10,7 +10,7 @@ ALL_AUTH_METHODS = ('spf', 'dkim', 'dmarc', 'compauth')
 
 
 def _get_auth_headers(message):
-    """When message passes through multiple servers, the authentication_results becomes an array
+    """When message passes through multiple servers, the authentication_results becomes an array.
     """
     authentication_results = message.authentication_results[0] if isinstance(
         message.authentication_results,

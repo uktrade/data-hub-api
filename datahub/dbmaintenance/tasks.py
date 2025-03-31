@@ -179,7 +179,7 @@ def copy_export_countries_to_company_export_country_model(
     status,
     batch_size=5000,
 ):
-    """Task that copies all export countries from Company model to CompanyExportCountry
+    """Task that copies all export countries from Company model to CompanyExportCountry.
     """
     key_switch = {
         'future_interest': 'future_interest_countries',
@@ -205,7 +205,7 @@ def copy_export_countries_to_company_export_country_model(
 @atomic
 def _copy_export_countries(key, status, batch_size):
     """Main logic for copying export companies from Company model to
-    CompanyExportCountry one
+    CompanyExportCountry one.
     """
     export_countries = _get_company_countries(key, status, batch_size)
     num_updated = _copy_company_countries(

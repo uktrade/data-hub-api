@@ -40,7 +40,7 @@ LABOUR = GVAMultiplier.SectorClassificationChoices.LABOUR
 
 @pytest.fixture
 def get_gva_multiplier():
-    """Get a GVA Multiplier for the year 3010"""
+    """Get a GVA Multiplier for the year 3010."""
     return GVAMultiplierFactory(
         multiplier=DEFAULT_MULTIPLIER,
         financial_year=3010,
@@ -97,7 +97,7 @@ class TestGVAMultiplierAdmin(AdminTestMixin):
 
     @pytest.mark.parametrize(
         'data',
-        (
+        [
             {
                 'multiplier': ALTERNATE_MULTIPLIER,
             },
@@ -131,7 +131,7 @@ class TestGVAMultiplierAdmin(AdminTestMixin):
             {
                 'fdi_sic_grouping': ALTERNATE_FDI_SIC_GROUPING_ID,
             },
-        ),
+        ],
     )
     def test_updating_gva_multiplier_not_allowed(self, get_gva_multiplier, data):
         """Test updating GVA multiplier not allowed."""

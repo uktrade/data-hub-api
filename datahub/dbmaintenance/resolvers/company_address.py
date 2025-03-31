@@ -12,7 +12,7 @@ logger = getLogger(__name__)
 
 
 class CompanyAddressResolver:
-    """Command for resolving company address postcode and areas
+    """Command for resolving company address postcode and areas.
     """
 
     def __init__(
@@ -29,7 +29,7 @@ class CompanyAddressResolver:
         :param zip_states: This is a unique list of postcode prefixes or
         identifiers facilitating area mapping
         :param postcode_replacement: Regex patterns to regulate postcode
-        replacement
+        replacement.
         """
         self.country_id = country_id
         self.revision_comment = revision_comment
@@ -39,7 +39,7 @@ class CompanyAddressResolver:
     def get_companies_with_no_areas(self):
         """Companies with no areas and country
         or no registered areas and registered country
-        and not archived with a duns value to guarantee the quality of the data
+        and not archived with a duns value to guarantee the quality of the data.
         """
         result = Company.objects.filter(
             Q(
@@ -62,7 +62,7 @@ class CompanyAddressResolver:
     def update_registered_address_area(self, area_code, company):
         """Update registered address area with administrative area
         :param area_code: Area code value
-        :param company: Company data
+        :param company: Company data.
         """
         if area_code and self.is_valid_postcode_format(company.registered_address_postcode):
             administrative_area = self.get_administrative_area_by_code(area_code)
@@ -75,7 +75,7 @@ class CompanyAddressResolver:
 
     def fix_address_postcode(self, company):
         """Fix address postcode formatting the postcode into an expected format if possible
-        :param company: Company record
+        :param company: Company record.
         """
         if is_not_blank(company.address_postcode):
             log_message = f'Updating address postcode from "{company.address_postcode}"'
@@ -86,7 +86,7 @@ class CompanyAddressResolver:
         return False
 
     def fix_postcodes_and_areas(self):
-        """Does update on the postcode address table
+        """Does update on the postcode address table.
         """
         for company in self.get_companies_with_no_areas():
             if self.fix_address_postcode(company):
@@ -106,7 +106,7 @@ class CompanyAddressResolver:
     def update_address_area(self, area_code, company):
         """Update address area with administrative area
         :param area_code: Area code value
-        :param company: Company data
+        :param company: Company data.
         """
         if area_code and self.is_valid_postcode_format(company.address_postcode):
             administrative_area = self.get_administrative_area_by_code(area_code)
@@ -117,7 +117,7 @@ class CompanyAddressResolver:
     def get_area_code(self, post_code):
         """Get area code from a postcode
         :param post_code: Post Code from an address
-        :return: An area code based on the format states list
+        :return: An area code based on the format states list.
         """
         if is_not_blank(post_code):
             for zip_prefix, area_code, _area_name in self.zip_states:
@@ -128,7 +128,7 @@ class CompanyAddressResolver:
     def format_postcode(self, postcode):
         """Format postcode with postcode pattern for united states
         :param postcode: Postcode string value
-        :return: Formatted US postcode value
+        :return: Formatted US postcode value.
         """
         return re.sub(
             self.postcode_replacement.postcode_pattern,
@@ -141,13 +141,13 @@ class CompanyAddressResolver:
     def is_valid_postcode_format(self, postcode):
         """Validates the postcode is valid based one the postcode replacement regex
         :param postcode: Address Postcode
-        :return: True if valid, False if Invalid
+        :return: True if valid, False if Invalid.
         """
         return re.fullmatch(self.postcode_replacement.postcode_pattern, postcode, re.MULTILINE)
 
     def fix_registered_address_postcode(self, company):
         """Fix registered address postcode formatting the postcode into an expected format if possible
-        :param company: company record
+        :param company: company record.
         """
         if is_not_blank(company.registered_address_postcode):
             log_message = (
@@ -167,7 +167,7 @@ class CompanyAddressResolver:
     def get_administrative_area_by_code(self, area_code):
         """Gets United States Administrative Area by Area Code
         :param area_code: Unique ISO administrative area code
-        :return: First Administrative Area Found
+        :return: First Administrative Area Found.
         """
         return AdministrativeArea.objects.filter(
             country_id=self.country_id,

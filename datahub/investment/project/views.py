@@ -37,7 +37,7 @@ _team_member_queryset = InvestmentProjectTeamMember.objects.select_related('advi
 
 
 class InvestmentFilter(FilterSet):
-    """Investment project filter that allows autocomplete"""
+    """Investment project filter that allows autocomplete."""
 
     autocomplete = AutocompleteFilter(
         search_fields=('name',),
@@ -156,7 +156,7 @@ class IProjectViewSet(ArchivableViewSetMixin, CoreViewSet):
         schema=StubSchema(),
     )
     def change_stage(self, request, *args, **kwargs):
-        """Change the stage of an investment project"""
+        """Change the stage of an investment project."""
         instance = self.get_object()
         serializer = IProjectChangeStageSerializer(
             instance,

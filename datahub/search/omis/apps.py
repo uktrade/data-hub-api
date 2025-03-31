@@ -13,7 +13,7 @@ from datahub.search.omis.models import Order
 
 
 class OrderSearchApp(SearchApp):
-    """SearchApp for order"""
+    """SearchApp for order."""
 
     name = 'order'
     search_model = Order

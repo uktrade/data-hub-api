@@ -15,7 +15,7 @@ class CompaniesDatasetView(BaseFilterDatasetView):
     """
 
     def get_dataset(self, request):
-        """Returns list of Company records"""
+        """Returns list of Company records."""
         queryset = Company.objects.annotate(
             sector_name=get_sector_name_subquery('sector'),
             one_list_core_team_advisers=ArrayAgg('one_list_core_team_members__adviser_id'),

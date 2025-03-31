@@ -22,7 +22,7 @@ class TestBaseCSVImportForm:
         form = ExampleCSVImportForm()
         assert form.fields['csv_file'].label == form.csv_file_field_label
 
-    @pytest.mark.parametrize('encoding', ('windows-1252', 'utf-8', 'utf-8-sig'))
+    @pytest.mark.parametrize('encoding', ['windows-1252', 'utf-8', 'utf-8-sig'])
     def test_valid_file_is_loaded(self, encoding):
         """Test that the form validates with a valid file and reads its data."""
         csv_contents = """data\r
@@ -42,7 +42,7 @@ row2é\r
                 {'data': 'row2é'},
             ]
 
-    @pytest.mark.parametrize('filename', ('noext', 'file.blah', 'test.test', 'test.csv.docx'))
+    @pytest.mark.parametrize('filename', ['noext', 'file.blah', 'test.test', 'test.csv.docx'])
     def test_does_not_allow_invalid_file_extensions(self, filename):
         """Test that the form rejects various invalid file extensions."""
         file = SimpleUploadedFile(filename, b'test')
@@ -73,13 +73,13 @@ row2é\r
 
     @pytest.mark.parametrize(
         'file_contents',
-        (
+        [
             b'test\xc3\x28\r\nrow',
             b"""email\r
 test1@datahub\r
 \xc3\x28
 """,
-        ),
+        ],
     )
     def test_does_not_allow_files_with_invalid_utf8(self, file_contents):
         """Test that the form rejects a CSV file with invalid UTF-8."""

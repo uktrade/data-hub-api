@@ -12,8 +12,8 @@ pytestmark = pytest.mark.django_db
 class TestLegacyIdMigrations():
 
     @pytest.mark.parametrize(
-        'factory,model',
-        (
+        ('factory', 'model'),
+        [
             (
                 WinAdviserFactory,
                 'WinAdviser',
@@ -22,7 +22,7 @@ class TestLegacyIdMigrations():
                 BreakdownFactory,
                 'Breakdown',
             ),
-        ),
+        ],
     )
     def test_legacy_id_forwards_func(self, factory, model):
         module = import_module('datahub.export_win.legacy_id_utils')

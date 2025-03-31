@@ -154,7 +154,7 @@ class TestAssigneesFilledInSubValidator:
 class TestOrderDetailsFilledInSubValidator:
     """Tests for the OrderDetailsFilledInSubValidator."""
 
-    @pytest.mark.parametrize('values_as_data', (True, False))
+    @pytest.mark.parametrize('values_as_data', [True, False])
     def test_incomplete_order(self, values_as_data):
         """Test that an incomplete order doesn't pass the validation.
 
@@ -192,7 +192,7 @@ class TestOrderDetailsFilledInSubValidator:
             'assignees': ['You need to add at least one assignee.'],
         }
 
-    @pytest.mark.parametrize('values_as_data', (True, False))
+    @pytest.mark.parametrize('values_as_data', [True, False])
     def test_complete_order(self, values_as_data):
         """Test that a complete order passes the validation.
 
@@ -355,10 +355,10 @@ class TestOrderInStatusValidator:
 
     @pytest.mark.parametrize(
         'serializer_factory',
-        (
+        [
             lambda order: mock.Mock(instance=order, context={}),
             lambda order: mock.Mock(context={'order': order}),
-        ),
+        ],
     )
     def test_validation_passes(self, serializer_factory):
         """Test that the validation passes if order.status is one of the allowed statuses.
@@ -381,10 +381,10 @@ class TestOrderInStatusValidator:
 
     @pytest.mark.parametrize(
         'serializer_factory',
-        (
+        [
             lambda order: mock.Mock(instance=order, context={}),
             lambda order: mock.Mock(context={'order': order}),
-        ),
+        ],
     )
     def test_validation_fails(self, serializer_factory):
         """Test that the validation fails if order.status is NOT one of the allowed statuses.
@@ -425,7 +425,7 @@ class TestOrderInStatusValidator:
 class TestVATSubValidator:
     """Tests for the VATSubValidator."""
 
-    @pytest.mark.parametrize('values_as_data', (True, False))
+    @pytest.mark.parametrize('values_as_data', [True, False])
     def test_nothing_specified_fails(self, values_as_data):
         """Test that if none of the vat fields are specified, it raises a ValidationError.
 
@@ -448,7 +448,7 @@ class TestVATSubValidator:
             validator(data=data, order=order)
         assert exc.value.detail == {'vat_status': ['This field is required.']}
 
-    @pytest.mark.parametrize('values_as_data', (True, False))
+    @pytest.mark.parametrize('values_as_data', [True, False])
     def test_only_status_eu_specified_fails(self, values_as_data):
         """Test that if only vat_status = eu is specified, it raises a ValidationError
         as vat_verified (true or false) has to be specified as well.
@@ -472,7 +472,7 @@ class TestVATSubValidator:
             validator(data=data, order=order)
         assert exc.value.detail == {'vat_verified': ['This field is required.']}
 
-    @pytest.mark.parametrize('values_as_data', (True, False))
+    @pytest.mark.parametrize('values_as_data', [True, False])
     def test_only_status_eu_verified_true_specified_fails(self, values_as_data):
         """Test that if vat_status = eu and vat_verified = True but vat_number is not specified,
         it raises a ValidationError.
@@ -496,7 +496,7 @@ class TestVATSubValidator:
             validator(data=data, order=order)
         assert exc.value.detail == {'vat_number': ['This field is required.']}
 
-    @pytest.mark.parametrize('values_as_data', (True, False))
+    @pytest.mark.parametrize('values_as_data', [True, False])
     def test_complete_verified_eu_vat_succeeds(self, values_as_data):
         """Test that if vat_status = eu, vat_verified = True and vat_number is specified,
         the validation passes.
@@ -521,7 +521,7 @@ class TestVATSubValidator:
         except Exception:
             pytest.fail('Should not raise a validator error.')
 
-    @pytest.mark.parametrize('values_as_data', (True, False))
+    @pytest.mark.parametrize('values_as_data', [True, False])
     def test_only_status_eu_verified_false_specified_succeeds(self, values_as_data):
         """Test that if vat_status = eu, vat_verified = False and vat_number is not specified,
         the validation passes and vat_number is not required when vat_verified is False.
@@ -546,8 +546,8 @@ class TestVATSubValidator:
         except Exception:
             pytest.fail('Should not raise a validator error.')
 
-    @pytest.mark.parametrize('values_as_data', (True, False))
-    @pytest.mark.parametrize('vat_status', (VATStatus.OUTSIDE_EU, VATStatus.UK))
+    @pytest.mark.parametrize('values_as_data', [True, False])
+    @pytest.mark.parametrize('vat_status', [VATStatus.OUTSIDE_EU, VATStatus.UK])
     def test_only_status_non_eu_succeeds(self, values_as_data, vat_status):
         """Test that if vat_status != eu, the validation passes even if the other
         fields are empty.
@@ -614,8 +614,8 @@ class TestCancellableOrderSubValidator:
     """Tests for the CancellableOrderSubValidator."""
 
     @pytest.mark.parametrize(
-        'order_status,force,should_pass',
-        (
+        ('order_status', 'force', 'should_pass'),
+        [
             # with force=False
             (OrderStatus.DRAFT, False, True),
             (OrderStatus.QUOTE_AWAITING_ACCEPTANCE, False, True),
@@ -631,7 +631,7 @@ class TestCancellableOrderSubValidator:
             (OrderStatus.PAID, True, True),
             (OrderStatus.COMPLETE, True, False),
             (OrderStatus.CANCELLED, True, False),
-        ),
+        ],
     )
     def test_validation(self, order_status, force, should_pass):
         """Test the validator with different order status and force values."""
@@ -647,11 +647,11 @@ class TestCancellableOrderSubValidator:
 
 
 @pytest.mark.parametrize(
-    'order_status,expected_status,res',
-    (
+    ('order_status', 'expected_status', 'res'),
+    [
         (OrderStatus.DRAFT, OrderStatus.DRAFT, True),
         (OrderStatus.DRAFT, OrderStatus.PAID, False),
-    ),
+    ],
 )
 def test_order_in_status_rule(order_status, expected_status, res):
     """Tests for OrderInStatusRule."""
@@ -667,8 +667,8 @@ class TestOrderEditableFieldsValidator:
     """Tests for the OrderEditableFieldsValidator."""
 
     @pytest.mark.parametrize(
-        'order_status,mapping,data,should_pass',
-        (
+        ('order_status', 'mapping', 'data', 'should_pass'),
+        [
             # allowed field => OK
             (
                 OrderStatus.DRAFT,
@@ -704,7 +704,7 @@ class TestOrderEditableFieldsValidator:
                 {'description': 'lorem ipsum'},
                 False,
             ),
-        ),
+        ],
     )
     def test_validation_with_order(self, order_status, mapping, data, should_pass):
         """Test the validator with different order status, mapping and data."""

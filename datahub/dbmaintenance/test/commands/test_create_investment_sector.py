@@ -14,7 +14,7 @@ pytestmark = pytest.mark.django_db
 
 
 def test_happy_path(s3_stubber):
-    """Test that command creates specified investment sectors"""
+    """Test that command creates specified investment sectors."""
     sectors = SectorFactory.create_batch(
         3,
         segment=factory.Iterator(['sector1', 'sector2', 'sector3']),
@@ -186,7 +186,7 @@ def test_non_existent_fdi_sic_grouping(s3_stubber, caplog):
 
 def test_entry_already_exists_for_sector(s3_stubber, caplog):
     """Test that the command ignores records for with sector_ids that already
-    exist in the InvestmentSector table
+    exist in the InvestmentSector table.
     """
     caplog.set_level('ERROR')
 

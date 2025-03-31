@@ -69,8 +69,10 @@ class TestAuditLog:
         versions = [{'id': 0}, {'id': 1}, {'id': 2}]
         pairs = AuditLog.get_version_pairs(versions)
         assert len(pairs) == 2
-        assert pairs[0][0]['id'] == 0 and pairs[0][1]['id'] == 1
-        assert pairs[1][0]['id'] == 1 and pairs[1][1]['id'] == 2
+        assert pairs[0][0]['id'] == 0
+        assert pairs[0][1]['id'] == 1
+        assert pairs[1][0]['id'] == 1
+        assert pairs[1][1]['id'] == 2
 
     def test_get_user_representation_with_no_user(self):
         result = AuditLog._get_user_representation(None)
@@ -149,7 +151,7 @@ class TestAuditLog:
         assert changelog[0]['extra'] == 'info-1'
 
     @pytest.mark.parametrize(
-        'num_versions,expected_entries',
+        ('num_versions', 'expected_entries'),
         [
             (0, []),  # No versions
             (1, []),  # Single version (no changes)

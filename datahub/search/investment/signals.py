@@ -32,7 +32,7 @@ def investment_project_sync_search(instance):
 
 
 def remove_investment_project_from_opensearch(instance):
-    """Remove task from es"""
+    """Remove task from es."""
     transaction.on_commit(
         lambda pk=instance.pk: delete_document(SearchInvestmentProject, pk),
     )

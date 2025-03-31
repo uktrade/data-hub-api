@@ -9,8 +9,8 @@ pytestmark = pytest.mark.django_db
 
 
 @pytest.mark.parametrize(
-    'email, domain',
-    (
+    ('email', 'domain'),
+    [
         ('adviser@dit.gov.uk', 'dit.gov.uk'),
         # Emails can have @ if in quotes
         ('"adviser@dit"@dit.gov.uk', 'dit.gov.uk'),
@@ -21,7 +21,7 @@ pytestmark = pytest.mark.django_db
         ('adviser@DIT.GOV.UK', 'dit.gov.uk'),
         # Invalid email
         ('adviser', None),
-    ),
+    ],
 )
 def test_get_email_domain(email, domain, db):
     """Test that the `Adviser.get_email_domain` method
@@ -33,10 +33,10 @@ def test_get_email_domain(email, domain, db):
 
 @pytest.mark.parametrize(
     'sso_email_user_id',
-    (
+    [
         'test@dit.gov.uk',
         None,
-    ),
+    ],
 )
 def test_adviser_sso_email_user_id_can_store_email_or_none(sso_email_user_id):
     """Test that SSO email user ID can store email or None."""

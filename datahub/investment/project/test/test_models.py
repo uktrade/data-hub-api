@@ -114,12 +114,12 @@ def test_project_assurance_team_valid():
 
 @pytest.mark.parametrize(
     'field',
-    (
+    [
         'client_relationship_manager',
         'project_assurance_adviser',
         'project_manager',
         'created_by',
-    ),
+    ],
 )
 def test_associated_advisers_specific_roles(field):
     """Tests that get_associated_advisers() includes advisers in specific roles."""

@@ -32,7 +32,7 @@ pytestmark = pytest.mark.django_db
 
 
 def search_investment_project_by_id(pk):
-    """Search for an investment project with the given id"""
+    """Search for an investment project with the given id."""
     return get_search_by_entities_query(
         [InvestmentProject],
         term='',
@@ -96,7 +96,7 @@ def test_investment_project_auto_updates_to_opensearch(opensearch_with_signals):
 
 def test_investment_project_delete_from_opensearch(opensearch_with_signals):
     """Test that when an investment project is deleted from the db it also
-    calls delete document to delete from OpenSearch
+    calls delete document to delete from OpenSearch.
     """
     project = InvestmentProjectFactory()
 
@@ -111,7 +111,7 @@ def test_investment_project_delete_from_opensearch(opensearch_with_signals):
 
 @pytest.fixture
 def team_member():
-    """Team member fixture"""
+    """Team member fixture."""
     return InvestmentProjectTeamMemberFactory(role='Co-ordinator')
 
 
@@ -180,12 +180,12 @@ def test_investment_project_team_member_deleted_sync_to_opensearch(
 
 @pytest.mark.parametrize(
     'field',
-    (
+    [
         'created_by',
         'client_relationship_manager',
         'project_manager',
         'project_assurance_adviser',
-    ),
+    ],
 )
 def test_investment_project_syncs_when_adviser_changes(
     opensearch_with_signals,
@@ -421,14 +421,14 @@ def test_incomplete_fields_syncs_when_project_changes(opensearch_with_signals):
 
 
 @pytest.mark.parametrize(
-    'field,get_field_values',
-    (
+    ('field', 'get_field_values'),
+    [
         ('competitor_countries', lambda: Country.objects.all()[:3]),
         ('uk_region_locations', lambda: UKRegion.objects.all()[:3]),
         ('actual_uk_regions', lambda: UKRegion.objects.all()[:2]),
         ('delivery_partners', lambda: InvestmentDeliveryPartner.objects.all()[:2]),
         ('strategic_drivers', lambda: InvestmentStrategicDriver.objects.all()[:1]),
-    ),
+    ],
 )
 def test_incomplete_fields_syncs_when_m2m_changes(
     opensearch_with_signals,

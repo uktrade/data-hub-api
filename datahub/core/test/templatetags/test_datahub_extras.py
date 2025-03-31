@@ -38,12 +38,12 @@ class TestAdminChangeLink:
 
 
 @pytest.mark.parametrize(
-    'count,expected_result',
-    (
+    ('count', 'expected_result'),
+    [
         (0, 'plural'),
         (1, 'singular'),
         (2, 'plural'),
-    ),
+    ],
 )
 def test_verbose_name_for_count(count, expected_result):
     """Test that verbose_name_for_count() returns the correct verbose name form for various counts.

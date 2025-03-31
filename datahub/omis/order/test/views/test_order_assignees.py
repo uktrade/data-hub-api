@@ -162,7 +162,7 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
                     "estimated_time": 250,
                     "is_lead": false
                 },
-            ]
+            ].
 
         if I pass the following data:
             [
@@ -296,7 +296,7 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
                     "estimated_time": 250,
                     "is_lead": false
                 },
-            ]
+            ].
 
         if I pass the following data with force_delete True:
             [
@@ -366,7 +366,7 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
                     "estimated_time": 250,
                     "is_lead": false
                 },
-            ]
+            ].
 
         if I pass the following data:
             [
@@ -434,7 +434,7 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
                     "estimated_time": 250,
                     "is_lead": false
                 },
-            ]
+            ].
 
         if I pass the following data:
             [
@@ -620,10 +620,10 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
         assert response.json() == {'non_field_errors': ['Only one lead allowed.']}
 
     @pytest.mark.parametrize(
-        'disallowed_status', (
+        'disallowed_status', [
             OrderStatus.COMPLETE,
             OrderStatus.CANCELLED,
-        ),
+        ],
     )
     def test_409_if_order_not_in_allowed_status(self, disallowed_status):
         """Test that if the order is not in one of the allowed statuses, the endpoint
@@ -674,7 +674,7 @@ class TestChangeAssigneesWhenOrderInPaid(APITestMixin):
                     "estimated_time": 250,
                     "is_lead": false
                 },
-            ]
+            ].
 
         if I pass the following data:
             [
@@ -721,7 +721,7 @@ class TestChangeAssigneesWhenOrderInPaid(APITestMixin):
                     "estimated_time": 250,
                     "is_lead": false
                 },
-            ]
+            ].
 
         if I pass the following data with force_delete == True
             [
@@ -770,7 +770,7 @@ class TestChangeAssigneesWhenOrderInPaid(APITestMixin):
                     "estimated_time": 250,
                     "is_lead": false
                 },
-            ]
+            ].
 
         if I pass the following data:
             [
@@ -829,10 +829,10 @@ class TestChangeAssigneesWhenOrderInPaid(APITestMixin):
 
     @pytest.mark.parametrize(
         'data',
-        (
+        [
             {'estimated_time': 100},
             {'is_lead': True},
-        ),
+        ],
     )
     def test_400_if_readonly_fields_changed(self, data):
         """Test that estimated_time and is_lead cannot be set at this stage.
@@ -865,10 +865,10 @@ class TestChangeAssigneesWhenOrderInPaid(APITestMixin):
 
     @pytest.mark.parametrize(
         'data',
-        (
+        [
             {'estimated_time': 100},
             {'is_lead': True},
-        ),
+        ],
     )
     def test_400_if_assignee_added_with_extra_field(self, data):
         """Test that estimated_time and is_lead cannot be set at this stage
@@ -913,10 +913,10 @@ class TestChangeAssigneesWhenOrderInOtherAllowedStatuses(APITestMixin):
     """
 
     @pytest.mark.parametrize(
-        'order_status', (
+        'order_status', [
             OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
             OrderStatus.QUOTE_ACCEPTED,
-        ),
+        ],
     )
     def test_ok_if_assignee_added(self, order_status):
         """Test that an assignee can be added.
@@ -932,7 +932,7 @@ class TestChangeAssigneesWhenOrderInOtherAllowedStatuses(APITestMixin):
                     "estimated_time": 250,
                     "is_lead": false
                 },
-            ]
+            ].
 
         if I pass the following data:
             [
@@ -964,10 +964,10 @@ class TestChangeAssigneesWhenOrderInOtherAllowedStatuses(APITestMixin):
         assert str(new_adviser.id) in [item['adviser']['id'] for item in response.json()]
 
     @pytest.mark.parametrize(
-        'order_status', (
+        'order_status', [
             OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
             OrderStatus.QUOTE_ACCEPTED,
-        ),
+        ],
     )
     def test_400_if_assignee_deleted(self, order_status):
         """Test that assignees cannot be deleted.
@@ -983,7 +983,7 @@ class TestChangeAssigneesWhenOrderInOtherAllowedStatuses(APITestMixin):
                     "estimated_time": 250,
                     "is_lead": false
                 },
-            ]
+            ].
 
         if I pass the following data with force_delete == True
             [
@@ -1019,17 +1019,17 @@ class TestChangeAssigneesWhenOrderInOtherAllowedStatuses(APITestMixin):
         }
 
     @pytest.mark.parametrize(
-        'order_status', (
+        'order_status', [
             OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
             OrderStatus.QUOTE_ACCEPTED,
-        ),
+        ],
     )
     @pytest.mark.parametrize(
-        'data', (
+        'data', [
             {'estimated_time': 100},
             {'actual_time': 100},
             {'is_lead': True},
-        ),
+        ],
     )
     def test_400_if_readonly_fields_changed(self, order_status, data):
         """Test that estimated_time, actual_time and is_lead cannot be set
@@ -1062,17 +1062,17 @@ class TestChangeAssigneesWhenOrderInOtherAllowedStatuses(APITestMixin):
         ]
 
     @pytest.mark.parametrize(
-        'order_status', (
+        'order_status', [
             OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
             OrderStatus.QUOTE_ACCEPTED,
-        ),
+        ],
     )
     @pytest.mark.parametrize(
-        'data', (
+        'data', [
             {'estimated_time': 100},
             {'actual_time': 100},
             {'is_lead': True},
-        ),
+        ],
     )
     def test_400_if_assignee_added_with_extra_field(self, order_status, data):
         """Test that estimated_time, actual_time and is_lead cannot be set

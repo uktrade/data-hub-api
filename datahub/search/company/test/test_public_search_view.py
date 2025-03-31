@@ -203,8 +203,8 @@ class TestPublicCompanySearch:
         assert 'Server-Authorization' in response
 
     @pytest.mark.parametrize(
-        'filters,expected_companies',
-        (
+        ('filters', 'expected_companies'),
+        [
             # no filter
             (
                 {},
@@ -224,7 +224,7 @@ class TestPublicCompanySearch:
                 },
                 ['abc defg ltd', 'abc defg us ltd'],
             ),
-        ),
+        ],
     )
     def test_filters(self, public_company_api_client, setup_data, filters, expected_companies):
         """Tests different filters."""
@@ -238,8 +238,8 @@ class TestPublicCompanySearch:
         assert Counter(actual_names) == Counter(expected_companies)
 
     @pytest.mark.parametrize(
-        'name_term,matched_company_name',
-        (
+        ('name_term', 'matched_company_name'),
+        [
             # name
             ('whiskers', 'whiskers and tabby'),
             ('whi', 'whiskers and tabby'),
@@ -260,7 +260,7 @@ class TestPublicCompanySearch:
             ('tiger', None),
             ('panda', None),
             ('moine', None),
-        ),
+        ],
     )
     def test_composite_name_filter(
         self,

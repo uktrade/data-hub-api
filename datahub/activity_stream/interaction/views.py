@@ -12,7 +12,7 @@ class InteractionCursorPagination(ActivityCursorPagination):
 
 
 class InteractionActivityViewSet(ActivityViewSet):
-    """Interaction ViewSet for the activity stream
+    """Interaction ViewSet for the activity stream.
     """
 
     pagination_class = InteractionCursorPagination

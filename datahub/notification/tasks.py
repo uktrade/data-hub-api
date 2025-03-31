@@ -38,7 +38,7 @@ def send_email_notification(
 ):
     """Call the notify API to send a templated email notification
     to an email address.
-    To schedule with RQ call schedule_send_email_notification(...)
+    To schedule with RQ call schedule_send_email_notification(...).
     """
     try:
         response = notify_gateway.send_email_notification(

@@ -51,7 +51,7 @@ class InteractionActivitySerializer(ActivitySerializer):
 
     def to_representation(self, instance):
         """Serialize the interaction as per Activity Stream spec:
-        https://www.w3.org/TR/activitystreams-core/
+        https://www.w3.org/TR/activitystreams-core/.
         """
         interaction_id = f'dit:DataHubInteraction:{instance.pk}'
         interaction = {

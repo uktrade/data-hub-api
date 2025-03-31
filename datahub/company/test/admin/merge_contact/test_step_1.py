@@ -60,7 +60,7 @@ class TestMergeWithAnotherContactViewGet(AdminTestMixin):
 
     @pytest.mark.parametrize(
         'data',
-        (
+        [
             {},
             {
                 'contact_1': '',
@@ -68,7 +68,7 @@ class TestMergeWithAnotherContactViewGet(AdminTestMixin):
             {
                 'contact_1': '12345',
             },
-        ),
+        ],
     )
     def test_returns_400_if_invalid_contact_passed(self, data):
         """Test that a 400 is returned when an invalid value is passed in the query string.
@@ -142,8 +142,8 @@ class TestMergeWithAnotherCompanyViewPost(AdminTestMixin):
         assert response.redirect_chain[0][0] == select_primary_url
 
     @pytest.mark.parametrize(
-        'contact_2,expected_error',
-        (
+        ('contact_2', 'expected_error'),
+        [
             (
                 SAME_CONTACT,
                 'The two contacts to merge cannot be the same. Please select a different '
@@ -157,7 +157,7 @@ class TestMergeWithAnotherCompanyViewPost(AdminTestMixin):
                 '',
                 'This field is required.',
             ),
-        ),
+        ],
     )
     def test_error_if_invalid_contact_selected(self, contact_2, expected_error):
         """Test that an error is displayed if the an invalid contact is selected."""

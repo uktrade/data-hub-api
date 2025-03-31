@@ -46,11 +46,11 @@ class TestAutomaticCompanyArchive:
         ]
 
     @pytest.mark.parametrize(
-        'lock_acquired, call_count',
-        (
+        ('lock_acquired', 'call_count'),
+        [
             (False, 0),
             (True, 1),
-        ),
+        ],
     )
     def test_lock(
         self,
@@ -78,10 +78,10 @@ class TestAutomaticCompanyArchive:
 
     @pytest.mark.parametrize(
         'simulate',
-        (
+        [
             True,
             False,
-        ),
+        ],
     )
     @freeze_time('2020-01-01-12:00:00')
     def test_no_interactions(
@@ -114,12 +114,12 @@ class TestAutomaticCompanyArchive:
             ]
 
     @pytest.mark.parametrize(
-        'interaction_date_delta, expected_archived',
-        (
+        ('interaction_date_delta', 'expected_archived'),
+        [
             (relativedelta(), False),
             (relativedelta(years=5), False),
             (relativedelta(years=5, days=1), True),
-        ),
+        ],
     )
     @freeze_time('2020-01-01-12:00:00')
     def test_interactions(
@@ -143,12 +143,12 @@ class TestAutomaticCompanyArchive:
         assert company.archived == expected_archived
 
     @pytest.mark.parametrize(
-        'created_on_delta, expected_archived',
-        (
+        ('created_on_delta', 'expected_archived'),
+        [
             (relativedelta(), False),
             (relativedelta(months=3), False),
             (relativedelta(months=3, days=1), True),
-        ),
+        ],
     )
     @freeze_time('2020-01-01-12:00:00')
     def test_created_on(
@@ -172,8 +172,8 @@ class TestAutomaticCompanyArchive:
         assert company.archived == expected_archived
 
     @pytest.mark.parametrize(
-        'created_on_delta, companies_to_create, expected_message',
-        (
+        ('created_on_delta', 'companies_to_create', 'expected_message'),
+        [
             (
                 relativedelta(),
                 1,
@@ -189,7 +189,7 @@ class TestAutomaticCompanyArchive:
                 3,
                 'datahub.company.tasks.automatic_company_archive archived: 3',
             ),
-        ),
+        ],
     )
     @freeze_time('2020-01-01-12:00:00')
     def test_realtime_messages_sent(
@@ -222,12 +222,12 @@ class TestAutomaticCompanyArchive:
         mock_send_realtime_message.assert_called_once_with(expected_message)
 
     @pytest.mark.parametrize(
-        'modified_on_delta, expected_archived',
-        (
+        ('modified_on_delta', 'expected_archived'),
+        [
             (relativedelta(), False),
             (relativedelta(months=3), False),
             (relativedelta(months=3, days=1), True),
-        ),
+        ],
     )
     @freeze_time('2020-01-01-12:00:00')
     def test_modified_on(
@@ -316,8 +316,8 @@ class TestAutomaticCompanyArchive:
         assert archived_companies_count == 1
 
     @pytest.mark.parametrize(
-        'investment_projects_status, expected_archived',
-        (
+        ('investment_projects_status', 'expected_archived'),
+        [
             (
                 [InvestmentProject.Status.LOST],
                 True,
@@ -334,7 +334,7 @@ class TestAutomaticCompanyArchive:
                 [],
                 True,
             ),
-        ),
+        ],
     )
     @freeze_time('2020-01-01-12:00:00')
     def test_investment_projects(
@@ -363,7 +363,7 @@ class TestAutomaticCompanyArchive:
         automatic_company_archive_feature_flag,
     ):
         """Test companies that share an global_ultimate_duns_number
-        are not archived if any of them are active
+        are not archived if any of them are active.
         """
         gt_3m_ago = timezone.now() - relativedelta(months=3, days=1)
         global_ultimate_duns_number = '123456789'
@@ -390,7 +390,7 @@ class TestAutomaticCompanyArchive:
         automatic_company_archive_feature_flag,
     ):
         """Test companies that share an global_ultimate_duns_number
-        can be archived if none of them are active
+        can be archived if none of them are active.
         """
         gt_3m_ago = timezone.now() - relativedelta(months=3, days=1)
         global_ultimate_duns_number = '123456789'

@@ -69,7 +69,7 @@ def join_truthy_strings(*args, sep=' '):
 
 
 def upper_snake_case_to_sentence_case(strings, glue=' '):
-    """Formats string or strings from UPPER_SNAKE_CASE to Sentence case
+    """Formats string or strings from UPPER_SNAKE_CASE to Sentence case.
     """
     if isinstance(strings, str):
         strings = [strings]
@@ -78,7 +78,7 @@ def upper_snake_case_to_sentence_case(strings, glue=' '):
 
 def format_currency(value, symbol='£'):
     """Formats currency according to Gov UK style guide
-    value: (str, int, float)
+    value: (str, int, float).
 
     https://www.gov.uk/guidance/style-guide/a-to-z#money and others
     """
@@ -112,7 +112,7 @@ def format_currency(value, symbol='£'):
 
 def format_currency_range(values, separator=' to ', symbol='£'):
     """Formats a range of ammounts according to Gov UK style guide
-    values: [(str, float, int), ...]
+    values: [(str, float, int), ...].
     """
     return separator.join(list(map(lambda value: format_currency(value, symbol=symbol), values)))
 
@@ -135,7 +135,7 @@ def format_currency_range_string(
         E.g. '100+' will return 'More than 100'
     smart_more_or_less: (boolean) when true and more_or_less is set it will add one to any
         upper range ending on a 9.
-        E.g. '0 - 9999' will return 'Less than 1000'
+        E.g. '0 - 9999' will return 'Less than 1000'.
     """
     try:
         prefix = ''

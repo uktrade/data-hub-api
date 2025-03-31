@@ -12,7 +12,7 @@ from datahub.search.test.utils import create_mock_search_app
 
 
 class TestResyncAfterMigrate:
-    """Tests for resync_after_migrate()"""
+    """Tests for resync_after_migrate()."""
 
     def test_normal_resync(self, monkeypatch, mock_opensearch_client):
         """Test that resync_after_migrate() resyncs the app, updates the read alias and deletes the

@@ -12,7 +12,7 @@ DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
 
 
 def stova_event_identification_task() -> None:
-    """Identifies the most recent file to be ingested and schedules a task to ingest it"""
+    """Identifies the most recent file to be ingested and schedules a task to ingest it."""
     logger.info('Stova event identification task started.')
     identification_task = StovaEventIdentificationTask(prefix=STOVA_EVENT_PREFIX)
     identification_task.identify_new_objects(stova_event_ingestion_task)
@@ -20,7 +20,7 @@ def stova_event_identification_task() -> None:
 
 
 def stova_event_ingestion_task(object_key: str) -> None:
-    """Ingest the given key (file) from S3"""
+    """Ingest the given key (file) from S3."""
     logger.info(f'Stova event ingestion task started for file {object_key}.')
     ingestion_task = StovaEventIngestionTask(
         object_key=object_key,
@@ -87,7 +87,7 @@ class StovaEventIngestionTask(BaseObjectIngestionTask):
         return values
 
     def _process_record(self, record: dict) -> None:
-        """Saves an event from Stova from the S3 bucket into a `StovaEvent`"""
+        """Saves an event from Stova from the S3 bucket into a `StovaEvent`."""
         stova_event_id = record.get('id')
 
         required_fields = self._required_fields()

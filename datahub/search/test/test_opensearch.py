@@ -22,7 +22,7 @@ def test_bulk(opensearch_bulk, mock_opensearch_client):
     )
 
 
-@pytest.mark.parametrize('expected', (True, False))
+@pytest.mark.parametrize('expected', [True, False])
 def test_index_exists(mock_opensearch_client, expected):
     """Tests that `index_exists` returns True if the index exists, False otherwise."""
     index_name = 'test'
@@ -140,8 +140,8 @@ def test_delete_index(mock_opensearch_client):
 
 
 @pytest.mark.parametrize(
-    'aliases,response,result',
-    (
+    ('aliases', 'response', 'result'),
+    [
         (
             ('alias1',),
             {
@@ -164,7 +164,7 @@ def test_delete_index(mock_opensearch_client):
             },
             [{'index1'}, {'index2'}],
         ),
-    ),
+    ],
     ids=['(alias1,)', '(alias1,alias2)', '(alias2,)'],
 )
 def test_get_indices_for_aliases(mock_opensearch_client, aliases, response, result):
@@ -190,7 +190,7 @@ def test_get_aliases_for_index(mock_opensearch_client):
     client.indices.get_alias.assert_called_with(index=index)
 
 
-@pytest.mark.parametrize('expected', (True, False))
+@pytest.mark.parametrize('expected', [True, False])
 def test_alias_exists(mock_opensearch_client, expected):
     """Test alias_exists()."""
     index_name = 'test-index'
@@ -203,9 +203,9 @@ def test_alias_exists(mock_opensearch_client, expected):
 
 
 @pytest.mark.parametrize(
-    'add_actions,remove_actions,expected_body',
+    ('add_actions', 'remove_actions', 'expected_body'),
     (
-        (
+        [
             (
                 (),
                 (
@@ -258,7 +258,7 @@ def test_alias_exists(mock_opensearch_client, expected):
                     ],
                 },
             ),
-        )
+        ]
     ),
 )
 def test_update_alias(mock_opensearch_client, add_actions, remove_actions, expected_body):

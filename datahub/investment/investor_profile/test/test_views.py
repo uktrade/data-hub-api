@@ -69,7 +69,7 @@ class TestCreateLargeCapitalProfileView(APITestMixin):
     """Test creating a large capital profile."""
 
     def test_large_capital_unauthorized_user(self, api_client):
-        """Should return 401"""
+        """Should return 401."""
         url = reverse('api-v4:large-investor-profile:collection')
         user = create_test_user()
         response = api_client.get(url, user=user)
@@ -172,8 +172,8 @@ class TestLargeCapitalProfileListView(APITestMixin):
         assert response_data['results'] == []
 
     @pytest.mark.parametrize(
-        'search_parameter,expected_response',
-        (
+        ('search_parameter', 'expected_response'),
+        [
             (
                 uuid.uuid4(),
                 {'investor_company_id': [INVALID_CHOICE_ERROR_MESSAGE]},
@@ -186,7 +186,7 @@ class TestLargeCapitalProfileListView(APITestMixin):
                 1,
                 {'investor_company_id': ['“1” is not a valid UUID.']},
             ),
-        ),
+        ],
     )
     def test_large_capital_profile_list_view_invalid_search(
         self, search_parameter, expected_response,
@@ -248,7 +248,7 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
 
     def test_patch_large_capital_profile_with_a_different_company_returns_validation_error(self):
         """Test updating a large capital profile with a different investor company
-        does return a validation error
+        does return a validation error.
         """
         investor_company = CompanyFactory()
         new_investor_company = CompanyFactory()
@@ -271,7 +271,7 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
 
     @freeze_time('2019-05-01')
     def test_patch_large_capital_profile_all_details_fields(self):
-        """Test updating the details fields for a large capital profile"""
+        """Test updating the details fields for a large capital profile."""
         investor_company = CompanyFactory()
         required_checks_conducted_by = AdviserFactory()
         investor_profile = LargeCapitalInvestorProfileFactory(
@@ -461,8 +461,8 @@ class TestUpdateLargeCapitalProfileConditionalFields(APITestMixin):
     """Tests for conditional field checks when updating a large capital profile."""
 
     @pytest.mark.parametrize(
-        'request_data,expected_status,expected_error_response',
-        (
+        ('request_data', 'expected_status', 'expected_error_response'),
+        [
             (
                 {
                     'required_checks_conducted': {
@@ -556,7 +556,7 @@ class TestUpdateLargeCapitalProfileConditionalFields(APITestMixin):
                 status.HTTP_200_OK,
                 None,
             ),
-        ),
+        ],
     )
     @freeze_time('2011-01-01')
     def test_patch_large_capital_conditional_required_checks_fields(
@@ -582,10 +582,10 @@ class TestUpdateLargeCapitalProfileConditionalFields(APITestMixin):
 
     @pytest.mark.parametrize(
         'required_checks_conducted',
-        (
+        [
             RequiredChecksConductedConstant.not_yet_checked.value.id,
             RequiredChecksConductedConstant.checks_not_required.value.id,
-        ),
+        ],
     )
     def test_patch_large_capital_conditional_required_checks_fields_removes_old_data(
         self, required_checks_conducted,
@@ -638,8 +638,8 @@ class TestUpdateLargeCapitalProfileConditionalFields(APITestMixin):
         }
 
     @pytest.mark.parametrize(
-        'request_data,expected_error_response',
-        (
+        ('request_data', 'expected_error_response'),
+        [
             (
                 {
                     'required_checks_conducted': {
@@ -671,7 +671,7 @@ class TestUpdateLargeCapitalProfileConditionalFields(APITestMixin):
                     ],
                 },
             ),
-        ),
+        ],
     )
     @freeze_time('2011-01-01')
     def test_patch_large_capital_required_checks_conducted_by_error_update(

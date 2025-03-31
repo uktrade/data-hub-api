@@ -58,15 +58,15 @@ class TestTokenAuth:
     """
 
     @pytest.mark.parametrize(
-        'token_auth_args,expected_authorization',
-        (
+        ('token_auth_args', 'expected_authorization'),
+        [
             (
                 ['abc123'], 'Token abc123',
             ),
             (
                 ['foobarbaz', 'Key'], 'Key foobarbaz',
             ),
-        ),
+        ],
     )
     def test_requests_with_no_body_are_signed(self, token_auth_args, expected_authorization):
         """Tests that requests without a body are signed."""
@@ -148,7 +148,7 @@ class TestAPIClient:
         assert response.status_code == 200
         assert response.request.headers['Accept'] == '*/*'
 
-    @pytest.mark.parametrize('default_timeout', (10, None))
+    @pytest.mark.parametrize('default_timeout', [10, None])
     def test_can_override_timeout_per_request(self, requests_mock, default_timeout):
         """Tests that the timeout can be overridden for a specific request."""
         api_url = 'http://test/v1/'

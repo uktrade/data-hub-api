@@ -23,7 +23,7 @@ from datahub.core.templatetags.datahub_extras import admin_change_link
 
 
 class OneListCoreTeamMemberInline(admin.TabularInline):
-    """Inline admin for OneListCoreTeamMember"""
+    """Inline admin for OneListCoreTeamMember."""
 
     model = OneListCoreTeamMember
     fields = ('id', 'adviser')

@@ -214,8 +214,8 @@ class TestSearch(APITestMixin):
         assert response.data['results'][0]['promoters'][0]['name'] == 'Distinct promoter'
 
     @pytest.mark.parametrize(
-        'search,check_response_item,expected_results',
-        (
+        ('search', 'check_response_item', 'expected_results'),
+        [
             # Detail filters
             (
                 {
@@ -312,7 +312,7 @@ class TestSearch(APITestMixin):
                 ['Railway', 'Skyscraper'],
             ),
 
-        ),
+        ],
     )
     def test_filters(self, search, check_response_item, expected_results):
         """Test filters."""
@@ -345,8 +345,8 @@ class TestSearch(APITestMixin):
         assert response.data == {'total_investment_sought_start': ['A valid integer is required.']}
 
     @pytest.mark.parametrize(
-        'sort_by,check_item_key,expected_results',
-        (
+        ('sort_by', 'check_item_key', 'expected_results'),
+        [
             (
                 'name:asc',
                 'name',
@@ -426,7 +426,7 @@ class TestSearch(APITestMixin):
                 ],
             ),
 
-        ),
+        ],
     )
     def test_sorts(self, sort_by, check_item_key, expected_results):
         """Test search sorts."""
@@ -456,8 +456,8 @@ class TestLargeCapitalOpportunityExportView(APITestMixin):
     """Tests large capital opportunity export view."""
 
     @pytest.mark.parametrize(
-        'permissions,expected_status_code',
-        (
+        ('permissions', 'expected_status_code'),
+        [
             # User has insufficient permissions, deny export
             (
                 (),
@@ -483,7 +483,7 @@ class TestLargeCapitalOpportunityExportView(APITestMixin):
                 ),
                 status.HTTP_200_OK,
             ),
-        ),
+        ],
     )
     def test_user_with_correct_permissions_can_export_data(
         self, opensearch, permissions, expected_status_code,
@@ -497,12 +497,12 @@ class TestLargeCapitalOpportunityExportView(APITestMixin):
         assert response.status_code == expected_status_code
 
     @pytest.mark.parametrize(
-        'request_sortby,orm_ordering',
-        (
+        ('request_sortby', 'orm_ordering'),
+        [
             ('created_on:desc', '-created_on'),
             ('modified_on:desc', '-modified_on'),
             ('name', 'name'),
-        ),
+        ],
     )
     def test_export(self, opensearch_with_collector, request_sortby, orm_ordering):
         """Test export large capital opportunity search results."""

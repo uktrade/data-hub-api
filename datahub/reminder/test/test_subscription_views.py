@@ -49,14 +49,14 @@ class SubscriptionViewsetTestMixin(APITestMixin):
     factory = BaseSubscriptionFactory
 
     def test_not_authed(self):
-        """Should return Unauthorised"""
+        """Should return Unauthorised."""
         url = reverse(self.url_name)
         api_client = APIClient()
         response = api_client.get(url)
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     def test_get_subscription_not_present(self):
-        """Given the current user does not have a subscription, make an empty one"""
+        """Given the current user does not have a subscription, make an empty one."""
         url = reverse(self.url_name)
         response = self.api_client.get(url)
         assert response.status_code == status.HTTP_200_OK
@@ -66,7 +66,7 @@ class SubscriptionViewsetTestMixin(APITestMixin):
         }
 
     def test_get_subscription(self):
-        """Given an existing subscription, those details should be returned"""
+        """Given an existing subscription, those details should be returned."""
         self.factory(
             adviser=self.user,
             reminder_days=[10, 20, 40],
@@ -81,7 +81,7 @@ class SubscriptionViewsetTestMixin(APITestMixin):
         }
 
     def test_patch_existing_subscription(self):
-        """Patching the subscription will update an existing subscription"""
+        """Patching the subscription will update an existing subscription."""
         self.factory(
             adviser=self.user,
             reminder_days=[10, 20, 40],
@@ -97,7 +97,7 @@ class SubscriptionViewsetTestMixin(APITestMixin):
         }
 
     def test_patch_subscription_no_existing(self):
-        """Patching the subscription will create one if it didn't exist already"""
+        """Patching the subscription will create one if it didn't exist already."""
         url = reverse(self.url_name)
         data = {'reminder_days': [15]}
         response = self.api_client.patch(url, data)
@@ -114,7 +114,7 @@ class SubscriptionWithReminderValidationViewsetTestMixin(APITestMixin):
     factory = BaseSubscriptionFactory
 
     def test_400_patch_existing_subscription_duplicate_days(self):
-        """Patching the subscription will update an existing subscription"""
+        """Patching the subscription will update an existing subscription."""
         self.factory(
             adviser=self.user,
             reminder_days=[10, 20, 40],
@@ -129,7 +129,7 @@ class SubscriptionWithReminderValidationViewsetTestMixin(APITestMixin):
         }
 
     def test_400_patch_subscription_no_existing_duplicate_days(self):
-        """Patching the subscription will create one if it didn't exist already"""
+        """Patching the subscription will create one if it didn't exist already."""
         url = reverse(self.url_name)
         data = {'reminder_days': [10, 10, 15]}
         response = self.api_client.patch(url, data)
@@ -210,7 +210,7 @@ class TestTaskOverdueReminderSubscriptionViewset(
 
 
 @pytest.mark.parametrize(
-    'url_name,factory',
+    ('url_name', 'factory'),
     [
         (
             'api-v4:reminder:my-tasks-task-assigned-to-me-from-others-subscription',
@@ -228,10 +228,6 @@ class TestTaskOverdueReminderSubscriptionViewset(
             'api-v4:reminder:my-tasks-task-deleted-by-others-subscription',
             TaskDeletedByOthersSubscriptionFactory,
         ),
-        (
-            'api-v4:reminder:my-tasks-task-deleted-by-others-subscription',
-            TaskDeletedByOthersSubscriptionFactory,
-        ),
     ],
 )
 class TestTaskSubscriptionViewset(APITestMixin):
@@ -240,14 +236,14 @@ class TestTaskSubscriptionViewset(APITestMixin):
     """
 
     def test_not_authed(self, url_name, factory):
-        """Should return Unauthorised"""
+        """Should return Unauthorised."""
         url = reverse(url_name)
         api_client = APIClient()
         response = api_client.get(url)
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     def test_get_subscription_not_present(self, url_name, factory):
-        """Given the current user does not have a subscription, make an empty one"""
+        """Given the current user does not have a subscription, make an empty one."""
         url = reverse(url_name)
         response = self.api_client.get(url)
         assert response.status_code == status.HTTP_200_OK
@@ -256,7 +252,7 @@ class TestTaskSubscriptionViewset(APITestMixin):
         }
 
     def test_get_subscription(self, url_name, factory):
-        """Given an existing subscription, those details should be returned"""
+        """Given an existing subscription, those details should be returned."""
         factory(
             adviser=self.user,
             email_reminders_enabled=True,
@@ -269,7 +265,7 @@ class TestTaskSubscriptionViewset(APITestMixin):
         }
 
     def test_patch_existing_subscription(self, url_name, factory):
-        """Patching the subscription will update an existing subscription"""
+        """Patching the subscription will update an existing subscription."""
         factory(
             adviser=self.user,
             email_reminders_enabled=True,
@@ -283,7 +279,7 @@ class TestTaskSubscriptionViewset(APITestMixin):
         }
 
     def test_patch_subscription_no_existing(self, url_name, factory):
-        """Patching the subscription will create one if it didn't exist already"""
+        """Patching the subscription will create one if it didn't exist already."""
         url = reverse(url_name)
         data = {'email_reminders_enabled': True}
         response = self.api_client.patch(url, data)
@@ -301,14 +297,14 @@ class TestGetReminderSubscriptionSummaryView(APITestMixin):
     url_name = 'api-v4:reminder:subscription-summary'
 
     def test_not_authed(self):
-        """Should return Unauthorised"""
+        """Should return Unauthorised."""
         url = reverse(self.url_name)
         api_client = APIClient()
         response = api_client.get(url)
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     def test_get_summary_of_reminders(self):
-        """Should return a summary of reminders"""
+        """Should return a summary of reminders."""
         reminder_days = [10, 20, 40]
         email_reminders_enabled = True
 

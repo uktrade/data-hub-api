@@ -90,7 +90,7 @@ def get_basic_search_query(
 
 
 def _get_search_fields(search_apps):
-    """Get all search fields that should be included in this query"""
+    """Get all search fields that should be included in this query."""
     fields = set(chain.from_iterable(app.search_model.SEARCH_FIELDS for app in search_apps))
     for field in V3_FIELD_EXCLUSIONS:
         fields.discard(field)

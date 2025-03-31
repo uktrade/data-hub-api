@@ -34,8 +34,8 @@ class TestActivityFeedView(APITestMixin):
     """Activity Feed view test case."""
 
     @pytest.mark.parametrize(
-        'request_data,response_status_code,response_content',
-        (
+        ('request_data', 'response_status_code', 'response_content'),
+        [
             (
                 b'{"arg": "value"}',
                 200,
@@ -51,7 +51,7 @@ class TestActivityFeedView(APITestMixin):
                 500,
                 b'{"error":"msg"}',
             ),
-        ),
+        ],
     )
     def test_get(self, requests_mock, request_data, response_status_code, response_content):
         """Test for GET proxy."""
@@ -76,12 +76,12 @@ class TestActivityFeedView(APITestMixin):
         assert requests_mock.last_request.body == request_data
 
     @pytest.mark.parametrize(
-        'content_type,expected_status_code',
-        (
+        ('content_type', 'expected_status_code'),
+        [
             (None, status.HTTP_406_NOT_ACCEPTABLE),
             ('text/html', status.HTTP_406_NOT_ACCEPTABLE),
             ('application/json', status.HTTP_200_OK),
-        ),
+        ],
     )
     def test_content_type(self, requests_mock, content_type, expected_status_code):
         """Test that 406 is returned if Content Type is not application/json."""

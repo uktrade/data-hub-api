@@ -46,7 +46,7 @@ ORDER_FIELDS_INVOICE_RELATED = {
 
 
 class OrderSerializer(serializers.ModelSerializer):
-    """Order DRF serializer"""
+    """Order DRF serializer."""
 
     created_by = NestedRelatedField(Advisor, read_only=True)
     modified_by = NestedRelatedField(Advisor, read_only=True)

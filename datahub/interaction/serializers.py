@@ -399,7 +399,7 @@ class BaseInteractionSerializer(serializers.ModelSerializer):
 
 
 class InteractionSerializer(BaseInteractionSerializer):
-    """Interaction Serializer for V3 endpoint"""
+    """Interaction Serializer for V3 endpoint."""
 
     related_trade_agreements = NestedRelatedField(
         'metadata.TradeAgreement', many=True, required=False, allow_empty=True,
@@ -602,7 +602,7 @@ class InteractionSerializer(BaseInteractionSerializer):
 
 
 class InteractionSerializerV4(BaseInteractionSerializer):
-    """Interaction Serializer for V4 Endpoint"""
+    """Interaction Serializer for V4 Endpoint."""
 
     related_trade_agreements = NestedRelatedField(
         'metadata.TradeAgreement', many=True, required=True, allow_empty=True,

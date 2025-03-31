@@ -111,7 +111,7 @@ class SearchCompanyAPIView(SearchCompanyAPIViewMixin, SearchAPIView):
     """Filtered company search view."""
 
     def deep_get(self, dictionary, keys, default=None):
-        """Perform a deep search on a dictionary to find the item at the location provided in the keys
+        """Perform a deep search on a dictionary to find the item at the location provided in the keys.
         """
         return reduce(
             lambda d, key: d.get(key, default) if isinstance(d, dict) else default,
@@ -279,7 +279,7 @@ class SearchCompanyExportAPIView(SearchCompanyAPIViewMixin, SearchExportAPIView)
 
     @property
     def field_titles(self):
-        """Returns field titles for CSV export
+        """Returns field titles for CSV export.
 
         There is implicit ordering here, guaranteed for python >= 3.7 to be insertion order
         This is a property because we don't want it to evaluate prior to database instantiation

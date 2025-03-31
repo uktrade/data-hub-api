@@ -153,7 +153,7 @@ class TestBasicSearch(APITestMixin):
             end = start + page_size
             assert ids[start:end] == [result['id'] for result in response.data['results']]
 
-    @pytest.mark.parametrize('entity', ('sloth',))
+    @pytest.mark.parametrize('entity', ['sloth'])
     def test_400_with_invalid_entity(self, opensearch_with_collector, entity):
         """Tests case where provided entity is invalid."""
         url = reverse('api-v3:search:basic')
@@ -204,8 +204,8 @@ class TestBasicSearch(APITestMixin):
         ] == [result['name'] for result in response.data['results']]
 
     @pytest.mark.parametrize(
-        'name,search_term,should_match',
-        (
+        ('name', 'search_term', 'should_match'),
+        [
             ('The Risk Advisory Group', 'The Advisory', True),
             ('The Advisory Group', 'The Advisory', True),
             ('The Advisory', 'The Advisory', True),
@@ -223,7 +223,7 @@ class TestBasicSearch(APITestMixin):
             ('Smarterlight Ltd', 'Smarterlight Inc', False),
             ('Charterhouse', 'Hotel', False),
             ('Block C, The Courtyard, 55 Charterhouse Street', 'Hotel', False),
-        ),
+        ],
     )
     def test_fuzzy_quality_single_field(
         self,
@@ -260,14 +260,14 @@ class TestBasicSearch(APITestMixin):
             assert response.data['count'] == 0
 
     @pytest.mark.parametrize(
-        'name,address,search_term,should_match',
-        (
+        ('name', 'address', 'search_term', 'should_match'),
+        [
             ('Charterhouse', 'Block C, The Courtyard, 55 Charterhouse Street', 'Hotel', False),
             ('Charterhouse', 'Overlook Hotel, Courtyard, 55 Charterhouse', 'Hotel', True),
             ('Charterhouse', 'Overlook Hotel, Courtyard, 55 Charterhouse', 'Hotal', True),
             ('Charterhouse', 'Overlook Hotel, Courtyard, 55 Charterhouse', 'Hartleyhouse', False),
             ('Charterhouse', 'Overlook Hotel, Courtyard, 55 London Road', 'Chatterhouse', True),
-        ),
+        ],
     )
     def test_fuzzy_quality_multi_field(
         self,
@@ -531,8 +531,8 @@ class TestBasicSearch(APITestMixin):
         assert all(aggregation in response.data['aggregations'] for aggregation in aggregations)
 
     @pytest.mark.parametrize(
-        'permission,permission_entity',
-        (
+        ('permission', 'permission_entity'),
+        [
             ('view_company', 'company'),
             ('view_contact', 'contact'),
             ('view_event', 'event'),
@@ -541,11 +541,11 @@ class TestBasicSearch(APITestMixin):
             ('view_associated_investmentproject', 'investment_project'),
             ('view_order', 'order'),
             ('view_advisor', 'adviser'),
-        ),
+        ],
     )
     @pytest.mark.parametrize(
         'entity',
-        ('company', 'contact', 'event', 'interaction', 'investment_project', 'order', 'adviser'),
+        ['company', 'contact', 'event', 'interaction', 'investment_project', 'order', 'adviser'],
     )
     def test_permissions(self, opensearch_with_collector, permission, permission_entity, entity):
         """Tests model permissions enforcement in basic search.

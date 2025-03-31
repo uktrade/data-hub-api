@@ -95,7 +95,7 @@ class VATSubValidator:
         - if vat_status == eu:
             - vat_verified is specified
             - if vat_verified == True:
-                - vat_number is specified
+                - vat_number is specified.
         """
         data_combiner = DataCombiner(order, data)
 

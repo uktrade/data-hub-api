@@ -23,7 +23,7 @@ CAT_INDICES_MOCK_DATA = [
 
 
 @override_settings(OPENSEARCH_INDEX_PREFIX='test-datahub')
-@pytest.mark.parametrize('interactive', (True, False))
+@pytest.mark.parametrize('interactive', [True, False])
 def test_deletes_matching_indices(mock_opensearch_client, interactive, monkeypatch):
     """Test that indices matching the OPENSEARCH_INDEX_PREFIX prefix are deleted."""
     mocked_input = Mock(return_value='yes')

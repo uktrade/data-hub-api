@@ -18,7 +18,7 @@ DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
 
 
 def stova_attendee_identification_task() -> None:
-    """Identifies the most recent file to be ingested and schedules a task to ingest it"""
+    """Identifies the most recent file to be ingested and schedules a task to ingest it."""
     logger.info('Stova attendee identification task started.')
     identification_task = StovaAttendeeIdentificationTask(
         prefix=STOVA_ATTENDEE_PREFIX,
@@ -29,7 +29,7 @@ def stova_attendee_identification_task() -> None:
 
 
 def stova_attendee_ingestion_task(object_key: str) -> None:
-    """Ingest the given key (file) from S3"""
+    """Ingest the given key (file) from S3."""
     logger.info(f'Stova attendee ingestion task started for file {object_key}.')
     ingestion_task = StovaAttendeeIngestionTask(
         object_key=object_key,

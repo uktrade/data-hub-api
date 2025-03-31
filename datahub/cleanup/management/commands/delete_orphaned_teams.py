@@ -20,18 +20,18 @@ class DummyFilter(object):
 
     @staticmethod
     def as_q():
-        """Returns an empty query"""
+        """Returns an empty query."""
         return Q()
 
 
 class Command(BaseCleanupCommand):
-    """Deletes all orphaned :class:`datahub.metadata.models.Team` records"""
+    """Deletes all orphaned :class:`datahub.metadata.models.Team` records."""
 
     model_name = 'metadata.Team'
     CONFIGS = {'metadata.Team': ModelCleanupConfig([DummyFilter()])}
 
     def add_arguments(self, parser):
-        """Override to add the ``list-only`` argument"""
+        """Override to add the ``list-only`` argument."""
         super(Command, self).add_arguments(parser)
         parser.add_argument(
             '-l',
@@ -41,7 +41,7 @@ class Command(BaseCleanupCommand):
         )
 
     def handle(self, *args, list_only, **options):
-        """Override to add the ``list-only`` argument"""
+        """Override to add the ``list-only`` argument."""
         if list_only:
             for item in self._get_query(Team):
                 self.stdout.write(str(item.id))

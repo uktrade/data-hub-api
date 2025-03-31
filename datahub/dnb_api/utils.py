@@ -552,7 +552,7 @@ def validate_company_id(company_id):
 
 
 def get_full_company_hierarchy_data(duns_number) -> HierarchyData:
-    """Get a full set of company hierarchy data direct from the dnb service
+    """Get a full set of company hierarchy data direct from the dnb service.
     """
     if not settings.DNB_SERVICE_BASE_URL:
         raise ImproperlyConfigured('The setting DNB_SERVICE_BASE_URL has not been set')
@@ -586,7 +586,7 @@ def get_full_company_hierarchy_data(duns_number) -> HierarchyData:
 
 
 def get_company_hierarchy_data(duns_number) -> HierarchyData:
-    """Get company hierarchy data
+    """Get company hierarchy data.
     """
     companies_count = get_company_hierarchy_count(duns_number)
     if companies_count > settings.DNB_MAX_COMPANIES_IN_TREE_COUNT:
@@ -605,7 +605,7 @@ def is_valid_uuid(value):
 
 def _merge_columns_into_single_column(df, key: str, columns: list, nested_objects=None):
     """Merge each of the columns in the columns list into a single column with the name
-    provided in the key argument
+    provided in the key argument.
     """
     dataframe_rows = (
         df.reindex(columns=columns).replace([np.nan], [None]).to_dict(orient='records')
@@ -635,7 +635,7 @@ def _merge_columns_into_single_column(df, key: str, columns: list, nested_object
 
 def _move_requested_duns_to_start_of_subsidiary_list(dataframe, duns_number):
     """Move the dataframe row that matches the provided duns number to the start of it's parent
-    subsidiary list
+    subsidiary list.
     """
     requested_duns_row = dataframe.loc[dataframe['duns'] == duns_number]
 
@@ -689,7 +689,7 @@ def create_company_tree(companies: list, duns_number):
 
 
 def create_company_hierarchy_dataframe(family_tree_members: list, duns_number):
-    """Create a dataframe from the list of family tree members
+    """Create a dataframe from the list of family tree members.
     """
     append_datahub_details(family_tree_members)
 
@@ -745,7 +745,7 @@ def create_company_hierarchy_dataframe(family_tree_members: list, duns_number):
 
 
 def append_datahub_details(family_tree_members: list):
-    """Appended any known datahub details to the list of family tree members provided
+    """Appended any known datahub details to the list of family tree members provided.
     """
     family_tree_members_duns = [object['duns'] for object in family_tree_members]
     family_tree_members_datahub_details = load_datahub_details(family_tree_members_duns)
@@ -797,7 +797,7 @@ def append_datahub_details(family_tree_members: list):
 
 def create_related_company_dataframe(family_tree_members: list):
     """Create a dataframe from the list of family tree members that only appends with
-    Data Hub company IDs
+    Data Hub company IDs.
     """
     normalized_df = pd.json_normalize(family_tree_members)
     normalized_df.replace([np.nan], [None], inplace=True)
@@ -815,7 +815,7 @@ def _batch_list(list, number_items):
         number_items (_type_): The maximum number of items
     Returns:
         A list of lists, with each inner list containing at most the number_items. The final inner
-        list may contain less then the number_items
+        list may contain less then the number_items.
     """
     list = iter(list)
     return iter(lambda: tuple(islice(list, number_items)), ())
@@ -823,7 +823,7 @@ def _batch_list(list, number_items):
 
 def _batch_opensearch_query(duns_numbers: list, fields_to_include):
     """Run a batched opensearch query for duns numbers. This query is batched as companies with a
-    large number of related companies can exceed the 1024 opensearch limit
+    large number of related companies can exceed the 1024 opensearch limit.
     """
     results = []
     # Because of the way the get_search_by_entities_query creates an opensearch query, which is
@@ -845,7 +845,7 @@ def _batch_opensearch_query(duns_numbers: list, fields_to_include):
 
 
 def get_datahub_company_ids(family_tree_members: list):
-    """Get company ids for related companies returned from D&B
+    """Get company ids for related companies returned from D&B.
     """
     results = _batch_opensearch_query(family_tree_members, 'id')
 
@@ -853,7 +853,7 @@ def get_datahub_company_ids(family_tree_members: list):
 
 
 def load_datahub_details(family_tree_members_duns):
-    """Load any known datahub details for the duns numbers provided
+    """Load any known datahub details for the duns numbers provided.
     """
     results = _batch_opensearch_query(
         family_tree_members_duns,
@@ -878,7 +878,7 @@ def load_datahub_details(family_tree_members_duns):
 
 
 def get_company_hierarchy_count(duns_number):
-    """Get the count of companies in the hierarchy
+    """Get the count of companies in the hierarchy.
     """
     if not settings.DNB_SERVICE_BASE_URL:
         raise ImproperlyConfigured('The setting DNB_SERVICE_BASE_URL has not been set')
@@ -908,7 +908,7 @@ def get_company_hierarchy_count(duns_number):
 
 
 def call_api_request_with_exception_handling(api_request_function):
-    """Call the dnb service api client and handle any common errors
+    """Call the dnb service api client and handle any common errors.
     """
     api_client = _get_api_client()
     try:
@@ -938,7 +938,7 @@ def call_api_request_with_exception_handling(api_request_function):
 
 
 def get_reduced_company_hierarchy_data(duns_number) -> HierarchyData:
-    """Get company data that only includes direct parents of the duns number
+    """Get company data that only includes direct parents of the duns number.
     """
     hierarchy = []
     while duns_number:
@@ -1009,7 +1009,7 @@ def get_datahub_ids_for_dnb_service_company_hierarchy(
 
 def get_cached_dnb_company(duns_number):
     """Get the dnb company from the cache if it exists. If not, call the dnb api and save the result
-    in the cache before returning the company
+    in the cache before returning the company.
     """
     cache_key = f'dnb_company_{duns_number}'
     cache_value = cache.get(cache_key)
@@ -1026,7 +1026,7 @@ def get_cached_dnb_company(duns_number):
 
 
 def format_company_for_family_tree(company):
-    """Format the response from the search api to the format needed by the family tree
+    """Format the response from the search api to the format needed by the family tree.
     """
     company_object = {
         'duns': None,

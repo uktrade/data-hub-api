@@ -26,7 +26,7 @@ from datahub.investment_lead.test.utils import (
 
 @pytest.mark.django_db
 class TestEYBLeadServices:
-    """Tests EYB Lead services"""
+    """Tests EYB Lead services."""
 
     def test_duns_number_matches_existing_company(self):
         company = CompanyFactory(duns_number='123456789')
@@ -121,7 +121,7 @@ class TestEYBLeadServices:
             add_new_company_from_eyb_lead(eyb_lead)
 
     def test_existing_company_match_contact_on_email_address(self):
-        """Match email address for contact associated with EYB Lead company
+        """Match email address for contact associated with EYB Lead company.
         """
         contact = ContactFactory()
         eyb_lead_matching = EYBLeadFactory(
@@ -154,7 +154,7 @@ class TestEYBLeadServices:
         assert not result
 
     def test_fail_match_for_different_company(self):
-        """Do not match contact with a matching email address belonging to a different company
+        """Do not match contact with a matching email address belonging to a different company.
         """
         contact = ContactFactory()
         eyb_lead_not_matching = EYBLeadFactory(
@@ -169,7 +169,7 @@ class TestEYBLeadServices:
         assert not result
 
     def test_skip_creation_when_contact_exists(self):
-        """Match email address for contact associated with EYB Lead company
+        """Match email address for contact associated with EYB Lead company.
         """
         contact = ContactFactory()
         eyb_lead_matching = EYBLeadFactory(

@@ -266,7 +266,7 @@ def update_new_export_interaction_reminder_email_status(email_notification_id, r
 
 
 def generate_estimated_land_date_reminders():
-    """Generates Estimated Land Date Reminders according to each adviser's Subscriptions
+    """Generates Estimated Land Date Reminders according to each adviser's Subscriptions.
     """
     with advisory_lock(
         'generate_estimated_land_date_reminders',
@@ -380,7 +380,7 @@ def generate_estimated_land_date_reminders_for_subscription(subscription, curren
 
 
 def generate_no_recent_interaction_reminders():
-    """Generates No Recent Interaction Reminders according to each adviser's Subscriptions
+    """Generates No Recent Interaction Reminders according to each adviser's Subscriptions.
     """
     with advisory_lock(
         'generate_no_recent_interaction_reminders',
@@ -451,7 +451,7 @@ def generate_no_recent_interaction_reminders_for_subscription(subscription, curr
 
 
 def generate_no_recent_export_interaction_reminders():
-    """Generates No Recent Export Interaction Reminders according to each adviser's Subscriptions
+    """Generates No Recent Export Interaction Reminders according to each adviser's Subscriptions.
     """
     with advisory_lock(
         'generate_no_recent_export_interaction_reminders',
@@ -530,7 +530,7 @@ def generate_no_recent_export_interaction_reminders_for_subscription(subscriptio
 
 
 def generate_new_export_interaction_reminders():
-    """Generates New Export Interaction Reminders according to each adviser's Subscriptions
+    """Generates New Export Interaction Reminders according to each adviser's Subscriptions.
     """
     with advisory_lock(
         'generate_new_export_interaction_reminders',
@@ -1046,7 +1046,7 @@ def _get_active_projects(adviser):
 
 def _get_managed_companies(adviser):
     """For given adviser, get the companies for which they are the global account manager OR where
-    they are a member of the one list core team
+    they are a member of the one list core team.
     """
     return Company.objects.filter(
         (

@@ -31,7 +31,7 @@ class InvestmentProjectsDatasetView(BaseFilterDatasetView):
     """
 
     def get_dataset(self, request):
-        """Returns list of Investment Projects Dataset records"""
+        """Returns list of Investment Projects Dataset records."""
         queryset = InvestmentProject.objects.annotate(
             actual_uk_region_names=get_array_agg_subquery(
                 InvestmentProject.actual_uk_regions.through,

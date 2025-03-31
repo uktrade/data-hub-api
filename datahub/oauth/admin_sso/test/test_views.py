@@ -56,10 +56,10 @@ def test_login_view_redirects_with_next_url():
 
 @pytest.mark.parametrize(
     'dangerous_redirect',
-    (
+    [
         'https://external-dangerous-website/protected-area',
         'javascript:alert("Meow!")',
-    ),
+    ],
 )
 def test_login_view_validates_next_url(dangerous_redirect):
     """Tests that login view checks redirect URLs for safety."""
@@ -169,11 +169,11 @@ def test_callback_requests_sso_profile_no_user(get_sso_user_profile, get_access_
 @patch('datahub.oauth.admin_sso.views.get_sso_user_profile')
 @pytest.mark.parametrize(
     'flags',
-    (
+    [
         {'is_staff': False, 'is_active': True},
         {'is_staff': True, 'is_active': False},
         {'is_staff': False, 'is_active': False},
-    ),
+    ],
 )
 def test_callback_requests_sso_profile_valid_non_staff_user(
     get_sso_user_profile,
@@ -253,10 +253,10 @@ def test_callback_redirects_to_next_url(get_sso_user_profile, get_access_token):
 @patch('datahub.oauth.admin_sso.views.get_sso_user_profile')
 @pytest.mark.parametrize(
     'dangerous_redirect',
-    (
+    [
         'https://external-dangerous-website/protected-area',
         'javascript:alert("Meow!")',
-    ),
+    ],
 )
 def test_callback_validates_next_url(get_sso_user_profile, get_access_token, dangerous_redirect):
     """Test that successful login redirects user to `next_url`."""

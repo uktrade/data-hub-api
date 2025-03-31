@@ -25,12 +25,12 @@ class HawkAuthentication(BaseAuthentication):
     def authenticate_header(self, request):
         """This is returned as the WWW-Authenticate header when
         AuthenticationFailed is raised. DRF also requires this
-        to send a 401 (as opposed to 403)
+        to send a 401 (as opposed to 403).
         """
         return 'Hawk'
 
     def authenticate(self, request):
-        """Authenticates a request using Hawk signature in the Authorization header
+        """Authenticates a request using Hawk signature in the Authorization header.
 
         If we cannot authenticate, AuthenticationFailed is raised, as required
         in the DRF authentication flow
@@ -102,7 +102,7 @@ def _lookup_credentials(access_key_id):
 
 def _seen_nonce(access_key_id, nonce, _):
     """Returns if the passed access_key_id/nonce combination has been
-    used within settings.HAWK_RECEIVER_NONCE_EXPIRY_SECONDS
+    used within settings.HAWK_RECEIVER_NONCE_EXPIRY_SECONDS.
     """
     cache_key = f'hawk:{access_key_id}:{nonce}'
 
@@ -120,7 +120,7 @@ def _seen_nonce(access_key_id, nonce, _):
 
 
 def _authorise(request):
-    """Raises a HawkFail if the passed request cannot be authenticated"""
+    """Raises a HawkFail if the passed request cannot be authenticated."""
     return Receiver(
         _lookup_credentials,
         request.headers['authorization'],

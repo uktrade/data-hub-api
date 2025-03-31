@@ -8,7 +8,7 @@ class CompanyObjectiveDatasetView(BaseDatasetView):
     """
 
     def get_dataset(self):
-        """Returns list of CompanyObjective records"""
+        """Returns list of CompanyObjective records."""
         return Objective.objects.values(
             'id',
             'company_id',

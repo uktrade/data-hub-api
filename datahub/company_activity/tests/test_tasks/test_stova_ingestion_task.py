@@ -114,7 +114,7 @@ class TestStovaIngestionTasks:
     @override_settings(S3_LOCAL_ENDPOINT_URL=None)
     def test_stova_data_file_ingestion(self, caplog, test_file, test_file_path):
         """Test that a Aventri/Stova data file is ingested correctly and the ingested file
-        is added to the IngestedObject table
+        is added to the IngestedObject table.
         """
         initial_stova_activity_count = StovaEvent.objects.count()
         initial_ingested_count = IngestedObject.objects.count()
@@ -132,7 +132,7 @@ class TestStovaIngestionTasks:
     @mock_aws
     @override_settings(S3_LOCAL_ENDPOINT_URL=None)
     def test_skip_previously_ingested_records(self, test_file_path, test_base_stova_event):
-        """Test that we skip updating records that have already been ingested
+        """Test that we skip updating records that have already been ingested.
         """
         StovaEventFactory(stova_event_id=123456789)
         data = test_base_stova_event
@@ -150,7 +150,7 @@ class TestStovaIngestionTasks:
     @mock_aws
     @override_settings(S3_LOCAL_ENDPOINT_URL=None)
     def test_invalid_file(self, test_file_path):
-        """Test that an exception is raised when the file is not valid
+        """Test that an exception is raised when the file is not valid.
         """
         mock_transport = MockSentryTransport()
         init(transport=mock_transport)
@@ -242,12 +242,12 @@ class TestStovaIngestionTasks:
 
     @pytest.mark.parametrize(
         'required_field',
-        (
+        [
             'id',
             'name',
             'location_address1',
             'location_city',
-        ),
+        ],
     )
     def test_stova_event_ingestion_rejects_event_if_missing_required_fields(
         self, caplog, test_base_stova_event, required_field,
@@ -274,13 +274,13 @@ class TestStovaIngestionTasks:
 
     @pytest.mark.parametrize(
         'null_field',
-        (
+        [
             'location_address2',
             'location_address3',
             'location_state',
             'location_postcode',
             'description',
-        ),
+        ],
     )
     def test_stova_event_ingestion_converts_null_fields_to_empty_string(
         self, test_base_stova_event, null_field,

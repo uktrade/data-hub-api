@@ -10,7 +10,7 @@ class TestGetOmisPaymentDataFromGovukPayment:
 
     def test_with_non_success_response_returns_none(self):
         """Test that if the status of the GOV.UK payment is not `success`,
-        the method returns None
+        the method returns None.
         """
         govuk_payment = {
             'state': {

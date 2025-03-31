@@ -115,7 +115,7 @@ class ExportWinsAdminMixin(admin.ModelAdmin):
 
 class BaseModelAdminMixin(ExportWinsAdminMixin):
     """Mixin for ModelAdmins which adds extra functionalities.
-    Useful when the model extends core.BaseModel
+    Useful when the model extends core.BaseModel.
 
     It updates created_by and modified_by automatically from the logged in user.
 

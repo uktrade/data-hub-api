@@ -12,13 +12,13 @@ class TestInteractionAdmin(AdminTestMixin):
     """Tests for interaction admin."""
 
     @pytest.mark.parametrize(
-        'num_contacts,expected_display_value',
-        (
+        ('num_contacts', 'expected_display_value'),
+        [
             (0, ''),
             (1, '{first_contact_name}'),
             (2, '{first_contact_name} and 1 more'),
             (10, '{first_contact_name} and 9 more'),
-        ),
+        ],
     )
     def test_get_contact_names(self, num_contacts, expected_display_value):
         """Test that contact names are formatted as expected."""

@@ -60,13 +60,13 @@ class TestCanPricingBeCalculated:
 
     @pytest.mark.parametrize(
         'fields',
-        (
+        [
             {'vat_status': None, 'vat_number': '123'},
             {'vat_status': None, 'vat_verified': True},
             {'vat_status': None, 'vat_number': '123', 'vat_verified': True},
             {'vat_status': VATStatus.EU, 'vat_number': '', 'vat_verified': None},
             {'vat_status': VATStatus.EU, 'vat_number': '', 'vat_verified': True},
-        ),
+        ],
     )
     def test_cannot_with_incomplete_vat_data(self, fields):
         """Test that it returns False if the VAT fields are incomplete.
@@ -76,11 +76,11 @@ class TestCanPricingBeCalculated:
 
     @pytest.mark.parametrize(
         'fields',
-        (
+        [
             {'vat_status': VATStatus.OUTSIDE_EU},
             {'vat_status': VATStatus.UK},
             {'vat_status': VATStatus.EU, 'vat_number': '', 'vat_verified': False},
-        ),
+        ],
     )
     def test_can(self, fields):
         """Test that it returns True if the VAT fields are filled in."""
@@ -102,10 +102,10 @@ class TestShouldVATBeApplied:
 
     @pytest.mark.parametrize(
         'fields',
-        (
+        [
             {'vat_status': VATStatus.OUTSIDE_EU},
             {'vat_status': VATStatus.EU, 'vat_verified': True, 'vat_number': '123'},
-        ),
+        ],
     )
     def test_shouldnt(self, fields):
         """Test the cases where the VAT should not be applied."""
@@ -114,10 +114,10 @@ class TestShouldVATBeApplied:
 
     @pytest.mark.parametrize(
         'fields',
-        (
+        [
             {'vat_status': VATStatus.UK},
             {'vat_status': VATStatus.EU, 'vat_verified': False},
-        ),
+        ],
     )
     def test_should(self, fields):
         """Test the cases where the VAT should be applied."""
@@ -142,7 +142,7 @@ class TestCalculatePricing:
     def test_with_vat(self):
         """Test that given
             hourly rate: 1000 pence
-            vat rate: 19.5
+            vat rate: 19.5.
 
             estimated time: 130 mins
             discount amount: 100 pence
@@ -172,7 +172,7 @@ class TestCalculatePricing:
     def test_without_vat(self):
         """Test that given
             hourly rate: 1000 pence
-            vat rate: 0
+            vat rate: 0.
 
             estimated time: 130 mins
             discount amount: 100 pence
@@ -225,10 +225,10 @@ class TestCalculateOrderPricing:
 
     @pytest.mark.parametrize(
         'fields',
-        (
+        [
             {'vat_status': VATStatus.UK},
             {'vat_status': VATStatus.EU, 'vat_verified': False},
-        ),
+        ],
     )
     def test_with_applied_vat(self, fields):
         """Test when the VAT status requires the VAT to be applied."""
@@ -250,10 +250,10 @@ class TestCalculateOrderPricing:
 
     @pytest.mark.parametrize(
         'fields',
-        (
+        [
             {'vat_status': VATStatus.OUTSIDE_EU},
             {'vat_status': VATStatus.EU, 'vat_verified': True},
-        ),
+        ],
     )
     def test_without_applied_vat(self, fields):
         """Test when the VAT status doesn't require the VAT to be applied."""

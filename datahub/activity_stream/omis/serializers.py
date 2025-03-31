@@ -7,7 +7,7 @@ class OMISOrderAddedSerializer(ActivitySerializer):
 
     def to_representation(self, instance):
         """Serialize the OMIS order as per activity stream spec:
-        https://www.w3.org/TR/activitystreams-core/
+        https://www.w3.org/TR/activitystreams-core/.
         """
         order_id = f'dit:DataHubOMISOrder:{instance.pk}'
         order = {

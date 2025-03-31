@@ -16,7 +16,7 @@ from datahub.search.investment.models import InvestmentProject
 
 
 class InvestmentSearchApp(SearchApp):
-    """SearchApp for investment"""
+    """SearchApp for investment."""
 
     name = 'investment_project'
     search_model = InvestmentProject

@@ -129,7 +129,7 @@ class ContactConsentIngestionTask:
     def _log_at_interval(self, index: int, message: str):
         """Log in a way that is suitable for both small and large datasets. Initially
         a log info entry will be written every 100 rows, then increasing in frequency
-        to every 1000, 10000, 100000 up to every million
+        to every 1000, 10000, 100000 up to every million.
         """
         if (index) % (10 ** min((max((math.floor(math.log10(index))), 2)), 6)) == 0:
             logger.info(message)

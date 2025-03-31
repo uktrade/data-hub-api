@@ -85,7 +85,7 @@ def auto_resend_client_email_from_unconfirmed_win():
 
 
 def create_token_for_contact(contact, customer_response, adviser=None):
-    """Generate new token and set all existing unexpired token to expire
+    """Generate new token and set all existing unexpired token to expire.
     """
     CustomerResponseToken.objects.filter(
         company_contact=contact,

@@ -31,7 +31,7 @@ class TestConfirmMergeViewGet(AdminTestMixin):
 
     @pytest.mark.parametrize(
         'data',
-        (
+        [
             {},
             {
                 'source_contact': '12345',
@@ -52,7 +52,7 @@ class TestConfirmMergeViewGet(AdminTestMixin):
                 'source_contact': '13495',
                 'target_contact': lambda: str(ContactFactory().pk),
             },
-        ),
+        ],
     )
     def test_returns_400_if_invalid_contacts_passed(self, data):
         """Test that a 400 is returned when invalid values are passed in the query string.
@@ -94,15 +94,15 @@ class TestConfirmMergeViewPost(AdminTestMixin):
 
     @pytest.mark.parametrize(
         'factory_relation_kwarg',
-        (
+        [
             'num_export',
             'num_interactions',
             'num_investment_projects',
             'num_orders',
             'num_referrals',
-        ),
+        ],
     )
-    @pytest.mark.parametrize('num_related_objects', (0, 1, 3))
+    @pytest.mark.parametrize('num_related_objects', [0, 1, 3])
     def test_merge_succeeds(
         self,
         factory_relation_kwarg,
@@ -233,8 +233,8 @@ class TestConfirmMergeViewPost(AdminTestMixin):
         assert reversion.user == self.user
 
     @pytest.mark.parametrize(
-        'target_contact_factory, disallowed_fields',
-        (
+        ('target_contact_factory', 'disallowed_fields'),
+        [
             (
                 ArchivedContactFactory,
                 [],
@@ -243,19 +243,19 @@ class TestConfirmMergeViewPost(AdminTestMixin):
                 ContactFactory,
                 ['some_disallowed_field_1', 'some_disallowed_field_2'],
             ),
-        ),
+        ],
     )
     @pytest.mark.parametrize(
         'factory_relation_kwarg',
-        (
+        [
             'num_export',
             'num_interactions',
             'num_investment_projects',
             'num_orders',
             'num_referrals',
-        ),
+        ],
     )
-    @pytest.mark.parametrize('num_related_objects', (0, 1, 3))
+    @pytest.mark.parametrize('num_related_objects', [0, 1, 3])
     @patch('datahub.company.merge_contact.is_model_a_valid_merge_source')
     def test_merge_fails(
         self,
