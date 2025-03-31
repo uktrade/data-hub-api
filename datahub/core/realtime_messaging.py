@@ -26,4 +26,4 @@ def send_realtime_message(message_text):
             text=message_text,
         )
     except SlackClientError:
-        logger.error('Slack post failed.', exc_info=True)
+        logger.exception('Slack post failed.')
