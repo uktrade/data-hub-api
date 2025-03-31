@@ -624,6 +624,12 @@ _add_hawk_credentials(
     (HawkScope.public_omis,),
 )
 
+_add_hawk_credentials(
+    'REDBOX_ACCESS_KEY_ID',
+    'REDBOX_SECRET_ACCESS_KEY',
+    (HawkScope.datasets,),
+)
+
 # Sending messages to Slack
 ENABLE_SLACK_MESSAGING = env.bool('ENABLE_SLACK_MESSAGING', default=False)
 if ENABLE_SLACK_MESSAGING:
