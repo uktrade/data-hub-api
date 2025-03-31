@@ -1,4 +1,4 @@
-from django.db import migrations, models
+from django.db import migrations
 from pathlib import PurePath
 import uuid
 
