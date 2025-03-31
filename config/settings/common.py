@@ -609,7 +609,7 @@ _add_hawk_credentials(
 _add_hawk_credentials(
     'DATA_FLOW_API_ACCESS_KEY_ID',
     'DATA_FLOW_API_SECRET_ACCESS_KEY',
-    (HawkScope.data_flow_api,),
+    (HawkScope.datasets,),
 )
 
 _add_hawk_credentials(
