@@ -10,7 +10,7 @@ MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
 @reversion.register_base_model()
-class IngestedObject(models.Model):
+class IngestedObject(models.Model):  # noqa: DJ008
     """Model to track which source objects (files) have been ingested already."""
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)

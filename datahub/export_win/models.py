@@ -39,18 +39,10 @@ class BaseExportWinSoftDeleteManager(BaseExportWinManager):
     """Manager for handling non-deleted export win queries."""
 
     def get_queryset(self):
-        return (
-            super()
-            .get_queryset()
-            .filter(is_deleted=False)
-        )
+        return super().get_queryset().filter(is_deleted=False)
 
     def soft_deleted(self, *args, **kwargs):
-        return (
-            super()
-            .get_queryset(*args, **kwargs)
-            .filter(is_deleted=True)
-        )
+        return super().get_queryset(*args, **kwargs).filter(is_deleted=True)
 
 
 class AnonymousWinManager(BaseExportWinManager):
@@ -58,9 +50,7 @@ class AnonymousWinManager(BaseExportWinManager):
 
     def anonymous_win(self, *args, **kwargs):
         return (
-            super()
-            .get_queryset(*args, **kwargs)
-            .filter(is_anonymous_win=True, is_deleted=False)
+            super().get_queryset(*args, **kwargs).filter(is_anonymous_win=True, is_deleted=False)
         )
 
 
@@ -68,12 +58,7 @@ class BaseCustomerResponseSoftDeleteManager(models.Manager):
     """Base class for Customer response soft delete manager."""
 
     def get_queryset(self):
-        return (
-            super()
-            .get_queryset()
-            .select_related('win')
-            .exclude(win__is_deleted=True)
-        )
+        return super().get_queryset().select_related('win').exclude(win__is_deleted=True)
 
     def all_customer_responses(self, *args, **kwargs):
         return super().get_queryset(*args, **kwargs)
@@ -88,7 +73,7 @@ class BaseExportWinOrderedConstantModel(BaseOrderedConstantModel):
 
     class Meta:
         abstract = True
-        ordering = ('order', )
+        ordering = ('order',)
 
 
 class TeamType(BaseExportWinOrderedConstantModel):
@@ -196,7 +181,7 @@ class HVC(BaseExportWinOrderedConstantModel, BaseLegacyModel):
     financial_year = models.PositiveIntegerField()
 
     class Meta:
-        ordering = ('order', )
+        ordering = ('order',)
         unique_together = ('campaign_id', 'financial_year')
 
     def __str__(self):
@@ -482,8 +467,10 @@ class Win(BaseModel):
 
     def __str__(self):
         if self.adviser:
-            return (f'Export win {self.pk}: {self.adviser} <{self.adviser.email}> - '
-                    f'{self.created_on.strftime("%Y-%m-%d %H:%M:%S") if self.created_on else ""}')
+            return (
+                f'Export win {self.pk}: {self.adviser} <{self.adviser.email}> - '
+                f'{self.created_on.strftime("%Y-%m-%d %H:%M:%S") if self.created_on else ""}'
+            )
         else:
             return (
                 f'Export win {self.pk} (legacy): {self.adviser_name} '
@@ -507,7 +494,7 @@ class Win(BaseModel):
         super().save(*args, **kwargs)
 
 
-class Breakdown(BaseModel, BaseLegacyModel):
+class Breakdown(BaseModel, BaseLegacyModel):  # noqa: DJ008
     """Win breakdown."""
 
     win = models.ForeignKey(Win, related_name='breakdowns', on_delete=models.CASCADE)
@@ -621,8 +608,8 @@ class CustomerResponse(BaseModel):
         Rating,
         related_name='overcame_problem_customer_responses',
         verbose_name=(
-            'Overcoming a problem in the country (such as '
-            'legal, regulatory, commercial)?'),
+            'Overcoming a problem in the country (such as legal, regulatory, commercial)?'
+        ),
         on_delete=models.PROTECT,
         null=True,
         blank=True,
@@ -630,7 +617,8 @@ class CustomerResponse(BaseModel):
     involved_state_enterprise = models.BooleanField(
         verbose_name=(
             'The win involved a foreign government or state-owned enterprise (such as an '
-            'intermediary or facilitator)'),
+            'intermediary or facilitator)'
+        ),
         default=False,
         null=True,
         blank=True,
@@ -688,8 +676,9 @@ class CustomerResponse(BaseModel):
         blank=True,
     )
     has_explicit_export_plans = models.BooleanField(
-        verbose_name=('Apart from this win, you already have specific plans to export in the next '
-                      '12 months'),
+        verbose_name=(
+            'Apart from this win, you already have specific plans to export in the next 12 months'
+        ),
         default=False,
         null=True,
         blank=True,
@@ -700,8 +689,10 @@ class CustomerResponse(BaseModel):
         db_index=True,
     )
     case_study_willing = models.BooleanField(
-        verbose_name=('Would you be willing for DBT/Exporting is GREAT to feature your success '
-                      'in marketing materials?'),
+        verbose_name=(
+            'Would you be willing for DBT/Exporting is GREAT to feature your success '
+            'in marketing materials?'
+        ),
         default=False,
         null=True,
         blank=True,
@@ -747,20 +738,25 @@ class CustomerResponseToken(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     expires_on = models.DateTimeField()
     customer_response = models.ForeignKey(
-        CustomerResponse, related_name='tokens', on_delete=models.CASCADE)
+        CustomerResponse,
+        related_name='tokens',
+        on_delete=models.CASCADE,
+    )
     email_notification_id = models.UUIDField(null=True, blank=True)
     email_delivery_status = models.CharField(
         max_length=MAX_LENGTH,
         blank=True,
         choices=EmailDeliveryStatus.choices,
         help_text='Email delivery status',
-        default=EmailDeliveryStatus.UNKNOWN)
+        default=EmailDeliveryStatus.UNKNOWN,
+    )
     company_contact = models.ForeignKey(
         'company.Contact',
         related_name='tokens',
         null=True,
         blank=True,
-        on_delete=models.CASCADE)
+        on_delete=models.CASCADE,
+    )
     times_used = models.PositiveIntegerField(default=0)
     created_on = models.DateTimeField(db_index=True, null=True, blank=True, auto_now_add=True)
     adviser = models.ForeignKey(
@@ -783,7 +779,7 @@ class CustomerResponseToken(models.Model):
 
 
 @reversion.register_base_model()
-class LegacyExportWinsToDataHubCompany(models.Model):
+class LegacyExportWinsToDataHubCompany(models.Model):  # noqa: DJ008
     """Maps Legacy Export win to Data Hub company."""
 
     id = models.UUIDField(primary_key=True)
@@ -796,7 +792,7 @@ class LegacyExportWinsToDataHubCompany(models.Model):
     )
 
 
-class LegacyExportWinsToDataHubAdminUser(models.Model):
+class LegacyExportWinsToDataHubAdminUser(models.Model):  # noqa: DJ008
     """Maps Legacy Export win admin user to Data Hub adviser."""
 
     email = models.CharField(max_length=MAX_LENGTH)

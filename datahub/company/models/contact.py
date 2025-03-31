@@ -25,8 +25,7 @@ class ContactPermission(StrEnum):
 
 @reversion.register_base_model()
 class Contact(ArchivableModel, BaseModel):
-    """Contact (a person at a company that DIT has had contact with).
-    """
+    """Contact (a person at a company that DIT has had contact with)."""
 
     class Source(models.TextChoices):
         """Where the Contact was created from. Whether it was created on Data Hub or through
@@ -60,7 +59,7 @@ class Contact(ArchivableModel, BaseModel):
     )
     first_name = models.CharField(max_length=MAX_LENGTH)
     last_name = models.CharField(max_length=MAX_LENGTH)
-    job_title = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    job_title = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)  # noqa: DJ001
     company = models.ForeignKey(
         'Company',
         related_name='contacts',
@@ -84,10 +83,10 @@ class Contact(ArchivableModel, BaseModel):
     )
     email = models.EmailField()
     address_same_as_company = models.BooleanField(default=False)
-    address_1 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
-    address_2 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
-    address_town = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
-    address_county = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+    address_1 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)  # noqa: DJ001
+    address_2 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)  # # noqa: DJ001
+    address_town = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)  # noqa: DJ001
+    address_county = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)  # noqa: DJ001
     address_country = models.ForeignKey(
         metadata_models.Country,
         null=True,
@@ -101,8 +100,8 @@ class Contact(ArchivableModel, BaseModel):
         null=True,
         on_delete=models.SET_NULL,
     )
-    address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
-    notes = models.TextField(null=True, blank=True)
+    address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)  # noqa: DJ001
+    notes = models.TextField(null=True, blank=True)  # noqa: DJ001
     archived_documents_url_path = models.CharField(
         max_length=MAX_LENGTH,
         blank=True,
@@ -117,7 +116,7 @@ class Contact(ArchivableModel, BaseModel):
         related_name='transferred_from',
         help_text='Where data about this contact was transferred to.',
     )
-    transfer_reason = models.CharField(
+    transfer_reason = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         blank=True,
         null=True,

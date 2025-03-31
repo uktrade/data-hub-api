@@ -14,13 +14,15 @@ class BaseModel(models.Model):
     modified_on = models.DateTimeField(null=True, blank=True, auto_now=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        null=True, blank=True,
+        null=True,
+        blank=True,
         on_delete=models.SET_NULL,
         related_name='+',
     )
     modified_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        null=True, blank=True,
+        null=True,
+        blank=True,
         on_delete=models.SET_NULL,
         related_name='+',
     )
@@ -34,10 +36,13 @@ class ArchivableModel(models.Model):
 
     archived = models.BooleanField(default=False)
     archived_on = models.DateTimeField(blank=True, null=True)
-    archived_reason = models.TextField(blank=True, null=True)
+    archived_reason = models.TextField(blank=True, null=True)  # noqa: DJ001
     archived_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, blank=True, null=True,
-        on_delete=models.SET_NULL, related_name='+',
+        settings.AUTH_USER_MODEL,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name='+',
     )
 
     class Meta:
@@ -65,14 +70,14 @@ class DisableableModel(models.Model):
 
     disabled_on = models.DateTimeField(blank=True, null=True)
 
+    class Meta:
+        abstract = True
+
     def was_disabled_on(self, date_on):
         """Returns True if this object was disabled at time `date_on`, False otherwise."""
         if not self.disabled_on:
             return False
         return self.disabled_on <= date_on
-
-    class Meta:
-        abstract = True
 
 
 class BaseConstantModel(DisableableModel):
@@ -83,7 +88,7 @@ class BaseConstantModel(DisableableModel):
 
     class Meta:
         abstract = True
-        ordering = ('name', )
+        ordering = ('name',)
 
     def __str__(self):
         """Human readable admin name."""
@@ -101,4 +106,4 @@ class BaseOrderedConstantModel(BaseConstantModel):
 
     class Meta:
         abstract = True
-        ordering = ('order', )
+        ordering = ('order',)

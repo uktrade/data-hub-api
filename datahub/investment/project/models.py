@@ -77,9 +77,6 @@ class InvestmentProjectPermission(StrEnum):
 class IProjectAbstract(models.Model):
     """The core part of an investment project."""
 
-    class Meta:
-        abstract = True
-
     class Priority(models.TextChoices):
         LOW = ('1_low', 'Low')
         MEDIUM = ('2_medium', 'Medium')
@@ -115,8 +112,7 @@ class IProjectAbstract(models.Model):
         related_name='investment_projects',
     )
 
-    cdms_project_code = models.CharField(
-        max_length=MAX_LENGTH, blank=True, null=True)
+    cdms_project_code = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)  # noqa: DJ001
     quotable_as_public_case_study = models.BooleanField(null=True)
     actual_land_date = models.DateField(
         blank=True,
@@ -130,7 +126,7 @@ class IProjectAbstract(models.Model):
         on_delete=models.SET_NULL,
     )
 
-    priority = models.CharField(
+    priority = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         choices=Priority.choices,
         blank=True,
@@ -155,10 +151,10 @@ class IProjectAbstract(models.Model):
         choices=Status.choices,
         default=Status.ONGOING,
     )
-    reason_delayed = models.TextField(blank=True, null=True)
-    reason_abandoned = models.TextField(blank=True, null=True)
+    reason_delayed = models.TextField(blank=True, null=True)  # noqa: DJ001
+    reason_abandoned = models.TextField(blank=True, null=True)  # noqa: DJ001
     date_abandoned = models.DateField(blank=True, null=True)
-    reason_lost = models.TextField(blank=True, null=True)
+    reason_lost = models.TextField(blank=True, null=True)  # noqa: DJ001
     date_lost = models.DateField(blank=True, null=True)
     country_lost_to = models.ForeignKey(
         'metadata.Country',
@@ -249,8 +245,7 @@ class IProjectAbstract(models.Model):
         blank=True,
         on_delete=models.SET_NULL,
     )
-    referral_source_activity_event = models.CharField(
-        max_length=MAX_LENGTH, null=True, blank=True)
+    referral_source_activity_event = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)  # noqa: DJ001
     fdi_type = models.ForeignKey(
         'metadata.FDIType',
         related_name='investment_projects',
@@ -270,11 +265,14 @@ class IProjectAbstract(models.Model):
         related_name='+',
         blank=True,
     )
-    other_business_activity = models.CharField(
+    other_business_activity = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
     )
+
+    class Meta:
+        abstract = True
 
     @cached_property
     def financial_year(self):
@@ -349,10 +347,7 @@ class IProjectAbstract(models.Model):
 class IProjectValueAbstract(models.Model):
     """The value part of an investment project."""
 
-    class Meta:
-        abstract = True
-
-    fdi_value = models.ForeignKey(
+    fdi_value = models.ForeignKey(  # noqa: DJ001
         'metadata.FDIValue',
         related_name='investment_projects',
         null=True,
@@ -420,22 +415,20 @@ class IProjectValueAbstract(models.Model):
         ),
     )
 
+    class Meta:
+        abstract = True
+
 
 class IProjectRequirementsAbstract(models.Model):
     """The requirements part of an investment project."""
 
-    class Meta:
-        abstract = True
-
-    client_requirements = models.TextField(blank=True, null=True)
+    client_requirements = models.TextField(blank=True, null=True)  # noqa: DJ001
     site_decided = models.BooleanField(null=True)
     site_address_is_company_address = models.BooleanField(null=True, default=None)
-    address_1 = models.CharField(blank=True, null=True, max_length=MAX_LENGTH)
-    address_2 = models.CharField(blank=True, null=True, max_length=MAX_LENGTH)
-    address_town = models.CharField(
-        blank=True, null=True, max_length=MAX_LENGTH)
-    address_postcode = models.CharField(
-        blank=True, null=True, max_length=MAX_LENGTH)
+    address_1 = models.CharField(blank=True, null=True, max_length=MAX_LENGTH)  # noqa: DJ001
+    address_2 = models.CharField(blank=True, null=True, max_length=MAX_LENGTH)  # noqa: DJ001
+    address_town = models.CharField(blank=True, null=True, max_length=MAX_LENGTH)  # noqa: DJ001
+    address_postcode = models.CharField(blank=True, null=True, max_length=MAX_LENGTH)  # noqa: DJ001
     client_considering_other_countries = models.BooleanField(null=True)
 
     uk_company_decided = models.BooleanField(null=True)
@@ -446,8 +439,7 @@ class IProjectRequirementsAbstract(models.Model):
         blank=True,
         on_delete=models.SET_NULL,
     )
-    competitor_countries = models.ManyToManyField(
-        'metadata.Country', related_name='+', blank=True)
+    competitor_countries = models.ManyToManyField('metadata.Country', related_name='+', blank=True)
     allow_blank_possible_uk_regions = models.BooleanField(
         default=False,
         help_text='Controls whether possible UK regions is a required field (after the prospect '
@@ -485,12 +477,12 @@ class IProjectRequirementsAbstract(models.Model):
         'investment project.',
     )
 
+    class Meta:
+        abstract = True
+
 
 class IProjectTeamAbstract(models.Model):
     """The team part of an investment project."""
-
-    class Meta:
-        abstract = True
 
     project_manager = models.ForeignKey(
         'company.Advisor',
@@ -501,8 +493,7 @@ class IProjectTeamAbstract(models.Model):
     )
     # field project_manager_first_assigned_on is being used for SPI reporting
     # it contains a datetime when first time a project manager has been assigned
-    project_manager_first_assigned_on = models.DateTimeField(
-        null=True, blank=True)
+    project_manager_first_assigned_on = models.DateTimeField(null=True, blank=True)
     # field project_manager_first_assigned_by is being used for SPI reporting
     # it contains a reference to an Adviser who first time assigned a project manager
     project_manager_first_assigned_by = models.ForeignKey(
@@ -529,6 +520,9 @@ class IProjectTeamAbstract(models.Model):
         on_delete=models.SET_NULL,
     )
 
+    class Meta:
+        abstract = True
+
     @property
     def project_manager_team(self):
         """The DIT team associated with the project manager."""
@@ -547,15 +541,15 @@ class IProjectTeamAbstract(models.Model):
 class IProjectSPIAbstract(models.Model):
     """The Service Performance Indicator (SPI) part of an investment project.
 
-    It enables monitoring and measurement of the Investment Services Team’s (IST)
+    It enables monitoring and measurement of the Investment Services Team's (IST)
     key service performance indicators (SPIs).
     """
 
-    class Meta:
-        abstract = True
-
     project_arrived_in_triage_on = models.DateField(blank=True, null=True)
     proposal_deadline = models.DateField(blank=True, null=True)
+
+    class Meta:
+        abstract = True
 
 
 _AssociatedToManyField = namedtuple(
@@ -593,62 +587,6 @@ class InvestmentProject(
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
 
-    def __init__(self, *args, **kwargs):
-        """Keep the original stage value so that we can see if it changes when saving."""
-        super().__init__(*args, **kwargs)
-        self.__stage_id = self.stage_id
-
-    def get_absolute_url(self):
-        """URL to the object in the Data Hub internal front end."""
-        return f'{get_front_end_url(self)}/details'
-
-    def save(self, *args, **kwargs):
-        """Updates the stage log after saving.
-        Create a `CompanyActivity` linked to this investment project for
-        showing all activities related to a company. If no company exist then do nothing.
-        """
-        adding = self._state.adding
-
-        with transaction.atomic():
-            super().save(*args, **kwargs)
-            self._update_stage_log(adding)
-
-            if not self.investor_company_id:
-                return
-            CompanyActivity.objects.update_or_create(
-                investment_id=self.id,
-                activity_source=CompanyActivity.ActivitySource.investment,
-                defaults={
-                    'date': self.created_on,
-                    'company_id': self.investor_company_id,
-                },
-            )
-
-    def _update_stage_log(self, adding):
-        """Creates a log of changes to stage field.
-
-        This allows us to construct the timeline of changes to the stage field as
-        required for Service Performance Indicators (SPI).
-        """
-        stage_changed_on = None
-
-        if adding:
-            stage_changed_on = self.created_on
-        elif self.__stage_id != self.stage_id:
-            stage_changed_on = self.modified_on
-
-        if stage_changed_on:
-            InvestmentProjectStageLog.objects.create(
-                investment_project_id=self.pk,
-                stage_id=self.stage_id,
-                created_on=stage_changed_on,
-            )
-
-    def __str__(self):
-        """Human-readable name for admin section etc."""
-        company_name = self.investor_company or 'No company'
-        return f'{company_name} – {self.name}'
-
     class Meta:
         permissions = (
             (
@@ -683,6 +621,62 @@ class InvestmentProject(
             models.Index(fields=('modified_on', 'id')),
         ]
 
+    def __str__(self):
+        """Human-readable name for admin section etc."""
+        company_name = self.investor_company or 'No company'
+        return f'{company_name} - {self.name}'
+
+    def __init__(self, *args, **kwargs):
+        """Keep the original stage value so that we can see if it changes when saving."""
+        super().__init__(*args, **kwargs)
+        self.__stage_id = self.stage_id
+
+    def save(self, *args, **kwargs):
+        """Updates the stage log after saving.
+        Create a `CompanyActivity` linked to this investment project for
+        showing all activities related to a company. If no company exist then do nothing.
+        """
+        adding = self._state.adding
+
+        with transaction.atomic():
+            super().save(*args, **kwargs)
+            self._update_stage_log(adding)
+
+            if not self.investor_company_id:
+                return
+            CompanyActivity.objects.update_or_create(
+                investment_id=self.id,
+                activity_source=CompanyActivity.ActivitySource.investment,
+                defaults={
+                    'date': self.created_on,
+                    'company_id': self.investor_company_id,
+                },
+            )
+
+    def get_absolute_url(self):
+        """URL to the object in the Data Hub internal front end."""
+        return f'{get_front_end_url(self)}/details'
+
+    def _update_stage_log(self, adding):
+        """Creates a log of changes to stage field.
+
+        This allows us to construct the timeline of changes to the stage field as
+        required for Service Performance Indicators (SPI).
+        """
+        stage_changed_on = None
+
+        if adding:
+            stage_changed_on = self.created_on
+        elif self.__stage_id != self.stage_id:
+            stage_changed_on = self.modified_on
+
+        if stage_changed_on:
+            InvestmentProjectStageLog.objects.create(
+                investment_project_id=self.pk,
+                stage_id=self.stage_id,
+                created_on=stage_changed_on,
+            )
+
     @cached_property
     def incomplete_fields(self):
         """Fields that need to be completed to move to the next stage."""
@@ -705,8 +699,7 @@ class InvestmentProject(
         return cls._ASSOCIATED_ADVISER_TO_ONE_FIELDS, cls._ASSOCIATED_ADVISER_TO_MANY_FIELDS
 
     def _get_associated_to_one_advisers(self):
-        advisers = (getattr(self, field)
-                    for field in self._ASSOCIATED_ADVISER_TO_ONE_FIELDS)
+        advisers = (getattr(self, field) for field in self._ASSOCIATED_ADVISER_TO_ONE_FIELDS)
         return filter(None, advisers)
 
     def _get_associated_to_many_advisers(self):
@@ -738,17 +731,16 @@ class InvestmentProjectTeamMember(models.Model):
         on_delete=models.CASCADE,
         related_name='team_members',
     )
-    adviser = models.ForeignKey(
-        'company.Advisor', on_delete=models.CASCADE, related_name='+')
+    adviser = models.ForeignKey('company.Advisor', on_delete=models.CASCADE, related_name='+')
     role = models.CharField(max_length=MAX_LENGTH)
-
-    def __str__(self):
-        """Human-readable representation."""
-        return f'{self.investment_project} – {self.adviser} – {self.role}'
 
     class Meta:
         unique_together = (('investment_project', 'adviser'),)
         default_permissions = ()
+
+    def __str__(self):
+        """Human-readable representation."""
+        return f'{self.investment_project} - {self.adviser} - {self.role}'
 
 
 class InvestmentProjectStageLog(models.Model):
@@ -782,8 +774,7 @@ class InvestmentActivity(BaseModel):
     """An investment activity."""
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
-    revision = models.OneToOneField(
-        Revision, on_delete=models.SET_NULL, null=True, blank=True)
+    revision = models.OneToOneField(Revision, on_delete=models.SET_NULL, null=True, blank=True)
     text = models.TextField()
     activity_type = models.ForeignKey(
         'investment.InvestmentActivityType',
@@ -804,7 +795,7 @@ class InvestmentActivity(BaseModel):
         return self.text
 
 
-class InvestmentProjectCode(models.Model):
+class InvestmentProjectCode(models.Model):  # noqa: DJ008
     """An investment project number used for project codes.
 
     These are generated for new projects (but not for projects migrated from CDMS).

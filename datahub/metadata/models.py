@@ -23,7 +23,7 @@ MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
 class _MPTTObjectName:
-    """This adds a cached property "name" to the model that gets a full name
+    """Adds a cached property "name" to the model that gets a full name
     of the object using parent.
     """
 
@@ -62,7 +62,8 @@ class Sector(MPTTModel, _MPTTObjectName, DisableableModel):
     segment = models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH)
     sector_cluster = models.ForeignKey(
         SectorCluster,
-        null=True, blank=True,
+        null=True,
+        blank=True,
         related_name='%(class)ss',
         on_delete=models.PROTECT,
     )
@@ -88,10 +89,7 @@ class Sector(MPTTModel, _MPTTObjectName, DisableableModel):
     @staticmethod
     def get_name_from_segments(segments: list[str | None]) -> str:
         """Gets a sector's full name from a list of segments, some of which can be None."""
-        name = ' : '.join([
-            segment.strip() for segment in segments
-            if segment not in [None, '']
-        ])
+        name = ' : '.join([segment.strip() for segment in segments if segment not in [None, '']])
         return name
 
     @staticmethod
@@ -191,8 +189,7 @@ class AdministrativeArea(BaseConstantModel):
     area_name = models.CharField(blank=True, max_length=255)
 
     def __str__(self):
-        """To make this clearer for anyone using the admin drop down on this data.
-        """
+        """To make this clearer for anyone using the admin drop down on this data."""
         return f'{self.name} ({self.country.name})'
 
 
@@ -228,19 +225,22 @@ class Team(BaseConstantModel):
 
     role = models.ForeignKey(
         TeamRole,
-        null=True, blank=True,
+        null=True,
+        blank=True,
         related_name='%(class)ss',
         on_delete=models.PROTECT,
     )
     uk_region = models.ForeignKey(
         UKRegion,
-        null=True, blank=True,
+        null=True,
+        blank=True,
         related_name='%(class)ss',
         on_delete=models.PROTECT,
     )
     country = models.ForeignKey(
         Country,
-        null=True, blank=True,
+        null=True,
+        blank=True,
         related_name='%(class)ss',
         on_delete=models.PROTECT,
     )
@@ -338,7 +338,7 @@ class Service(MPTTModel, _MPTTObjectName, BaseOrderedConstantModel):
         indexes = [
             GinIndex(fields=['contexts']),
         ]
-        ordering = ('lft', )
+        ordering = ('lft',)
 
     class MPTTMeta:
         order_insertion_by = ('segment',)
@@ -352,8 +352,9 @@ class InvestmentProjectStage(BaseOrderedConstantModel):
     """Investment project stage."""
 
     exclude_from_investment_flow = models.BooleanField(
-        help_text=_('If set to True the stage will not be part of the '
-                    'linear flow and will be skipped.'),
+        help_text=_(
+            'If set to True the stage will not be part of the linear flow and will be skipped.',
+        ),
         default=False,
     )
 
@@ -378,7 +379,7 @@ class ReferralSourceWebsite(BaseConstantModel):
 
 
 class ReferralSourceMarketing(BaseConstantModel):
-    """Referral source – marketing activities (for investment projects)."""
+    """Referral source - marketing activities (for investment projects)."""
 
 
 class InvestmentBusinessActivity(BaseConstantModel):
@@ -404,26 +405,26 @@ class ExportBarrierType(BaseOrderedConstantModel):
     """Export barrier type (used for company interactions)."""
 
 
-class PostcodeData(models.Model):
+class PostcodeData(models.Model):  # noqa: DJ008
     """Postcode data (for the manual addition of a company)."""
 
     id = models.IntegerField(
         primary_key=True,
         help_text='External ID from data workspace',
     )
-    ccg = models.CharField(
+    ccg = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         help_text='Clinical Commissioning Group',
     )
-    ced = models.CharField(
+    ced = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         help_text='County Electoral Division',
     )
-    eer = models.CharField(
+    eer = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
@@ -438,49 +439,49 @@ class PostcodeData(models.Model):
         decimal_places=6,
         help_text='Degress Latitude',
     )
-    pcd = models.CharField(
+    pcd = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         help_text='Unit Postcode (7 character version)',
     )
-    pct = models.CharField(
+    pct = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         help_text='Primary Care Trust',
     )
-    pfa = models.CharField(
+    pfa = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         help_text='Police Force Area',
     )
-    rgn = models.CharField(
+    rgn = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         help_text='Region Code',
     )
-    stp = models.CharField(
+    stp = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         help_text='Sustainability and Transformation Partnership',
     )
-    ctry = models.CharField(
+    ctry = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         help_text='Country',
     )
-    lep1 = models.CharField(
+    lep1 = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         help_text='Primary Local Enterprise Partnership',
     )
-    lep2 = models.CharField(
+    lep2 = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
@@ -491,86 +492,86 @@ class PostcodeData(models.Model):
         decimal_places=6,
         help_text='Degrees Longitude',
     )
-    nuts = models.CharField(
+    nuts = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         help_text='International Terratorial Levels (ITL  - Former\
         Nomenclature of Units for Territorial Statistics (NUTS)',
     )
-    oa01 = models.CharField(
+    oa01 = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         help_text='Census Output Area',
     )
-    oa11 = models.CharField(
+    oa11 = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         help_text='Census Output Area/Small Area',
     )
-    park = models.CharField(
+    park = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         help_text='National Parks',
     )
-    pcd2 = models.CharField(
+    pcd2 = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         help_text='Unit Postcode (8 character version)',
     )
-    pcds = models.CharField(
+    pcds = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         help_text='Unit Postcode (variable length version)',
     )
-    pcon = models.CharField(
+    pcon = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         help_text='Westminster Parliamentary Consituency',
     )
-    ttwa = models.CharField(
+    ttwa = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         help_text='Travel to Work Area',
     )
-    wz11 = models.CharField(
+    wz11 = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         help_text='Workplace Zone',
     )
-    bua11 = models.CharField(
+    bua11 = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         help_text='Built-up Area',
     )
-    nhser = models.CharField(
+    nhser = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         help_text='NHS England Region',
     )
-    oac01 = models.CharField(
+    oac01 = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         help_text='Census Area Output Classification',
     )
-    oac11 = models.CharField(
+    oac11 = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         help_text='Census Area/Small Area Output Classification',
     )
-    oscty = models.CharField(
+    oscty = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
@@ -580,7 +581,7 @@ class PostcodeData(models.Model):
         null=True,
         help_text='Standard Statistical Region',
     )
-    calncv = models.CharField(
+    calncv = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
@@ -596,97 +597,97 @@ class PostcodeData(models.Model):
         blank=True,
         help_text='Date of Termination (YYYYMM)',
     )
-    lsoa01 = models.CharField(
+    lsoa01 = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         help_text='Census Lower Layer Super Output Area',
     )
-    lsoa11 = models.CharField(
+    lsoa11 = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         help_text='Census Lower Layer Super Output Area',
     )
-    msoa01 = models.CharField(
+    msoa01 = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         help_text='Census Middle Layer Super Output Area',
     )
-    msoa11 = models.CharField(
+    msoa11 = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         help_text='Census Middle Layer Super Output Area',
     )
-    oslaua = models.CharField(
+    oslaua = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         help_text='Local Authority District',
     )
-    osward = models.CharField(
+    osward = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         help_text='Electoral Ward',
     )
-    parish = models.CharField(
+    parish = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         help_text='Parish',
     )
-    teclec = models.CharField(
+    teclec = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         help_text='Local Learning and Skills Council',
     )
-    buasd11 = models.CharField(
+    buasd11 = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         help_text='Built-up Areas Subdivision',
     )
-    casward = models.CharField(
+    casward = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         help_text='Census Area Statistics Ward',
     )
-    ru11ind = models.CharField(
+    ru11ind = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         help_text='Census Rural-Urban Classification',
     )
-    ur01ind = models.CharField(
+    ur01ind = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         help_text='Census Rural-Urban Indicator',
     )
-    oseast1m = models.CharField(
+    oseast1m = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         help_text='National Grid Reference - Easting',
     )
-    osgrdind = models.CharField(
+    osgrdind = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         help_text='Grid Reference Positional Quality Indicator',
     )
-    oshlthau = models.CharField(
+    oshlthau = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         help_text='Former Strategic Health Authority/Health Board',
     )
-    osnrth1m = models.CharField(
+    osnrth1m = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
@@ -696,25 +697,25 @@ class PostcodeData(models.Model):
         null=True,
         help_text='Postcode User Type (0 - Small or 1 - Large)',
     )
-    statsward = models.CharField(
+    statsward = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         help_text='Statistical Ward',
     )
-    region_name = models.CharField(
+    region_name = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         help_text='Region Name',
     )
-    pcd_normalised = models.CharField(
+    pcd_normalised = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         help_text='Unit Postcode Normalised',
     )
-    uk_super_region = models.CharField(
+    uk_super_region = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
@@ -725,25 +726,25 @@ class PostcodeData(models.Model):
         blank=True,
         help_text='Publication Date',
     )
-    local_authority_district_name = models.CharField(
+    local_authority_district_name = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         help_text=' Local Authority District Name',
     )
-    parliamentary_constituency_name = models.CharField(
+    parliamentary_constituency_name = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         help_text='Parliamentary Constituency Name',
     )
-    lep1_local_enterprise_partnership_name = models.CharField(
+    lep1_local_enterprise_partnership_name = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
         help_text='Primary Local Enterprise Partnership Name',
     )
-    lep2_local_enterprise_partnership_name = models.CharField(
+    lep2_local_enterprise_partnership_name = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,

@@ -154,7 +154,7 @@ class Company(ArchivableModel, BaseModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     name = models.CharField(max_length=MAX_LENGTH)
     reference_code = models.CharField(max_length=MAX_LENGTH, blank=True)
-    company_number = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+    company_number = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)  # noqa: DJ001
     vat_number = models.CharField(max_length=MAX_LENGTH, blank=True)
     duns_number = models.CharField(
         blank=True,
@@ -231,8 +231,8 @@ class Company(ArchivableModel, BaseModel):
         blank=True,
         related_name='companies_with_future_interest',
     )
-    description = models.TextField(blank=True, null=True)
-    website = models.URLField(max_length=MAX_LENGTH, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)  # noqa: DJ001
+    website = models.URLField(max_length=MAX_LENGTH, blank=True, null=True)  # noqa: DJ001
     uk_region = models.ForeignKey(
         metadata_models.UKRegion,
         blank=True,
@@ -356,7 +356,7 @@ class Company(ArchivableModel, BaseModel):
         default=False,
         help_text='Whether this company is to be investigated by DNB.',
     )
-    export_potential = models.CharField(
+    export_potential = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
@@ -368,7 +368,7 @@ class Company(ArchivableModel, BaseModel):
         null=True,
         help_text='Timestamp of the last modification for export potential.',
     )
-    great_profile_status = models.CharField(
+    great_profile_status = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
@@ -496,16 +496,14 @@ class Company(ArchivableModel, BaseModel):
 
     @property
     def is_global_ultimate(self):
-        """Whether this company is the global ultimate or not.
-        """
+        """Whether this company is the global ultimate or not."""
         if not self.duns_number:
             return False
         return self.duns_number == self.global_ultimate_duns_number
 
     @property
     def related_companies(self):
-        """All companies that share the same global ultimate duns number.
-        """
+        """All companies that share the same global ultimate duns number."""
         return (
             Company.objects.filter(
                 global_ultimate_duns_number=self.global_ultimate_duns_number,
@@ -557,15 +555,13 @@ class Company(ArchivableModel, BaseModel):
         self.archive(user, archived_reason)
 
     def get_group_global_headquarters(self):
-        """:returns: the Global Headquarters for the group that this company is part of.
-        """
+        """:returns: the Global Headquarters for the group that this company is part of."""
         if self.global_headquarters:
             return self.global_headquarters
         return self
 
     def get_one_list_group_tier(self):
-        """:returns: the One List Tier of the group this company is part of.
-        """
+        """:returns: the One List Tier of the group this company is part of."""
         return self.get_group_global_headquarters().one_list_tier
 
     def get_one_list_group_core_team(self):
@@ -740,12 +736,12 @@ class OneListCoreTeamMember(models.Model):
         related_name='one_list_core_team_memberships',
     )
 
+    class Meta:
+        unique_together = (('company', 'adviser'),)
+
     def __str__(self):
         """Human-readable representation."""
         return f'{self.adviser} - One List Core Team member of {self.company}'
-
-    class Meta:
-        unique_together = (('company', 'adviser'),)
 
 
 @reversion.register_base_model()

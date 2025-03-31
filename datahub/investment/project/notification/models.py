@@ -6,7 +6,7 @@ from django.db import models
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
-class NotificationInnerTemplate(models.Model):
+class NotificationInnerTemplate(models.Model):  # noqa: DJ008
     """Notification inner template content."""
 
     class NotificationType(models.TextChoices):

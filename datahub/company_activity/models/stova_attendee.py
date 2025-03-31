@@ -12,7 +12,7 @@ MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
 @reversion.register_base_model()
-class StovaAttendee(models.Model):
+class StovaAttendee(models.Model):  # noqa: DJ008
     """Stova can also be known as Aventri.
     This model is filled and based off data from the S3 bucket: ExportAventriAttendees.
     """
@@ -21,22 +21,22 @@ class StovaAttendee(models.Model):
     stova_attendee_id = models.IntegerField(unique=True)
     stova_event_id = models.IntegerField()
 
-    created_by = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+    created_by = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)  # noqa: DJ001
     created_date = models.DateTimeField(blank=True, null=True)
-    modified_by = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+    modified_by = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)  # noqa: DJ001
     modified_date = models.DateTimeField(blank=True, null=True)
 
     email = models.CharField(max_length=MAX_LENGTH)
     first_name = models.CharField(max_length=MAX_LENGTH)
     last_name = models.CharField(max_length=MAX_LENGTH)
-    attendee_questions = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+    attendee_questions = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)  # noqa: DJ001
 
     company_name = models.CharField(max_length=MAX_LENGTH)
-    category = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
-    registration_status = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+    category = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)  # noqa: DJ001
+    registration_status = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)  # noqa: DJ001
 
-    virtual_event_attendance = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
-    language = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+    virtual_event_attendance = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)  # noqa: DJ001
+    language = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)  # noqa: DJ001
 
     last_lobby_login = models.DateTimeField(blank=True, null=True)
 
@@ -73,7 +73,7 @@ class StovaAttendee(models.Model):
     )
 
 
-class TempRelationStorage(models.Model):
+class TempRelationStorage(models.Model):  # noqa: DJ008
     """Temporary model to store the deleted IDs of companies, interactions and contacts created
     from Stova. This is so there is a way to roll these back if the deletion fails.
 

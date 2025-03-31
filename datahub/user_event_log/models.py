@@ -37,10 +37,6 @@ class UserEvent(models.Model):
     )
     data = models.JSONField(null=True, encoder=DjangoJSONEncoder)
 
-    def __str__(self):
-        """Human-friendly string representation."""
-        return f'{self.timestamp} – {self.adviser} – {self.get_type_display()}'
-
     class Meta:
         indexes = [
             models.Index(fields=['api_url_path', 'timestamp']),
@@ -48,3 +44,7 @@ class UserEvent(models.Model):
             models.Index(fields=['timestamp', 'type', 'adviser']),
         ]
         ordering = ('-timestamp', '-pk')
+
+    def __str__(self):
+        """Human-friendly string representation."""
+        return f'{self.timestamp} - {self.adviser} - {self.get_type_display()}'

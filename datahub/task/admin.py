@@ -21,7 +21,7 @@ class TaskAdminForm(forms.ModelForm):
 
     class Meta:
         model = Task
-        exclude = []
+        exclude = []  # noqa: DJ006
 
 
 @admin.register(Task)
@@ -48,8 +48,6 @@ class TaskAdmin(BaseModelAdminMixin, VersionAdmin):
         'modified_by',
         'archived_by',
     )
-    autocomplete_fields = (
-        'advisers',
-    )
+    autocomplete_fields = ('advisers',)
 
     form = TaskAdminForm
