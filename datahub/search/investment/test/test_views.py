@@ -1726,16 +1726,16 @@ class TestInvestmentProjectExportView(APITestMixin):
                 'Other team members': join_attr_values(
                     project.team_members.order_by('adviser__first_name', 'adviser__last_name'),
                     'adviser.name',
-                ),  # noqa: E123
+                ),
                 'Delivery partners': join_attr_values(
                     project.delivery_partners.order_by('name'),
-                ),  # noqa: E123
+                ),
                 'Possible UK regions': join_attr_values(
                     project.uk_region_locations.order_by('name'),
-                ),  # noqa: E123
+                ),
                 'Actual UK regions': join_attr_values(
                     project.actual_uk_regions.order_by('name'),
-                ),  # noqa: E123
+                ),
                 'Specific investment programmes': join_attr_values(
                     project.specific_programmes.order_by('name'),
                 ),
