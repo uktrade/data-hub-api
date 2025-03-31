@@ -84,7 +84,7 @@ class Contact(ArchivableModel, BaseModel):
     email = models.EmailField()
     address_same_as_company = models.BooleanField(default=False)
     address_1 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)  # noqa: DJ001
-    address_2 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)  # # noqa: DJ001
+    address_2 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)  # noqa: DJ001
     address_town = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)  # noqa: DJ001
     address_county = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)  # noqa: DJ001
     address_country = models.ForeignKey(

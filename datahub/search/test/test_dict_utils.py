@@ -226,7 +226,7 @@ def test_address_dict_raises_error_with_invalid_prefix():
         ),
         primary_address_area=None,
     )
-    with pytest.pytest.raises(AttributeError):
+    with pytest.raises(AttributeError):
         dict_utils.address_dict(obj, prefix='secondary_address')
 
 
