@@ -52,7 +52,7 @@ class TestGenericDocumentRetrieveSerializer:
         )
         with pytest.raises(Exception):
             serializer = GenericDocumentRetrieveSerializer(generic_document)
-            serializer.data
+            serializer.data  # noqa: B018
 
     def test_serializer_raises_error_if_unsupported_related_object_type(self):
         document = SharePointDocumentFactory()
@@ -71,4 +71,4 @@ class TestGenericDocumentRetrieveSerializer:
         )
         with pytest.raises(Exception):
             serializer = GenericDocumentRetrieveSerializer(generic_document)
-            serializer.data
+            serializer.data  # noqa: B018

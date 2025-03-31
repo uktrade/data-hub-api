@@ -40,8 +40,7 @@ class IsObjectBeingCreated(BaseRule):
     """Rule to check if an object is being added."""
 
     def __call__(self, combiner) -> bool:
-        """Returns True if the object is being created.
-        """
+        """Returns True if the object is being created."""
         return not combiner.instance
 
 
@@ -63,8 +62,7 @@ class IsFieldBeingUpdatedAndIsNotBlankRule(BaseRule):
     """Rule to check if a field is being updated and the value is not blank."""
 
     def __call__(self, combiner) -> bool:
-        """Returns True if the field is being updated and the value is not blank.
-        """
+        """Returns True if the field is being updated and the value is not blank."""
         if self.field not in combiner.data:
             return False
         return is_not_blank(combiner.data[self.field])
@@ -189,9 +187,7 @@ class ConditionalRule:
 
     def __repr__(self):
         """Returns the Python representation of this object."""
-        return (
-            f'{self.__class__.__name__}({self._rule!r}, when={self._condition!r})'
-        )
+        return f'{self.__class__.__name__}({self._rule!r}, when={self._condition!r})'
 
 
 class AllIsBlankRule(BaseRule):
@@ -260,7 +256,7 @@ class NotRule(AbstractRule):
     @property
     def field(self):
         """Field on which the rule is being applied."""
-        self._rule.field
+        self._rule.field  # noqa: B018
 
     def __call__(self, combiner) -> bool:
         """Test whether rule is False."""
@@ -326,8 +322,7 @@ class RulesBasedValidator:
     requires_context = True
 
     def __init__(self, *rules: AbstractValidationRule):
-        """Initialises the validator with rules.
-        """
+        """Initialises the validator with rules."""
         self._rules = rules
 
     def __call__(self, data, serializer):

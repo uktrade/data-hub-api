@@ -23,7 +23,7 @@ def test_project_code_cdms():
     project = InvestmentProjectFactory(cdms_project_code='P-79661656')
     assert project.project_code == 'P-79661656'
     with pytest.raises(ObjectDoesNotExist):
-        project.investmentprojectcode
+        project.investmentprojectcode  # noqa: B018
 
 
 def test_project_code_datahub():
@@ -180,9 +180,7 @@ def test_doesnt_create_stage_log_if_stage_was_not_modified():
 def test_stage_log_added_when_investment_project_is_created():
     """Tests that stage is being logged when Investment Projects is created."""
     project = InvestmentProjectFactory()
-    assert [
-        (entry.stage.id, entry.created_on) for entry in project.stage_log.all()
-    ] == [
+    assert [(entry.stage.id, entry.created_on) for entry in project.stage_log.all()] == [
         (
             UUID(constants.InvestmentProjectStage.prospect.value.id),
             datetime(2017, 4, 28, 17, 35, tzinfo=timezone.utc),

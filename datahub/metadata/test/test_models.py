@@ -34,8 +34,7 @@ def test_sector_name_level_two():
 
 
 def test_sector_save_recursive_via_parent():
-    """Test that it's not possible to save a sector when it's part of a recursive hierarchy.
-    """
+    """Test that it's not possible to save a sector when it's part of a recursive hierarchy."""
     parent = SectorFactory()
     sector = SectorFactory(parent=parent)
     parent.parent = sector
@@ -51,7 +50,7 @@ def test_sector_name_recursive_via_parent_unsaved():
     sector = SectorFactory(parent=parent)
     parent.parent = sector
     with pytest.raises(DataHubError):
-        sector.name
+        sector.name  # noqa: B018
 
 
 def test_sector_save_recursive():
@@ -69,7 +68,7 @@ def test_sector_name_level_recursive_unsaved():
     sector = SectorFactory()
     sector.parent = sector
     with pytest.raises(DataHubError):
-        sector.name
+        sector.name  # noqa: B018
 
 
 @pytest.mark.parametrize(

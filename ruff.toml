@@ -40,6 +40,7 @@ ignore = [
     'B017',   # Do not assert blind exception: {exception}
     'B019',   # Use of functools.lru_cache or functools.cache on methods can lead to memory leaks
     'B026',   # Star-arg unpacking after a keyword argument is strongly discouraged
+    'B904',   # Within an except* clause, raise exceptions with raise ... from err or raise ... from None to distinguish them from errors in exception handling
     'D100',   # Missing docstring in public module 
     'D101',   # Missing docstring in public class
     'D102',   # Missing docstring in public method
@@ -70,6 +71,9 @@ dummy-variable-rgx = '^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$'
 
 [lint.mccabe]
 max-complexity = 10
+
+[lint.pylint]
+max-args = 10
 
 [lint.isort]
 known-first-party = ['datahub', 'config']

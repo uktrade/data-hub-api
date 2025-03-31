@@ -33,16 +33,15 @@ class TestReplaceNullWithDefault:
         ],
     )
     def test_replaces_null_with_default(
-            self,
-            num_objects,
-            batch_size,
-            expected_batches,
+        self,
+        num_objects,
+        batch_size,
+        expected_batches,
     ):
         """Test that null values are replaced with the default value for the model field."""
-        objs = (
-            [NullableWithDefaultModel(nullable_with_default=None)] * num_objects
-            + [NullableWithDefaultModel(nullable_with_default=False)] * 10
-        )
+        objs = [NullableWithDefaultModel(nullable_with_default=None)] * num_objects + [
+            NullableWithDefaultModel(nullable_with_default=False),
+        ] * 10
         NullableWithDefaultModel.objects.bulk_create(objs)
 
         replace_null_with_default(
@@ -51,9 +50,12 @@ class TestReplaceNullWithDefault:
             batch_size=batch_size,
         )
 
-        assert NullableWithDefaultModel.objects.filter(
-            nullable_with_default__isnull=True,
-        ).count() == 0
+        assert (
+            NullableWithDefaultModel.objects.filter(
+                nullable_with_default__isnull=True,
+            ).count()
+            == 0
+        )
         assert NullableWithDefaultModel.objects.filter(nullable_with_default=False).count() == 10
 
     @pytest.mark.parametrize(
@@ -67,16 +69,15 @@ class TestReplaceNullWithDefault:
         ],
     )
     def test_replaces_null_with_given_default(
-            self,
-            num_objects,
-            batch_size,
-            expected_batches,
+        self,
+        num_objects,
+        batch_size,
+        expected_batches,
     ):
         """Test that null values are replaced with the default value explicitly specified."""
-        objs = (
-            [NullableWithDefaultModel(nullable_without_default=None)] * num_objects
-            + [NullableWithDefaultModel(nullable_without_default=False)] * 10
-        )
+        objs = [NullableWithDefaultModel(nullable_without_default=None)] * num_objects + [
+            NullableWithDefaultModel(nullable_without_default=False),
+        ] * 10
         NullableWithDefaultModel.objects.bulk_create(objs)
 
         replace_null_with_default(
@@ -86,12 +87,18 @@ class TestReplaceNullWithDefault:
             batch_size=batch_size,
         )
 
-        assert NullableWithDefaultModel.objects.filter(
-            nullable_without_default__isnull=True,
-        ).count() == 0
-        assert NullableWithDefaultModel.objects.filter(
-            nullable_without_default=False,
-        ).count() == 10
+        assert (
+            NullableWithDefaultModel.objects.filter(
+                nullable_without_default__isnull=True,
+            ).count()
+            == 0
+        )
+        assert (
+            NullableWithDefaultModel.objects.filter(
+                nullable_without_default=False,
+            ).count()
+            == 10
+        )
 
     @pytest.mark.parametrize(
         ('field', 'default', 'expected_error_msg'),
@@ -149,11 +156,11 @@ class TestCopyForeignKeyToM2MField:
         ],
     )
     def test_successfully_copies_data(
-            self,
-            monkeypatch,
-            num_objects,
-            batch_size,
-            expected_batches,
+        self,
+        monkeypatch,
+        num_objects,
+        batch_size,
+        expected_batches,
     ):
         """Test that the task copies data for various batch sizes."""
         job_scheduler_mock = Mock(wraps=job_scheduler)
@@ -229,7 +236,7 @@ class TestCopyForeignKeyToM2MField:
         # more useful information in assertion failures
         # These objects should not have been modified due to the roll back
         assert all([obj.values.count() == 0 for obj in objects_to_update])
-        job_scheduler_mock.assert_not_called
+        job_scheduler_mock.assert_not_called()
 
     def test_aborts_when_already_in_progress(self, monkeypatch):
         """Test that the task aborts when a task for the same field is already in progress."""
@@ -253,8 +260,7 @@ class TestCopyForeignKeyToM2MField:
 
 @pytest.mark.django_db
 class TestCopyExportCountriesFromCompanyModelToCompanyExportCountryModel:
-    """Tests for the task that copies all export countries from Company model to CompanyExportCountry.
-    """
+    """Tests for the task that copies all export countries from Company model to CompanyExportCountry."""
 
     @pytest.mark.parametrize(
         ('num_objects', 'batch_size', 'expected_batches'),
@@ -266,11 +272,11 @@ class TestCopyExportCountriesFromCompanyModelToCompanyExportCountryModel:
         ],
     )
     def test_successfully_copies_from_company_model_future_interest(
-            self,
-            monkeypatch,
-            num_objects,
-            batch_size,
-            expected_batches,
+        self,
+        monkeypatch,
+        num_objects,
+        batch_size,
+        expected_batches,
     ):
         """Test that the task copies data for various batch sizes."""
         job_scheduler_mock = Mock(wraps=job_scheduler)
@@ -304,25 +310,28 @@ class TestCopyExportCountriesFromCompanyModelToCompanyExportCountryModel:
 
         updated_countries = CompanyExportCountry.objects.filter(company__in=companies_to_update)
 
-        assert set([
-            export_country.company for export_country in updated_countries
-        ]) == set(companies_to_update)
+        assert set([export_country.company for export_country in updated_countries]) == set(
+            companies_to_update,
+        )
 
-        assert set(
-            item.country for item in set(updated_countries)
-        ) == set(mock_future_interest_countries)
+        assert set(item.country for item in set(updated_countries)) == set(
+            mock_future_interest_countries,
+        )
 
         # These countries should not have been modified
         assert all(
             [
-                set(CompanyExportCountry.objects.filter(
-                    ~Q(
-                        country_id__in=[
-                            export_country.country.pk for export_country in updated_countries
-                        ],
-                        status='future_interest',
+                set(
+                    CompanyExportCountry.objects.filter(
+                        ~Q(
+                            country_id__in=[
+                                export_country.country.pk for export_country in updated_countries
+                            ],
+                            status='future_interest',
+                        ),
                     ),
-                )) == set(future_countries_already_in_the_new_table),
+                )
+                == set(future_countries_already_in_the_new_table),
             ],
         )
 
@@ -336,11 +345,11 @@ class TestCopyExportCountriesFromCompanyModelToCompanyExportCountryModel:
         ],
     )
     def test_successfully_copies_from_company_model_currently_exporting(
-            self,
-            monkeypatch,
-            num_objects,
-            batch_size,
-            expected_batches,
+        self,
+        monkeypatch,
+        num_objects,
+        batch_size,
+        expected_batches,
     ):
         """Test that the task copies data for various batch sizes."""
         job_scheduler_mock = Mock(wraps=job_scheduler)
@@ -374,24 +383,27 @@ class TestCopyExportCountriesFromCompanyModelToCompanyExportCountryModel:
 
         updated_countries = CompanyExportCountry.objects.filter(company__in=companies_to_update)
 
-        assert set([
-            export_country.company for export_country in updated_countries
-        ]) == set(companies_to_update)
+        assert set([export_country.company for export_country in updated_countries]) == set(
+            companies_to_update,
+        )
 
-        assert set(
-            item.country for item in set(updated_countries)
-        ) == set(mock_export_to_countries)
+        assert set(item.country for item in set(updated_countries)) == set(
+            mock_export_to_countries,
+        )
 
         assert all(
             [
-                set(CompanyExportCountry.objects.filter(
-                    ~Q(
-                        country_id__in=[
-                            export_country.country.pk for export_country in updated_countries
-                        ],
-                        status='currently_exporting',
+                set(
+                    CompanyExportCountry.objects.filter(
+                        ~Q(
+                            country_id__in=[
+                                export_country.country.pk for export_country in updated_countries
+                            ],
+                            status='currently_exporting',
+                        ),
                     ),
-                )) == set(current_countries_already_in_the_new_table),
+                )
+                == set(current_countries_already_in_the_new_table),
             ],
         )
 
@@ -406,11 +418,11 @@ class TestCopyExportCountriesFromCompanyModelToCompanyExportCountryModel:
         ],
     )
     def test_successfully_copies_from_company_model_when_duplicates_involved(
-            self,
-            monkeypatch,
-            num_objects,
-            batch_size,
-            expected_batches,
+        self,
+        monkeypatch,
+        num_objects,
+        batch_size,
+        expected_batches,
     ):
         """Test that the task copies data for various batch sizes."""
         job_scheduler_mock = Mock(wraps=job_scheduler)
@@ -448,28 +460,33 @@ class TestCopyExportCountriesFromCompanyModelToCompanyExportCountryModel:
 
         updated_countries = CompanyExportCountry.objects.filter(company__in=companies_to_update)
 
-        assert set([
-            export_country.company for export_country in updated_countries
-        ]) == set(companies_to_update)
+        assert set([export_country.company for export_country in updated_countries]) == set(
+            companies_to_update,
+        )
 
-        assert all([
+        assert all(
             [
-                item.country in set(new_future_interest_countries) - set(new_export_to_countries)
-                and item.country not in new_export_to_countries
-                for item in CompanyExportCountry.objects.filter(
-                    country_id=export_country.country.pk,
-                )
-            ]
-            for export_country in updated_countries.filter(status='future_interest')
-        ])
+                [
+                    item.country
+                    in set(new_future_interest_countries) - set(new_export_to_countries)
+                    and item.country not in new_export_to_countries
+                    for item in CompanyExportCountry.objects.filter(
+                        country_id=export_country.country.pk,
+                    )
+                ]
+                for export_country in updated_countries.filter(status='future_interest')
+            ],
+        )
 
-        assert all([
+        assert all(
             [
-                item.country in new_export_to_countries
-                for item in CompanyExportCountry.objects.filter(
-                    country_id=export_country.country.pk,
-                    status='currently_exporting',
-                )
-            ]
-            for export_country in updated_countries.filter(status='currently_exporting')
-        ])
+                [
+                    item.country in new_export_to_countries
+                    for item in CompanyExportCountry.objects.filter(
+                        country_id=export_country.country.pk,
+                        status='currently_exporting',
+                    )
+                ]
+                for export_country in updated_countries.filter(status='currently_exporting')
+            ],
+        )
