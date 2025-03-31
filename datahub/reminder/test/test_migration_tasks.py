@@ -83,8 +83,7 @@ class TestITAUsersMigration:
         caplog,
         monkeypatch,
     ):
-        """Test that the task runs but no users are migrated when the setting is disabled.
-        """
+        """Test that the task runs but no users are migrated when the setting is disabled."""
         monkeypatch.setattr(
             'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_ITA_USER_MIGRATIONS',
             False,
@@ -136,8 +135,7 @@ class TestITAUsersMigration:
         self,
         monkeypatch,
     ):
-        """Test when an adviser belongs to no notification group they are excluded from the migration.
-        """
+        """Test when an adviser belongs to no notification group they are excluded from the migration."""
         monkeypatch.setattr(
             'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_ITA_USER_MIGRATIONS',
             True,
@@ -257,8 +255,7 @@ class TestPostUsersMigration:
         investment_flag,
         advisor,
     ):
-        """Check the advisor does not have any subscriptions or contain any of the feature flags.
-        """
+        """Check the advisor does not have any subscriptions or contain any of the feature flags."""
         self._assert_advisor_not_given_subscriptions(advisor)
         assert Advisor.objects.filter(id=advisor.id, feature_groups=export_flag).exists() is False
         assert (
@@ -266,8 +263,7 @@ class TestPostUsersMigration:
         )
 
     def _assert_advisor_not_given_subscriptions(self, advisor):
-        """Check the advisor does not have any subscriptions or contain any of the feature flags.
-        """
+        """Check the advisor does not have any subscriptions or contain any of the feature flags."""
         assert NewExportInteractionSubscription.objects.filter(adviser=advisor).exists() is False
         assert (
             NoRecentExportInteractionSubscription.objects.filter(adviser=advisor).exists() is False
@@ -286,8 +282,7 @@ class TestPostUsersMigration:
         investment_flag,
         advisor,
     ):
-        """Check the advisor has all the subscriptions and all feature flags.
-        """
+        """Check the advisor has all the subscriptions and all feature flags."""
         self.assert_advisor_given_subscriptions(advisor)
 
         assert Advisor.objects.filter(feature_groups=export_flag).exists() is True
@@ -356,8 +351,7 @@ class TestPostUsersMigration:
         caplog,
         monkeypatch,
     ):
-        """Test that the task runs but no users are migrated when the setting is disabled.
-        """
+        """Test that the task runs but no users are migrated when the setting is disabled."""
         monkeypatch.setattr(
             'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_POST_USER_MIGRATIONS',
             False,
@@ -388,7 +382,7 @@ class TestPostUsersMigration:
     ):
         caplog.set_level(logging.INFO, logger='datahub.reminder.migration_tasks')
         monkeypatch.setattr(Advisor.objects, 'filter', mock.Mock(side_effect=ValueError))
-        with pytest.raises(Exception):
+        with pytest.raises(Exception):  # noqa: PT011
             assert caplog.messages == [
                 'Starting migration of POST users',
                 'Error migrating POST users',

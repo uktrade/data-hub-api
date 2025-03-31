@@ -82,12 +82,15 @@ def create_stova_event_records():
 
 
 class TestStovaIngestionTasks:
-
     @pytest.mark.django_db
     @mock_aws
     @override_settings(S3_LOCAL_ENDPOINT_URL=None)
     def test_stova_data_file_ingestion(
-        self, caplog, test_file, test_file_path, s3_object_processor,
+        self,
+        caplog,
+        test_file,
+        test_file_path,
+        s3_object_processor,
     ):
         """Test that a Aventri/Stova data file is ingested correctly and the ingested file
         is added to the IngestedObject table.
@@ -118,7 +121,10 @@ class TestStovaIngestionTasks:
     @mock_aws
     @override_settings(S3_LOCAL_ENDPOINT_URL=None)
     def test_skip_previously_ingested_records(
-        self, test_file_path, test_base_stova_attendee, s3_object_processor,
+        self,
+        test_file_path,
+        test_base_stova_attendee,
+        s3_object_processor,
     ):
         """Test that we skip updating records that have already been ingested."""
         StovaAttendeeFactory(stova_attendee_id=123456789)
@@ -136,19 +142,17 @@ class TestStovaIngestionTasks:
     @override_settings(S3_LOCAL_ENDPOINT_URL=None)
     @pytest.mark.usefixtures('s3_client')
     def test_invalid_file(self, test_file_path):
-        """Test that an exception is raised when the file is not valid.
-        """
-        with pytest.raises(Exception) as e:
+        """Test that an exception is raised when the file is not valid."""
+        with pytest.raises(Exception) as e:  # noqa: PT011
             stova_attendee_ingestion_task(test_file_path)
         exception = e.value.args[0]
         assert 'The specified key does not exist' in exception
-        expected = "key: 'data-flow/exports/ExportAventriAttendees/" 'stovaAttendeeFake.jsonl.gz'
+        expected = "key: 'data-flow/exports/ExportAventriAttendees/stovaAttendeeFake.jsonl.gz"
         assert expected in exception
 
     @pytest.mark.django_db
     def test_stova_attendee_fields_are_saved(self, test_base_stova_attendee):
-        """Test that the ingested stova attendee fields are saved to the StovaAttendee model.
-        """
+        """Test that the ingested stova attendee fields are saved to the StovaAttendee model."""
         s3_processor_mock = mock.Mock()
         task = StovaAttendeeIngestionTask('dummy-prefix', s3_processor_mock)
         data = test_base_stova_attendee
@@ -170,7 +174,11 @@ class TestStovaIngestionTasks:
 
     @pytest.mark.django_db
     def test_stova_attendee_fields_with_duplicate_attendee_ids_in_db(
-        self, test_file_path, test_base_stova_attendee, s3_object_processor, caplog,
+        self,
+        test_file_path,
+        test_base_stova_attendee,
+        s3_object_processor,
+        caplog,
     ):
         existing_stova_attendee = StovaAttendeeFactory(stova_attendee_id=123456789)
         data = test_base_stova_attendee
@@ -211,19 +219,26 @@ class TestStovaIngestionTasks:
         ingestion_task = StovaAttendeeIngestionTask(test_file_path, s3_object_processor)
         ingestion_task.ingest_object()
 
-        assert StovaAttendee.objects.get(
-            stova_attendee_id=12345,
-        ).stova_event_id == shared_stova_event_id
-        assert StovaAttendee.objects.get(
-            stova_attendee_id=54321,
-        ).stova_event_id == shared_stova_event_id
+        assert (
+            StovaAttendee.objects.get(
+                stova_attendee_id=12345,
+            ).stova_event_id
+            == shared_stova_event_id
+        )
+        assert (
+            StovaAttendee.objects.get(
+                stova_attendee_id=54321,
+            ).stova_event_id
+            == shared_stova_event_id
+        )
 
     @pytest.mark.django_db
     def test_stova_attendee_fields_with_duplicate_attendee_ids_in_json(
-        self, caplog, test_base_stova_attendee,
+        self,
+        caplog,
+        test_base_stova_attendee,
     ):
-        """Test records which have duplicate IDs in their JSON do not raise errors and are handled.
-        """
+        """Test records which have duplicate IDs in their JSON do not raise errors and are handled."""
         s3_processor_mock = mock.Mock()
         task = StovaAttendeeIngestionTask('dummy-prefix', s3_processor_mock)
 
@@ -238,7 +253,9 @@ class TestStovaIngestionTasks:
 
     @pytest.mark.django_db
     def test_stova_attendee_ingestion_handles_unexpected_fields(
-        self, caplog, test_base_stova_attendee,
+        self,
+        caplog,
+        test_base_stova_attendee,
     ):
         """Test that if they rows from stova contain data in an unexpected data type these are handled
         and logged.
@@ -368,10 +385,13 @@ class TestStovaIngestionTasks:
     @mock_aws
     @override_settings(S3_LOCAL_ENDPOINT_URL=None)
     def test_stova_attendee_not_created_if_event_does_not_exist(
-        self, caplog, test_file, test_file_path, s3_object_processor,
+        self,
+        caplog,
+        test_file,
+        test_file_path,
+        s3_object_processor,
     ):
-        """A StovaEvent needs to exist before ingesting the Stova Attendee.
-        """
+        """A StovaEvent needs to exist before ingesting the Stova Attendee."""
         object_definition = (test_file_path, test_file)
         upload_objects_to_s3(s3_object_processor, [object_definition])
 
@@ -395,7 +415,10 @@ class TestStovaIngestionTasks:
 
     @pytest.mark.django_db
     def test_stova_attendee_ingestion_creates_default_adviser(
-        self, test_base_stova_attendee, s3_object_processor, test_file_path,
+        self,
+        test_base_stova_attendee,
+        s3_object_processor,
+        test_file_path,
     ):
         """Test a default adviser is created when a default does not already exist."""
         data = test_base_stova_attendee
@@ -403,25 +426,34 @@ class TestStovaIngestionTasks:
         upload_objects_to_s3(s3_object_processor, [object_definition])
 
         ingestion_task = StovaAttendeeIngestionTask(test_file_path, s3_object_processor)
-        assert Adviser.objects.filter(
-            email='stova_default@businessandtrade.gov.uk',
-            first_name='Stova Default',
-            last_name='Adviser',
-            is_active=False,
-        ).exists() is False
+        assert (
+            Adviser.objects.filter(
+                email='stova_default@businessandtrade.gov.uk',
+                first_name='Stova Default',
+                last_name='Adviser',
+                is_active=False,
+            ).exists()
+            is False
+        )
 
         ingestion_task.ingest_object()
 
-        assert Adviser.objects.filter(
-            email='stova_default@businessandtrade.gov.uk',
-            first_name='Stova Default',
-            last_name='Adviser',
-            is_active=False,
-        ).exists() is True
+        assert (
+            Adviser.objects.filter(
+                email='stova_default@businessandtrade.gov.uk',
+                first_name='Stova Default',
+                last_name='Adviser',
+                is_active=False,
+            ).exists()
+            is True
+        )
 
     @pytest.mark.django_db
     def test_stova_attendee_ingestion_uses_existing_default_adviser_if_exists(
-        self, test_base_stova_attendee, s3_object_processor, test_file_path,
+        self,
+        test_base_stova_attendee,
+        s3_object_processor,
+        test_file_path,
     ):
         """Test the default advisor is reused and not created again for each record."""
         data = test_base_stova_attendee
@@ -437,25 +469,34 @@ class TestStovaIngestionTasks:
             is_active=False,
         )
 
-        assert Adviser.objects.filter(
-            email='stova_default@businessandtrade.gov.uk',
-            first_name='Stova Default',
-            last_name='Adviser',
-            is_active=False,
-        ).count() == 1
+        assert (
+            Adviser.objects.filter(
+                email='stova_default@businessandtrade.gov.uk',
+                first_name='Stova Default',
+                last_name='Adviser',
+                is_active=False,
+            ).count()
+            == 1
+        )
 
         ingestion_task.ingest_object()
 
-        assert Adviser.objects.filter(
-            email='stova_default@businessandtrade.gov.uk',
-            first_name='Stova Default',
-            last_name='Adviser',
-            is_active=False,
-        ).count() == 1
+        assert (
+            Adviser.objects.filter(
+                email='stova_default@businessandtrade.gov.uk',
+                first_name='Stova Default',
+                last_name='Adviser',
+                is_active=False,
+            ).count()
+            == 1
+        )
 
     @pytest.mark.django_db
     def test_stova_attendee_ingestion_creates_interaction(
-        self, test_base_stova_attendee, s3_object_processor, test_file_path,
+        self,
+        test_base_stova_attendee,
+        s3_object_processor,
+        test_file_path,
     ):
         """Test that the Stova Attendee ingestion creates an Interaction from the contact (attendee),
         the event (stova event) and the default adviser.
@@ -498,7 +539,10 @@ class TestStovaIngestionTasks:
 
     @pytest.mark.django_db
     def test_stova_attendee_ingestion_handles_interaction_creation_fail(
-        self, s3_object_processor, test_file_path, caplog,
+        self,
+        s3_object_processor,
+        test_file_path,
+        caplog,
     ):
         """Test that errors raised when creating an interaction are logged."""
         data = {'stova_attendee_id': 1234}
@@ -529,7 +573,9 @@ class TestStovaIngestionTasks:
         '.StovaAttendeeIngestionTask.get_event_from_attendee',
     )
     def test_stova_attendee_does_not_create_attendee_when_interaction_fails(
-        self, mocked_get_event_from_attendee, test_base_stova_attendee,
+        self,
+        mocked_get_event_from_attendee,
+        test_base_stova_attendee,
     ):
         """Test that no Stova Attendee is created if the interaction fails to create."""
         # Make event invalid for an interaction
@@ -556,7 +602,11 @@ class TestStovaIngestionTasks:
         ],
     )
     def test_get_or_create_company__returns_when_company_name_empty(
-        self, s3_object_processor, test_file_path, caplog, company_name,
+        self,
+        s3_object_processor,
+        test_file_path,
+        caplog,
+        company_name,
     ):
         """Tests empty company names are logged and no company is created."""
         data = {'stova_attendee_id': 1234, 'company_name': company_name}
@@ -569,7 +619,10 @@ class TestStovaIngestionTasks:
 
     @pytest.mark.django_db
     def test_get_or_create_company__returns_when_stova_event_has_no_datahub_event(
-        self, s3_object_processor, test_file_path, caplog,
+        self,
+        s3_object_processor,
+        test_file_path,
+        caplog,
     ):
         """Tests stova events without datahub events are logged and no company is created."""
         data = {'stova_attendee_id': 1234, 'company_name': 'a new company'}
@@ -587,7 +640,10 @@ class TestStovaIngestionTasks:
 
     @pytest.mark.django_db
     def test_created_companies_have_country_matching_stova_event_country(
-        self, test_base_stova_attendee, s3_object_processor, test_file_path,
+        self,
+        test_base_stova_attendee,
+        s3_object_processor,
+        test_file_path,
     ):
         """The feed from Stova Attendees does not contain a country field which is an issue as this
         creates companies without countries. This test checks that the country defaults to the

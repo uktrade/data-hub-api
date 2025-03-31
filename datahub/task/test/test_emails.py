@@ -1,6 +1,6 @@
 import datetime
 
-from pytest import fixture
+import pytest
 
 from datahub.company.test.factories import CompanyFactory
 from datahub.core.test_utils import (
@@ -17,14 +17,14 @@ from datahub.task.emails import (
 from datahub.task.test.factories import TaskFactory
 
 
-@fixture
+@pytest.fixture
 def generic_task():
     return TaskFactory(
         due_date=datetime.date.today(),
     )
 
 
-@fixture
+@pytest.fixture
 def investment_project_task():
     return TaskFactory(
         due_date=datetime.date.today(),
@@ -32,7 +32,7 @@ def investment_project_task():
     )
 
 
-@fixture
+@pytest.fixture
 def company_task():
     return TaskFactory(
         due_date=datetime.date.today(),

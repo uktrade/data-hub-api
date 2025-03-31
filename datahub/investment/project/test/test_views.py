@@ -552,9 +552,9 @@ class TestCreateView(APITestMixin):
         assert response_data['country_investment_originates_from']['id'] == str(
             investor_company.address_country.id,
         )
-        assert sorted(
-            eyb_lead_m2m['id'] for eyb_lead_m2m in response_data['eyb_leads']
-        ) == sorted([str(eyb_lead.id)])
+        assert sorted(eyb_lead_m2m['id'] for eyb_lead_m2m in response_data['eyb_leads']) == sorted(
+            [str(eyb_lead.id)],
+        )
 
     def test_create_project_fail(self):
         """Test creating a project with missing required values."""
@@ -772,8 +772,7 @@ class TestRetrieveView(APITestMixin):
         }
 
     def test_get_project_no_investor_and_crm(self):
-        """Test getting a company when investor_company and client_relationship_manager are None.
-        """
+        """Test getting a company when investor_company and client_relationship_manager are None."""
         project = InvestmentProjectFactory(
             investor_company=None,
             client_relationship_manager=None,
@@ -1578,7 +1577,7 @@ class TestPartialUpdateView(APITestMixin):
             ),
             investor_type_id=InvestorType.new_investor.value.id,
             level_of_involvement_id=Involvement.no_involvement.value.id,
-            ** extra,
+            **extra,
         )
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
@@ -1642,8 +1641,7 @@ class TestPartialUpdateView(APITestMixin):
         assert response_data['status'] == InvestmentProject.Status.WON
 
     def test_change_stage_to_won_by_unauthorised_user(self):
-        """Tests moving a complete project to the 'Won' stage by unauthorised user.
-        """
+        """Tests moving a complete project to the 'Won' stage by unauthorised user."""
         project = VerifyWinInvestmentProjectFactory()
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
@@ -1757,8 +1755,7 @@ class TestPartialUpdateView(APITestMixin):
         new_stage,
         expected_status,
     ):
-        """Tests moving a project back a stage or forward multiple stages.
-        """
+        """Tests moving a project back a stage or forward multiple stages."""
         project = project_factory()
         url = reverse('api-v3:investment:update-stage-of-item', kwargs={'pk': project.pk})
         request_data = {
@@ -2238,8 +2235,7 @@ class TestPartialUpdateView(APITestMixin):
         assert response_data['name'] == 'new name'
 
     def test_restricted_user_can_update_project_if_associated_via_team_member(self):
-        """Tests that restricted users can update a project associated to them via a team member.
-        """
+        """Tests that restricted users can update a project associated to them via a team member."""
         team = TeamFactory()
         adviser = AdviserFactory(dit_team_id=team.id)
         _, api_client = _create_user_and_api_client(
@@ -2392,7 +2388,7 @@ class TestInvestmentProjectActivities(APITestMixin):
         with mock.patch.object(InvestmentProject, 'save') as mocked_save:
             mocked_save.side_effect = Exception()
 
-            with pytest.raises(Exception):
+            with pytest.raises(Exception):  # noqa: PT011
                 self.api_client.patch(url, data=request_data)
 
         project.refresh_from_db()
@@ -2440,8 +2436,7 @@ class TestInvestmentProjectActivities(APITestMixin):
 
 
 class TestInvestmentProjectVersioning(APITestMixin):
-    """Tests for versions created when interacting with the investment project endpoints.
-    """
+    """Tests for versions created when interacting with the investment project endpoints."""
 
     def test_add_creates_a_new_version(self):
         """Test that creating an investment project creates a new version."""
@@ -2789,8 +2784,7 @@ class TestReplaceAllTeamMembersView(APITestMixin):
     """Tests for the replace all team members view."""
 
     def test_replace_all_team_members(self):
-        """Test that replacing all team members removes existing team members and adds the new ones.
-        """
+        """Test that replacing all team members removes existing team members and adds the new ones."""
         project = InvestmentProjectFactory()
         advisers = AdviserFactory.create_batch(2)
         advisers.sort(key=attrgetter('id'))
@@ -3147,8 +3141,7 @@ class TestDeleteAllTeamMembersView(APITestMixin):
         assert InvestmentProjectTeamMember.objects.all().exists()
 
     def test_restricted_user_cannot_delete_all_team_members_of_non_associated_project(self):
-        """Test that a restricted user cannot remove all team members from a non-associated project.
-        """
+        """Test that a restricted user cannot remove all team members from a non-associated project."""
         project = InvestmentProjectFactory()
         team_members = InvestmentProjectTeamMemberFactory.create_batch(
             2,
@@ -3174,8 +3167,7 @@ class TestDeleteAllTeamMembersView(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_restricted_user_can_delete_all_team_members_of_associated_project(self):
-        """Test that a restricted user can remove all team members from an associated project.
-        """
+        """Test that a restricted user can remove all team members from an associated project."""
         creator = AdviserFactory()
         project = InvestmentProjectFactory(created_by=creator)
         team_members = InvestmentProjectTeamMemberFactory.create_batch(
@@ -3480,8 +3472,7 @@ class TestDeleteTeamMemberView(APITestMixin):
 
 
 class TestTeamMemberVersioning(APITestMixin):
-    """Tests for versions created when interacting with the investment team member endpoints.
-    """
+    """Tests for versions created when interacting with the investment team member endpoints."""
 
     def test_add_creates_a_new_version(self):
         """Test that adding a team member creates a new version."""

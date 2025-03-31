@@ -280,7 +280,7 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
             | HasPermissions(
                 f'company.{CompanyPermission.change_company}',
                 f'company.{CompanyPermission.change_one_list_tier_and_global_account_manager}',
-            )
+            ),
         ],
         schema=StubSchema(),
     )

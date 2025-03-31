@@ -1,7 +1,6 @@
 from unittest import mock
 
 import pytest
-from pytest import raises
 
 from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.core.test_utils import construct_mock
@@ -227,7 +226,7 @@ def test_address_dict_raises_error_with_invalid_prefix():
         ),
         primary_address_area=None,
     )
-    with pytest.raises(AttributeError):
+    with pytest.pytest.raises(AttributeError):
         dict_utils.address_dict(obj, prefix='secondary_address')
 
 
@@ -337,10 +336,18 @@ def test_core_team_advisers_list_of_dicts():
         {'adviser': adviser_3, 'is_global_account_manager': False},
     ]
     expected_response = [
-        {'id': str(adviser_2.id), 'first_name': adviser_2.first_name,
-            'last_name': adviser_2.last_name, 'name': adviser_2.name},
-        {'id': str(adviser_3.id), 'first_name': adviser_3.first_name,
-            'last_name': adviser_3.last_name, 'name': adviser_3.name},
+        {
+            'id': str(adviser_2.id),
+            'first_name': adviser_2.first_name,
+            'last_name': adviser_2.last_name,
+            'name': adviser_2.name,
+        },
+        {
+            'id': str(adviser_3.id),
+            'first_name': adviser_3.first_name,
+            'last_name': adviser_3.last_name,
+            'name': adviser_3.name,
+        },
     ]
 
     assert dict_utils.core_team_advisers_list_of_dicts(data) == expected_response
@@ -421,7 +428,7 @@ def test_nested_id_name_dict_raises_exception_on_invalid_argument():
     """Tests nested id name dict raises exception on invalid argument."""
     obj = mock.Mock()
 
-    with raises(ValueError):
+    with pytest.raises(ValueError):  # noqa: PT011
         dict_utils.computed_nested_id_name_dict('company')(obj)
 
 
@@ -439,7 +446,7 @@ def test_computed_field_function_missing_function():
     """Tests when provided function is missing, ValueError is raised."""
     obj = construct_mock()
 
-    with raises(ValueError):
+    with pytest.raises(ValueError):  # noqa: PT011
         dict_utils.computed_field_function('get_cats_name', dict_utils.id_name_dict)(obj)
 
 
@@ -449,7 +456,7 @@ def test_computed_field_function_not_a_function():
         get_cats_name='tabby',
     )
 
-    with raises(ValueError):
+    with pytest.raises(ValueError):  # noqa: PT011
         dict_utils.computed_field_function('get_cats_name', dict_utils.id_name_dict)(obj)
 
 

@@ -28,5 +28,5 @@ class TestHasPermissions:
 
     def test_raises_error_if_no_permissions_provided(self):
         """Tests that an error is raised if no permissions are provided."""
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError):  # noqa: PT011
             HasPermissions()

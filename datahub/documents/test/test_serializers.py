@@ -50,7 +50,7 @@ class TestGenericDocumentRetrieveSerializer:
             related_object_type=company_type,
             related_object_id=company.id,
         )
-        with pytest.raises(Exception):
+        with pytest.raises(Exception):  # noqa: PT011, PT012
             serializer = GenericDocumentRetrieveSerializer(generic_document)
             serializer.data  # noqa: B018
 
@@ -69,6 +69,6 @@ class TestGenericDocumentRetrieveSerializer:
             related_object_type=unsupported_related_object_type,
             related_object_id=unsupported_related_object.id,
         )
-        with pytest.raises(Exception):
+        with pytest.raises(Exception):  # noqa: PT011, PT012
             serializer = GenericDocumentRetrieveSerializer(generic_document)
             serializer.data  # noqa: B018

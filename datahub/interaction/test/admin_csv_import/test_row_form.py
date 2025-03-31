@@ -304,8 +304,7 @@ class TestInteractionCSVRowFormValidation:
                 {'event_id': '00000000-0000-0000-0000-000000000000'},
                 {
                     'event_id': [
-                        'Select a valid choice. That choice is not one of the available '
-                        'choices.',
+                        'Select a valid choice. That choice is not one of the available choices.',
                     ],
                 },
                 id='event_id non-existent',
@@ -402,7 +401,6 @@ class TestInteractionCSVRowFormValidation:
             'contact_email': contact.email,
             'service': service.name,
             'communication_channel': communication_channel.name,
-
             **resolve_data(data),
         }
         form = InteractionCSVRowForm(data=resolved_data)
@@ -503,10 +501,7 @@ class TestInteractionCSVRowFormValidation:
 
         resolved_row_data = resolve_data(row_data)
         resolved_existing_objects_data = [
-            {
-                key: value(resolved_row_data)
-                for key, value in duplicate_item.items()
-            }
+            {key: value(resolved_row_data) for key, value in duplicate_item.items()}
             for duplicate_item in existing_objects_data
         ]
 
@@ -525,7 +520,6 @@ class TestInteractionCSVRowFormValidation:
             'kind': Interaction.Kind.INTERACTION,
             'adviser_1': adviser.name,
             'communication_channel': communication_channel.name,
-
             'contact_email': resolved_row_data['contact'].email,
             'service': resolved_row_data['service'].name,
             'date': resolved_row_data['date'].strftime('%d/%m/%Y'),
@@ -629,10 +623,7 @@ class TestInteractionCSVRowFormValidation:
 
         resolved_row_data = resolve_data(row_data)
         resolved_prior_rows = [
-            {
-                key: value(resolved_row_data)
-                for key, value in duplicate_item.items()
-            }
+            {key: value(resolved_row_data) for key, value in duplicate_item.items()}
             for duplicate_item in prior_rows
         ]
 
@@ -645,7 +636,6 @@ class TestInteractionCSVRowFormValidation:
             'kind': Interaction.Kind.INTERACTION,
             'adviser_1': adviser.name,
             'communication_channel': communication_channel.name,
-
             'contact_email': resolved_row_data['contact'].email,
             'service': resolved_row_data['service'].name,
             'date': resolved_row_data['date'].strftime('%d/%m/%Y'),
@@ -675,7 +665,6 @@ class TestInteractionCSVRowFormValidation:
             'adviser_1': adviser.name,
             'service': service.name,
             'communication_channel': communication_channel.name,
-
             'contact_email': '',
         }
         form = InteractionCSVRowForm(data=data)
@@ -696,6 +685,7 @@ class TestInteractionCSVRowFormSerializerUsage:
         """Test that an unmapped error from the serializer validators is not added to
         NON_FIELD_ERRORS if the form was otherwise invalid.
         """
+
         def validator(_):
             raise serializers.ValidationError(
                 {'non_existent_field': 'test error'},
@@ -713,6 +703,7 @@ class TestInteractionCSVRowFormSerializerUsage:
 
     def test_serializer_errors_for_valid_form(self, monkeypatch):
         """Test that errors from the serializer validators are added to the form."""
+
         def validator(_):
             raise serializers.ValidationError(
                 {
@@ -806,7 +797,6 @@ class TestInteractionCSVRowFormSuccessfulCleaning:
             'contact_email': 'person@company.com',
             'service': service.name,
             'communication_channel': communication_channel.name,
-
             field: input_value,
         }
 
@@ -894,7 +884,6 @@ class TestInteractionCSVRowFormSuccessfulCleaning:
             'contact_email': 'person@company.com',
             'service': service.name,
             'communication_channel': communication_channel.name,
-
             field: input_transformer(obj),
         }
 
@@ -933,7 +922,6 @@ class TestInteractionCSVRowFormSuccessfulCleaning:
             'adviser_1': adviser.name,
             'contact_email': contact.email,
             'service': service.name,
-
             field: input_transformer(obj),
         }
 
@@ -987,7 +975,6 @@ class TestInteractionCSVRowFormSuccessfulCleaning:
             'adviser_1': adviser.name,
             'contact_email': contact.email,
             'service': service.name,
-
             field: input_transformer(obj),
         }
 
@@ -1051,7 +1038,6 @@ class TestInteractionCSVRowFormSuccessfulCleaning:
             'adviser_1': adviser.name,
             'service': service.name,
             'communication_channel': communication_channel.name,
-
             'contact_email': input_email,
         }
         form = InteractionCSVRowForm(data=data)
@@ -1510,7 +1496,7 @@ class TestInteractionCSVRowFormSaving:
 
         assert form.is_valid()
 
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError):  # noqa: PT011
             form.save(user, source=source)
 
         assert not Interaction.objects.exists()

@@ -132,7 +132,7 @@ class TestReplaceNullWithDefault:
         - a non-nullable field
         - a non-nullable field and an explicit default.
         """
-        with pytest.raises(ValueError) as excinfo:
+        with pytest.raises(ValueError) as excinfo:  # noqa: PT011
             replace_null_with_default(
                 'support.NullableWithDefaultModel',
                 field,
@@ -221,7 +221,7 @@ class TestCopyForeignKeyToM2MField:
         num_objects = 10
         objects_to_update = ForeignAndM2MModelFactory.create_batch(num_objects, values=[])
 
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError):  # noqa: PT011
             copy_foreign_key_to_m2m_field(
                 'support.ForeignAndM2MModel',
                 'value',

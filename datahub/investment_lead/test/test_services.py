@@ -117,12 +117,11 @@ class TestEYBLeadServices:
         eyb_lead = EYBLeadFactory(duns_number=None)
         eyb_lead.address_country = None
 
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError):  # noqa: PT011
             add_new_company_from_eyb_lead(eyb_lead)
 
     def test_existing_company_match_contact_on_email_address(self):
-        """Match email address for contact associated with EYB Lead company.
-        """
+        """Match email address for contact associated with EYB Lead company."""
         contact = ContactFactory()
         eyb_lead_matching = EYBLeadFactory(
             company=contact.company,
@@ -154,8 +153,7 @@ class TestEYBLeadServices:
         assert not result
 
     def test_fail_match_for_different_company(self):
-        """Do not match contact with a matching email address belonging to a different company.
-        """
+        """Do not match contact with a matching email address belonging to a different company."""
         contact = ContactFactory()
         eyb_lead_not_matching = EYBLeadFactory(
             email=contact.email,
@@ -169,8 +167,7 @@ class TestEYBLeadServices:
         assert not result
 
     def test_skip_creation_when_contact_exists(self):
-        """Match email address for contact associated with EYB Lead company.
-        """
+        """Match email address for contact associated with EYB Lead company."""
         contact = ContactFactory()
         eyb_lead_matching = EYBLeadFactory(
             company=contact.company,
@@ -241,7 +238,8 @@ class TestEYBLeadServices:
 
     @patch(
         'datahub.investment_lead.services.match_or_create_company_for_eyb_lead',
-        return_value=None)
+        return_value=None,
+    )
     def test_link_leads_to_companies_raises_exception_contact(self, mock_method, caplog):
         hashed_uuid = generate_hashed_uuid()
         eyb_lead = EYBLeadFactory(

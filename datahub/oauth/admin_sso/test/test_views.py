@@ -19,7 +19,7 @@ pytestmark = pytest.mark.django_db
 
 
 @patch('datahub.oauth.admin_sso.views.token_urlsafe')
-def test_login_view_redirects_to_sso_auth_url(_token_urlsafe):
+def test_login_view_redirects_to_sso_auth_url(_token_urlsafe):  # noqa: PT019
     """Tests that login view redirects to Staff SSO Auth URL."""
     _token_urlsafe.return_value = 'aZFsiJfbDLF9bwve8f2HTBeC1rCnhFUn4K6c_iq-wLo'
 
@@ -101,8 +101,7 @@ def test_callback_without_state():
 
 
 def test_callback_without_state_includes_next_url():
-    """Test that a callback without provided state will restart login process including next URL.
-    """
+    """Test that a callback without provided state will restart login process including next URL."""
     request = get_request_with_session('/oauth/callback/?next=/protected-area')
 
     response = callback(request)

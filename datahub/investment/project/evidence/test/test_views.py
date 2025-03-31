@@ -22,11 +22,9 @@ pytestmark = pytest.mark.django_db
 
 VIEW_PERMISSIONS = (
     (
-        (
-            EvidenceDocumentPermission.view_all,
-        ),
+        (EvidenceDocumentPermission.view_all,),
         False,  # associated to investment project?
-        True,   # should be allowed?
+        True,  # should be allowed?
     ),
     (
         (
@@ -37,16 +35,12 @@ VIEW_PERMISSIONS = (
         True,  # should be allowed?
     ),
     (
-        (
-            EvidenceDocumentPermission.view_associated,
-        ),
+        (EvidenceDocumentPermission.view_associated,),
         True,  # associated to investment project?
         True,  # should be allowed?
     ),
     (
-        (
-            EvidenceDocumentPermission.view_associated,
-        ),
+        (EvidenceDocumentPermission.view_associated,),
         False,  # associated to investment project?
         False,  # should be allowed?
     ),
@@ -55,9 +49,7 @@ VIEW_PERMISSIONS = (
 
 ADD_PERMISSIONS = (
     (
-        (
-            EvidenceDocumentPermission.add_all,
-        ),
+        (EvidenceDocumentPermission.add_all,),
         False,  # associated to investment project?
         True,  # should be allowed?
     ),
@@ -70,16 +62,12 @@ ADD_PERMISSIONS = (
         True,  # should be allowed?
     ),
     (
-        (
-            EvidenceDocumentPermission.add_associated,
-        ),
+        (EvidenceDocumentPermission.add_associated,),
         True,  # associated to investment project?
         True,  # should be allowed?
     ),
     (
-        (
-            EvidenceDocumentPermission.add_associated,
-        ),
+        (EvidenceDocumentPermission.add_associated,),
         False,  # associated to investment project?
         False,  # should be allowed?
     ),
@@ -88,9 +76,7 @@ ADD_PERMISSIONS = (
 
 CHANGE_PERMISSIONS = (
     (
-        (
-            EvidenceDocumentPermission.change_all,
-        ),
+        (EvidenceDocumentPermission.change_all,),
         False,  # associated to investment project?
         True,  # should be allowed?
     ),
@@ -103,16 +89,12 @@ CHANGE_PERMISSIONS = (
         True,  # should be allowed?
     ),
     (
-        (
-            EvidenceDocumentPermission.change_associated,
-        ),
+        (EvidenceDocumentPermission.change_associated,),
         True,  # associated to investment project?
         True,  # should be allowed?
     ),
     (
-        (
-            EvidenceDocumentPermission.change_associated,
-        ),
+        (EvidenceDocumentPermission.change_associated,),
         False,  # associated to investment project?
         False,  # should be allowed?
     ),
@@ -121,9 +103,7 @@ CHANGE_PERMISSIONS = (
 
 DELETE_PERMISSIONS = (
     (
-        (
-            EvidenceDocumentPermission.delete_all,
-        ),
+        (EvidenceDocumentPermission.delete_all,),
         False,  # associated to investment project?
         True,  # should be allowed?
     ),
@@ -136,16 +116,12 @@ DELETE_PERMISSIONS = (
         True,  # should be allowed?
     ),
     (
-        (
-            EvidenceDocumentPermission.delete_associated,
-        ),
+        (EvidenceDocumentPermission.delete_associated,),
         True,  # associated to investment project?
         True,  # should be allowed?
     ),
     (
-        (
-            EvidenceDocumentPermission.delete_associated,
-        ),
+        (EvidenceDocumentPermission.delete_associated,),
         False,  # associated to investment project?
         False,  # should be allowed?
     ),
@@ -423,7 +399,13 @@ class TestEvidenceDocumentViews(APITestMixin):
     @pytest.mark.parametrize(('permissions', 'associated', 'allowed'), VIEW_PERMISSIONS)
     @patch('datahub.documents.models.sign_s3_url')
     def test_document_download(
-        self, sign_s3_url, permissions, associated, allowed, av_clean, expected_status,
+        self,
+        sign_s3_url,
+        permissions,
+        associated,
+        allowed,
+        av_clean,
+        expected_status,
     ):
         """Tests download of individual document."""
         sign_s3_url.return_value = 'http://what'
@@ -707,9 +689,7 @@ class TestEvidenceDocumentViews(APITestMixin):
                 'name': entity_document.investment_project.name,
                 'project_code': entity_document.investment_project.project_code,
             },
-            'tags': [
-                {'id': str(tag.id), 'name': tag.name} for tag in entity_document.tags.all()
-            ],
+            'tags': [{'id': str(tag.id), 'name': tag.name} for tag in entity_document.tags.all()],
         }
         expected_user_event_data['tags'].sort(key=itemgetter('id'))
 
@@ -765,7 +745,7 @@ class TestEvidenceDocumentViews(APITestMixin):
         )
 
         api_client = self.create_api_client(user=user)
-        with pytest.raises(Exception):
+        with pytest.raises(Exception):  # noqa: PT011
             api_client.delete(url)
 
         assert UserEvent.objects.count() == 0

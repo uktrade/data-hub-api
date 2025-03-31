@@ -68,7 +68,7 @@ class TestPayClientCreatePayment:
         url = govuk_url('payments')
         requests_mock.post(url, status_code=status_code, reason=error_msg)
 
-        with pytest.raises(GOVUKPayAPIException) as exc:
+        with pytest.raises(GOVUKPayAPIException) as exc:  # noqa: PT012
             pay = PayClient()
             pay.create_payment(
                 amount=1234,
@@ -122,7 +122,7 @@ class TestPayClientGetPaymentById:
         url = govuk_url(f'payments/{payment_id}')
         requests_mock.get(url, status_code=status_code, reason=error_msg)
 
-        with pytest.raises(GOVUKPayAPIException) as exc:
+        with pytest.raises(GOVUKPayAPIException) as exc:  # noqa: PT012
             pay = PayClient()
             pay.get_payment_by_id(payment_id)
         assert exc.value.detail == f'{error_msg}: {error_msg} for url: {url}'
@@ -162,7 +162,7 @@ class TestPayClientCancelPayment:
         url = govuk_url(f'payments/{payment_id}/cancel')
         requests_mock.post(url, status_code=status_code, reason=error_msg)
 
-        with pytest.raises(GOVUKPayAPIException) as exc:
+        with pytest.raises(GOVUKPayAPIException) as exc:  # noqa: PT012
             pay = PayClient()
             pay.cancel_payment(payment_id)
         assert exc.value.detail == f'{error_msg}: {error_msg} for url: {url}'

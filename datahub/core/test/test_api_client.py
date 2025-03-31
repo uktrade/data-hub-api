@@ -41,7 +41,7 @@ class TestHawkAuth:
             },
         )
 
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError):  # noqa: PT011
             request.register_hook.call_args[0][1](response)
 
     def test_response_not_verified_if_verification_disabled(self):
@@ -54,17 +54,18 @@ class TestHawkAuth:
 
 
 class TestTokenAuth:
-    """Tests TokenAuth.
-    """
+    """Tests TokenAuth."""
 
     @pytest.mark.parametrize(
         ('token_auth_args', 'expected_authorization'),
         [
             (
-                ['abc123'], 'Token abc123',
+                ['abc123'],
+                'Token abc123',
             ),
             (
-                ['foobarbaz', 'Key'], 'Key foobarbaz',
+                ['foobarbaz', 'Key'],
+                'Key foobarbaz',
             ),
         ],
     )
@@ -188,10 +189,12 @@ class TestAPIClient:
         api_url = 'http://test/v1/'
         requests_mock.get('http://test/v1/path/to/item', status_code=200)
 
-        request = Mock(headers={
-            'x-b3-traceid': '123',
-            'x-b3-spanid': '456',
-        })
+        request = Mock(
+            headers={
+                'x-b3-traceid': '123',
+                'x-b3-spanid': '456',
+            },
+        )
 
         api_client = APIClient(api_url, request=request)
         response = api_client.request(

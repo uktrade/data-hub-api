@@ -19,7 +19,7 @@ def test_error_raises_exception(mock_capture_exception):
     """
     mock_task = mock.Mock(__name__='mock_task', side_effect=ValueError())
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError):  # noqa: PT011
         submit_to_thread_pool(mock_task)
 
     assert mock_capture_exception.called

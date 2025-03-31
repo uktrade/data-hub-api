@@ -235,7 +235,7 @@ def test_job_scheduler_no_retries(
 
 
 def test_job_scheduler_can_not_define_cron_and_time_delta(queue: DataHubScheduler):
-    with pytest.raises(Exception):
+    with pytest.raises(Exception):  # noqa: PT011
         job_scheduler(
             function=PickleableMock.queue_handler,
             queue_name='234',

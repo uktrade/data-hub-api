@@ -126,15 +126,19 @@ class TestGetArrayAggSubquery:
             assert Counter(actual_author_names) == Counter(names)
 
     @pytest.mark.parametrize(
-        ('names', 'desired_names'), [
+        ('names', 'desired_names'),
+        [
             (
-                ['Barbara'], ['Barbara'],
+                ['Barbara'],
+                ['Barbara'],
             ),
             (
-                ['Barbara', 'Claire'], ['Claire'],
+                ['Barbara', 'Claire'],
+                ['Claire'],
             ),
             (
-                ['Barbara', 'Claire', 'John', 'John'], ['Barbara', 'John'],
+                ['Barbara', 'Claire', 'John', 'John'],
+                ['Barbara', 'John'],
             ),
             (
                 ['Barbara', 'Barbara', 'Claire', 'John', 'John', 'John', 'Samantha'],
@@ -213,9 +217,8 @@ class TestGetAggregateSubquery:
         assert actual_max_published == expected_max_published
 
     def test_get_aggregate_subquery_raises_error_on_on_aggregate_expression(self):
-        """Test that an error is raised when passed a non-aggregate expression.
-        """
-        with pytest.raises(ValueError):
+        """Test that an error is raised when passed a non-aggregate expression."""
+        with pytest.raises(ValueError):  # noqa: PT011
             get_aggregate_subquery(Person, Left('proofread_books__name', 5))
 
 
@@ -246,7 +249,9 @@ class TestGetTopRelatedExpressionSubquery:
 
         queryset = Person.objects.annotate(
             name_of_latest_book=get_top_related_expression_subquery(
-                Book.proofreader.field, expression, ('-published_on',),
+                Book.proofreader.field,
+                expression,
+                ('-published_on',),
             ),
         )
         assert queryset.first().name_of_latest_book == 'newest'
@@ -437,8 +442,7 @@ class TestBracketedConcatExpression:
         bracketed_field,
         expected_value,
     ):
-        """Tests that a Person query set can be annotated using get_bracketed_concat_expression().
-        """
+        """Tests that a Person query set can be annotated using get_bracketed_concat_expression()."""
         PersonFactory(first_name=first_name, last_name=last_name, country=country)
         queryset = Person.objects.annotate(
             name=get_bracketed_concat_expression(

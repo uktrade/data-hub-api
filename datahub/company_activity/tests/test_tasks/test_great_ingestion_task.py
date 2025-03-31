@@ -25,9 +25,7 @@ from datahub.metadata.models import BusinessType, Country, EmployeeRange, Sector
 
 @pytest.fixture
 def test_file():
-    filepath = (
-        'datahub/company_activity/tests/test_tasks/fixtures/great/20241023T000346.jsonl.gz'
-    )
+    filepath = 'datahub/company_activity/tests/test_tasks/fixtures/great/20241023T000346.jsonl.gz'
     return open(filepath, 'rb')
 
 
@@ -88,13 +86,17 @@ class TestGreatIngestionTasks:
     @pytest.mark.django_db
     @mock_aws
     def test_skip_previously_ingested_records(self, test_file_path):
-        """Test that we skip updating records that have already been ingested.
-        """
+        """Test that we skip updating records that have already been ingested."""
         GreatExportEnquiryFactory(form_id=5249)
-        record = json.dumps(dict({
-            'id': '5249',
-            'created_at': '2024-09-19T14:00:34.069',
-        }), default=str)
+        record = json.dumps(
+            dict(
+                {
+                    'id': '5249',
+                    'created_at': '2024-09-19T14:00:34.069',
+                },
+            ),
+            default=str,
+        )
         test_file = gzip.compress(record.encode('utf-8'))
         setup_s3_bucket(BUCKET)
         setup_s3_files(BUCKET, test_file, test_file_path)
@@ -104,17 +106,15 @@ class TestGreatIngestionTasks:
     @pytest.mark.django_db
     @mock_aws
     def test_invalid_file(self, test_file_path):
-        """Test that an exception is raised when the file is not valid.
-        """
+        """Test that an exception is raised when the file is not valid."""
         mock_transport = MockSentryTransport()
         init(transport=mock_transport)
         setup_s3_bucket(BUCKET)
-        with pytest.raises(Exception) as e:
+        with pytest.raises(Exception) as e:  # noqa: PT011
             ingest_great_data(BUCKET, test_file_path)
         exception = e.value.args[0]
         assert 'The specified key does not exist' in exception
-        expected = " key: 'data-flow/exports/ExportGreatContactFormData/" \
-            '20240920T000000.jsonl.gz'
+        expected = " key: 'data-flow/exports/ExportGreatContactFormData/20240920T000000.jsonl.gz"
         assert expected in exception
 
     @pytest.mark.django_db
@@ -256,8 +256,7 @@ class TestGreatIngestionTasks:
 
     @pytest.mark.django_db
     def test_company_contact_first_name_filtering(self):
-        """Test that contact is filtered on first name correctly.
-        """
+        """Test that contact is filtered on first name correctly."""
         company = CompanyFactory(company_number='123')
         contact = ContactFactory(company=company)
         name = 'Some non-existent business'
@@ -280,8 +279,7 @@ class TestGreatIngestionTasks:
 
     @pytest.mark.django_db
     def test_company_contact_last_name_filtering(self):
-        """Test that contact is filtered on last name correctly.
-        """
+        """Test that contact is filtered on last name correctly."""
         company = CompanyFactory(company_number='123')
         contact = ContactFactory(company=company)
         name = 'Some non-existent business'
@@ -304,8 +302,7 @@ class TestGreatIngestionTasks:
 
     @pytest.mark.django_db
     def test_company_contact_email_filtering(self):
-        """Test that contact is filtered on email correctly.
-        """
+        """Test that contact is filtered on email correctly."""
         company = CompanyFactory(company_number='123')
         contact = ContactFactory(company=company, email='valid@example.com')
         name = 'Some non-existent business'
@@ -328,8 +325,7 @@ class TestGreatIngestionTasks:
 
     @pytest.mark.django_db
     def test_company_contact_phone_filtering(self):
-        """Test that contact is filtered on phone correctly.
-        """
+        """Test that contact is filtered on phone correctly."""
         company = CompanyFactory(company_number='123')
         contact = ContactFactory(company=company, full_telephone_number='1234')
         name = 'Some non-existent business'
@@ -382,8 +378,10 @@ class TestGreatIngestionTasks:
         with caplog.at_level(logging.INFO):
             task.json_to_model(json.loads(data))
             id = Company.objects.latest('created_on').id
-            assert 'Could not match company for Great Export Enquiry: 5249.' \
+            assert (
+                'Could not match company for Great Export Enquiry: 5249.'
                 f'Created new company with id: {id}' in caplog.text
+            )
         result = GreatExportEnquiry.objects.get(form_id='5249').company
         assert result.name == name
         assert result.address_country.iso_alpha2_code == 'GB'
@@ -437,8 +435,7 @@ class TestGreatIngestionTasks:
 
     @pytest.mark.django_db
     def test_company_contact_name_handling(self):
-        """Test handling withheld names.
-        """
+        """Test handling withheld names."""
         company = CompanyFactory(company_number='123')
         email = 'test@example.com'
         assert not Contact.objects.filter(email=email).exists()
@@ -490,8 +487,7 @@ class TestGreatIngestionTasks:
 
     @pytest.mark.django_db
     def test_upper_business_size(self):
-        """Test that the upper business size range is mapped correctly.
-        """
+        """Test that the upper business size range is mapped correctly."""
         name = 'Some non-existent business'
         first_name = 'Ada'
         last_name = 'Babbage'
@@ -554,8 +550,7 @@ class TestGreatIngestionTasks:
 
     @pytest.mark.django_db
     def test_sector_mapping(self):
-        """Test that sectors are mapped correctly.
-        """
+        """Test that sectors are mapped correctly."""
         primary = Sector.objects.get(segment='Aerospace', level=0)
         secondary = Sector.objects.get(segment='Defence and Security', level=0)
         tertiary = Sector.objects.get(segment='Energy', level=0)
@@ -579,8 +574,7 @@ class TestGreatIngestionTasks:
 
     @pytest.mark.django_db
     def test_invalid_sector(self):
-        """Test that invalid sectors raise a Sentry alert.
-        """
+        """Test that invalid sectors raise a Sentry alert."""
         data = """
             {
                 "id": "5249",
@@ -596,8 +590,7 @@ class TestGreatIngestionTasks:
         task = GreatIngestionTask()
         task.json_to_model(json.loads(data))
         sentry_event = mock_transport.events[0].get_event()
-        expected_message = 'Could not match sector: Some non-existent sector, ' + \
-            'for form: 5249'
+        expected_message = 'Could not match sector: Some non-existent sector, ' + 'for form: 5249'
         assert sentry_event['logentry']['message'] == expected_message
 
     @pytest.mark.django_db
@@ -655,18 +648,15 @@ class TestGreatIngestionTasks:
         assert result.meta_sender_country is None
         assert list(result.data_markets.all()) == [argentina, uk]
         sentry_event = mock_transport.events[1].get_event()
-        expected_message = 'Could not match country with iso code: ZZ, ' + \
-            'for form: 5249'
+        expected_message = 'Could not match country with iso code: ZZ, ' + 'for form: 5249'
         assert sentry_event['logentry']['message'] == expected_message
         sentry_event = mock_transport.events[0].get_event()
-        expected_message = 'Could not match country with iso code: ZP, ' + \
-            'for form: 5249'
+        expected_message = 'Could not match country with iso code: ZP, ' + 'for form: 5249'
         assert sentry_event['logentry']['message'] == expected_message
 
     @pytest.mark.django_db
     def test_boolean_field_mapping(self):
-        """Test that boolean fields are mapped correctly.
-        """
+        """Test that boolean fields are mapped correctly."""
         data = """
             {
                 "id": "5249",
@@ -703,8 +693,7 @@ class TestGreatIngestionTasks:
     @pytest.mark.django_db
     @mock_aws
     def test_long_field_values(self):
-        """Test that we can ingest records with long field values.
-        """
+        """Test that we can ingest records with long field values."""
         initial_count = GreatExportEnquiry.objects.count()
         long_text = (
             'Some text string that is longer than 255 characters.'

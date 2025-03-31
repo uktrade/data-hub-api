@@ -27,8 +27,7 @@ class TestPaymentGatewaySessionIsFinished:
         ],
     )
     def test_value(self, status, finished):
-        """Test the return value of `is_finished` with different values of session.status.
-        """
+        """Test the return value of `is_finished` with different values of session.status."""
         session = PaymentGatewaySession(status=status)
         assert session.is_finished() == finished
 
@@ -37,8 +36,7 @@ class TestPaymentGatewaySessionGetPaymentURL:
     """Tests for the `get_payment_url` method."""
 
     def test_with_value(self, requests_mock):
-        """Test the value returned when the GOV.UK Pay response data includes next_url.
-        """
+        """Test the value returned when the GOV.UK Pay response data includes next_url."""
         govuk_payment_id = '123abc123abc123abc123abc12'
         next_url = 'https://payment.example.com/123abc'
         requests_mock.get(
@@ -105,7 +103,8 @@ class TestPaymentGatewaySessionRefresh:
     """Tests for the `refresh_from_govuk_payment` method."""
 
     @pytest.mark.parametrize(
-        'status', [
+        'status',
+        [
             PaymentGatewaySessionStatus.SUCCESS,
             PaymentGatewaySessionStatus.FAILED,
             PaymentGatewaySessionStatus.CANCELLED,
@@ -130,7 +129,9 @@ class TestPaymentGatewaySessionRefresh:
         ],
     )
     def test_with_unchanged_govuk_payment_status_doesnt_change_anything(
-        self, status, requests_mock,
+        self,
+        status,
+        requests_mock,
     ):
         """Test that if the GOV.UK payment status is the same as the payment gateway session one,
         (meaning that the payment gateway session is up-to-date), the record is not changed.
@@ -138,7 +139,9 @@ class TestPaymentGatewaySessionRefresh:
         session = PaymentGatewaySession(status=status)
         url = govuk_url(f'payments/{session.govuk_payment_id}')
         requests_mock.get(
-            url, status_code=200, json={
+            url,
+            status_code=200,
+            json={
                 'state': {'status': status, 'finished': False},
             },
         )
@@ -152,7 +155,8 @@ class TestPaymentGatewaySessionRefresh:
     @pytest.mark.parametrize(
         'status',
         (
-            status[0] for status in PaymentGatewaySessionStatus
+            status[0]
+            for status in PaymentGatewaySessionStatus
             if status[0] != PaymentGatewaySessionStatus.SUCCESS
         ),
     )
@@ -168,7 +172,9 @@ class TestPaymentGatewaySessionRefresh:
         session = PaymentGatewaySessionFactory(status=initial_status)
         url = govuk_url(f'payments/{session.govuk_payment_id}')
         requests_mock.get(
-            url, status_code=200, json={
+            url,
+            status_code=200,
+            json={
                 'state': {'status': status},
             },
         )
@@ -244,8 +250,7 @@ class TestPaymentGatewaySessionRefresh:
         assert requests_mock.call_count == 1
 
     def test_atomicity_when_govuk_pay_errors(self, requests_mock):
-        """Test that if GOV.UK Pay errors, none of the changes persists.
-        """
+        """Test that if GOV.UK Pay errors, none of the changes persists."""
         session = PaymentGatewaySessionFactory()
         original_session_status = session.status
 
@@ -261,19 +266,20 @@ class TestPaymentGatewaySessionRefresh:
         assert requests_mock.call_count == 1
 
     def test_atomicity_when_session_save_errors(self, requests_mock):
-        """Test that if the PaymentGatewaySession.save() call fails, none of the changes persists.
-        """
+        """Test that if the PaymentGatewaySession.save() call fails, none of the changes persists."""
         session = PaymentGatewaySessionFactory()
         original_session_status = session.status
         url = govuk_url(f'payments/{session.govuk_payment_id}')
         requests_mock.get(
-            url, status_code=200, json={
+            url,
+            status_code=200,
+            json={
                 'state': {'status': 'success'},
             },
         )
         session.save = mock.MagicMock(side_effect=Exception())
 
-        with pytest.raises(Exception):
+        with pytest.raises(Exception):  # noqa: PT011
             session.refresh_from_govuk_payment()
 
         session.refresh_from_db()
@@ -282,19 +288,20 @@ class TestPaymentGatewaySessionRefresh:
         assert requests_mock.call_count == 1
 
     def test_atomicity_when_order_save_errors(self, requests_mock):
-        """Test that if the order.mark_as_paid() call fails, non of the changes persists.
-        """
+        """Test that if the order.mark_as_paid() call fails, non of the changes persists."""
         session = PaymentGatewaySessionFactory()
         original_session_status = session.status
         url = govuk_url(f'payments/{session.govuk_payment_id}')
         requests_mock.get(
-            url, status_code=200, json={
+            url,
+            status_code=200,
+            json={
                 'state': {'status': 'success'},
             },
         )
         session.order.mark_as_paid = mock.MagicMock(side_effect=Exception())
 
-        with pytest.raises(Exception):
+        with pytest.raises(Exception):  # noqa: PT011
             session.refresh_from_govuk_payment()
 
         session.refresh_from_db()

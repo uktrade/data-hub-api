@@ -19,8 +19,7 @@ pytestmark = pytest.mark.django_db
 
 @pytest.fixture
 def mock_sync_investment_projects_of_subsidiary_companies(monkeypatch):
-    """Mocks the sync_investment_projects_of_subsidiary_companies function.
-    """
+    """Mocks the sync_investment_projects_of_subsidiary_companies function."""
     mock_sync_investment_projects_of_subsidiary_companies = PickleableMock()
     monkeypatch.setattr(
         'datahub.search.company.tasks.sync_investment_projects_of_subsidiary_companies',
@@ -98,8 +97,7 @@ def test_race_condition_sync_investment_projects_of_subsidiary_companies(
     opensearch_with_collector,
     mock_sync_investment_projects_of_subsidiary_companies,
 ):
-    """Test that the race condition exception is raised when appropirate.
-    """
+    """Test that the race condition exception is raised when appropirate."""
     account_owner = AdviserFactory()
     subsidiary = SubsidiaryFactory()
     subsidiary.global_headquarters.one_list_account_owner = account_owner
@@ -107,7 +105,7 @@ def test_race_condition_sync_investment_projects_of_subsidiary_companies(
     opensearch_with_collector.flush_and_refresh()
     original_modified_on = subsidiary.modified_on + datetime.timedelta(hours=1)
 
-    with pytest.raises(Exception) as exception_info:
+    with pytest.raises(Exception) as exception_info:  # noqa: PT011
         sync_investment_projects_of_subsidiary_companies(
             subsidiary.global_headquarters,
             original_modified_on,

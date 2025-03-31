@@ -20,5 +20,5 @@ def mute_task_signals(request):
                 signal.sender_receivers_cache.clear()
                 signal.receivers = receivers
 
-        request.addfinalizer(restore_signals)
+        request.addfinalizer(restore_signals)  # noqa: PT021
         yield

@@ -248,8 +248,7 @@ class TestCompanySearch:
 
 
 class TestUpdateCompanyFromDNB:
-    """Test update_company_from_dnb utility function.
-    """
+    """Test update_company_from_dnb utility function."""
 
     @pytest.mark.parametrize(
         'adviser_callable',
@@ -305,7 +304,8 @@ class TestUpdateCompanyFromDNB:
             'address_country': us_country.id,
             'address_county': '',
             'address_area': AdministrativeArea.objects.get(
-                country_id=us_country.id, name='New York',
+                country_id=us_country.id,
+                name='New York',
             ).id,
             'address_postcode': '10033-1062',
             'address_town': 'New York',
@@ -360,8 +360,7 @@ class TestUpdateCompanyFromDNB:
         formatted_dnb_company,
         adviser_callable,
     ):
-        """Test that update_company_from_dnb can update a subset of fields.
-        """
+        """Test that update_company_from_dnb can update a subset of fields."""
         duns_number = '123456789'
         company = CompanyFactory(duns_number=duns_number)
         original_company = Company.objects.get(id=company.id)
@@ -392,8 +391,7 @@ class TestUpdateCompanyFromDNB:
         formatted_dnb_company,
         adviser_callable,
     ):
-        """Test that update_company_from_dnb can update a subset of fields.
-        """
+        """Test that update_company_from_dnb can update a subset of fields."""
         duns_number = '123456789'
         company = CompanyFactory(duns_number=duns_number)
         original_company = Company.objects.get(id=company.id)
@@ -426,14 +424,13 @@ class TestUpdateCompanyFromDNB:
         company = CompanyFactory(duns_number='123456789')
         adviser = AdviserFactory()
         formatted_dnb_company['name'] = None
-        with pytest.raises(serializers.ValidationError) as excinfo:
+        with pytest.raises(serializers.ValidationError) as excinfo:  # noqa: PT012
             update_company_from_dnb(company, formatted_dnb_company, adviser)
             assert str(excinfo) == 'Data from D&B did not pass the Data Hub validation checks.'
 
 
 class TestGetCompanyUpdatePage:
-    """Test for the `get_company_update_page` utility function.
-    """
+    """Test for the `get_company_update_page` utility function."""
 
     @pytest.mark.parametrize(
         'last_updated_after',
@@ -557,8 +554,7 @@ class TestGetCompanyUpdatePage:
 
 
 class TestRollbackDNBCompanyUpdate:
-    """Test rollback_dnb_company_update utility function.
-    """
+    """Test rollback_dnb_company_update utility function."""
 
     @pytest.mark.parametrize(
         ('fields', 'expected_fields'),
@@ -624,14 +620,13 @@ class TestRollbackDNBCompanyUpdate:
             update_descriptor='foo',
         )
 
-        with pytest.raises(RevisionNotFoundError) as excinfo:
+        with pytest.raises(RevisionNotFoundError) as excinfo:  # noqa: PT012
             rollback_dnb_company_update(company, update_comment)
             assert str(excinfo.value) == error_message
 
 
 class TestFormatDNBCompany:
-    """Tests for format_dnb_company function.
-    """
+    """Tests for format_dnb_company function."""
 
     def test_turnover_usd(self, dnb_response_uk):
         """Test that the function returns `turnover`
@@ -656,8 +651,7 @@ class TestFormatDNBCompany:
 
 
 class TestDNBFullHierarchyData:
-    """Tests for DNB Hierarchy function.
-    """
+    """Tests for DNB Hierarchy function."""
 
     VALID_DUNS_NUMBER = '123456789'
     FAMILY_TREE_CACHE_KEY = f'family_tree_{VALID_DUNS_NUMBER}'
@@ -706,8 +700,7 @@ class TestDNBFullHierarchyData:
 
     @pytest.mark.usefixtures('local_memory_cache')
     def test_when_dnb_data_in_cache_this_is_returned_instead_of_calling_api(self, requests_mock):
-        """Test when a value is stored in the cache the dnb api is not called.
-        """
+        """Test when a value is stored in the cache the dnb api is not called."""
         cache.set(self.FAMILY_TREE_CACHE_KEY, 'cached')
 
         matcher = requests_mock.post(
@@ -751,9 +744,8 @@ class TestDNBFullHierarchyData:
         request_exception,
         expected_exception,
     ):
-        """Test when the dnb api doesn't return a success http status code the value is not cached.
-        """
-        with pytest.raises(expected_exception):
+        """Test when the dnb api doesn't return a success http status code the value is not cached."""
+        with pytest.raises(expected_exception):  # noqa: PT012
             requests_mock.post(DNB_HIERARCHY_SEARCH_URL, exc=request_exception)
             get_full_company_hierarchy_data(self.VALID_DUNS_NUMBER)
         assert cache.get(self.FAMILY_TREE_CACHE_KEY) is None
@@ -762,9 +754,8 @@ class TestDNBFullHierarchyData:
         self,
         requests_mock,
     ):
-        """Test when the dnb api doesn't return a success http status code the value is not cached.
-        """
-        with pytest.raises(DNBServiceError):
+        """Test when the dnb api doesn't return a success http status code the value is not cached."""
+        with pytest.raises(DNBServiceError):  # noqa: PT012
             requests_mock.post(
                 DNB_HIERARCHY_SEARCH_URL,
                 status_code=500,
@@ -1028,8 +1019,7 @@ class TestRelatedCompanyDataframe:
 
 
 class TestDNBHierarchyCount:
-    """Tests for DNB Hierarchy count function.
-    """
+    """Tests for DNB Hierarchy count function."""
 
     VALID_DUNS_NUMBER = '123456789'
     FAMILY_TREE_CACHE_KEY = f'family_tree_count_{VALID_DUNS_NUMBER}'
@@ -1077,8 +1067,7 @@ class TestDNBHierarchyCount:
 
     @pytest.mark.usefixtures('local_memory_cache')
     def test_when_dnb_data_in_cache_this_is_returned_instead_of_calling_api(self, requests_mock):
-        """Test when a value is stored in the cache the dnb api is not called.
-        """
+        """Test when a value is stored in the cache the dnb api is not called."""
         cache.set(self.FAMILY_TREE_CACHE_KEY, 'cached')
 
         matcher = requests_mock.post(
@@ -1122,9 +1111,8 @@ class TestDNBHierarchyCount:
         request_exception,
         expected_exception,
     ):
-        """Test when the dnb api raises an error the value is not cached.
-        """
-        with pytest.raises(expected_exception):
+        """Test when the dnb api raises an error the value is not cached."""
+        with pytest.raises(expected_exception):  # noqa: PT012
             requests_mock.post(DNB_HIERARCHY_COUNT_URL, exc=request_exception)
             get_company_hierarchy_count(self.VALID_DUNS_NUMBER)
         assert cache.get(self.FAMILY_TREE_CACHE_KEY) is None
@@ -1133,9 +1121,8 @@ class TestDNBHierarchyCount:
         self,
         requests_mock,
     ):
-        """Test when the dnb api doesn't return a success http status code the value is not cached.
-        """
-        with pytest.raises(DNBServiceError):
+        """Test when the dnb api doesn't return a success http status code the value is not cached."""
+        with pytest.raises(DNBServiceError):  # noqa: PT012
             requests_mock.post(
                 DNB_HIERARCHY_COUNT_URL,
                 status_code=500,
@@ -1147,13 +1134,11 @@ class TestDNBHierarchyCount:
 
 class TestReducedHierarchyData:
     def test_when_no_duns_number_provided_empty_array_returned(self):
-        """Test when no duns number is provided an empty array of hierarchy data is returned.
-        """
+        """Test when no duns number is provided an empty array of hierarchy data is returned."""
         assert get_reduced_company_hierarchy_data(duns_number='').data == []
 
     def test_when_company_has_no_parent_1_company_returned(self, requests_mock):
-        """Test when a company has no parent only that company is returned.
-        """
+        """Test when a company has no parent only that company is returned."""
         requests_mock.post(
             DNB_V2_SEARCH_URL,
             status_code=200,
@@ -1250,8 +1235,7 @@ class TestCompanyCaching:
 
 class TestFormatCompanyForFamilyTree:
     def test_no_company_returns_empty_object(self):
-        """Test when the company provided is none, an object is still returned.
-        """
+        """Test when the company provided is none, an object is still returned."""
         assert format_company_for_family_tree(None) == {
             'duns': None,
             'corporateLinkage.parent.duns': None,
@@ -1259,8 +1243,7 @@ class TestFormatCompanyForFamilyTree:
         }
 
     def test_company_with_no_parent_duns_returns_none_for_corporate_linkage_parent(self):
-        """Test a company without a parent duns number returns none for the corporate linkage.
-        """
+        """Test a company without a parent duns number returns none for the corporate linkage."""
         assert format_company_for_family_tree({'duns_number': '1', 'primary_name': 'abc'}) == {
             'duns': '1',
             'corporateLinkage.parent.duns': None,
@@ -1268,8 +1251,7 @@ class TestFormatCompanyForFamilyTree:
         }
 
     def test_company_with_parent_duns_returns_id_for_corporate_linkage_parent(self):
-        """Test a company with a parent duns number returns that number for the corporate linkage.
-        """
+        """Test a company with a parent duns number returns that number for the corporate linkage."""
         assert format_company_for_family_tree(
             {'duns_number': '1', 'parent_duns_number': '2', 'primary_name': 'abc'},
         ) == {

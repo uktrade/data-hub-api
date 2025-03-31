@@ -26,9 +26,7 @@ from datahub.ingest.models import IngestedObject
 
 @pytest.fixture
 def test_file():
-    filepath = (
-        'datahub/company_activity/tests/test_tasks/fixtures/stova/stovaEventFake2.jsonl.gz'
-    )
+    filepath = 'datahub/company_activity/tests/test_tasks/fixtures/stova/stovaEventFake2.jsonl.gz'
     return open(filepath, 'rb')
 
 
@@ -109,7 +107,6 @@ class MockSentryTransport(Transport):
 
 @pytest.mark.django_db
 class TestStovaIngestionTasks:
-
     @mock_aws
     @override_settings(S3_LOCAL_ENDPOINT_URL=None)
     def test_stova_data_file_ingestion(self, caplog, test_file, test_file_path):
@@ -132,8 +129,7 @@ class TestStovaIngestionTasks:
     @mock_aws
     @override_settings(S3_LOCAL_ENDPOINT_URL=None)
     def test_skip_previously_ingested_records(self, test_file_path, test_base_stova_event):
-        """Test that we skip updating records that have already been ingested.
-        """
+        """Test that we skip updating records that have already been ingested."""
         StovaEventFactory(stova_event_id=123456789)
         data = test_base_stova_event
         data['id'] = 123456789
@@ -150,21 +146,19 @@ class TestStovaIngestionTasks:
     @mock_aws
     @override_settings(S3_LOCAL_ENDPOINT_URL=None)
     def test_invalid_file(self, test_file_path):
-        """Test that an exception is raised when the file is not valid.
-        """
+        """Test that an exception is raised when the file is not valid."""
         mock_transport = MockSentryTransport()
         init(transport=mock_transport)
         setup_s3_bucket(BUCKET)
-        with pytest.raises(Exception) as e:
+        with pytest.raises(Exception) as e:  # noqa: PT011
             stova_event_ingestion_task(test_file_path)
         exception = e.value.args[0]
         assert 'The specified key does not exist' in exception
-        expected = "key: 'data-flow/exports/ExportAventriEvents/" 'stovaEventFake2.jsonl.gz'
+        expected = "key: 'data-flow/exports/ExportAventriEvents/stovaEventFake2.jsonl.gz"
         assert expected in exception
 
     def test_stova_event_fields_are_saved(self, test_base_stova_event):
-        """Test that the ingested stova event fields are saved to the StovaEvent model.
-        """
+        """Test that the ingested stova event fields are saved to the StovaEvent model."""
         s3_processor_mock = mock.Mock()
         task = StovaEventIngestionTask('dummy-prefix', s3_processor_mock)
         data = test_base_stova_event
@@ -182,7 +176,9 @@ class TestStovaIngestionTasks:
             assert model_value == file_value
 
     def test_stova_event_fields_with_duplicate_attendee_ids_in_db(
-        self, caplog, test_base_stova_event,
+        self,
+        caplog,
+        test_base_stova_event,
     ):
         """Test already ingested records to do pass the `_should_process_record` check."""
         s3_processor_mock = mock.Mock()
@@ -199,10 +195,11 @@ class TestStovaIngestionTasks:
             ) in caplog.text
 
     def test_stova_event_fields_with_duplicate_attendee_ids_in_json(
-        self, caplog, test_base_stova_event,
+        self,
+        caplog,
+        test_base_stova_event,
     ):
-        """Tests records which have duplicate IDs should have errors logged.
-        """
+        """Tests records which have duplicate IDs should have errors logged."""
         s3_processor_mock = mock.Mock()
         task = StovaEventIngestionTask('dummy-prefix', s3_processor_mock)
 
@@ -250,7 +247,10 @@ class TestStovaIngestionTasks:
         ],
     )
     def test_stova_event_ingestion_rejects_event_if_missing_required_fields(
-        self, caplog, test_base_stova_event, required_field,
+        self,
+        caplog,
+        test_base_stova_event,
+        required_field,
     ):
         """Some fields are required by Data Hub events, if a Stova Event does not provide these fields
         the stova event will not be ingested.
@@ -283,7 +283,9 @@ class TestStovaIngestionTasks:
         ],
     )
     def test_stova_event_ingestion_converts_null_fields_to_empty_string(
-        self, test_base_stova_event, null_field,
+        self,
+        test_base_stova_event,
+        null_field,
     ):
         """Some fields are required to be an empty string by Data Hub Events, they do not accept
         null values.

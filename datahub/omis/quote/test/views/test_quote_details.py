@@ -52,7 +52,8 @@ class TestCreatePreviewOrder(APITestMixin):
 
     @pytest.mark.parametrize('quote_view_name', ['detail', 'preview'])
     @pytest.mark.parametrize(
-        'disallowed_status', [
+        'disallowed_status',
+        [
             OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
             OrderStatus.QUOTE_ACCEPTED,
             OrderStatus.PAID,
@@ -75,8 +76,7 @@ class TestCreatePreviewOrder(APITestMixin):
         assert response.status_code == status.HTTP_409_CONFLICT
         assert response.json() == {
             'detail': (
-                'The action cannot be performed '
-                f'in the current status {disallowed_status.label}.'
+                f'The action cannot be performed in the current status {disallowed_status.label}.'
             ),
         }
 
@@ -177,7 +177,7 @@ class TestCreatePreviewOrder(APITestMixin):
         with mock.patch.object(Order, 'save') as mocked_save:
             mocked_save.side_effect = Exception()
 
-            with pytest.raises(Exception):
+            with pytest.raises(Exception):  # noqa: PT011
                 self.api_client.post(url)
 
         order.refresh_from_db()
@@ -293,7 +293,8 @@ class TestCancelOrder(APITestMixin):
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     @pytest.mark.parametrize(
-        'disallowed_status', [
+        'disallowed_status',
+        [
             OrderStatus.PAID,
             OrderStatus.COMPLETE,
             OrderStatus.CANCELLED,
@@ -318,8 +319,7 @@ class TestCancelOrder(APITestMixin):
         assert response.status_code == status.HTTP_409_CONFLICT
         assert response.json() == {
             'detail': (
-                'The action cannot be performed '
-                f'in the current status {disallowed_status.label}.'
+                f'The action cannot be performed in the current status {disallowed_status.label}.'
             ),
         }
 

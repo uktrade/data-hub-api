@@ -27,8 +27,10 @@ def test_delete_document(s3_stubber):
             'ResponseMetadata': {
                 'HTTPStatusCode': 204,
             },
-        }, expected_params={
-            'Bucket': bucket_name, 'Key': document.path,
+        },
+        expected_params={
+            'Bucket': bucket_name,
+            'Key': document.path,
         },
     )
 
@@ -57,11 +59,12 @@ def test_delete_document_s3_failure(s3_stubber):
         'delete_object',
         service_error_code=500,
         expected_params={
-            'Bucket': bucket_name, 'Key': document.path,
+            'Bucket': bucket_name,
+            'Key': document.path,
         },
     )
 
-    with pytest.raises(Exception):
+    with pytest.raises(Exception):  # noqa: PT011
         delete_document(document.pk).get()
 
     qs = MyEntityDocument.objects.include_objects_deletion_pending()

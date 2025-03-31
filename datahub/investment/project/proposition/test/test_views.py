@@ -298,7 +298,8 @@ class TestUpdateProposition(APITestMixin):
     """Tests for the update proposition view."""
 
     @pytest.mark.parametrize(
-        'method', ['put', 'patch'],
+        'method',
+        ['put', 'patch'],
     )
     def test_cannot_update_collection(self, method):
         """Test cannot update proposition."""
@@ -313,7 +314,8 @@ class TestUpdateProposition(APITestMixin):
         assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
 
     @pytest.mark.parametrize(
-        'method', ['put', 'patch'],
+        'method',
+        ['put', 'patch'],
     )
     def test_cannot_update_item(self, method):
         """Test cannot update given proposition."""
@@ -346,7 +348,8 @@ class TestListPropositions(APITestMixin):
 
         PropositionFactory.create_batch(3)
         propositions = PropositionFactory.create_batch(
-            3, investment_project=investment_project,
+            3,
+            investment_project=investment_project,
         )
 
         user = create_test_user(permission_codenames=permissions)
@@ -416,13 +419,12 @@ class TestListPropositions(APITestMixin):
             created_by=project_creator,
         )
         propositions = PropositionFactory.create_batch(
-            3, investment_project=investment_project,
+            3,
+            investment_project=investment_project,
         )
 
         user = create_test_user(
-            permission_codenames=(
-                PropositionPermission.view_associated,
-            ),
+            permission_codenames=(PropositionPermission.view_associated,),
             dit_team=project_creator.dit_team,
         )
         api_client = self.create_api_client(user=user)
@@ -454,13 +456,12 @@ class TestListPropositions(APITestMixin):
             created_by=project_creator,
         )
         PropositionFactory.create_batch(
-            3, investment_project=investment_project,
+            3,
+            investment_project=investment_project,
         )
 
         user = create_test_user(
-            permission_codenames=(
-                PropositionPermission.view_associated
-            ),
+            permission_codenames=(PropositionPermission.view_associated),
             dit_team=TeamFactory(),
         )
         api_client = self.create_api_client(user=user)
@@ -490,7 +491,8 @@ class TestListPropositions(APITestMixin):
         investment_project = InvestmentProjectFactory()
 
         PropositionFactory.create_batch(
-            3, investment_project=investment_project,
+            3,
+            investment_project=investment_project,
         )
         propositions = PropositionFactory.create_batch(
             3,
@@ -656,9 +658,7 @@ class TestGetProposition(APITestMixin):
             },
         )
         user = create_test_user(
-            permission_codenames=(
-                PropositionPermission.view_associated,
-            ),
+            permission_codenames=(PropositionPermission.view_associated,),
             dit_team=project_creator.dit_team,
         )
         api_client = self.create_api_client(user=user)
@@ -718,9 +718,7 @@ class TestGetProposition(APITestMixin):
             },
         )
         user = create_test_user(
-            permission_codenames=(
-                PropositionPermission.view_associated,
-            ),
+            permission_codenames=(PropositionPermission.view_associated,),
             dit_team=TeamFactory(),
         )
         api_client = self.create_api_client(user=user)
@@ -881,9 +879,7 @@ class TestCompleteProposition(APITestMixin):
         """Test completing proposition by a restricted user."""
         project_creator = AdviserFactory()
         user = create_test_user(
-            permission_codenames=(
-                PropositionPermission.change_associated,
-            ),
+            permission_codenames=(PropositionPermission.change_associated,),
             dit_team=project_creator.dit_team,
         )
         investment_project = InvestmentProjectFactory(
@@ -951,9 +947,7 @@ class TestCompleteProposition(APITestMixin):
         """Test restricted user cannot complete non associated investment project proposition."""
         project_creator = AdviserFactory()
         user = create_test_user(
-            permission_codenames=(
-                PropositionPermission.change_associated,
-            ),
+            permission_codenames=(PropositionPermission.change_associated,),
             dit_team=TeamFactory(),
         )
         investment_project = InvestmentProjectFactory(
@@ -989,16 +983,16 @@ class TestCompleteProposition(APITestMixin):
         assert proposition.modified_by != user
 
     @pytest.mark.parametrize(
-        'proposition_status', [
-            PropositionStatus.COMPLETED, PropositionStatus.ABANDONED,
+        'proposition_status',
+        [
+            PropositionStatus.COMPLETED,
+            PropositionStatus.ABANDONED,
         ],
     )
     def test_cannot_complete_proposition_without_ongoing_status(self, proposition_status):
         """Test cannot complete proposition that doesn't have ongoing status."""
         user = create_test_user(
-            permission_codenames=(
-                PropositionPermission.change_all,
-            ),
+            permission_codenames=(PropositionPermission.change_all,),
             dit_team=TeamFactory(),
         )
         proposition = PropositionFactory(
@@ -1152,9 +1146,7 @@ class TestAbandonProposition(APITestMixin):
         )
 
         user = create_test_user(
-            permission_codenames=(
-                PropositionPermission.change_associated,
-            ),
+            permission_codenames=(PropositionPermission.change_associated,),
             dit_team=project_creator.dit_team,
         )
         api_client = self.create_api_client(user=user)
@@ -1221,9 +1213,7 @@ class TestAbandonProposition(APITestMixin):
         )
 
         user = create_test_user(
-            permission_codenames=(
-                PropositionPermission.change_associated,
-            ),
+            permission_codenames=(PropositionPermission.change_associated,),
             dit_team=TeamFactory(),
         )
         api_client = self.create_api_client(user=user)
@@ -1244,8 +1234,10 @@ class TestAbandonProposition(APITestMixin):
         assert proposition.modified_by != user
 
     @pytest.mark.parametrize(
-        'proposition_status', [
-            PropositionStatus.COMPLETED, PropositionStatus.ABANDONED,
+        'proposition_status',
+        [
+            PropositionStatus.COMPLETED,
+            PropositionStatus.ABANDONED,
         ],
     )
     def test_cannot_abandon_proposition_without_ongoing_status(self, proposition_status):
@@ -1868,7 +1860,8 @@ class TestPropositionDocumentViews(APITestMixin):
         """Tests retrieval of individual document that is pending deletion."""
         proposition = PropositionFactory()
         entity_document = PropositionDocument.objects.create(
-            proposition_id=proposition.pk, original_filename='test.txt',
+            proposition_id=proposition.pk,
+            original_filename='test.txt',
         )
         entity_document.document.mark_deletion_pending()
 
@@ -1888,7 +1881,8 @@ class TestPropositionDocumentViews(APITestMixin):
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     @pytest.mark.parametrize(
-        ('av_clean', 'expected_status'), [
+        ('av_clean', 'expected_status'),
+        [
             (True, status.HTTP_200_OK),
             (False, status.HTTP_403_FORBIDDEN),
         ],
@@ -1944,7 +1938,8 @@ class TestPropositionDocumentViews(APITestMixin):
         """Tests download of individual document when not yet virus scanned."""
         proposition = PropositionFactory()
         entity_document = PropositionDocument.objects.create(
-            proposition_id=proposition.pk, original_filename='test.txt',
+            proposition_id=proposition.pk,
+            original_filename='test.txt',
         )
 
         url = reverse(
@@ -2011,7 +2006,6 @@ class TestPropositionDocumentViews(APITestMixin):
                 'last_name': entity_document.created_by.last_name,
                 'name': entity_document.created_by.name,
             },
-
             'original_filename': 'test.txt',
             'url': _get_document_url(entity_document.proposition, entity_document),
             'status': UploadStatus.VIRUS_SCANNING_SCHEDULED,
@@ -2026,8 +2020,7 @@ class TestPropositionDocumentViews(APITestMixin):
         self,
         monkeypatch,
     ):
-        """Test that restricted user can schedule a virus scan for associated document.
-        """
+        """Test that restricted user can schedule a virus scan for associated document."""
         mock_schedule_virus_scan_document = Mock()
         monkeypatch.setattr(
             'datahub.documents.models.schedule_virus_scan_document',
@@ -2074,7 +2067,6 @@ class TestPropositionDocumentViews(APITestMixin):
                 'last_name': entity_document.created_by.last_name,
                 'name': entity_document.created_by.name,
             },
-
             'original_filename': 'test.txt',
             'url': _get_document_url(entity_document.proposition, entity_document),
             'status': UploadStatus.VIRUS_SCANNING_SCHEDULED,
@@ -2134,7 +2126,8 @@ class TestPropositionDocumentViews(APITestMixin):
 
         proposition = PropositionFactory()
         entity_document = PropositionDocument.objects.create(
-            proposition_id=proposition.pk, original_filename='test.txt',
+            proposition_id=proposition.pk,
+            original_filename='test.txt',
         )
         document = entity_document.document
         document.mark_scan_scheduled()
@@ -2263,7 +2256,8 @@ class TestPropositionDocumentViews(APITestMixin):
         )
         proposition = PropositionFactory()
         entity_document = PropositionDocument.objects.create(
-            proposition_id=proposition.pk, original_filename='test.txt',
+            proposition_id=proposition.pk,
+            original_filename='test.txt',
         )
         entity_document.document.mark_scan_scheduled()
         entity_document.document.mark_as_scanned(True, 'reason')
@@ -2292,7 +2286,8 @@ class TestPropositionDocumentViews(APITestMixin):
 
         proposition = PropositionFactory()
         entity_document = PropositionDocument.objects.create(
-            proposition_id=proposition.pk, original_filename='test.txt',
+            proposition_id=proposition.pk,
+            original_filename='test.txt',
         )
         document = entity_document.document
         document.mark_scan_scheduled()
@@ -2346,7 +2341,8 @@ class TestPropositionDocumentViews(APITestMixin):
         mark_deletion_pending.side_effect = Exception('No way!')
         proposition = PropositionFactory()
         entity_document = PropositionDocument.objects.create(
-            proposition_id=proposition.pk, original_filename='test.txt',
+            proposition_id=proposition.pk,
+            original_filename='test.txt',
         )
         document = entity_document.document
         document.mark_scan_scheduled()
@@ -2365,7 +2361,7 @@ class TestPropositionDocumentViews(APITestMixin):
             dit_team=TeamFactory(),
         )
         api_client = self.create_api_client(user=user)
-        with pytest.raises(Exception):
+        with pytest.raises(Exception):  # noqa: PT011
             api_client.delete(url)
 
         assert UserEvent.objects.count() == 0
@@ -2378,7 +2374,8 @@ class TestPropositionDocumentViews(APITestMixin):
         )
         proposition = PropositionFactory()
         entity_document = PropositionDocument.objects.create(
-            proposition_id=proposition.pk, original_filename='test.txt',
+            proposition_id=proposition.pk,
+            original_filename='test.txt',
         )
 
         url = reverse(

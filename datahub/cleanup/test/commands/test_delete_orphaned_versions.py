@@ -131,8 +131,7 @@ def test_mappings():
     MAPPINGS.items(),
 )
 def test_with_one_model(model_label, model_factory):
-    """Test that --model_label can be used to specify which model we want the versions deleted.
-    """
+    """Test that --model_label can be used to specify which model we want the versions deleted."""
     model = apps.get_model(model_label)
 
     with reversion.create_revision():
@@ -165,7 +164,6 @@ def test_with_all_models(caplog):
     objs = []
     for model_factory in MAPPINGS.values():
         with reversion.create_revision():
-
             # This prevents CompanyInteractionFactory from creating an
             # InteractionDITParticipantFactory which has a revision.
             # Deleting the CompanyInteraction also deletes the InteractionDITParticipant
@@ -189,9 +187,7 @@ def test_with_all_models(caplog):
     # Interactions and referrals create a CompanyActivity when saved
     # so account for these being deleted as well.
     deleted_versions = len(MAPPINGS) + len(COMPANY_ACTIVITY_CREATED_BY_MODELS)
-    assert Version.objects.count() == (
-        total_versions - deleted_versions
-    )
+    assert Version.objects.count() == (total_versions - deleted_versions)
     assert Revision.objects.count() == len(MAPPINGS)
 
     assert f'{deleted_versions} records deleted' in caplog.text
@@ -200,8 +196,7 @@ def test_with_all_models(caplog):
 
 @pytest.mark.django_db
 def test_delete_revisions_without_versions(caplog):
-    """Test that a revision gets deleted as well if there aren't any more versions referencing it.
-    """
+    """Test that a revision gets deleted as well if there aren't any more versions referencing it."""
     caplog.set_level('INFO')
 
     model_label, model_factory = next(iter(MAPPINGS.items()))
@@ -251,7 +246,7 @@ def test_rollback_in_case_or_error(monkeypatch):
 
     monkeypatch.setattr(Revision.objects, 'filter', Mock(side_effect=Exception))
 
-    with pytest.raises(Exception):
+    with pytest.raises(Exception):  # noqa: PT011
         management.call_command(delete_orphaned_versions.Command())
 
     assert Version.objects.count() == total_versions
