@@ -466,27 +466,22 @@ class TestCopyExportCountriesFromCompanyModelToCompanyExportCountryModel:
 
         assert all(
             [
-                [
-                    item.country
-                    in set(new_future_interest_countries) - set(new_export_to_countries)
-                    and item.country not in new_export_to_countries
-                    for item in CompanyExportCountry.objects.filter(
-                        country_id=export_country.country.pk,
-                    )
-                ]
-                for export_country in updated_countries.filter(status='future_interest')
-            ],
+                item.country in set(new_future_interest_countries) - set(new_export_to_countries)
+                and item.country not in new_export_to_countries
+                for item in CompanyExportCountry.objects.filter(
+                    country_id=export_country.country.pk,
+                )
+            ]
+            for export_country in updated_countries.filter(status='future_interest')
         )
 
         assert all(
             [
-                [
-                    item.country in new_export_to_countries
-                    for item in CompanyExportCountry.objects.filter(
-                        country_id=export_country.country.pk,
-                        status='currently_exporting',
-                    )
-                ]
-                for export_country in updated_countries.filter(status='currently_exporting')
-            ],
+                item.country in new_export_to_countries
+                for item in CompanyExportCountry.objects.filter(
+                    country_id=export_country.country.pk,
+                    status='currently_exporting',
+                )
+            ]
+            for export_country in updated_countries.filter(status='currently_exporting')
         )

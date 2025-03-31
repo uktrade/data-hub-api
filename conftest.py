@@ -542,7 +542,7 @@ def pytest_collection_modifyitems(config, items):
         return
     for item in items:
         if any(
-            [m.name == 'excluded' or m.name.startswith('excluded_') for m in item.iter_markers()],
+            m.name == 'excluded' or m.name.startswith('excluded_') for m in item.iter_markers()
         ):
             item.add_marker(pytest.mark.skip(reason='Test marked as excluded'))
 
