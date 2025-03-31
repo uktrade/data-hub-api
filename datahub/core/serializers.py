@@ -67,8 +67,7 @@ class NestedRelatedField(serializers.RelatedField):
         'required': 'This field is required.',
         'missing_pk': 'pk not provided.',
         'does_not_exist': 'Invalid pk "{pk_value}" - object does not exist.',
-        'incorrect_type': 'Incorrect type. Expected object, received {'
-                          'data_type}.',
+        'incorrect_type': 'Incorrect type. Expected object, received {data_type}.',
     }
 
     def __init__(self, model, extra_fields=('name',), **kwargs):
@@ -84,8 +83,7 @@ class NestedRelatedField(serializers.RelatedField):
         """
         super().__init__(**kwargs)
 
-        model_class = (apps.get_model(model) if isinstance(model, str) else
-                       model)
+        model_class = apps.get_model(model) if isinstance(model, str) else model
 
         self.pk_field = UUIDField()
         self._fields = [
@@ -351,17 +349,23 @@ class AddressSerializer(serializers.ModelSerializer):
     )
 
     def __init__(
-            self, source_model, *args,
-            address_source_prefix='address', area_can_be_required=False,
-            postcode_can_be_required=False, **kwargs,
+        self,
+        source_model,
+        *args,
+        address_source_prefix='address',
+        area_can_be_required=False,
+        postcode_can_be_required=False,
+        **kwargs,
     ):
         """Initialises the serializer.
 
         It populates all necessary parts (e.g. Meta model, source, fields' source).
         """
+
         # Define a custom Meta so that the Meta model can be specified as an argument
         class MultiAddressMeta(self.Meta):
             model = source_model
+
         self.Meta = MultiAddressMeta
 
         kwargs.setdefault('source', '*')
@@ -378,8 +382,7 @@ class AddressSerializer(serializers.ModelSerializer):
         self.address_source_prefix = address_source_prefix
 
     def add_area_validator(self, validators):
-        """Mark area as required for US and Canadian companies.
-        """
+        """Mark area as required for US and Canadian companies."""
         validators.append(
             RulesBasedValidator(
                 ValidationRule(
@@ -397,8 +400,7 @@ class AddressSerializer(serializers.ModelSerializer):
         )
 
     def add_postcode_validator(self, validators):
-        """Mark postcode as required for US and Canadian companies.
-        """
+        """Mark postcode as required for US and Canadian companies."""
         validators.append(
             RulesBasedValidator(
                 ValidationRule(
@@ -468,7 +470,7 @@ class AddressSerializer(serializers.ModelSerializer):
             return None
 
         # for each address field, replace None with default if possible
-        for field_name, value in address_dict.items():
+        for field_name, value in address_dict.items():  # noqa: PLR1704
             field_default = self.fields[field_name].default
 
             if value is None and field_default is not serializers.empty:
@@ -477,15 +479,11 @@ class AddressSerializer(serializers.ModelSerializer):
         return address_dict
 
     def should_validate(self, data_combiner):
-        """Returns true if the data should be validated.
-        """
+        """Returns true if the data should be validated."""
         if self.required:
             return True
 
-        return any(
-            data_combiner.get_value(field.source)
-            for field in self.fields.values()
-        )
+        return any(data_combiner.get_value(field.source) for field in self.fields.values())
 
     def validate(self, attrs):
         """Validates the data if necessary.

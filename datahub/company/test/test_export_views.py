@@ -311,8 +311,7 @@ class TestListExport(APITestMixin):
         limit,
         expected_count,
     ):
-        """Test a request with pagination criteria returns expected export results.
-        """
+        """Test a request with pagination criteria returns expected export results."""
         ExportFactory.create_batch(batch_size, owner=self.user, team_members=[self.user])
 
         url = reverse('api-v4:export:collection')
@@ -354,8 +353,7 @@ class TestPatchExport(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_patch_success(self):
-        """Test a PATCH request with a known export id provides a success response.
-        """
+        """Test a PATCH request with a known export id provides a success response."""
         modified_date = now()
         with freeze_time(modified_date):
             export = ExportFactory()
@@ -705,7 +703,7 @@ class TestExportFilters(APITestMixin):
         for result in results:
             estimated_win_date = parse(result['estimated_win_date'])
             for filter_key, date in query.items():
-                date = parse(date)
+                date = parse(date)  # noqa: PLW2901
                 if filter_key == 'estimated_win_date_before':
                     assert estimated_win_date <= date
                 if filter_key == 'estimated_win_date_after':

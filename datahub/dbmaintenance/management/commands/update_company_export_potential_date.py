@@ -75,7 +75,7 @@ class Command(CSVBaseCommand):
             for row in reader:
                 batch.append(row)
                 if len(batch) >= batch_size:
-                    for row in batch:
+                    for row in batch:  # noqa: PLW2901
                         succeeded = self.process_row(row, **options)
                         result[succeeded] += 1
                     batch = []

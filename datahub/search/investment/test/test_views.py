@@ -406,7 +406,7 @@ class TestSearch(APITestMixin):
         for result in results:
             estimated_land_date = dateutil_parse(result['estimated_land_date'])
             for filter_key, date in query.items():
-                date = dateutil_parse(date)
+                date = dateutil_parse(date)  # noqa: PLW2901
                 if filter_key == 'estimated_land_date_before':
                     assert estimated_land_date <= date
                 if filter_key == 'estimated_land_date_after':
@@ -541,7 +541,7 @@ class TestSearch(APITestMixin):
         for result in results:
             created_on = dateutil_parse(result['created_on']).replace(tzinfo=datetime.timezone.utc)
             for filter_key, date in query.items():
-                date = dateutil_parse(date)
+                date = dateutil_parse(date)  # noqa: PLW2901
                 if filter_key == 'created_on_before':
                     assert created_on <= date
                 if filter_key == 'created_on_after':
@@ -1916,8 +1916,7 @@ class TestBasicSearchPermissions(APITestMixin):
         self,
         opensearch_with_collector,
     ):
-        """Automatic filter to see only associated IP for a specific (leps) user.
-        """
+        """Automatic filter to see only associated IP for a specific (leps) user."""
         team = TeamFactory()
         team_other = TeamFactory()
         adviser_other = AdviserFactory(dit_team_id=team_other.id)

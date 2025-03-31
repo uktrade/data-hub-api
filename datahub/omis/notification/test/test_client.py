@@ -176,7 +176,7 @@ class TestNotifyOrderCreated:
 
         # regional managers notified
         for index, call_args in enumerate(send_email_call_args_list[1:]):
-            call_args = call_args[1]
+            call_args = call_args[1]  # noqa: PLW2901
             assert call_args['email_address'] == regional_manager_emails[index]
             assert call_args['template_id'] == Template.order_created_for_regional_manager.value
 

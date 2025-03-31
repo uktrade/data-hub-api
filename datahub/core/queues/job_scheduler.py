@@ -9,7 +9,7 @@ from datahub.core.queues.scheduler import SHORT_RUNNING_QUEUE, DataHubScheduler
 logger = getLogger(__name__)
 
 
-def job_scheduler(
+def job_scheduler(  # noqa: PLR0913
     function,
     function_args=None,
     function_kwargs=None,
@@ -62,7 +62,7 @@ def job_scheduler(
     if retry_backoff is True or is_backoff_an_int:
         retry_intervals = retry_backoff_intervals(max_retries, retry_backoff, is_backoff_an_int)
     else:
-        retry_intervals = retry_intervals
+        retry_intervals = retry_intervals  # noqa: PLW0127
 
     if cron is not None and time_delta is not None:
         raise Exception('cron and time_delta can not both be defined.')
@@ -119,7 +119,7 @@ def retry_backoff_intervals(
     max_retries: int,
     retry_backoff: bool | int,
     is_backoff_an_int: bool,
-) -> (list | Literal[0]):
+) -> list | Literal[0]:
     if retry_backoff is True or is_backoff_an_int:
         start = 1 if not is_backoff_an_int else int(retry_backoff)
         return exponential_backoff_intervals(max_retries, start)
@@ -132,5 +132,5 @@ def exponential_backoff_intervals(
 ) -> list:
     result = [start]
     for interval in range(start + 1, start + max_retries):
-        result.append(interval ** 2)
+        result.append(interval**2)
     return result
