@@ -6,10 +6,10 @@ from django.utils.translation import gettext_lazy
 
 from datahub.company.models import Advisor
 from datahub.oauth.sso_api_client import (
-    get_user_by_email,
-    get_user_by_email_user_id,
     SSORequestError,
     SSOUserDoesNotExistError,
+    get_user_by_email,
+    get_user_by_email_user_id,
 )
 
 NO_MATCHING_USER_MESSAGE = gettext_lazy(
@@ -32,8 +32,7 @@ SSO_ADVISER_FIELD_MAPPING = {
 
 
 class AddAdviserFromSSOForm(forms.ModelForm):
-    """
-    Form for adding an adviser by looking the user up in Staff SSO.
+    """Form for adding an adviser by looking the user up in Staff SSO.
 
     Note: This form is designed so that it can be used as a ModelAdmin add_form.
 

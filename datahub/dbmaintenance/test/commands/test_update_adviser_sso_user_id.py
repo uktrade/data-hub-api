@@ -144,8 +144,7 @@ class TestUpdateAdviserSSOUserIDCommand:
         assert '1 advisers updated' in caplog.text
 
     def test_does_not_resync_search_investment_project_documents(self, monkeypatch):
-        """
-        Test that investment projects are not resynced to OpenSearch when an adviser is
+        """Test that investment projects are not resynced to OpenSearch when an adviser is
         updated.
         This is due to the use of the disable_search_signal_receivers decorator.
         """

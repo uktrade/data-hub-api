@@ -5,13 +5,11 @@ from datahub.omis.payment.utils import trasform_govuk_payment_to_omis_payment_da
 
 
 class TestGetOmisPaymentDataFromGovukPayment:
-    """
-    Tests for the `trasform_govuk_payment_to_omis_payment_data` function.
+    """Tests for the `trasform_govuk_payment_to_omis_payment_data` function.
     """
 
     def test_with_non_success_response_returns_none(self):
-        """
-        Test that if the status of the GOV.UK payment is not `success`,
+        """Test that if the status of the GOV.UK payment is not `success`,
         the method returns None
         """
         govuk_payment = {

@@ -5,9 +5,9 @@ import uuid
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.core.validators import (
-    integer_validator,
     MaxLengthValidator,
     MinLengthValidator,
+    integer_validator,
 )
 from django.db import models, transaction
 from django.utils.timezone import now
@@ -25,7 +25,7 @@ from datahub.core.models import (
     BaseModel,
     BaseOrderedConstantModel,
 )
-from datahub.core.utils import get_front_end_url, StrEnum
+from datahub.core.utils import StrEnum, get_front_end_url
 from datahub.metadata import models as metadata_models
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
@@ -68,8 +68,7 @@ class Company(ArchivableModel, BaseModel):
     """Representation of the company."""
 
     class Source(models.TextChoices):
-        """
-        Where the Company was created from. Whether it was created on Data Hub or through
+        """Where the Company was created from. Whether it was created on Data Hub or through
         ingestion tasks from sources such as EYB, Great, Stova etc.
         """
 
@@ -487,8 +486,7 @@ class Company(ArchivableModel, BaseModel):
 
     @property
     def has_name(self) -> bool:
-        """
-        Whether the company name is empty or not.
+        """Whether the company name is empty or not.
 
         :returns: True if company has a name, False if blank or null.
         """
@@ -498,8 +496,7 @@ class Company(ArchivableModel, BaseModel):
 
     @property
     def is_global_ultimate(self):
-        """
-        Whether this company is the global ultimate or not.
+        """Whether this company is the global ultimate or not.
         """
         if not self.duns_number:
             return False
@@ -507,8 +504,7 @@ class Company(ArchivableModel, BaseModel):
 
     @property
     def related_companies(self):
-        """
-        All companies that share the same global ultimate duns number
+        """All companies that share the same global ultimate duns number
         """
         return (
             Company.objects.filter(
@@ -540,8 +536,7 @@ class Company(ArchivableModel, BaseModel):
             return None
 
     def mark_as_transferred(self, to, reason, user):
-        """
-        Marks a company record as having been transferred to another company record.
+        """Marks a company record as having been transferred to another company record.
 
         This is used, for example, for marking a company as a duplicate record.
         """
@@ -562,23 +557,20 @@ class Company(ArchivableModel, BaseModel):
         self.archive(user, archived_reason)
 
     def get_group_global_headquarters(self):
-        """
-        :returns: the Global Headquarters for the group that this company is part of.
+        """:returns: the Global Headquarters for the group that this company is part of.
         """
         if self.global_headquarters:
             return self.global_headquarters
         return self
 
     def get_one_list_group_tier(self):
-        """
-        :returns: the One List Tier of the group this company is part of.
+        """:returns: the One List Tier of the group this company is part of.
         """
         return self.get_group_global_headquarters().one_list_tier
 
     def get_one_list_group_core_team(self):
-        """
-        :returns: the One List Core Team for the group that this company is part of
-            as a list of dicts with `adviser` and `is_global_account_manager`.
+        """:returns: the One List Core Team for the group that this company is part of
+        as a list of dicts with `adviser` and `is_global_account_manager`.
         """
         group_global_headquarters = self.get_group_global_headquarters()
         global_account_manager = group_global_headquarters.one_list_account_owner
@@ -621,9 +613,8 @@ class Company(ArchivableModel, BaseModel):
         return core_team
 
     def get_one_list_group_global_account_manager(self):
-        """
-        :returns: the One List Global Account Manager for the group that this
-            company is part of.
+        """:returns: the One List Global Account Manager for the group that this
+        company is part of.
         """
         group_global_headquarters = self.get_group_global_headquarters()
         return group_global_headquarters.one_list_account_owner
@@ -641,8 +632,7 @@ class Company(ArchivableModel, BaseModel):
         self.save()
 
     def remove_from_one_list(self, modified_by):
-        """
-        Remove the company from the One List.
+        """Remove the company from the One List.
 
         This is done by unsetting the company's One List account manager and tier.
         """
@@ -667,8 +657,7 @@ class Company(ArchivableModel, BaseModel):
         adviser,
         track_history=False,
     ):
-        """
-        Add a company export_country, if it doesn't exist.
+        """Add a company export_country, if it doesn't exist.
         If the company already exists and incoming status is different
         check if incoming record is newer and update.
         And send signal to track history.
@@ -715,8 +704,7 @@ class Company(ArchivableModel, BaseModel):
 
 @reversion.register_base_model()
 class OneListCoreTeamMember(models.Model):
-    """
-    Adviser who is a member of the One List Core Team of a company.
+    """Adviser who is a member of the One List Core Team of a company.
 
     When a company is account managed and added to the One List,
     a Core Team is established.
@@ -762,8 +750,7 @@ class OneListCoreTeamMember(models.Model):
 
 @reversion.register_base_model()
 class CompanyExportCountry(BaseModel):
-    """
-    Record `Company`'s exporting status to a `Country`.
+    """Record `Company`'s exporting status to a `Country`.
     Status is expressed as:
         - 'currently exporting to'
         - 'future interest'
@@ -814,8 +801,7 @@ class CompanyExportCountry(BaseModel):
 
 @reversion.register_base_model()
 class CompanyExportCountryHistory(models.Model):
-    """
-    Historical log of `CompanyExportCountry` model.
+    """Historical log of `CompanyExportCountry` model.
     Keeps record of each new status in order to come up with
     accurate consolidated export country history for a given
     company and/or country.

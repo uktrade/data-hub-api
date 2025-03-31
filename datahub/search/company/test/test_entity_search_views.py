@@ -137,7 +137,7 @@ def company_names_and_postcodes(opensearch_with_collector):
             ('company_se1_3', 'SE13AJ'),
             ('company_se2', 'SE23AJ'),
             ('company_se3', 'SE33AJ'),
-        ),
+        ), strict=False,
     )
 
     CompanyFactory.create_batch(
@@ -752,8 +752,7 @@ class TestSearch(APITestMixin):
         self,
         opensearch_with_collector,
     ):
-        """
-        Tests that one list account manager filter searches for inherited one list account manager.
+        """Tests that one list account manager filter searches for inherited one list account manager.
         """
         account_manager = AdviserFactory()
         CompanyFactory.create_batch(2)
@@ -921,8 +920,7 @@ class TestSearch(APITestMixin):
             assert len(response.data['results']) == 0
 
     def test_company_search_paging(self, opensearch_with_collector):
-        """
-        Tests the pagination.
+        """Tests the pagination.
 
         The sortby is not passed in so records are ordered by id.
         """

@@ -4,9 +4,9 @@ from decimal import Decimal
 import pytest
 
 from datahub.core.csv import (
+    INCOMPLETE_CSV_MESSAGE,
     csv_iterator,
     escape,
-    INCOMPLETE_CSV_MESSAGE,
     transform_csv_value,
 )
 
@@ -19,8 +19,7 @@ def _rows():
 
 
 def test_csv_iterator_with_error():
-    """
-    Tests that an error is appended to the CSV data is an error occurs during generation.
+    """Tests that an error is appended to the CSV data is an error occurs during generation.
 
     This is as if the CSV data is being used as part of a streamed HTTP response, it will be to
     late to return an error status.
@@ -117,8 +116,7 @@ def test_transform_csv_value(value, expected_value):
     ),
 ])
 def test_escape(value, expected_value):
-    """
-    Test csv escapes potentially malicious values.
+    """Test csv escapes potentially malicious values.
 
     Test cases taken from https://github.com/raphaelm/defusedcsv/blob/master/tests/test_escape.py
     """

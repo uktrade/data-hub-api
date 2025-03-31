@@ -20,8 +20,7 @@ class TestRefundAdmin(AdminTestMixin):
     """Tests for the Refund Admin."""
 
     def test_add(self):
-        """
-        Test adding a refund with status 'Approved'.
+        """Test adding a refund with status 'Approved'.
         This is the only status allowed when creating a record at the moment.
         """
         order = OrderPaidFactory()

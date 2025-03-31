@@ -7,7 +7,6 @@ from freezegun import freeze_time
 
 from datahub.cleanup.cleanup_config import DatetimeLessThanCleanupFilter
 
-
 FROZEN_TIME = datetime(2018, 6, 1, 2, tzinfo=timezone.utc)
 
 
@@ -29,8 +28,7 @@ class TestCleanupFilter:
         ),
     )
     def test_as_q(self, age_threshold, expected_datetime):
-        """
-        Test that the cut_off_date property calculates the cut-off date for both
+        """Test that the cut_off_date property calculates the cut-off date for both
         a relativedelta and an absolute datetime.
         """
         cleanup_filter = DatetimeLessThanCleanupFilter('date', age_threshold)

@@ -1,5 +1,5 @@
 from datetime import date
-from unittest.mock import call, MagicMock, Mock
+from unittest.mock import MagicMock, Mock, call
 from uuid import uuid4
 
 import pytest
@@ -105,8 +105,7 @@ class TestNestedRelatedField:
         }
 
     def test_to_representation_extra_fields_with_nested_related(self):
-        """
-        Tests that if the field has a nested related field,
+        """Tests that if the field has a nested related field,
         `to_representation` returns '<nested-field>': {...} using the nested mapping.
         """
         nested_pk = uuid4()
@@ -135,8 +134,7 @@ class TestNestedRelatedField:
         }
 
     def test_to_representation_extra_fields_with_nested_related_none(self):
-        """
-        Tests that if the field has a nested related field and its value is
+        """Tests that if the field has a nested related field and its value is
         None, `to_representation` returns '<nested-field>': None.
         """
         nested_field = NestedRelatedField(

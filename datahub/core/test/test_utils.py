@@ -156,8 +156,7 @@ def test_format_currency_range(values, expected):
     ),
 )
 def test_format_currency_range_string(string, expected):
-    """
-    Test range with and without currency symbol.
+    """Test range with and without currency symbol.
     """
     assert format_currency_range_string(string) == expected
     assert format_currency_range_string(string, symbol='') == expected.replace('£', '')
@@ -180,8 +179,7 @@ def test_format_currency_range_string(string, expected):
     ),
 )
 def test_format_currency_range_string_separator(string, expected):
-    """
-    Test range with separator symbol.
+    """Test range with separator symbol.
     """
     assert format_currency_range_string(string, separator='...') == expected
 
@@ -216,8 +214,7 @@ def test_format_currency_range_string_more_or_less_parameters(
         smart_more_or_less,
         expected,
 ):
-    """
-    Test range with and without currency symbol.
+    """Test range with and without currency symbol.
     """
     assert format_currency_range_string(
         string, more_or_less=more_or_less, smart_more_or_less=smart_more_or_less) == expected
@@ -246,8 +243,7 @@ class _MetadataModelConstant(Enum):
 
 @pytest.mark.django_db
 def test_load_constants_to_database():
-    """
-    Test loading constants to the database.
+    """Test loading constants to the database.
 
     Makes sure that new values are created, existing ones are updated and none are deleted.
     """
@@ -334,8 +330,7 @@ def test_get_financial_year(date_obj, expected_financial_year):
 @mock.patch('datahub.core.utils.sentry_sdk.push_scope')
 @mock.patch('datahub.core.utils.sentry_sdk.capture_message')
 def test_log_to_sentry(mocked_capture_message, mocked_push_scope, level, extra):
-    """
-    Test log_to_sentry utility.
+    """Test log_to_sentry utility.
     """
     kwargs = {}
     expected_extra = {}

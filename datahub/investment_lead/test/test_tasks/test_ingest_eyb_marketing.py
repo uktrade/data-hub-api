@@ -1,9 +1,7 @@
 import logging
-
 from unittest import mock
 
 import pytest
-
 from moto import mock_aws
 from reversion.models import Version
 
@@ -20,17 +18,16 @@ from datahub.ingest.utils import (
 from datahub.investment_lead.models import EYBLead
 from datahub.investment_lead.serializers import CreateEYBLeadMarketingSerializer
 from datahub.investment_lead.tasks.ingest_eyb_marketing import (
+    MARKETING_PREFIX,
+    EYBMarketingIngestionTask,
     eyb_marketing_identification_task,
     eyb_marketing_ingestion_task,
-    EYBMarketingIngestionTask,
-    MARKETING_PREFIX,
 )
 from datahub.investment_lead.test.factories import (
-    eyb_lead_marketing_record_faker,
     EYBLeadFactory,
+    eyb_lead_marketing_record_faker,
     generate_hashed_uuid,
 )
-
 
 pytestmark = pytest.mark.django_db
 

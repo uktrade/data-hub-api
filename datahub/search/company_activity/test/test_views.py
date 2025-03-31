@@ -33,7 +33,6 @@ from datahub.interaction.test.factories import (
 from datahub.metadata.test.factories import TeamFactory
 from datahub.search.company_activity import CompanyActivitySearchApp
 
-
 pytestmark = [
     pytest.mark.django_db,
     # Index objects for this search app only
@@ -71,7 +70,7 @@ def company_activities(opensearch_with_collector):
 
     opensearch_with_collector.flush_and_refresh()
 
-    yield data
+    return data
 
 
 class TestCompanyActivityEntitySearchView(APITestMixin):
@@ -86,8 +85,7 @@ class TestCompanyActivityEntitySearchView(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_get_all(self, company_activities):
-        """
-        Tests that all company activities are returned with an empty POST body.
+        """Tests that all company activities are returned with an empty POST body.
         """
         url = reverse('api-v4:search:company-activity')
 
@@ -366,8 +364,7 @@ class TestCompanyActivityEntitySearchView(APITestMixin):
         get_datahub_ids_dnb_service_company_hierarchy_mock,
         opensearch_with_collector,
     ):
-        """
-        Tests that when the following parameters are given, a company and its parent
+        """Tests that when the following parameters are given, a company and its parent
         company activities are shown.
         ```
             company
@@ -417,8 +414,7 @@ class TestCompanyActivityEntitySearchView(APITestMixin):
         get_datahub_ids_dnb_service_company_hierarchy_mock,
         opensearch_with_collector,
     ):
-        """
-        Tests that when the following parameters are given, a company and its subsidiary
+        """Tests that when the following parameters are given, a company and its subsidiary
         company activities are shown.
         ```
             company

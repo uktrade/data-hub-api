@@ -145,8 +145,7 @@ def test_get_adviser_by_sso_user_profile_email_id():
     ),
 )
 def test_get_adviser_by_sso_email_id_non_staff_or_active(flags):
-    """
-    Test that AuthenticationFailed is raised if SSO email user id matches and user has neither
+    """Test that AuthenticationFailed is raised if SSO email user id matches and user has neither
     is_staff nor is_active flags set.
     """
     AdviserFactory(sso_email_user_id='some-123@email', **flags)

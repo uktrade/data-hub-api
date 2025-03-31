@@ -19,8 +19,7 @@ from datahub.interaction.email_processors.parsers import (
 
 @pytest.mark.django_db
 class TestCalendarInteractionEmailParser:
-    """
-    Test the CalendarInteractionEmailParser class.
+    """Test the CalendarInteractionEmailParser class.
     """
 
     def _get_parser_for_email_file(self, relative_email_file_path):
@@ -103,8 +102,7 @@ class TestCalendarInteractionEmailParser:
         email_file,
         expected_event_details,
     ):
-        """
-        Verify that the get_calendar_event_metadata method extracts the expected
+        """Verify that the get_calendar_event_metadata method extracts the expected
         data from a given email message.
         """
         parser = self._get_parser_for_email_file(email_file)
@@ -156,8 +154,7 @@ class TestCalendarInteractionEmailParser:
         expected_interaction_data,
         interaction_email_fixture,
     ):
-        """
-        Functional test to ensure that interaction data is extracted as expected
+        """Functional test to ensure that interaction data is extracted as expected
         from an email.
         """
         parser = self._get_parser_for_email_file(email_file)
@@ -258,8 +255,7 @@ class TestCalendarInteractionEmailParser:
         expected_error,
         interaction_email_fixture,
     ):
-        """
-        Functional test to ensure that the extract_interaction_data_from_email method
+        """Functional test to ensure that the extract_interaction_data_from_email method
         raises ValidationErrors as expected in a number of situations.
         """
         parser = self._get_parser_for_email_file(email_file)
@@ -270,8 +266,7 @@ class TestCalendarInteractionEmailParser:
 
 @pytest.mark.django_db
 class TestInteractionEmailParser:
-    """
-    Test the InteractionPlainEmailParser class.
+    """Test the InteractionPlainEmailParser class.
     """
 
     def _get_parser_for_email_file(self, relative_email_file_path):
@@ -333,8 +328,7 @@ class TestInteractionEmailParser:
         expected_interaction_data,
         interaction_email_fixture,
     ):
-        """
-        Functional test to ensure that interaction data is extracted as expected
+        """Functional test to ensure that interaction data is extracted as expected
         from an email.
         """
         parser = self._get_parser_for_email_file(email_file)
@@ -398,8 +392,7 @@ class TestInteractionEmailParser:
         expected_error,
         interaction_email_fixture,
     ):
-        """
-        Functional test to ensure that the extract_interaction_data_from_email method
+        """Functional test to ensure that the extract_interaction_data_from_email method
         raises ValidationErrors as expected in a number of situations.
         """
         parser = self._get_parser_for_email_file(email_file)

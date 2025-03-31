@@ -6,8 +6,7 @@ from datahub.user_event_log.models import UserEvent
 
 
 class UserEventsView(BaseFilterDatasetView):
-    """
-    An APIView that provides 'get' action to return desired fields for
+    """An APIView that provides 'get' action to return desired fields for
     User Events Log Dataset to be consumed by Data-flow periodically. Data-flow uses
     response result to insert data into Dataworkspace through its defined API endpoints.
     """

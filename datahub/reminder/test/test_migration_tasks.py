@@ -1,9 +1,7 @@
 import logging
-
 from unittest import mock
 
 import factory
-
 import pytest
 from freezegun import freeze_time
 
@@ -48,8 +46,7 @@ class TestITAUsersMigration:
         monkeypatch,
         lock_acquired,
     ):
-        """
-        Test that the task doesn't run if it cannot acquire
+        """Test that the task doesn't run if it cannot acquire
         the advisory_lock.
         """
         caplog.set_level(logging.INFO, logger='datahub.reminder.migration_tasks')
@@ -86,8 +83,7 @@ class TestITAUsersMigration:
         caplog,
         monkeypatch,
     ):
-        """
-        Test that the task runs but no users are migrated when the setting is disabled
+        """Test that the task runs but no users are migrated when the setting is disabled
         """
         monkeypatch.setattr(
             'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_ITA_USER_MIGRATIONS',
@@ -115,8 +111,7 @@ class TestITAUsersMigration:
         self,
         monkeypatch,
     ):
-        """
-        Test when an adviser belongs to a company that is not in the Tier D -Internation Trade
+        """Test when an adviser belongs to a company that is not in the Tier D -Internation Trade
         Advisors tier they are excluded from the migration
         """
         monkeypatch.setattr(
@@ -141,8 +136,7 @@ class TestITAUsersMigration:
         self,
         monkeypatch,
     ):
-        """
-        Test when an adviser belongs to no notification group they are excluded from the migration
+        """Test when an adviser belongs to no notification group they are excluded from the migration
         """
         monkeypatch.setattr(
             'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_ITA_USER_MIGRATIONS',
@@ -169,8 +163,7 @@ class TestITAUsersMigration:
         self,
         monkeypatch,
     ):
-        """
-        Test when an advisor already has the export-notifications feature flag they are excluded
+        """Test when an advisor already has the export-notifications feature flag they are excluded
         from the migration
         """
         monkeypatch.setattr(
@@ -196,8 +189,7 @@ class TestITAUsersMigration:
         self,
         monkeypatch,
     ):
-        """
-        Test when an advisor already has the export subscriptions but not the feature flag they
+        """Test when an advisor already has the export subscriptions but not the feature flag they
         are only assigned the feature flag but not any additional subscriptions
         """
         monkeypatch.setattr(
@@ -232,8 +224,7 @@ class TestITAUsersMigration:
         self,
         monkeypatch,
     ):
-        """
-        Test when an advisor is the account owner for a company in the Tier D -Internation Trade
+        """Test when an advisor is the account owner for a company in the Tier D -Internation Trade
         Advisors tier and do not have the export-notifications feature flag or export
         subscriptions, they are given the export-notifications feature flag and added to the
         export subscriptions
@@ -266,8 +257,7 @@ class TestPostUsersMigration:
         investment_flag,
         advisor,
     ):
-        """
-        Check the advisor does not have any subscriptions or contain any of the feature flags
+        """Check the advisor does not have any subscriptions or contain any of the feature flags
         """
         self._assert_advisor_not_given_subscriptions(advisor)
         assert Advisor.objects.filter(id=advisor.id, feature_groups=export_flag).exists() is False
@@ -276,8 +266,7 @@ class TestPostUsersMigration:
         )
 
     def _assert_advisor_not_given_subscriptions(self, advisor):
-        """
-        Check the advisor does not have any subscriptions or contain any of the feature flags
+        """Check the advisor does not have any subscriptions or contain any of the feature flags
         """
         assert NewExportInteractionSubscription.objects.filter(adviser=advisor).exists() is False
         assert (
@@ -297,8 +286,7 @@ class TestPostUsersMigration:
         investment_flag,
         advisor,
     ):
-        """
-        Check the advisor has all the subscriptions and all feature flags
+        """Check the advisor has all the subscriptions and all feature flags
         """
         self.assert_advisor_given_subscriptions(advisor)
 
@@ -330,8 +318,7 @@ class TestPostUsersMigration:
         monkeypatch,
         lock_acquired,
     ):
-        """
-        Test that the task doesn't run if it cannot acquire
+        """Test that the task doesn't run if it cannot acquire
         the advisory_lock.
         """
         caplog.set_level(logging.INFO, logger='datahub.reminder.migration_tasks')
@@ -369,8 +356,7 @@ class TestPostUsersMigration:
         caplog,
         monkeypatch,
     ):
-        """
-        Test that the task runs but no users are migrated when the setting is disabled
+        """Test that the task runs but no users are migrated when the setting is disabled
         """
         monkeypatch.setattr(
             'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_POST_USER_MIGRATIONS',
@@ -412,8 +398,7 @@ class TestPostUsersMigration:
         self,
         monkeypatch,
     ):
-        """
-        Test an advisor that belongs to a team that has role of POST, is not a member of the one
+        """Test an advisor that belongs to a team that has role of POST, is not a member of the one
         list core team, is not a global account manager for a company on the Tier D - Overseas
         Post Accounts one list tier and is not linked to a project is excluded from migration
         """
@@ -434,8 +419,7 @@ class TestPostUsersMigration:
         self,
         monkeypatch,
     ):
-        """
-        Test an advisor that belongs to a team that DOES NOT have a role of POST, is a member of
+        """Test an advisor that belongs to a team that DOES NOT have a role of POST, is a member of
         the one list core team, is not a global account manager for a company on the
         Tier D - Overseas Post Accounts one list tier and is not linked to a project is
         excluded from migration
@@ -460,8 +444,7 @@ class TestPostUsersMigration:
         self,
         monkeypatch,
     ):
-        """
-        Test an advisor that belongs to a team that has a role of POST, is a member of
+        """Test an advisor that belongs to a team that has a role of POST, is a member of
         the one list core team and is not a global account manager for a company on the
         Tier D - Overseas Post Accounts one list tier and is not linked to a project is
         included in the migration
@@ -491,8 +474,7 @@ class TestPostUsersMigration:
         monkeypatch,
         feature_flag,
     ):
-        """
-        Test an advisor that belongs to a team that has a role of POST, is a member of the one
+        """Test an advisor that belongs to a team that has a role of POST, is a member of the one
         list core team and is not a global account manager for a company on the Tier D - Overseas
         Post Accounts one list tier and is not linked to a project is included in the migration
         """
@@ -516,8 +498,7 @@ class TestPostUsersMigration:
         self,
         monkeypatch,
     ):
-        """
-        Test an advisor that belongs to a team that DOES NOT have a role of POST, is a member of
+        """Test an advisor that belongs to a team that DOES NOT have a role of POST, is a member of
         the one list core team and is a global account manager but for a company not on the
         Tier D - Overseas Post Accounts one list tier and is not linked to a project is excluded
         from the migration
@@ -546,8 +527,7 @@ class TestPostUsersMigration:
         self,
         monkeypatch,
     ):
-        """
-        Test an advisor that belongs to a team that DOES NOT have a role of POST, is NOT a member
+        """Test an advisor that belongs to a team that DOES NOT have a role of POST, is NOT a member
         of the one list core team, is a global account manager for a company on the Tier D -
         Overseas Post Accounts one list tier and is not linked to a project is included from the
         migration
@@ -573,8 +553,7 @@ class TestPostUsersMigration:
         self,
         monkeypatch,
     ):
-        """
-        Test an advisor that belongs to a team that has a role of POST, is NOT a member
+        """Test an advisor that belongs to a team that has a role of POST, is NOT a member
         of the one list core team, is a global account manager for a company on the Tier D -
         Overseas Post Accounts one list tier and is not linked to a project is included from the
         migration
@@ -620,8 +599,7 @@ class TestPostUsersMigration:
         advisor_project_role,
         status,
     ):
-        """
-        Test an advisor that belongs to a team that DOES NOT have a role of POST, is NOT a member'
+        """Test an advisor that belongs to a team that DOES NOT have a role of POST, is NOT a member'
         ' of the one list core team and is NOT a global account manager for a company on the'
         ' Tier D - Overseas Post Accounts one list tier but is assigned to an investment project'
         ' as an {advisor_project_role} with an invalid status is excluded from the migration
@@ -667,8 +645,7 @@ class TestPostUsersMigration:
         advisor_project_role,
         status,
     ):
-        """
-        Test an advisor that belongs to a team that DOES NOT have a role of POST, is NOT a member'
+        """Test an advisor that belongs to a team that DOES NOT have a role of POST, is NOT a member'
         ' of the one list core team and is NOT a global account manager for a company on the'
         ' Tier D - Overseas Post Accounts one list tier but is assigned to an investment project'
         ' as an {advisor_project_role} with allowed stage is included in the migration

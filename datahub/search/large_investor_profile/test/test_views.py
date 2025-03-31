@@ -12,6 +12,8 @@ from rest_framework.reverse import reverse
 from datahub.company.test.factories import CompanyFactory, TeamFactory
 from datahub.core.constants import (
     Country as CountryConstant,
+)
+from datahub.core.constants import (
     UKRegion as UKRegionConstant,
 )
 from datahub.core.test_utils import (
@@ -25,13 +27,29 @@ from datahub.investment.investor_profile.models import LargeCapitalInvestorProfi
 from datahub.investment.investor_profile.permissions import InvestorProfilePermission
 from datahub.investment.investor_profile.test.constants import (
     AssetClassInterest as AssetClassInterestConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     ConstructionRisk as ConstructionRiskConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     DealTicketSize as DealTicketSizeConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     DesiredDealRole as DesiredDealRoleConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     EquityPercentage as EquityPercentageConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     LargeCapitalInvestmentTypes as InvestmentTypesConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     Restriction as RestrictionConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     ReturnRate as ReturnRateConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     TimeHorizon as TimeHorizonConstant,
 )
 from datahub.investment.investor_profile.test.factories import (
@@ -182,7 +200,7 @@ def setup_data(opensearch_with_collector):
         ]
     opensearch_with_collector.flush_and_refresh()
 
-    yield investor_profiles
+    return investor_profiles
 
 
 @pytest.mark.usefixtures('setup_data')

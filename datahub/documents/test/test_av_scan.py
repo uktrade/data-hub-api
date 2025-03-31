@@ -6,7 +6,7 @@ from requests.exceptions import HTTPError
 from requests_toolbelt.multipart.decoder import MultipartDecoder
 from rest_framework import status
 
-from datahub.documents.av_scan import _multipart_encoder, StreamWrapper, VirusScanException
+from datahub.documents.av_scan import StreamWrapper, VirusScanException, _multipart_encoder
 from datahub.documents.models import Document, UploadStatus
 from datahub.documents.tasks import virus_scan_document
 from datahub.documents.test.factories import DocumentFactory

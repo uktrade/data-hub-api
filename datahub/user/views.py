@@ -10,8 +10,7 @@ from datahub.user.serializers import WhoAmISerializer
 @api_view()
 @permission_classes([IsAuthenticated])
 def who_am_i(request):
-    """
-    Return the current user. This view is behind a login.
+    """Return the current user. This view is behind a login.
 
     As this endpoint does not directly modify the database, it is opted out of atomic requests
     so that it does not cause a transaction to be used for the lifetime of the request.

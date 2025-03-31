@@ -16,8 +16,8 @@ from datahub.interaction.email_processors.exceptions import (
     UnconfirmedCalendarInviteError,
 )
 from datahub.interaction.email_processors.processors import (
-    CalendarInteractionEmailProcessor,
     EXCEPTION_NOTIFY_MESSAGES,
+    CalendarInteractionEmailProcessor,
     InteractionPlainEmailProcessor,
 )
 from datahub.interaction.models import Interaction
@@ -26,18 +26,16 @@ from datahub.notification.constants import NotifyServiceName
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
-@pytest.fixture()
+@pytest.fixture
 def interaction_email_notification_feature_flag():
+    """Creates the email ingestion feature flag.
     """
-    Creates the email ingestion feature flag.
-    """
-    yield FeatureFlagFactory(code=MAILBOX_NOTIFICATION_FEATURE_FLAG_NAME)
+    return FeatureFlagFactory(code=MAILBOX_NOTIFICATION_FEATURE_FLAG_NAME)
 
 
-@pytest.fixture()
+@pytest.fixture
 def base_interaction_data_fixture():
-    """
-    Basic interaction data spec which can be used to build a return value
+    """Basic interaction data spec which can be used to build a return value
     which a mock of *EmailParser can return.
     """
     return {
@@ -54,8 +52,7 @@ def base_interaction_data_fixture():
 
 @pytest.fixture
 def mock_notify_adviser_by_email(monkeypatch):
-    """
-    Mocks the notify_adviser_by_email function.
+    """Mocks the notify_adviser_by_email function.
     """
     mock_notify_adviser_by_email = mock.Mock()
     monkeypatch.setattr(
@@ -67,8 +64,7 @@ def mock_notify_adviser_by_email(monkeypatch):
 
 @pytest.fixture
 def mock_message(base_interaction_data_fixture):
-    """
-    Mock email messsage.
+    """Mock email messsage.
     """
     message = mock.Mock()
     message.from_ = [(None, base_interaction_data_fixture['sender_email'])]
@@ -84,8 +80,7 @@ def mock_message(base_interaction_data_fixture):
 
 @pytest.fixture
 def mock_plain_message(base_interaction_data_fixture):
-    """
-    Mock email messsage.
+    """Mock email messsage.
     """
     message = mock.Mock()
     message.from_ = [(None, base_interaction_data_fixture['sender_email'])]
@@ -103,13 +98,11 @@ def mock_plain_message(base_interaction_data_fixture):
 
 @pytest.mark.django_db
 class TestCalendarInteractionEmailProcessor:
-    """
-    Test the CalendarInteractionEmailProcessor class.
+    """Test the CalendarInteractionEmailProcessor class.
     """
 
     def _get_email_parser_mock(self, interaction_data, monkeypatch):
-        """
-        Given a spec of interaction data and monkeypatch object, sets a mocked
+        """Given a spec of interaction data and monkeypatch object, sets a mocked
         return value for CalendarInteractionEmailParser.extract_interaction_data_from_email.
         """
         email_parser_mock = mock.Mock()
@@ -176,8 +169,7 @@ class TestCalendarInteractionEmailProcessor:
         mock_message,
         monkeypatch,
     ):
-        """
-        Test that process_email saves a draft interaction when the calendar
+        """Test that process_email saves a draft interaction when the calendar
         parser yields good data.
         """
         interaction_data = {
@@ -241,8 +233,7 @@ class TestCalendarInteractionEmailProcessor:
         mock_message,
         monkeypatch,
     ):
-        """
-        Test that process_email does not save another interaction when the meeting
+        """Test that process_email does not save another interaction when the meeting
         already exists as an interaction.
         """
         interaction_data = {**base_interaction_data_fixture}
@@ -301,8 +292,7 @@ class TestCalendarInteractionEmailProcessor:
         invalid_invite_exception_class,
         expected_to_notify,
     ):
-        """
-        Test that process_email returns an expected message when the parser
+        """Test that process_email returns an expected message when the parser
         raises a ValidationError.
         """
         caplog.set_level(logging.WARNING)
@@ -365,8 +355,7 @@ class TestCalendarInteractionEmailProcessor:
         mock_message,
         monkeypatch,
     ):
-        """
-        Test that process_email returns expected validation error messages when
+        """Test that process_email returns expected validation error messages when
         called with invalid data.
         """
         interaction_data = {**base_interaction_data_fixture, **interaction_data_overrides}
@@ -390,13 +379,11 @@ class TestCalendarInteractionEmailProcessor:
 
 @pytest.mark.django_db
 class TestInteractionPlainEmailProcessor:
-    """
-    Test the InteractionPlainEmailProcessor class.
+    """Test the InteractionPlainEmailProcessor class.
     """
 
     def _get_email_parser_mock(self, interaction_data, monkeypatch):
-        """
-        Given a spec of interaction data and monkeypatch object, sets a mocked
+        """Given a spec of interaction data and monkeypatch object, sets a mocked
         return value for InteractionEmailParser.extract_interaction_data_from_email.
         """
         email_parser_mock = mock.Mock()
@@ -467,8 +454,7 @@ class TestInteractionPlainEmailProcessor:
         mock_message,
         monkeypatch,
     ):
-        """
-        Test that process_email saves a draft interaction when the email parser yields good data.
+        """Test that process_email saves a draft interaction when the email parser yields good data.
         """
         interaction_data = {
             **base_interaction_data_fixture,
@@ -547,8 +533,7 @@ class TestInteractionPlainEmailProcessor:
         mock_message,
         monkeypatch,
     ):
-        """
-        Test that process_email returns expected validation error messages when
+        """Test that process_email returns expected validation error messages when
         called with invalid data.
         """
         interaction_data = {**base_interaction_data_fixture, **interaction_data_overrides}
@@ -577,8 +562,7 @@ class TestInteractionPlainEmailProcessor:
         mock_message,
         monkeypatch,
     ):
-        """
-        Test that process_email does not save another interaction when the email
+        """Test that process_email does not save another interaction when the email
         already exists as an interaction.
         """
         interaction_data = {**base_interaction_data_fixture}

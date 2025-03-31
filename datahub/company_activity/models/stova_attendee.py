@@ -8,14 +8,12 @@ from datahub.company.models.contact import Contact
 from datahub.company_activity.models.stova_event import StovaEvent
 from datahub.core import reversion
 
-
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
 @reversion.register_base_model()
 class StovaAttendee(models.Model):
-    """
-    Stova can also be known as Aventri.
+    """Stova can also be known as Aventri.
     This model is filled and based off data from the S3 bucket: ExportAventriAttendees.
     """
 
@@ -76,8 +74,7 @@ class StovaAttendee(models.Model):
 
 
 class TempRelationStorage(models.Model):
-    """
-    Temporary model to store the deleted IDs of companies, interactions and contacts created
+    """Temporary model to store the deleted IDs of companies, interactions and contacts created
     from Stova. This is so there is a way to roll these back if the deletion fails.
 
     This will be removed shortly after all these stova created relations are deleted.

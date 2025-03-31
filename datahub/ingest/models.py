@@ -6,7 +6,6 @@ from django.utils import timezone
 
 from datahub.core import reversion
 
-
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 

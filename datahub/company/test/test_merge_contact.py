@@ -5,8 +5,8 @@ import pytest
 from freezegun import freeze_time
 
 from datahub.company.merge import (
-    get_planned_changes,
     MergeNotAllowedError,
+    get_planned_changes,
 )
 from datahub.company.merge_contact import (
     MERGE_CONFIGURATION,
@@ -35,8 +35,7 @@ from datahub.user.company_list.test.factories import PipelineItemFactory
 
 @pytest.fixture
 def unrelated_objects():
-    """
-    Create some objects not related to a known company.
+    """Create some objects not related to a known company.
 
     This is used in tests below to make sure objects unrelated to the company being merged
     do not affect the counts of objects that will be affected by the merge.
@@ -202,8 +201,7 @@ class TestDuplicateContactMerger:
         expected_result,
         expected_should_archive,
     ):
-        """
-        Tests that get_planned_changes() returns the correct planned changes for various
+        """Tests that get_planned_changes() returns the correct planned changes for various
         cases.
         """
         source_contact = source_contact_factory()
@@ -213,8 +211,7 @@ class TestDuplicateContactMerger:
         assert merge_results == expected_planned_merge_results
 
     def test_merge_succeeds_when_target_has_minimal_info_and_source_has_complete_info(self):
-        """
-        Tests that source contact values get transferred to target contact values
+        """Tests that source contact values get transferred to target contact values
         when the target contact doesn't have values that the source contact does
         """
         target_contact = ContactFactory(
@@ -265,8 +262,7 @@ class TestDuplicateContactMerger:
         assert target_contact.company == source_contact.company
 
     def test_merge_succeeds_when_target_contact_and_source_contact_have_complete_info(self):
-        """
-        Tests that source contact values don't get transferred to target contact values
+        """Tests that source contact values don't get transferred to target contact values
         when the target contact and source contact have values for the same fields
         """
         target_contact = ContactFactory(
@@ -316,8 +312,7 @@ class TestDuplicateContactMerger:
         assert target_contact.company != source_contact.company
 
     def test_merge_succeeds_when_target_contact_and_source_contact_have_incomplete_info(self):
-        """
-        Tests that source contact values only get transferred to target contact values
+        """Tests that source contact values only get transferred to target contact values
         when the target contact has no corresponding value in that field
         """
         target_contact = ContactFactory(
@@ -369,8 +364,7 @@ class TestDuplicateContactMerger:
         assert target_contact.company != source_contact.company
 
     def test_merge_succeeds_when_source_contact_has_an_address_and_target_contact_does_not(self):
-        """
-        Tests that source contact values for the address get transferred to the target contact
+        """Tests that source contact values for the address get transferred to the target contact
         when the target contact doesn't have an address or a address_same_as_company value
         """
         target_contact = ContactFactory(address_same_as_company=False)
@@ -405,8 +399,7 @@ class TestDuplicateContactMerger:
         assert target_contact.address_postcode == source_contact.address_postcode
 
     def test_merge_succeeds_when_target_contact_has_address_same_as_company_set_to_true(self):
-        """
-        Tests that target contact address fields don't get overwritten by the source contact
+        """Tests that target contact address fields don't get overwritten by the source contact
         address fields when the target contact has address_same_as_company set to True
         """
         target_contact = ContactFactory(address_same_as_company=True)
@@ -441,8 +434,7 @@ class TestDuplicateContactMerger:
         assert target_contact.address_postcode != source_contact.address_postcode
 
     def test_merge_succeeds_when_target_contact_has_an_address(self):
-        """
-        Tests that target contact address fields don't get overwritten when
+        """Tests that target contact address fields don't get overwritten when
         the source contact has address_same_as_company set to True
         """
         target_contact = ContactWithOwnAreaFactory()
@@ -494,8 +486,7 @@ class TestDuplicateContactMerger:
             factory_relation_kwarg,
             num_related_objects,
     ):
-        """
-        Tests that merge_contacts() moves models that are linked to the source contact to the
+        """Tests that merge_contacts() moves models that are linked to the source contact to the
         target contact and marks the source contact as archived.
         """
         creation_time = datetime(2010, 12, 1, 15, 0, 10, tzinfo=timezone.utc)
@@ -582,8 +573,7 @@ class TestDuplicateContactMerger:
         valid_source_return_value,
         valid_target,
     ):
-        """
-        Test that merge_contacts raises MergeNotAllowedError when the merge is
+        """Test that merge_contacts raises MergeNotAllowedError when the merge is
         not allowed
         """
         is_contact_a_valid_merge_source_mock.return_value = valid_source_return_value
@@ -605,8 +595,7 @@ def _contact_factory(
         num_exports=0,
         num_investment_projects=0,
 ):
-    """
-    Factory for a contact that has company referrals, orders,
+    """Factory for a contact that has company referrals, orders,
     company exports, interactions and OMIS orders.
     """
     contact = ContactFactory()

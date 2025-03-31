@@ -1,5 +1,5 @@
 from datahub.search.test.search_support.relatedmodel import RelatedModelSearchApp
-from datahub.search.views import register_v3_view, SearchAPIView
+from datahub.search.views import SearchAPIView, register_v3_view
 
 
 @register_v3_view()

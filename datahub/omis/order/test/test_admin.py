@@ -106,8 +106,7 @@ class TestCancelOrderAdmin(AdminTestMixin):
         ),
     )
     def test_400_if_in_disallowed_status(self, order_factory):
-        """
-        Test that the action fails if the order is not in one of the allowed statuses.
+        """Test that the action fails if the order is not in one of the allowed statuses.
         """
         order = order_factory()
         url = reverse('admin:order_order_cancel', args=(order.pk,))
@@ -154,8 +153,7 @@ class TestCancelOrderAdmin(AdminTestMixin):
         ),
     )
     def test_200_if_in_allowed_status(self, order_factory):
-        """
-        Test that the order gets cancelled if it's in one of the allowed statuses.
+        """Test that the order gets cancelled if it's in one of the allowed statuses.
         """
         order = order_factory()
         url = reverse('admin:order_order_cancel', args=(order.pk,))

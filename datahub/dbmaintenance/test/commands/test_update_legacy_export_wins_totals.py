@@ -4,12 +4,10 @@ from uuid import uuid4
 import pytest
 from django.core.management import call_command
 from django.utils import timezone
-
 from reversion.models import Version
 
 from datahub.export_win.models import Win
 from datahub.export_win.test.factories import WinFactory
-
 
 pytestmark = pytest.mark.django_db
 
@@ -42,7 +40,7 @@ def test_run(s3_stubber, caplog):
         uuids,
         total_expected_export_values,
         total_expected_non_export_values,
-        total_expected_odi_values,
+        total_expected_odi_values, strict=False,
     ):
         csv_contents.append(f'{uuid},{export_value},{non_export_value},{odi_value}')
 
@@ -67,7 +65,7 @@ def test_run(s3_stubber, caplog):
         uuids,
         total_expected_export_values,
         total_expected_non_export_values,
-        total_expected_odi_values,
+        total_expected_odi_values, strict=False,
     ):
         win = Win.objects.get(id=uuid)
         if win == dh_win:
@@ -113,7 +111,7 @@ def test_simulate(s3_stubber, caplog):
         uuids,
         total_expected_export_values,
         total_expected_non_export_values,
-        total_expected_odi_values,
+        total_expected_odi_values, strict=False,
     ):
         csv_contents.append(f'{uuid},{export_value},{non_export_value},{odi_value}')
 

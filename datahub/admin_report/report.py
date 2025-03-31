@@ -11,8 +11,7 @@ _registry = {}
 
 
 class Report:
-    """
-    Base class for reports.
+    """Base class for reports.
 
     See QuerySetReport for reports based on a QuerySet.
     """
@@ -81,8 +80,7 @@ class QuerySetReport(Report, is_abstract=True):
 
 
 def get_reports_by_model(user):
-    """
-    Returns a dictionary mapping models to list of reports.
+    """Returns a dictionary mapping models to list of reports.
 
     Only reports that the user is allowed to access are returned.
     """
@@ -102,8 +100,7 @@ def report_exists(report_id):
 
 
 def get_report_by_id(report_id, user):
-    """
-    Gets a report instance for using its ID.
+    """Gets a report instance for using its ID.
 
     If the user does not have the correct permission for the report, PermissionDenied is raised.
     """

@@ -22,8 +22,7 @@ def power_set(s):
 @pytest.fixture
 @pytest.mark.django_db
 def with_empty_teams():
-    """
-    A fixture which ensures that the test runs with an empty
+    """A fixture which ensures that the test runs with an empty
     :class:`datahub.metadata.models.Team` model.
 
     The state of the model will be restored after each test.
@@ -43,8 +42,7 @@ def with_empty_teams():
 # We are not using the existing model factories, because they pollute the
 # metadata.Team model with lot of records, complicating assertions about them.
 def order_assignee_factory(team):
-    """
-    Creates a :class:`datahub.omis.order.models.OrderAssignee` instance related to ``team``
+    """Creates a :class:`datahub.omis.order.models.OrderAssignee` instance related to ``team``
     """
     adviser = Advisor.objects.create(
         first_name='John',
@@ -65,8 +63,7 @@ def order_assignee_factory(team):
 
 
 def event_with_lead_team_factory(team):
-    """
-    Creates a :class:`datahub.event.models.Event` instance with ``team`` assigned
+    """Creates a :class:`datahub.event.models.Event` instance with ``team`` assigned
     to ``Event.lead_team``.
     """
     return Event.objects.create(
@@ -77,8 +74,7 @@ def event_with_lead_team_factory(team):
 
 
 def event_with_teams_factory(team):
-    """
-    Creates a :class:`datahub.event.models.Event` instance with ``team`` assigned
+    """Creates a :class:`datahub.event.models.Event` instance with ``team`` assigned
     to ``Event.teams``.
     """
     event = Event.objects.create(
@@ -90,8 +86,7 @@ def event_with_teams_factory(team):
 
 
 def adviser_factory(team):
-    """
-    Creates a :class:`datahub.company.models.adviser.Advisor` related to ``team``.
+    """Creates a :class:`datahub.company.models.adviser.Advisor` related to ``team``.
     """
     return Advisor.objects.create(email=f'{uuid4()}@example.com', dit_team=team)
 
@@ -123,8 +118,7 @@ RELATIONS_POWER_SET = power_set({OrderAssignee, Event, Advisor, EVENT_TEAMS})
 ])
 @pytest.mark.django_db
 def test_command(teams, with_empty_teams):
-    """
-    Tests the :class:`datahub.cleanup.management.commands.delete_orphaned_teams.Command`
+    """Tests the :class:`datahub.cleanup.management.commands.delete_orphaned_teams.Command`
     """
     should_be_deleted = set()
     should_stay = set()

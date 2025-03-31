@@ -4,8 +4,7 @@ from rest_framework import status
 
 
 def enforce_request_content_type(content_type):
-    """
-    Decorator to enforce request content types to be a certain value.  Returns
+    """Decorator to enforce request content types to be a certain value.  Returns
     a 406 HttpResponse if the value is not allowed.
 
     This should be used on rest framework view functions/methods which have

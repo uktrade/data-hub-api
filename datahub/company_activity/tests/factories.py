@@ -12,8 +12,7 @@ from datahub.omis.order.test.factories import OrderFactory
 
 
 class CompanyActivityBaseFactory(factory.django.DjangoModelFactory):
-    """
-    The activity_source fields and the foriegn keys in the `CompanyActivity` model are
+    """The activity_source fields and the foriegn keys in the `CompanyActivity` model are
     automatically created as part of the save method inside the foreign key fields
     (oder, interaction, referral etc).
     """
@@ -27,8 +26,7 @@ class CompanyActivityBaseFactory(factory.django.DjangoModelFactory):
 
 
 class CompanyActivityInteractionFactory(CompanyActivityBaseFactory):
-    """
-    Overwrite the _create to prevent the CompanyActivity from saving to the database.
+    """Overwrite the _create to prevent the CompanyActivity from saving to the database.
     This is due to the Interaction already creating the CompanyActivity inside its
     model save.
     """
@@ -38,8 +36,7 @@ class CompanyActivityInteractionFactory(CompanyActivityBaseFactory):
 
     @classmethod
     def _create(cls, model_class, *args, **kwargs):
-        """
-        Overwrite the _create to prevent the CompanyActivity from saving to the database.
+        """Overwrite the _create to prevent the CompanyActivity from saving to the database.
         This is due to the Interaction already creating the CompanyActivity inside its
         model save.
         """
@@ -58,8 +55,7 @@ class CompanyActivityReferralFactory(CompanyActivityBaseFactory):
 
     @classmethod
     def _create(cls, model_class, *args, **kwargs):
-        """
-        Overwrite the _create to prevent the CompanyActivity from saving to the database.
+        """Overwrite the _create to prevent the CompanyActivity from saving to the database.
         This is due to the CompanyReferral already creating the CompanyActivity inside its
         model save.
         """
@@ -68,8 +64,7 @@ class CompanyActivityReferralFactory(CompanyActivityBaseFactory):
 
 
 class CompanyActivityInvestmentProjectFactory(CompanyActivityBaseFactory):
-    """
-    CompanyActivity factory with an investment project.
+    """CompanyActivity factory with an investment project.
     """
 
     activity_source = CompanyActivity.ActivitySource.investment
@@ -80,8 +75,7 @@ class CompanyActivityInvestmentProjectFactory(CompanyActivityBaseFactory):
 
     @classmethod
     def _create(cls, model_class, *args, **kwargs):
-        """
-        Overwrite the _create to prevent the CompanyActivity from saving to the database.
+        """Overwrite the _create to prevent the CompanyActivity from saving to the database.
         This is due to the InvestmentProject already creating the CompanyActivity inside its
         model save.
         """
@@ -90,8 +84,7 @@ class CompanyActivityInvestmentProjectFactory(CompanyActivityBaseFactory):
 
 
 class CompanyActivityOmisOrderFactory(CompanyActivityBaseFactory):
-    """
-    CompanyActivity factory with an omis order.
+    """CompanyActivity factory with an omis order.
     """
 
     activity_source = CompanyActivity.ActivitySource.order
@@ -102,8 +95,7 @@ class CompanyActivityOmisOrderFactory(CompanyActivityBaseFactory):
 
     @classmethod
     def _create(cls, model_class, *args, **kwargs):
-        """
-        Overwrite the _create to prevent the CompanyActivity from saving to the database.
+        """Overwrite the _create to prevent the CompanyActivity from saving to the database.
         This is due to the Omis Order already creating the CompanyActivity inside its
         model save.
         """
@@ -112,8 +104,7 @@ class CompanyActivityOmisOrderFactory(CompanyActivityBaseFactory):
 
 
 class CompanyActivityIngestedFileFactory(factory.django.DjangoModelFactory):
-    """
-    CompanyActivity ingested file factory
+    """CompanyActivity ingested file factory
     """
 
     filepath = 'data-flow/exports/ExportGreatContactFormData/20240920T000000.jsonl.gz'
@@ -124,8 +115,7 @@ class CompanyActivityIngestedFileFactory(factory.django.DjangoModelFactory):
 
 
 class GreatExportEnquiryFactory(factory.django.DjangoModelFactory):
-    """
-    Ingested Great Export Enquiry data factory
+    """Ingested Great Export Enquiry data factory
     """
 
     form_id = factory.Faker('pyint', min_value=0, max_value=999999)
@@ -187,8 +177,7 @@ class GreatExportEnquiryFactory(factory.django.DjangoModelFactory):
 
 
 class CompanyActivityGreatExportEnquiryFactory(CompanyActivityBaseFactory):
-    """
-    CompanyActivity factory with an great export enquiry.
+    """CompanyActivity factory with an great export enquiry.
     """
 
     activity_source = CompanyActivity.ActivitySource.great_export_enquiry
@@ -199,8 +188,7 @@ class CompanyActivityGreatExportEnquiryFactory(CompanyActivityBaseFactory):
 
     @classmethod
     def _create(cls, model_class, *args, **kwargs):
-        """
-        Overwrite the _create to prevent the CompanyActivity from saving to the database.
+        """Overwrite the _create to prevent the CompanyActivity from saving to the database.
         This is due to the great export enquiry already creating the CompanyActivity inside its
         model save.
         """
@@ -209,8 +197,7 @@ class CompanyActivityGreatExportEnquiryFactory(CompanyActivityBaseFactory):
 
 
 class CompanyActivityEYBLeadFactory(CompanyActivityBaseFactory):
-    """
-    CompanyActivity factory with an EYB lead.
+    """CompanyActivity factory with an EYB lead.
     """
 
     activity_source = CompanyActivity.ActivitySource.eyb_lead
@@ -221,8 +208,7 @@ class CompanyActivityEYBLeadFactory(CompanyActivityBaseFactory):
 
     @classmethod
     def _create(cls, model_class, *args, **kwargs):
-        """
-        Overwrite the _create to prevent the CompanyActivity from saving to the database.
+        """Overwrite the _create to prevent the CompanyActivity from saving to the database.
         This is due to the EYB lead already creating the CompanyActivity inside its
         model save.
         """
@@ -231,8 +217,7 @@ class CompanyActivityEYBLeadFactory(CompanyActivityBaseFactory):
 
 
 class StovaEventFactory(factory.django.DjangoModelFactory):
-    """
-    Ingested Stova Events data factory.
+    """Ingested Stova Events data factory.
     The StoveEvent model save also creates a DataHub `Event`.
     """
 
@@ -275,8 +260,7 @@ class StovaEventFactory(factory.django.DjangoModelFactory):
 
 
 class StovaAttendeeFactory(factory.django.DjangoModelFactory):
-    """
-    Ingested Stova Attendee data factory.
+    """Ingested Stova Attendee data factory.
     """
 
     stova_event_id = factory.Faker('pyint', min_value=0, max_value=999999999)

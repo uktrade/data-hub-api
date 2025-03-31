@@ -10,7 +10,6 @@ from datahub.investment_lead.tasks.ingest_eyb_common import (
     BaseEYBIngestionTask,
 )
 
-
 MARKETING_PREFIX = f'{DATA_FLOW_EXPORTS_PREFIX}ExportEYBAnalyticsToDataHubS3/'
 
 

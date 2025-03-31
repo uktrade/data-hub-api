@@ -99,8 +99,7 @@ def test_command_regex_generates_the_expected_postcode_substitution(
     post_code,
     expected_result,
 ):
-    """
-    Test regex efficiently without connecting to a database
+    """Test regex efficiently without connecting to a database
     :param post_code: POSTCODE format good and bad
     :param expected_result: regular expression substituted value using the
            Command pattern
@@ -127,8 +126,7 @@ def test_us_company_with_unique_zips_generates_valid_address_area(
     post_code,
     area_code,
 ):
-    """
-    Test postcode is fixed for the purpose of admin area
+    """Test postcode is fixed for the purpose of admin area
     generation with valid zip codes format
     :param post_code: POSTCODE good
     :param area_code: Area Code to be generated from Command
@@ -157,8 +155,7 @@ def test_us_company_with_address_data_only_will_generate_address_area(
     post_code,
     area_code,
 ):
-    """
-    Test postcode fixes and area generation with address area data
+    """Test postcode fixes and area generation with address area data
     :param post_code: POSTCODE good
     :param area_code: Area Code to be generated from Command
     """
@@ -186,8 +183,7 @@ def test_us_company_with_unique_zips_generates_the_valid_registered_address_area
     post_code,
     area_code,
 ):
-    """
-    Test registered address postcode fixes and area generation a
+    """Test registered address postcode fixes and area generation a
     couple of valid Zip Codes using the real DB
     :param post_code: POSTCODE good
     :param area_code: Area Code to be generated from Command
@@ -216,8 +212,7 @@ def test_us_company_with_registered_address_data_only_will_generate_registered_a
     post_code,
     area_code,
 ):
-    """
-    Test registered address data only creates data expected
+    """Test registered address data only creates data expected
     :param post_code: POSTCODE good
     :param area_code: Area Code to be generated from Command
     """
@@ -247,8 +242,7 @@ def test_command_fixes_invalid_postcodes_in_all_post_code_fields(
     post_code,
     expected_result,
 ):
-    """
-    Test Patterns that need fixing in all postcode fields
+    """Test Patterns that need fixing in all postcode fields
     :param post_code: Invalid Postcode Format
     :param expected_result:  The expected result of the fix
     """
@@ -280,8 +274,7 @@ def test_command_leaves_invalid_postcodes_in_original_state_with_no_area(
     post_code,
     expected_result,
 ):
-    """
-    Test edge cases are preserved
+    """Test edge cases are preserved
     :param post_code: Invalid Postcode Format
     :param expected_result:  The expected result of the fix
     """
@@ -305,8 +298,7 @@ def test_command_leaves_invalid_postcodes_in_original_state_with_no_area(
     ],
 )
 def test_audit_log(post_code, expected_result):
-    """
-    Verify auditable versions of the code are retained
+    """Verify auditable versions of the code are retained
     :param post_code: Invalid Postcode Format
     :param expected_result:  The expected result of the fix
     """
@@ -331,8 +323,7 @@ def test_audit_log(post_code, expected_result):
     ],
 )
 def test_audit_does_not_continue_creating_revisions(post_code, expected_result):
-    """
-    Verify auditable versions of the code are retained
+    """Verify auditable versions of the code are retained
     :param post_code: Invalid Postcode Format
     :param expected_result:  The expected result of the fix
     """

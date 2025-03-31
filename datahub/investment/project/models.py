@@ -5,18 +5,13 @@ from collections import namedtuple
 from itertools import chain
 
 from django.conf import settings
-
 from django.core.exceptions import ObjectDoesNotExist
-
 from django.db import models, transaction
-
 from django.utils.functional import cached_property
 from mptt.fields import TreeForeignKey
-
 from reversion.models import Revision
 
 from datahub.company_activity.models import CompanyActivity
-
 from datahub.core import reversion
 from datahub.core.constants import InvestmentProjectStage
 from datahub.core.models import (
@@ -25,7 +20,7 @@ from datahub.core.models import (
     BaseModel,
     BaseOrderedConstantModel,
 )
-from datahub.core.utils import force_uuid, get_financial_year, get_front_end_url, StrEnum
+from datahub.core.utils import StrEnum, force_uuid, get_financial_year, get_front_end_url
 from datahub.investment.project import constants
 from datahub.investment.project.validate import validate
 
@@ -33,8 +28,7 @@ MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
 class InvestmentProjectPermission(StrEnum):
-    """
-    Permission codename constants.
+    """Permission codename constants.
 
     (Defined here rather than in permissions to avoid an import of that module.)
 
@@ -284,8 +278,7 @@ class IProjectAbstract(models.Model):
 
     @cached_property
     def financial_year(self):
-        """
-        Gets the relevant financial year.
+        """Gets the relevant financial year.
 
         Projects in Prospect stage use the created date. Other projects use the
         Actual Land Date if it has been set falling back to Estimated Land Date.
@@ -641,9 +634,8 @@ class InvestmentProject(
 
         if adding:
             stage_changed_on = self.created_on
-        else:
-            if self.__stage_id != self.stage_id:
-                stage_changed_on = self.modified_on
+        elif self.__stage_id != self.stage_id:
+            stage_changed_on = self.modified_on
 
         if stage_changed_on:
             InvestmentProjectStageLog.objects.create(
@@ -705,8 +697,7 @@ class InvestmentProject(
 
     @classmethod
     def get_association_fields(cls):
-        """
-        Gets a list of to-one association fields, and to-many association fields.
+        """Gets a list of to-one association fields, and to-many association fields.
 
         These are used (as part of permissions) to determine if an adviser's team is associated
         with a project.
@@ -854,8 +845,7 @@ class FDISICGrouping(BaseConstantModel):
 
 
 class GVAMultiplier(models.Model):
-    """
-    Gross Value Added Multiplier.
+    """Gross Value Added Multiplier.
 
     To calculate the GVA of an investment project a constant (multiplier) is multiplied
     by the foreign equity investment value.

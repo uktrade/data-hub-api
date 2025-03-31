@@ -7,13 +7,14 @@ from rest_framework.exceptions import ValidationError
 from datahub.omis.order.constants import VATStatus
 from datahub.omis.order.models import Order
 from datahub.omis.order.pricing import (
+    ZERO_PRICING,
+    OrderPricing,
     _calculate_pricing,
     calculate_order_pricing,
     can_pricing_be_calculated,
     get_pricing_from_order,
-    OrderPricing,
     should_vat_be_applied,
-    update_order_pricing, ZERO_PRICING,
+    update_order_pricing,
 )
 from datahub.omis.order.test.factories import HourlyRateFactory, OrderAssigneeFactory, OrderFactory
 
@@ -22,8 +23,7 @@ class TestGetPricingFromOrder:
     """Tests for the get_pricing_from_order function."""
 
     def test_in_pence(self):
-        """
-        Test converting the pricing of an order to an OrderPricing obj with
+        """Test converting the pricing of an order to an OrderPricing obj with
         values defined in pence.
         """
         order = Order(
@@ -39,8 +39,7 @@ class TestGetPricingFromOrder:
         assert pricing.total_cost == 1303
 
     def test_in_pound(self):
-        """
-        Test converting the pricing of an order to an OrderPricing obj with
+        """Test converting the pricing of an order to an OrderPricing obj with
         values defined in pound.
         """
         order = Order(
@@ -70,8 +69,7 @@ class TestCanPricingBeCalculated:
         ),
     )
     def test_cannot_with_incomplete_vat_data(self, fields):
-        """
-        Test that it returns False if the VAT fields are incomplete.
+        """Test that it returns False if the VAT fields are incomplete.
         """
         order = Order(**fields)
         assert not can_pricing_be_calculated(order)
@@ -94,8 +92,7 @@ class TestShouldVATBeApplied:
     """Tests for the should_vat_be_applied function."""
 
     def test_incomplete_raises_exception(self):
-        """
-        Test that if the order doesn't have the right VAT fields populated,
+        """Test that if the order doesn't have the right VAT fields populated,
         it raises a ValidationError.
         """
         order = Order(vat_status=None)
@@ -132,8 +129,7 @@ class TestCalculatePricing:
     """Tests for the _calculate_pricing function."""
 
     def test_zero_hours(self):
-        """
-        Test that given estimated time = 0, all the calculated values are zero.
+        """Test that given estimated time = 0, all the calculated values are zero.
         """
         pricing = _calculate_pricing(
             estimated_time=0,
@@ -144,8 +140,7 @@ class TestCalculatePricing:
         assert pricing == OrderPricing(0, 0, 0, 0)
 
     def test_with_vat(self):
-        """
-        Test that given
+        """Test that given
             hourly rate: 1000 pence
             vat rate: 19.5
 
@@ -175,8 +170,7 @@ class TestCalculatePricing:
         assert pricing.total_cost == 2470
 
     def test_without_vat(self):
-        """
-        Test that given
+        """Test that given
             hourly rate: 1000 pence
             vat rate: 0
 
@@ -211,8 +205,7 @@ class TestCalculateOrderPricing:
     """Tests for the calculate_order_pricing function."""
 
     def test_zero_if_order_incomplete(self):
-        """
-        Test that if an order doesn't have all the VAT fields, the pricing is zero.
+        """Test that if an order doesn't have all the VAT fields, the pricing is zero.
         """
         order = Order(vat_status=None)
         pricing = calculate_order_pricing(order)
@@ -220,8 +213,7 @@ class TestCalculateOrderPricing:
         assert pricing == ZERO_PRICING
 
     def test_zero_with_no_estimated_time(self):
-        """
-        Test that if an order doesn't have any assignees, the pricing is zero.
+        """Test that if an order doesn't have any assignees, the pricing is zero.
         """
         order = OrderFactory(assignees=[])
         assert not order.assignees.count()
@@ -287,8 +279,7 @@ class TestUpdateOrderPricing:
     """Tests for the update_order_pricing function."""
 
     def test_without_committing(self):
-        """
-        Test that if udpate_order_pricing is called without committing,
+        """Test that if udpate_order_pricing is called without committing,
         the order model is changed but not the db.
         """
         order = OrderFactory(vat_status=VATStatus.UK)
@@ -305,8 +296,7 @@ class TestUpdateOrderPricing:
         assert order.total_cost == orig_total_cost
 
     def test_with_commit(self):
-        """
-        Test that if udpate_order_pricing is called with commit = True,
+        """Test that if udpate_order_pricing is called with commit = True,
         the order model is changed and the db as well.
         """
         order = OrderFactory(vat_status=VATStatus.UK)
@@ -323,8 +313,7 @@ class TestUpdateOrderPricing:
         assert order.total_cost != orig_total_cost
 
     def test_doesnt_save_if_pricing_didnt_change(self):
-        """
-        Test that if the pricing didn't change, update_order_pricing doesn't
+        """Test that if the pricing didn't change, update_order_pricing doesn't
         do anything.
         """
         order = OrderFactory()

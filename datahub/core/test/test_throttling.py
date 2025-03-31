@@ -17,8 +17,7 @@ class Path3SecRateThrottle(PathRateThrottle):
     rate = '3/sec'
 
     def __init__(self, *args, **kwargs):
-        """
-        Re-define self.timer to allow classes to mock time.time if needed.
+        """Re-define self.timer to allow classes to mock time.time if needed.
         This is because DRF sets this property on the class and it doesn't give
         opportunities for tests to override it.
         """
@@ -54,8 +53,7 @@ class TestPathRateThrottle:
 
     @freeze_time('2018-03-01 00:00:00')
     def test_query_params_do_not_count(self):
-        """
-        Test that query params are ignored.
+        """Test that query params are ignored.
         Eg. GET /some-path/ and GET /some-path/?param=value
         are treated as the same.
         """
@@ -68,8 +66,7 @@ class TestPathRateThrottle:
 
     @freeze_time('2018-03-01 00:00:00')
     def test_case_does_not_count(self):
-        """
-        Test that the match is case insensitive..
+        """Test that the match is case insensitive..
         Eg. GET /some-path/ and GET /some-Path/
         are treated as the same.
         """
@@ -82,8 +79,7 @@ class TestPathRateThrottle:
 
     @freeze_time('2018-03-01 00:00:00')
     def test_throttling_is_per_path(self):
-        """
-        Test that throttling is per path.
+        """Test that throttling is per path.
         Eg. GET /some-path-1/ and POST /some-path-2/
         are not treated as the same.
         """

@@ -1,7 +1,6 @@
 import logging
 
 import reversion
-
 from django.db.models import Q
 from rest_framework import serializers
 
@@ -11,7 +10,6 @@ from datahub.ingest.tasks import (
     BaseObjectIngestionTask,
 )
 from datahub.investment_lead.models import EYBLead
-
 
 logger = logging.getLogger(__name__)
 

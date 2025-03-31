@@ -36,8 +36,7 @@ def get_expected_data_from_pipeline_item(item):
 
 @pytest.mark.django_db
 class TestPipelineItemDatasetViewSet(BaseDatasetViewTest):
-    """
-    Tests for PipelineItemsDatasetView
+    """Tests for PipelineItemsDatasetView
     """
 
     view_url = reverse('api-v4:dataset:pipeline-items-dataset')

@@ -20,8 +20,7 @@ class AddressValidator:
     }
 
     def __init__(self, lazy=False, fields_mapping=None):
-        """
-        Init the params.
+        """Init the params.
 
         :param lazy: True if you want to skip validation when none of the fields are set.
             Useful when validating an extra and optional address where some fields
@@ -36,18 +35,16 @@ class AddressValidator:
             self.fields_mapping = self.DEFAULT_FIELDS_MAPPING
 
     def _should_validate(self, data_combined):
-        """
-        :returns: True if the data should be validated.
-            If lazy == True, the data should always be validated
-            If lazy == False, validate only if at least one field is set
+        """:returns: True if the data should be validated.
+        If lazy == True, the data should always be validated
+        If lazy == False, validate only if at least one field is set
         """
         if not self.lazy:
             return True
         return any(data_combined.values())
 
     def _validate_fields(self, data_combined):
-        """
-        :returns: a dict containing potential errors
+        """:returns: a dict containing potential errors
         """
         errors = {}
         for field_name, mapping in self.fields_mapping.items():

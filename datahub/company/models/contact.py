@@ -6,7 +6,7 @@ from django.utils.timezone import now
 
 from datahub.core import reversion
 from datahub.core.models import ArchivableModel, BaseModel
-from datahub.core.utils import get_front_end_url, join_truthy_strings, StrEnum
+from datahub.core.utils import StrEnum, get_front_end_url, join_truthy_strings
 from datahub.core.validators import (
     InternationalTelephoneValidator,
 )
@@ -25,13 +25,11 @@ class ContactPermission(StrEnum):
 
 @reversion.register_base_model()
 class Contact(ArchivableModel, BaseModel):
-    """
-    Contact (a person at a company that DIT has had contact with).
+    """Contact (a person at a company that DIT has had contact with).
     """
 
     class Source(models.TextChoices):
-        """
-        Where the Contact was created from. Whether it was created on Data Hub or through
+        """Where the Contact was created from. Whether it was created on Data Hub or through
         ingestion tasks from sources such as Great, Stova etc.
         """
 
@@ -183,8 +181,7 @@ class Contact(ArchivableModel, BaseModel):
         return join_truthy_strings(getattr(self.title, 'name', None), self.name)
 
     def mark_as_transferred(self, to, reason, user):
-        """
-        Marks a contact record as having been transferred to another contact record.
+        """Marks a contact record as having been transferred to another contact record.
         This is used, for example, for marking a contact as a duplicate record.
         """
         self.modified_by = user

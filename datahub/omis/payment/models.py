@@ -10,7 +10,6 @@ from datahub.omis.payment.govukpay import PayClient
 from datahub.omis.payment.managers import PaymentGatewaySessionManager, PaymentManager
 from datahub.omis.payment.utils import trasform_govuk_payment_to_omis_payment_data
 
-
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
@@ -44,16 +43,14 @@ class PaymentGatewaySession(BaseModel):
         return f'Payment gateway session {self.id} for order {self.order}'
 
     def _get_payment_from_govuk_pay(self):
-        """
-        :returns: the GOV.UK payment data for this payment gateway session
+        """:returns: the GOV.UK payment data for this payment gateway session
 
         :raises GOVUKPayAPIException: if there is a problem with GOV.UK Pay
         """
         return PayClient().get_payment_by_id(self.govuk_payment_id)
 
     def get_payment_url(self):
-        """
-        :returns: the GOV.UK Pay payment url to redirect the users to complete the payment
+        """:returns: the GOV.UK Pay payment url to redirect the users to complete the payment
 
         :raises GOVUKPayAPIException: if there is a problem with GOV.UK Pay
         """
@@ -64,8 +61,7 @@ class PaymentGatewaySession(BaseModel):
         return next_url.get('href', '')
 
     def is_finished(self):
-        """
-        :returns: True if this payment gateway session is in a finished status
+        """:returns: True if this payment gateway session is in a finished status
         """
         return self.status in (
             PaymentGatewaySessionStatus.SUCCESS,
@@ -76,8 +72,7 @@ class PaymentGatewaySession(BaseModel):
 
     @transaction.atomic
     def refresh_from_govuk_payment(self):
-        """
-        Refreshes this record with the data from the related GOV.UK payment.
+        """Refreshes this record with the data from the related GOV.UK payment.
         If, during the update, the GOV.UK response says that the payment happened
         successfully, the related order gets marked as `paid` and an
         `payment.Payment` record is created from the GOV.UK payment data.
@@ -109,8 +104,7 @@ class PaymentGatewaySession(BaseModel):
         return True
 
     def cancel(self):
-        """
-        Cancels this payment gateway session and the related GOV.UK payment.
+        """Cancels this payment gateway session and the related GOV.UK payment.
 
         :raises GOVUKPayAPIException: if there is a problem with GOV.UK Pay
         """

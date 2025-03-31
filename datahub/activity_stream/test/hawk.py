@@ -9,8 +9,7 @@ def sender(
     content='',
     content_type='',
 ):
-    """
-    Return hawk sender for the given URL.
+    """Return hawk sender for the given URL.
     """
     return mohawk.Sender(
         {
@@ -33,8 +32,7 @@ def auth_header(
     content='',
     content_type='',
 ):
-    """
-    Return HTTP_AUTHORIZATION header using hawk auth.
+    """Return HTTP_AUTHORIZATION header using hawk auth.
     """
     return sender(
         url,
@@ -47,8 +45,7 @@ def auth_header(
 
 
 def get(client, url):
-    """
-    Returns the response of a HAWK authenticated get request.
+    """Returns the response of a HAWK authenticated get request.
     """
     return client.get(
         url,

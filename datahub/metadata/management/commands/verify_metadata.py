@@ -4,16 +4,13 @@ from operator import itemgetter
 
 from django.apps import apps
 from django.core.management.base import BaseCommand
-
 from tabulate import tabulate
-
 
 logger = getLogger(__name__)
 
 
 class Command(BaseCommand):
-    """
-    Management command which returns the count for all the metadata models.
+    """Management command which returns the count for all the metadata models.
     """
 
     help = 'Return a count of all the metadata models.'

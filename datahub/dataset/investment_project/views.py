@@ -5,14 +5,10 @@ from django.db.models.functions import Cast, Concat
 from datahub.core.constants import InvestmentProjectStage as Stage
 from datahub.core.query_utils import (
     get_aggregate_subquery,
+    get_array_agg_subquery,
     get_empty_string_if_null_expression,
 )
-from datahub.core.query_utils import (
-    get_array_agg_subquery,
-)
-from datahub.dataset.core.views import BaseDatasetView
-from datahub.dataset.core.views import BaseFilterDatasetView
-
+from datahub.dataset.core.views import BaseDatasetView, BaseFilterDatasetView
 from datahub.dataset.investment_project.pagination import (
     InvestmentProjectActivityDatasetViewCursorPagination,
 )
@@ -27,8 +23,7 @@ from datahub.metadata.query_utils import get_sector_name_subquery
 
 
 class InvestmentProjectsDatasetView(BaseFilterDatasetView):
-    """
-    An APIView that provides 'get' action which queries and returns desired fields for
+    """An APIView that provides 'get' action which queries and returns desired fields for
     Investment Projects Dataset to be consumed by Data-flow periodically.
     Data-flow uses response result to insert data into Dataworkspace through its defined
     API endpoints. The goal is presenting various reports to the users out of flattened table
@@ -188,8 +183,7 @@ class InvestmentProjectsDatasetView(BaseFilterDatasetView):
 
 
 class InvestmentProjectsActivityDatasetView(BaseDatasetView):
-    """
-    An APIView that provides 'get' action which queries and returns desired fields
+    """An APIView that provides 'get' action which queries and returns desired fields
     for Investment Projects Activity Dataset to be consumed by Data-flow periodically.
 
     Activity contains SPI report records and it is linked to Investment Project by Data Hub ID.

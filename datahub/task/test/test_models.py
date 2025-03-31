@@ -3,10 +3,8 @@ import datetime
 import pytest
 
 from datahub.company.test.factories import CompanyFactory
-
 from datahub.interaction.test.factories import InteractionFactoryBase
 from datahub.investment.project.test.factories import InvestmentProjectFactory
-
 from datahub.task.models import Task
 from datahub.task.test.factories import TaskFactory
 

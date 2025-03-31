@@ -5,8 +5,7 @@ from django.db.models.functions import Cast, Coalesce, Concat, NullIf
 
 
 class ConcatWS(Func):
-    """
-    Concatenates text fields together with a separator.
+    """Concatenates text fields together with a separator.
 
     The first argument is the separator. Null arguments are ignored.
 
@@ -18,8 +17,7 @@ class ConcatWS(Func):
 
 
 class PreferNullConcat(Func):
-    """
-    Concatenates a sequence of expressions, but evaluates to NULL if any one expression does
+    """Concatenates a sequence of expressions, but evaluates to NULL if any one expression does
     (in PostgreSQL).
     """
 
@@ -28,8 +26,7 @@ class PreferNullConcat(Func):
 
 
 class JSONBBuildObject(Func):
-    """
-    Create a JSONB field from keys and expressions.
+    """Create a JSONB field from keys and expressions.
 
     Can be used with subqueries to annotate a query with multiple values from the subquery at
     once.
@@ -49,8 +46,7 @@ class JSONBBuildObject(Func):
     output_field = JSONField()
 
     def __init__(self, **kwargs):
-        """
-        Initialise the function with a list of keys and expressions to build the JSON object
+        """Initialise the function with a list of keys and expressions to build the JSON object
         from.
         """
         args = [
@@ -62,8 +58,7 @@ class JSONBBuildObject(Func):
 
 
 def get_string_agg_subquery(model, expression, delimiter=', ', distinct=False, ordering=None):
-    """
-    Gets a subquery that uses string_agg to concatenate values in a to-many field.
+    """Gets a subquery that uses string_agg to concatenate values in a to-many field.
 
     The passed model must be the model of the query set being annotated.
 
@@ -93,8 +88,7 @@ def get_array_agg_subquery(
     distinct=False,
     ordering=(),
 ):
-    """
-    Get a subquery that aggregates values from a to-many relation as an array.
+    """Get a subquery that aggregates values from a to-many relation as an array.
 
     Can be used with a many-to-many through model, or any other model with a foreign key to the
     model being annotated.
@@ -149,8 +143,7 @@ def get_array_agg_subquery(
 
 
 def get_aggregate_subquery(model, expression, join_field_name='pk'):
-    """
-    Gets a subquery that calculates an aggregate value of a to-many field.
+    """Gets a subquery that calculates an aggregate value of a to-many field.
 
     The passed model must be the model of the query set being annotated.
 
@@ -182,8 +175,7 @@ def get_aggregate_subquery(model, expression, join_field_name='pk'):
 
 
 def get_top_related_expression_subquery(related_field, expression, ordering, outer_field='pk'):
-    """
-    Returns an expression that gets a particular field of the top row for a particular ordering
+    """Returns an expression that gets a particular field of the top row for a particular ordering
     of a related model.
 
     expression could be a string referring to a field, or an instance of Expression.
@@ -212,8 +204,7 @@ def get_top_related_expression_subquery(related_field, expression, ordering, out
 
 
 def get_choices_as_case_expression(model, field_name):
-    """
-    Gets an SQL expression that returns the display name for a field with choices.
+    """Gets an SQL expression that returns the display name for a field with choices.
 
     Usage example:
         InvestmentProject.objects.annotate(
@@ -228,8 +219,7 @@ def get_choices_as_case_expression(model, field_name):
 
 
 def get_full_name_expression(person_field_name=None, bracketed_field_name=None):
-    """
-    Gets an SQL expression that returns the full name for a contact or adviser.
+    """Gets an SQL expression that returns the full name for a contact or adviser.
 
     Can both be used directly on a Contact or Adviser query set and on related fields.
 
@@ -276,8 +266,7 @@ def get_full_name_expression(person_field_name=None, bracketed_field_name=None):
 
 
 def get_bracketed_concat_expression(*expressions, expression_to_bracket=None):
-    """
-    Gets an SQL expression that concatenates a number of expressions and optionally another
+    """Gets an SQL expression that concatenates a number of expressions and optionally another
     field surrounded by brackets.
 
     For simple annotation of full names of contacts or advisers, get_full_name_expression() should
@@ -324,8 +313,7 @@ def get_bracketed_concat_expression(*expressions, expression_to_bracket=None):
 
 
 def get_front_end_url_expression(model_name, pk_expression, url_suffix=''):
-    """
-    Gets an SQL expression that returns a front-end URL for an object.
+    """Gets an SQL expression that returns a front-end URL for an object.
 
     :param model_name:      key in settings.DATAHUB_FRONTEND_URL_PREFIXES
     :param pk_expression:   expression that resolves to the pk for the model
@@ -339,8 +327,7 @@ def get_front_end_url_expression(model_name, pk_expression, url_suffix=''):
 
 
 def get_queryset_object(queryset, **filters):
-    """
-    Safer version of QuerySet.get() that avoids loading all objects into memory when there
+    """Safer version of QuerySet.get() that avoids loading all objects into memory when there
     are multiple results.
 
     (When there are multiple results, QuerySet.get() loads all of them into memory even though

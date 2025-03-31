@@ -10,8 +10,7 @@ class ServiceFilterSet(FilterSet):
     contexts__has_any = CharFilter(field_name='contexts', method='filter_contexts__has_any')
 
     def filter_contexts__has_any(self, queryset, field_name, value):
-        """
-        Filters by checking if contexts contains any of a number of values.
+        """Filters by checking if contexts contains any of a number of values.
 
         Multiple values are separated by a comma.
         """

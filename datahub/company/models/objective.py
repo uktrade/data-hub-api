@@ -5,9 +5,7 @@ from django.core.validators import MaxValueValidator
 from django.db import models
 
 from datahub.company.models import Company
-
 from datahub.core import reversion
-
 from datahub.core.models import ArchivableModel, BaseModel
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH

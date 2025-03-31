@@ -28,8 +28,7 @@ class FeatureFlag(BaseModel):
 
 
 class UserFeatureFlag(BaseModel):
-    """
-    Per-user feature flag.
+    """Per-user feature flag.
 
     This is a feature flag that can be set on a user-by-user basis.
 

@@ -11,8 +11,7 @@ logger = getLogger(__name__)
 
 
 class CSVBaseCommand(BaseCommand):
-    """
-    Base class for db maintenance related commands.
+    """Base class for db maintenance related commands.
     It helps dealing with processing rows in a CSV stored in S3,
     manages basic logging and failures.
     The operation is not atomic and each row is processed individually.
@@ -39,8 +38,7 @@ class CSVBaseCommand(BaseCommand):
         )
 
     def _handle(self, *args, **options):
-        """
-        Internal version of the `handle` method.
+        """Internal version of the `handle` method.
 
         :returns: dict with count of records successful and failed updates
         """
@@ -70,8 +68,7 @@ class CSVBaseCommand(BaseCommand):
         logger.info(f'Finished - succeeded: {result[True]}, failed: {result[False]}')
 
     def process_row(self, row, **options):
-        """
-        Process one single row.
+        """Process one single row.
 
         :returns: True if the row has been processed successfully, False otherwise.
         """
@@ -85,8 +82,7 @@ class CSVBaseCommand(BaseCommand):
             return True
 
     def _process_row(self, row, **options):
-        """
-        To be implemented by a subclass, it should propagate exceptions so that `process_row` knows
+        """To be implemented by a subclass, it should propagate exceptions so that `process_row` knows
         that the row has not been successfully processed.
 
         :param row: dict where the keys are defined in the header and the values are the CSV row

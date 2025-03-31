@@ -7,7 +7,6 @@ import pytest
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, SubsidiaryFactory
 from datahub.core.test.queues.test_scheduler import PickleableMock
 from datahub.investment.project.test.factories import InvestmentProjectFactory
-
 from datahub.search.company.tasks import (
     schedule_sync_investment_projects_of_subsidiary_companies,
     sync_investment_projects_of_subsidiary_companies,
@@ -20,8 +19,7 @@ pytestmark = pytest.mark.django_db
 
 @pytest.fixture
 def mock_sync_investment_projects_of_subsidiary_companies(monkeypatch):
-    """
-    Mocks the sync_investment_projects_of_subsidiary_companies function.
+    """Mocks the sync_investment_projects_of_subsidiary_companies function.
     """
     mock_sync_investment_projects_of_subsidiary_companies = PickleableMock()
     monkeypatch.setattr(
@@ -35,8 +33,7 @@ def test_schedule_sync_investment_projects_of_subsidiary_companies(
     caplog,
     mock_sync_investment_projects_of_subsidiary_companies,
 ):
-    """
-    Test that the sync_investment_projects_of_subsidiary_companies function is called from the
+    """Test that the sync_investment_projects_of_subsidiary_companies function is called from the
     scheduler.
     """
     caplog.set_level(logging.INFO, logger='datahub.search.company.tasks')
@@ -62,8 +59,7 @@ def test_sync_investment_projects_of_subsidiary_companies(
     opensearch_with_collector,
     mock_sync_investment_projects_of_subsidiary_companies,
 ):
-    """
-    Test that the sync_investment_projects_of_subsidiary_companies function is called from the
+    """Test that the sync_investment_projects_of_subsidiary_companies function is called from the
     scheduler for related subsidiaries/investment projects.
     """
     unrelated_owner = AdviserFactory()
@@ -102,8 +98,7 @@ def test_race_condition_sync_investment_projects_of_subsidiary_companies(
     opensearch_with_collector,
     mock_sync_investment_projects_of_subsidiary_companies,
 ):
-    """
-    Test that the race condition exception is raised when appropirate.
+    """Test that the race condition exception is raised when appropirate.
     """
     account_owner = AdviserFactory()
     subsidiary = SubsidiaryFactory()

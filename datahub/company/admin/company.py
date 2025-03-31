@@ -53,8 +53,7 @@ class CompanyAdminForm(forms.ModelForm):
         self.set_trading_names_field_size()
 
     def set_trading_names_field_size(self):
-        """
-        Sets the size of the form field trading_names using the following logic:
+        """Sets the size of the form field trading_names using the following logic:
 
         given TRADING_NAMES_DEFAULT_FIELD_SIZE as default size
         the actual array field size for the specific self.instance is:
@@ -235,8 +234,7 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
     }
 
     def get_form(self, request, obj=None, **kwargs):
-        """
-        Gets the model form used for add and change views.
+        """Gets the model form used for add and change views.
 
         Overridden here to add help text for read-only method fields.
         """

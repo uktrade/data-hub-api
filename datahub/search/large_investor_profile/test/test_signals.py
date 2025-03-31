@@ -46,8 +46,7 @@ def test_delete_from_opensearch(
     expected_to_call_delete,
     opensearch_with_signals,
 ):
-    """
-    Test that when an large investor profile is deleted from db it is also
+    """Test that when an large investor profile is deleted from db it is also
     calls delete document to delete from OpenSearch.
     """
     investor_profile = investor_profile_factory()

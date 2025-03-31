@@ -3,12 +3,10 @@ import logging
 
 import smart_open
 
-
 from datahub.ingest.boto3 import S3ObjectProcessor
 from datahub.ingest.tasks import BaseObjectIdentificationTask, BaseObjectIngestionTask
 from datahub.metadata.constants import POSTCODE_DATA_PREFIX
 from datahub.metadata.models import PostcodeData
-
 
 logger = logging.getLogger(__name__)
 

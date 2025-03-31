@@ -1,13 +1,10 @@
 from datetime import datetime, timedelta, timezone
 
 import pytest
-
 from dateutil import parser
-
 from django.conf import settings
 from django.contrib.admin.models import LogEntry
 from freezegun import freeze_time
-
 from rest_framework import status
 from reversion.models import Version
 
@@ -30,7 +27,6 @@ from datahub.export_win.test.factories import (
     LegacyExportWinsToDataHubAdminUserFactory,
     LegacyExportWinsToDataHubCompanyFactory,
 )
-
 
 pytestmark = pytest.mark.django_db
 

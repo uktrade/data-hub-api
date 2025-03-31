@@ -10,8 +10,7 @@ logger = getLogger(__name__)
 
 
 def process_mailbox_emails():
-    """
-    Process new emails for S3 mailboxes.
+    """Process new emails for S3 mailboxes.
     """
     # NOTE: This is a long-lived feature flag which allows us to quickly switch off email
     # ingestion in case of any problems with third party (SMTP) services or security issues

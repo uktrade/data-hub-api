@@ -2,6 +2,8 @@ from django.db.models import Prefetch
 
 from datahub.omis.order.models import (
     Order as DBOrder,
+)
+from datahub.omis.order.models import (
     OrderAssignee,
     OrderPermission,
     OrderSubscriber,

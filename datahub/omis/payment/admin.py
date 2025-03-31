@@ -50,8 +50,7 @@ class RefundForm(forms.ModelForm):
         )
 
     def __init__(self, *args, **kwargs):
-        """
-        Initialise the object.
+        """Initialise the object.
 
         During the creation step, the value of status can only be RefundStatus.APPROVED.
         During the editing step, the value of status cannot be changed any longer.

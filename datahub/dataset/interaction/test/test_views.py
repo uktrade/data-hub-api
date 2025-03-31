@@ -1,11 +1,8 @@
 from datetime import datetime, timezone
 
 import pytest
-
 from django.urls import reverse
-
 from freezegun import freeze_time
-
 from rest_framework import status
 
 from datahub.core.test_utils import format_date_or_datetime, get_attr_or_none
@@ -100,8 +97,7 @@ def get_expected_data_from_interaction(interaction):
 
 @pytest.mark.django_db
 class TestInteractionsDatasetViewSet(BaseDatasetViewTest):
-    """
-    Tests for InteractionsDatasetView
+    """Tests for InteractionsDatasetView
     """
 
     view_url = reverse('api-v4:dataset:interactions-dataset')

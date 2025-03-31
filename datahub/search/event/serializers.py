@@ -9,8 +9,7 @@ from datahub.search.serializers import (
 
 
 class NestedDisabledOnQuerySerializer(serializers.Serializer):
-    """
-    Serialiser used to validate disabled_on filter.
+    """Serialiser used to validate disabled_on filter.
 
     Validated data uses "or" operator. For example if you want to
     find events that were disabled after certain date, but also those that

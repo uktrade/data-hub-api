@@ -12,7 +12,6 @@ from datahub.metadata.admin import (
     ReadOnlyMetadataAdmin,
 )
 
-
 admin.site.register(ExportExperienceCategory, DisableableMetadataAdmin)
 admin.site.register(OneListTier, ReadOnlyMetadataAdmin)
 

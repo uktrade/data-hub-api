@@ -6,7 +6,11 @@ import pytest
 
 from datahub.core.constants import (
     InvestmentBusinessActivity as InvestmentBusinessActivityConstant,
+)
+from datahub.core.constants import (
     InvestmentType as InvestmentTypeConstant,
+)
+from datahub.core.constants import (
     Sector as SectorConstant,
 )
 from datahub.investment.project.management.commands import refresh_gross_value_added_values

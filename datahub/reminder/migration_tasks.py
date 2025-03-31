@@ -32,7 +32,6 @@ from datahub.reminder.models import (
     UpcomingEstimatedLandDateSubscription,
 )
 
-
 logger = getLogger(__name__)
 
 
@@ -303,8 +302,7 @@ def _log_post_advisor_migration(advisor_id, logger):
 
 
 def _generate_advisor_investment_project_query(role):
-    """
-    Generate a django Q object using the advisor role to match against an investment project
+    """Generate a django Q object using the advisor role to match against an investment project
     """
     return Q(
         **{

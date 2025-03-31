@@ -15,7 +15,6 @@ from datahub.company.test.factories import (
 from datahub.core.test_utils import random_obj_for_model
 from datahub.metadata.models import Country
 
-
 # mark the whole module for db use
 pytestmark = pytest.mark.django_db
 
@@ -39,8 +38,7 @@ class TestCompany:
         ids=('as_subsidiary', 'as_non_subsidiary'),
     )
     def test_get_group_global_headquarters(self, build_global_headquarters):
-        """
-        Test that `get_group_global_headquarters` returns `self` if the company has
+        """Test that `get_group_global_headquarters` returns `self` if the company has
         no `global_headquarters` or the `global_headquarters` otherwise.
         """
         company = CompanyFactory.build(
@@ -82,8 +80,7 @@ class TestCompany:
         ),
     )
     def test_get_one_list_group_tier(self, build_company):
-        """
-        Test that `get_one_list_group_tier` returns the One List Tier of `self`
+        """Test that `get_one_list_group_tier` returns the One List Tier of `self`
         if company has no `global_headquarters` or the one of its `global_headquarters`
         otherwise.
         """
@@ -122,8 +119,7 @@ class TestCompany:
         build_company,
         with_global_account_manager,
     ):
-        """
-        Test that `get_one_list_group_core_team` returns the Core Team of `self` if the company
+        """Test that `get_one_list_group_core_team` returns the Core Team of `self` if the company
         has no `global_headquarters` or the one of its `global_headquarters` otherwise.
         """
         team_member_advisers = AdviserFactory.create_batch(
@@ -192,8 +188,7 @@ class TestCompany:
         ),
     )
     def test_get_one_list_group_global_account_manager(self, build_company):
-        """
-        Test that `get_one_list_group_global_account_manager` returns
+        """Test that `get_one_list_group_global_account_manager` returns
         the One List Global Account Manager of `self` if the company has no
         `global_headquarters` or the one of its `global_headquarters` otherwise.
         """
@@ -249,8 +244,7 @@ class TestCompanyExportCountry:
         assert str(export_country) == status
 
     def test_unique_constraint(self):
-        """
-        Test unique constraint
+        """Test unique constraint
         a company and country combination can't be added more than once
         """
         company_1 = CompanyFactory()

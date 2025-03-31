@@ -18,8 +18,7 @@ pytestmark = pytest.mark.django_db
 
 
 def pytest_generate_tests(metafunc):
-    """
-    Parametrizes the tests that use the `metadata_view_name` fixture
+    """Parametrizes the tests that use the `metadata_view_name` fixture
     by getting all the metadata from the different apps.
 
     Parametrizes the tests that use the `ordered_mapping` fixture
@@ -113,8 +112,7 @@ def test_view_name_generation():
 
 
 def test_ordered_metadata_order_view(ordered_mapping, metadata_client):
-    """
-    Test that views with BaseOrderedConstantModel are ordered by the `order` field.
+    """Test that views with BaseOrderedConstantModel are ordered by the `order` field.
     """
     metadata_view_name, queryset = ordered_mapping
 
@@ -260,8 +258,7 @@ def test_team_view(metadata_client):
 
 
 def test_exchange_rate_view(metadata_client):
-    """
-    Tests exchange rate returns from_currency_code, to_currency_code, exchange_rate & created_on
+    """Tests exchange rate returns from_currency_code, to_currency_code, exchange_rate & created_on
     """
     url = reverse(viewname='api-v4:metadata:exchange-rate')
     exchange_rate = ExchangeRate.objects.first()
@@ -309,8 +306,7 @@ class TestServiceView:
     """Tests for the /v4/metadata/service view."""
 
     def test_list(self, metadata_client):
-        """
-        Test listing services.
+        """Test listing services.
 
         Services should include a list of contexts.
         """
@@ -413,8 +409,7 @@ class TestSectorView:
     """Tests for the /v4/metadata/sector/ view."""
 
     def test_list(self, metadata_client):
-        """
-        Test listing sectors.
+        """Test listing sectors.
         """
         url = reverse(viewname='api-v4:metadata:sector')
         response = metadata_client.get(url)

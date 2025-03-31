@@ -4,8 +4,9 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from datahub.company.models import CompanyPermission
-from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.company.test.factories import (
+    AdviserFactory,
+    CompanyFactory,
     OneListCoreTeamMemberFactory,
 )
 from datahub.company.test.utils import random_non_ita_one_list_tier
@@ -18,7 +19,7 @@ from datahub.core.test_utils import (
 @pytest.fixture
 def one_list_company():
     """Get One List company."""
-    yield CompanyFactory(
+    return CompanyFactory(
         global_headquarters=None,
         one_list_tier=random_non_ita_one_list_tier(),
         one_list_account_owner=AdviserFactory(),
@@ -44,8 +45,7 @@ class TestOneListGroupCoreTeam(APITestMixin):
         ids=('as_subsidiary', 'as_non_subsidiary'),
     )
     def test_empty_list(self, build_company):
-        """
-        Test that if there's no Global Account Manager and no Core Team
+        """Test that if there's no Global Account Manager and no Core Team
         member for a company's Global Headquarters, the endpoint returns
         an empty list.
         """
@@ -76,8 +76,7 @@ class TestOneListGroupCoreTeam(APITestMixin):
         ids=('as_subsidiary', 'as_non_subsidiary'),
     )
     def test_with_only_global_account_manager(self, build_company):
-        """
-        Test that if there is a Global Account Manager but no Core Team
+        """Test that if there is a Global Account Manager but no Core Team
         member for a company's Global Headquarters, the endpoint returns
         a list with only that adviser in it.
         """
@@ -137,8 +136,7 @@ class TestOneListGroupCoreTeam(APITestMixin):
         ids=lambda val: f'{"With" if val else "Without"} global account manager',
     )
     def test_with_core_team_members(self, build_company, with_global_account_manager):
-        """
-        Test that if there are Core Team members for a company's Global Headquarters,
+        """Test that if there are Core Team members for a company's Global Headquarters,
         the endpoint returns a list with these advisers in it.
         """
         team_member_advisers = AdviserFactory.create_batch(
@@ -191,8 +189,7 @@ class TestOneListGroupCoreTeam(APITestMixin):
         ]
 
     def test_404_with_invalid_company(self):
-        """
-        Test that if the company doesn't exist, the endpoint returns 404.
+        """Test that if the company doesn't exist, the endpoint returns 404.
         """
         url = reverse(
             'api-v4:company:one-list-group-core-team',
@@ -204,8 +201,7 @@ class TestOneListGroupCoreTeam(APITestMixin):
 
 
 class TestUpdateOneListCoreTeam(APITestMixin):
-    """
-    Tests for updating the Core Team of One List company.
+    """Tests for updating the Core Team of One List company.
 
     (Implemented in CompanyViewSet.remove_from_one_list().)
     """
@@ -293,8 +289,7 @@ class TestUpdateOneListCoreTeam(APITestMixin):
         ),
     )
     def test_returns_403_if_without_permission(self, permission_codenames):
-        """
-        Test that a 403 is returned if the user does not have all of the required
+        """Test that a 403 is returned if the user does not have all of the required
         permissions.
         """
         company = CompanyFactory()
@@ -339,8 +334,7 @@ class TestUpdateOneListCoreTeam(APITestMixin):
         existing_team_count,
         new_team_count,
     ):
-        """
-        Test that an account manager can update core team members.
+        """Test that an account manager can update core team members.
         - requires user to also have change_company permission.
         """
         api_client, company = self._one_list_account_owner_api_client()
@@ -348,8 +342,7 @@ class TestUpdateOneListCoreTeam(APITestMixin):
             company, existing_team_count, new_team_count, api_client)
 
     def test_returns_403_if_account_manager_updates_other_company(self):
-        """
-        Test that a 403 is returned if an account manager tries to update the core team from
+        """Test that a 403 is returned if an account manager tries to update the core team from
         a company they are not the account manage for.
         """
         api_client, adviser_company = self._one_list_account_owner_api_client()

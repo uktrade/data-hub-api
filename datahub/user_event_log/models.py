@@ -7,8 +7,7 @@ from datahub.user_event_log.constants import UserEventType
 
 
 class UserEvent(models.Model):
-    """
-    User event.
+    """User event.
 
     Used to keep a record of specific events that have occurred while the user was using the
     system (e.g. the user exported data from search).

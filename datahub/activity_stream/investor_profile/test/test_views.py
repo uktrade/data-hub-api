@@ -15,8 +15,7 @@ from datahub.investment.investor_profile.test.factories import (
 
 @pytest.mark.django_db
 def test_large_capital_investor_profile_activity(api_client):
-    """
-    Get a list of large capital investor profiles and test the returned JSON is valid as per:
+    """Get a list of large capital investor profiles and test the returned JSON is valid as per:
     https://www.w3.org/TR/activitystreams-core/
     """
     start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
@@ -65,8 +64,7 @@ def test_large_capital_investor_profile_activity(api_client):
 
 @pytest.mark.django_db
 def test_complete_large_capital_investor_profile_activity(api_client):
-    """
-    Get a list of complete large capital investor profiles and test the returned JSON
+    """Get a list of complete large capital investor profiles and test the returned JSON
     is valid as per:
     https://www.w3.org/TR/activitystreams-core/
     """
@@ -205,8 +203,7 @@ def test_complete_large_capital_investor_profile_activity(api_client):
 
 @pytest.mark.django_db
 def test_investor_profiles_ordering(api_client):
-    """
-    Test that the investor profiles are ordered by ('modified_on', 'pk')
+    """Test that the investor profiles are ordered by ('modified_on', 'pk')
     """
     investor_profiles = []
 

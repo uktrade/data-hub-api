@@ -120,8 +120,7 @@ def setup_data(opensearch_with_collector):
 
 @pytest.fixture
 def setup_subtotal_cost_data(opensearch_with_collector):
-    """
-    Setup Order data for total subtotal cost test.
+    """Setup Order data for total subtotal cost test.
 
     Order will have a reference that is a string representation of the resulting subtotal_cost.
     Subtotal cost must be three-digit because the test is choosing orders by their
@@ -433,8 +432,7 @@ class TestSearchOrder(APITestMixin):
         assert response.json() == {'created_on_before': ['Date is in incorrect format.']}
 
     def test_incorrect_primary_market_raise_validation_error(self, setup_data):
-        """
-        Test that if the primary_market is not in a valid format,
+        """Test that if the primary_market is not in a valid format,
         then the API return a validation error.
         """
         url = reverse('api-v3:search:order')

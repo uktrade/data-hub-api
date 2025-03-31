@@ -21,8 +21,7 @@ class BaseInvoiceViewSet(BaseNestedOrderViewSet):
     serializer_class = InvoiceSerializer
 
     def get_object(self):
-        """
-        :returns: the invoice related to the order.
+        """:returns: the invoice related to the order.
 
         :raises Http404: if the invoice doesn't exist
         """

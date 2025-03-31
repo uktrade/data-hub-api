@@ -41,8 +41,7 @@ def test_user_is_logged_out_from_admin_when_oauth2_session_has_expired():
 
 @freeze_time(FROZEN_TIME)
 def test_user_is_not_logged_out_when_oauth2_session_is_not_expired():
-    """
-    Tests that user is not logged out if OAuth2 session is not expired.
+    """Tests that user is not logged out if OAuth2 session is not expired.
     """
     adviser = AdviserFactory()
 

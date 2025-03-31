@@ -4,8 +4,7 @@ from datahub.core.validate_utils import is_blank
 
 
 class RequiredUnlessAlreadyBlankValidator:
-    """
-    Class-level DRF validator for required fields that are allowed to stay null if already
+    """Class-level DRF validator for required fields that are allowed to stay null if already
     null.
 
     (Because of how validation works in DRF, this cannot be done as a field-level validator.)
@@ -15,8 +14,7 @@ class RequiredUnlessAlreadyBlankValidator:
     required_message = 'This field is required.'
 
     def __init__(self, *fields):
-        """
-        Initialises the validator with a list of fields to individually validate.
+        """Initialises the validator with a list of fields to individually validate.
 
         :param fields:  Fields that should be required (when not already null)
         """

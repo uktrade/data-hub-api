@@ -51,8 +51,7 @@ class InvestmentProjectPropositionAssociationChecker(
     _PropositionViewToActionMapping,
     InvestmentProjectAssociationCheckerBase,
 ):
-    """
-    Association checker for propositions, which checks association with the investment
+    """Association checker for propositions, which checks association with the investment
     project linked to the proposition.
     """
 
@@ -114,8 +113,7 @@ class InvestmentProjectPropositionDocumentAssociationChecker(
     _PropositionDocumentViewToActionMapping,
     InvestmentProjectAssociationCheckerBase,
 ):
-    """
-    Association checker for propositions, which checks association with the investment
+    """Association checker for propositions, which checks association with the investment
     project linked to the proposition.
     """
 

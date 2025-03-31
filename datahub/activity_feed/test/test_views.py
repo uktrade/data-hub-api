@@ -8,8 +8,7 @@ from datahub.core.test_utils import APITestMixin, create_test_user
 
 
 def pytest_generate_tests(metafunc):
-    """
-    Parametrizes the tests that use the `insufficient_activity_permissions` fixture
+    """Parametrizes the tests that use the `insufficient_activity_permissions` fixture
     by creating lists with all required permissions except one.
     """
     if 'insufficient_activity_permissions' in metafunc.fixturenames:
@@ -103,8 +102,7 @@ class TestActivityFeedView(APITestMixin):
         self,
         insufficient_activity_permissions,
     ):
-        """
-        Test that an empty list is returned if the authenticated user doesn't have permission
+        """Test that an empty list is returned if the authenticated user doesn't have permission
         to view all activity models.
         """
         requester = create_test_user(

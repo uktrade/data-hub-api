@@ -2,16 +2,17 @@ import pytest
 from django.core.management import call_command
 from reversion.models import Version
 
-from datahub.interaction.test.factories import AdviserFactory
-from datahub.interaction.test.factories import CompaniesInteractionFactory
-from datahub.interaction.test.factories import InteractionDITParticipantFactory
+from datahub.interaction.test.factories import (
+    AdviserFactory,
+    CompaniesInteractionFactory,
+    InteractionDITParticipantFactory,
+)
 
 pytestmark = pytest.mark.django_db
 
 
 def test_run__fake_uuids(caplog):
-    """
-    Test that the command:
+    """Test that the command:
 
     - ignores rows with unmatched adviser UUIDs
     """
@@ -37,8 +38,7 @@ def test_run__fake_uuids(caplog):
     ),
 )
 def test_run__update_interaction_participant(simulate):
-    """
-    Test that the command:
+    """Test that the command:
     - updates records only if simulate=False is passed
     - does not update records if simulate=True is passed
     - updates interaction participants to new adviser
@@ -71,8 +71,7 @@ def test_run__update_interaction_participant(simulate):
 
 
 def test_run__no_update_for_advisers_with_same_interaction(caplog):
-    """
-    Test that the command:
+    """Test that the command:
 
     - does not update advisers which have the same interaction as this breaks
         the unique_together constraint.

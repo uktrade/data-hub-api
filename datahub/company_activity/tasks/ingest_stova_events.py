@@ -7,7 +7,6 @@ from datahub.company_activity.tasks.constants import STOVA_EVENT_PREFIX
 from datahub.ingest.boto3 import S3ObjectProcessor
 from datahub.ingest.tasks import BaseObjectIdentificationTask, BaseObjectIngestionTask
 
-
 logger = logging.getLogger(__name__)
 DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
 
@@ -53,8 +52,7 @@ class StovaEventIngestionTask(BaseObjectIngestionTask):
 
     @staticmethod
     def _required_fields() -> list:
-        """
-        Returns a list of fields required for to make a StovaEvent a Data Hub Event.
+        """Returns a list of fields required for to make a StovaEvent a Data Hub Event.
         Any fields listed here but not provided by Stova will be rejected from ingestion.
 
         :return: Required fields to save a StovaEvent.
@@ -68,8 +66,7 @@ class StovaEventIngestionTask(BaseObjectIngestionTask):
 
     @staticmethod
     def _convert_fields_from_null_to_blank(values: dict) -> dict:
-        """
-        Coverts values from the stova record which could be null into empty strings for saving
+        """Coverts values from the stova record which could be null into empty strings for saving
         as a Data Hub event.
 
         :param values: A single Stova Event record from an S3 bucket.

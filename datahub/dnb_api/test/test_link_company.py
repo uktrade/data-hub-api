@@ -24,8 +24,7 @@ def test_link_company_with_dnb_success(
     dnb_response_uk,
     base_company_dict,
 ):
-    """
-    Test the link_company_with_dnb utility.
+    """Test the link_company_with_dnb utility.
     """
     requests_mock.post(
         DNB_V2_SEARCH_URL,
@@ -75,8 +74,7 @@ def test_link_company_with_dnb_success(
 
 
 def test_link_company_with_dnb_duns_already_set():
-    """
-    Test link_company_with_dnb when it is called for a company which has already
+    """Test link_company_with_dnb when it is called for a company which has already
     been linked with a DNB record.
     """
     company = CompanyFactory(duns_number='123456788')
@@ -89,8 +87,7 @@ def test_link_company_with_dnb_sync_task_failure(
     requests_mock,
     dnb_response_uk,
 ):
-    """
-    Test link_company_with_dnb when the sync_company_with_dnb task encounters
+    """Test link_company_with_dnb when the sync_company_with_dnb task encounters
     a failure - expect the exception to bubble up.
     """
     malformed_response = dnb_response_uk.copy()

@@ -2,12 +2,14 @@ from django.db.models import Prefetch
 
 from datahub.investment.project.models import (
     InvestmentProject as DBInvestmentProject,
+)
+from datahub.investment.project.models import (
     InvestmentProjectPermission,
     InvestmentProjectTeamMember,
 )
 from datahub.investment.project.permissions import (
-    get_association_filters,
     InvestmentProjectAssociationChecker,
+    get_association_filters,
 )
 from datahub.search.apps import EXCLUDE_ALL, SearchApp
 from datahub.search.investment.models import InvestmentProject
@@ -79,8 +81,7 @@ class InvestmentSearchApp(SearchApp):
 
     @classmethod
     def get_permission_filters(cls, request):
-        """
-        Gets permission filter arguments.
+        """Gets permission filter arguments.
 
         If a user only has permission to access projects associated to their team, this returns
         the filters that should be applied to only return those projects.

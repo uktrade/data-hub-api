@@ -9,8 +9,7 @@ class InvoiceManager(models.Manager):
     """Custom Invoice Manager."""
 
     def create_from_order(self, order):
-        """
-        :param order: Order instance for this invoice
+        """:param order: Order instance for this invoice
 
         :returns: Invoice object generated from the order
         """

@@ -6,8 +6,14 @@ from uuid import UUID
 
 from datahub.core.constants import (
     InvestmentBusinessActivity as BusinessActivity,
+)
+from datahub.core.constants import (
     InvestmentProjectStage as Stage,
+)
+from datahub.core.constants import (
     InvestmentType,
+)
+from datahub.core.constants import (
     ReferralSourceActivity as Activity,
 )
 from datahub.core.validate_utils import DataCombiner

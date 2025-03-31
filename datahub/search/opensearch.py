@@ -2,7 +2,7 @@ from contextlib import contextmanager
 from logging import getLogger
 
 from django.conf import settings
-from opensearch_dsl import analysis, Index
+from opensearch_dsl import Index, analysis
 from opensearch_dsl.connections import connections
 from opensearchpy.helpers import bulk as opensearch_bulk
 
@@ -153,8 +153,7 @@ def index_exists(index_name):
 
 
 def create_index(index_name, mapping, alias_names=()):
-    """
-    Creates an index, initialises it with a mapping, and optionally associates aliases with it.
+    """Creates an index, initialises it with a mapping, and optionally associates aliases with it.
 
     Note: If you need to perform multiple alias operations atomically, you should use
     start_alias_transaction() instead of specifying aliases when creating an index.
@@ -250,8 +249,7 @@ class _AliasUpdater:
 
 @contextmanager
 def start_alias_transaction():
-    """
-    Returns a context manager that can be used to create and update aliases atomically.
+    """Returns a context manager that can be used to create and update aliases atomically.
 
     Changes are committed when the context manager exits.
 
@@ -272,8 +270,7 @@ def start_alias_transaction():
 
 
 def associate_index_with_alias(alias_name, index_name):
-    """
-    Associates a new or existing alias with an index.
+    """Associates a new or existing alias with an index.
 
     This is only intended to be a convenience function for simple operations. For more complex
     operations, use start_alias_transaction().

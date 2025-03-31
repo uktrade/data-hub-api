@@ -6,13 +6,11 @@ from django.db import transaction
 
 from datahub.company.models import Company
 
-
 logger = getLogger(__name__)
 
 
 class Command(BaseCommand):
-    """
-    Command to update address_area_id to None for companies with a given company address_country_id
+    """Command to update address_area_id to None for companies with a given company address_country_id
     and area id match.
     """
 

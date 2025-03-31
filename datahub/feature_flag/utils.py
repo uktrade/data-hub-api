@@ -6,8 +6,7 @@ from datahub.feature_flag.models import FeatureFlag
 
 
 def is_feature_flag_active(code):
-    """
-    Tells if given feature flag is active.
+    """Tells if given feature flag is active.
 
     If feature flag doesn't exist, it returns False.
     """
@@ -15,8 +14,7 @@ def is_feature_flag_active(code):
 
 
 def is_user_feature_flag_active(code, user):
-    """
-    Tells if given user feature flag is active for the specified user.
+    """Tells if given user feature flag is active for the specified user.
 
     If user feature flag doesn't exist, it returns False.
     """
@@ -35,8 +33,7 @@ def is_user_feature_flag_active(code, user):
 
 
 def is_user_feature_flag_group_active(code, user):
-    """
-    Tells if given user feature flag group is active for the specified user.
+    """Tells if given user feature flag group is active for the specified user.
 
     If user feature flag group doesn't exist, it returns False.
     """
@@ -44,8 +41,7 @@ def is_user_feature_flag_group_active(code, user):
 
 
 def feature_flagged_view(code):
-    """
-    Decorator to put a view behind a feature flag.
+    """Decorator to put a view behind a feature flag.
 
     This returns a 404 is a specified feature flag is not active. Otherwise, the view is called
     normally.

@@ -4,9 +4,8 @@ from datahub.interaction.models import InteractionExportCountry
 
 
 class InteractionsExportCountryDatasetView(BaseFilterDatasetView):
-    """
-    A GET API view to return all interaction data related to export country
-     as required for syncing by Data-flow periodically.
+    """A GET API view to return all interaction data related to export country
+    as required for syncing by Data-flow periodically.
     """
 
     def get_dataset(self, request):

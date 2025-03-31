@@ -4,8 +4,7 @@ from datahub.core.models import BaseModel
 
 
 class SimpleModel(BaseModel):
-    """
-    Simple model extending BaseModel.
+    """Simple model extending BaseModel.
     """
 
     archived = models.BooleanField(default=False)

@@ -24,8 +24,7 @@ pytestmark = pytest.mark.django_db
     ),
 )
 def test_run(s3_stubber, caplog, simulate, overwrite):
-    """
-    Test that the command:
+    """Test that the command:
 
     - updates records if simulate=False is passed
     - doesn't update records if simulate=True is passed

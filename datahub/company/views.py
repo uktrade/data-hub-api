@@ -135,8 +135,7 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
         schema=StubSchema(),
     )
     def assign_regional_account_manager(self, request, *args, **kwargs):
-        """
-        Sets the company to be an international trade adviser-managed One List company, and
+        """Sets the company to be an international trade adviser-managed One List company, and
         assigns the requested user as the account manager.
 
         This means:
@@ -170,8 +169,7 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
         schema=StubSchema(),
     )
     def self_assign_account_manager(self, request, *args, **kwargs):
-        """
-        Sets the company to be an international trade adviser-managed One List company, and
+        """Sets the company to be an international trade adviser-managed One List company, and
         assigns the authenticated user as the account manager.
 
         This means:
@@ -205,8 +203,7 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
         schema=StubSchema(),
     )
     def remove_account_manager(self, request, *args, **kwargs):
-        """
-        Remove the One List account manager and tier from a company if it is an international
+        """Remove the One List account manager and tier from a company if it is an international
         trade adviser-managed One List company.
 
         The operation is not allowed if the company is a One List company that isn't on
@@ -231,8 +228,7 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
         schema=StubSchema(),
     )
     def assign_one_list_tier_and_global_account_manager(self, request, *args, **kwargs):
-        """
-        Assign One List tier and Global Account Manager.
+        """Assign One List tier and Global Account Manager.
 
         This endpoint enables a user with correct permissions to assign company one list tier
         and global account manager except when company is on
@@ -261,8 +257,7 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
         schema=StubSchema(),
     )
     def remove_from_one_list(self, request, *args, **kwargs):
-        """
-        Remove company from One List.
+        """Remove company from One List.
 
         The operation is not allowed if the company is on
         'Tier D - Interaction Trade Adviser Accounts'.
@@ -311,8 +306,7 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
         detail=True,
     )
     def update_export_detail(self, request, *args, **kwargs):
-        """
-        Update export related information for the company.
+        """Update export related information for the company.
         """
         instance = self.get_object()
         serializer = UpdateExportDetailsSerializer(
@@ -357,8 +351,7 @@ class PublicCompanyViewSet(HawkResponseSigningMixin, mixins.RetrieveModelMixin, 
 
 
 class OneListGroupCoreTeamViewSet(CoreViewSet):
-    """
-    Views for the One List Core Team of the group a company is part of.
+    """Views for the One List Core Team of the group a company is part of.
     A Core Team is usually assigned to the Global Headquarters and is shared among all
     members of the group.
 
@@ -420,8 +413,7 @@ class ContactAuditViewSet(AuditViewSet):
 
 
 def _build_permission_filter(app_label, codename):
-    """
-    Create a Q object that checks if an adviser has a particular permission.
+    """Create a Q object that checks if an adviser has a particular permission.
 
     All possible places permissions could be stored are checked:
 
@@ -459,8 +451,7 @@ class AdviserFilter(FilterSet):
 
     @staticmethod
     def filter_permissions__has(queryset, field_name, value):
-        """
-        Filter advisers by a single permission (e.g. filter to advisers with the
+        """Filter advisers by a single permission (e.g. filter to advisers with the
         'company.add_company' permission).
 
         Note: An adviser could have the same permission multiple times (in different
@@ -501,8 +492,7 @@ class AdviserReadOnlyViewSetV1(
     _default_ordering = ('first_name', 'last_name', 'dit_team__name')
 
     def filter_queryset(self, queryset):
-        """
-        Applies the default ordering when the query set has not already been ordered.
+        """Applies the default ordering when the query set has not already been ordered.
 
         (The autocomplete filter automatically applies an ordering, hence we only set the
         default ordering when another one has not already been set.)
@@ -516,8 +506,7 @@ class AdviserReadOnlyViewSetV1(
 
 
 class ExportWinsForCompanyView(ListAPIView):
-    """
-    Export Wins for Company. The view is based on the legacy view that used
+    """Export Wins for Company. The view is based on the legacy view that used
     external system storing export wins. They are now migrated to Data Hub so there
     is no need for that.
     """
@@ -535,8 +524,7 @@ class ExportWinsForCompanyView(ListAPIView):
     ordering = ('-customer_response__responded_on', '-created_on')
 
     def _get_company(self, company_pk):
-        """
-        Returns the company for given pk
+        """Returns the company for given pk
         raises Http404 if it doesn't exist.
         """
         try:
@@ -648,8 +636,7 @@ class CompanyObjectiveV4ViewSet(ArchivableViewSetMixin, CoreViewSet):
     filterset_fields = ['archived']
 
     def get_queryset(self):
-        """
-        This view is return a list of all the objectives associated
+        """This view is return a list of all the objectives associated
         with a specific company
         """
         company_id = self.kwargs['company_id']
@@ -683,8 +670,7 @@ class CompanyObjectiveArchivedCountV4ViewSet(APIView):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def owner_list(request):
-    """
-    Returns a list of owners. The list includes users that own an export, if the user
+    """Returns a list of owners. The list includes users that own an export, if the user
     is a team member of an export then the owner of that export is also included in
     the list of owners. An owner should only appear once in the list - no duplicates.
     """

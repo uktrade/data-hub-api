@@ -17,7 +17,6 @@ from datahub.investment.project.admin import InvestmentProjectAdmin
 from datahub.investment.project.constants import (
     FDISICGrouping as FDISICGroupingConstant,
 )
-
 from datahub.investment.project.models import (
     GVAMultiplier,
     InvestmentProject,
@@ -26,7 +25,6 @@ from datahub.investment.project.test.factories import (
     GVAMultiplierFactory,
     InvestmentProjectFactory,
 )
-
 
 DEFAULT_SECTOR_ID = constants.Sector.renewable_energy_wind.value.id
 DEFAULT_FDI_SIC_GROUPING_ID = FDISICGroupingConstant.electric.value.id
@@ -43,7 +41,7 @@ LABOUR = GVAMultiplier.SectorClassificationChoices.LABOUR
 @pytest.fixture
 def get_gva_multiplier():
     """Get a GVA Multiplier for the year 3010"""
-    yield GVAMultiplierFactory(
+    return GVAMultiplierFactory(
         multiplier=DEFAULT_MULTIPLIER,
         financial_year=3010,
         sector_id=DEFAULT_SECTOR_ID,
@@ -165,8 +163,7 @@ class TestInvestmentProjectAdmin(AdminTestMixin):
 
     @freeze_time('2018-01-01 00:00:00')
     def test_if_assigning_project_manager_first_updates_related_columns(self):
-        """
-        Test that the assignment of project manager for the first time, updates who and when
+        """Test that the assignment of project manager for the first time, updates who and when
         made an assignment.
         """
         investment_project = InvestmentProjectFactory()
@@ -194,8 +191,7 @@ class TestInvestmentProjectAdmin(AdminTestMixin):
 
     @freeze_time('2018-01-01 00:00:00')
     def test_if_assigning_project_manager_second_time_doesnt_update_related_columns(self):
-        """
-        Test that the assignment of project manager for the second time, doesn't update who and
+        """Test that the assignment of project manager for the second time, doesn't update who and
         when made an assignment.
         """
         investment_project = InvestmentProjectFactory(
@@ -228,8 +224,7 @@ class TestInvestmentProjectAdmin(AdminTestMixin):
 
     @freeze_time('2018-01-01 00:00:00')
     def test_if_assigning_project_manager_when_adding_updates_related_columns(self):
-        """
-        Test that the assignment of project manager for the first time, updates who and when
+        """Test that the assignment of project manager for the first time, updates who and when
         made an assignment.
         """
         url = reverse('admin:investment_investmentproject_add')

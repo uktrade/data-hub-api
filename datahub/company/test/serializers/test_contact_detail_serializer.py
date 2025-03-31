@@ -22,8 +22,7 @@ request = Mock(
 
 @freeze_time(FROZEN_TIME)
 class TestContactV4Serializer:
-    """
-    Tests for the Contact V4 Serializer.
+    """Tests for the Contact V4 Serializer.
     """
 
     @pytest.mark.parametrize(
@@ -69,8 +68,7 @@ class TestContactV4Serializer:
         is_valid,
         address_area,
     ):
-        """
-        Ensure that area required validation is called for appropriate countries
+        """Ensure that area required validation is called for appropriate countries
         and excluded for others
         """
         company = CompanyFactory()

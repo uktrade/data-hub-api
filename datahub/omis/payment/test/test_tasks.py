@@ -13,14 +13,12 @@ from datahub.omis.payment.tasks import (
 )
 from datahub.omis.payment.test.factories import PaymentGatewaySessionFactory
 
-
 # mark the whole module for db use
 pytestmark = pytest.mark.django_db
 
 
 class TestRefreshPendingPaymentGatewaySessions:
-    """
-    Tests for the `refresh_pending_payment_gateway_sessions` and related
+    """Tests for the `refresh_pending_payment_gateway_sessions` and related
     `refresh_payment_gateway_session` tasks.
     """
 
@@ -56,8 +54,7 @@ class TestRefreshPendingPaymentGatewaySessions:
         return sessions
 
     def test_schedule_refresh_payment_gateway_session(self, monkeypatch, requests_mock):
-        """
-        Test that only ongoing sessions older than 60 minutes are refreshed against GOV.UK Pay.
+        """Test that only ongoing sessions older than 60 minutes are refreshed against GOV.UK Pay.
         Note that the value '60 minutes' is a parameter initialised in the test
         and not part of the logic of the task.
         """
@@ -93,8 +90,7 @@ class TestRefreshPendingPaymentGatewaySessions:
         # assert mock_payment_tasks_job_scheduler.call_count == 3
 
     def test_refresh(self, monkeypatch, requests_mock):
-        """
-        Test that only ongoing sessions older than 60 minutes are refreshed against GOV.UK Pay.
+        """Test that only ongoing sessions older than 60 minutes are refreshed against GOV.UK Pay.
         Note that the value '60 minutes' is a parameter initialised in the test
         and not part of the logic of the task.
         """

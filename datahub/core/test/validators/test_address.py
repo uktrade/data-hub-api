@@ -12,8 +12,7 @@ class TestAddressValidator:
     @pytest.mark.parametrize('values_as_data', (True, False))
     @pytest.mark.parametrize('with_instance', (True, False))
     def test_fails_without_any_fields_if_not_lazy(self, values_as_data, with_instance):
-        """
-        Test that the validation fails if lazy == False and the required fields
+        """Test that the validation fails if lazy == False and the required fields
         are not specified.
 
         Test all scenarios:
@@ -51,8 +50,7 @@ class TestAddressValidator:
     @pytest.mark.parametrize('values_as_data', (True, False))
     @pytest.mark.parametrize('with_instance', (True, False))
     def test_passes_without_any_fields_set_if_lazy(self, values_as_data, with_instance):
-        """
-        Test that the validation passes if lazy == True and none of the fields
+        """Test that the validation passes if lazy == True and none of the fields
         are specified.
 
         Test all scenarios:
@@ -88,8 +86,7 @@ class TestAddressValidator:
     @pytest.mark.parametrize('values_as_data', (True, False))
     @pytest.mark.parametrize('lazy', (True, False))
     def test_fails_without_all_required_fields_set(self, values_as_data, lazy):
-        """
-        Test that the validation fails if only some fields are set but not
+        """Test that the validation fails if only some fields are set but not
         all the required ones are.
 
         Test all scenarios:

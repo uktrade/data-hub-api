@@ -9,8 +9,7 @@ from datahub.core.viewsets import CoreViewSet
 
 
 class ActivityViewSet(HawkResponseSigningMixin, CoreViewSet):
-    """
-    Generic view for activities.
+    """Generic view for activities.
 
     Sets up authentication, permission and scope.
     """

@@ -2,9 +2,9 @@ import io
 from unittest.mock import Mock
 
 import pytest
-
 from django.conf import settings
-from django.contrib import auth, messages as django_messages
+from django.contrib import auth
+from django.contrib import messages as django_messages
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.contrib.auth import get_user_model
 from django.test import Client, override_settings
@@ -14,6 +14,7 @@ from rest_framework import status
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.admin import (
+    RawIdWidget,
     custom_add_permission,
     custom_change_permission,
     custom_delete_permission,
@@ -22,7 +23,6 @@ from datahub.core.admin import (
     get_change_link,
     get_change_url,
     handle_export_wins_admin_permissions,
-    RawIdWidget,
 )
 from datahub.core.test.factories import GroupFactory
 from datahub.core.test.support.factories import BookFactory
@@ -143,8 +143,7 @@ class TestMaxUploadSize:
     @pytest.mark.urls('datahub.core.test.support.urls')
     @pytest.mark.django_db
     def test_rejects_large_files(self, file_size, error_expected, client):
-        """
-        Test that the max_upload_size() rejects files above the set limit.
+        """Test that the max_upload_size() rejects files above the set limit.
 
         This test uses the datahub.core.test.support.views.max_upload_size_view view.
         """

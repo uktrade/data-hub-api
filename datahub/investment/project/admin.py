@@ -91,8 +91,7 @@ class InvestmentProjectAdmin(BaseModelAdminMixin, VersionAdmin):
         )
 
     def save_model(self, request, obj, form, change):
-        """
-        Populate who and when assigned a project manager for the first time.
+        """Populate who and when assigned a project manager for the first time.
         """
         first_assigned = not change or form.initial['project_manager'] is None
 

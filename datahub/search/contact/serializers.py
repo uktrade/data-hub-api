@@ -8,7 +8,6 @@ from datahub.search.serializers import (
     StringUUIDField,
 )
 
-
 logger = getLogger(__name__)
 
 

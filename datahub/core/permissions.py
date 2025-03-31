@@ -57,8 +57,7 @@ class HasPermissions(BasePermission):
         self.required_permissions = required_permissions
 
     def __call__(self):
-        """
-        Used for compatibility with DRF.
+        """Used for compatibility with DRF.
 
         (DRF instantiates permission classes, but we use instantiation to configure the class
         here.)
@@ -74,8 +73,7 @@ class HasPermissions(BasePermission):
 
 
 class ViewBasedModelPermissions(BasePermission):
-    """
-    Model-permission-based permission class.
+    """Model-permission-based permission class.
 
     This differs from the standard DjangoModelPermissions class in that:
     - the permissions mapping is based on view/model actions rather than HTTP methods
@@ -114,8 +112,7 @@ class ViewBasedModelPermissions(BasePermission):
         return any(request.user.has_perm(perm) for perm in perms)
 
     def _get_required_permissions(self, request, view, model_cls):
-        """
-        Returns the permissions that a user should have one of for a particular method.
+        """Returns the permissions that a user should have one of for a particular method.
         """
         action = get_model_action_for_view_action(
             request.method,
@@ -137,8 +134,7 @@ class ViewBasedModelPermissions(BasePermission):
 
 
 class ObjectAssociationCheckerBase(ABC):
-    """
-    Base class for object association checkers.
+    """Base class for object association checkers.
 
     Derived classes are used to determine whether a user is associated with a particular object,
     and whether access to a particular object for the current request should be restricted to
@@ -154,14 +150,12 @@ class ObjectAssociationCheckerBase(ABC):
 
     @abstractmethod
     def should_apply_restrictions(self, request, view_action) -> bool:
-        """
-        Checks whether a request should be restricted to objects that the user is associated with.
+        """Checks whether a request should be restricted to objects that the user is associated with.
         """
 
 
 class IsAssociatedToObjectPermission(BasePermission):
-    """
-    DRF permission class that checks if an object is associated to the user.
+    """DRF permission class that checks if an object is associated to the user.
 
     To use, derive from this class and override the checker_class class attribute. It should
     point at a class derived from ObjectAssociationCheckerBase.
@@ -174,8 +168,7 @@ class IsAssociatedToObjectPermission(BasePermission):
         self.checker = self.checker_class()
 
     def get_actual_object(self, obj):
-        """
-        Gets the actual object for permissions to be checked on.
+        """Gets the actual object for permissions to be checked on.
 
         Subclasses can override this for cases where permissions need to be checked on an
         attribute on the model associated with the view's queryset.
@@ -183,8 +176,7 @@ class IsAssociatedToObjectPermission(BasePermission):
         return obj
 
     def has_object_permission(self, request, view, obj):
-        """
-        Determines whether the user has permission for the specified object, using checker_class.
+        """Determines whether the user has permission for the specified object, using checker_class.
         """
         actual_obj = self.get_actual_object(obj)
 

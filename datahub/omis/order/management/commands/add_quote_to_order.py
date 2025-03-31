@@ -6,8 +6,7 @@ from datahub.omis.order.serializers import OrderAssigneeSerializer
 
 
 class Command(BaseCommand):
-    """
-    Command to complete the order creation process after initial test data added to database
+    """Command to complete the order creation process after initial test data added to database
     by adding an assignee to the order and generating the quote.
     Example of executing the command locally:
         python manage.py add_quote_to_order

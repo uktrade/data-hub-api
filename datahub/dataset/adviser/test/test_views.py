@@ -27,8 +27,7 @@ def get_expected_data_from_adviser(adviser):
 
 @pytest.mark.django_db
 class TestAdviserDatasetViewSet(BaseDatasetViewTest):
-    """
-    Tests for the advisers data-flow export endpoint
+    """Tests for the advisers data-flow export endpoint
     """
 
     view_url = reverse('api-v4:dataset:advisers-dataset')

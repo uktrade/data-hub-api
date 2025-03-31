@@ -2,8 +2,7 @@ from django.core.validators import RegexValidator
 
 
 class TelephoneValidator(RegexValidator):
-    """
-    Validator for telephone numbers.
+    """Validator for telephone numbers.
 
     Validates that phone number is composed of characters found in telephone numbers -
     0-9, a space or open / close brackets.
@@ -17,8 +16,7 @@ class TelephoneValidator(RegexValidator):
 
 
 class InternationalTelephoneValidator(RegexValidator):
-    """
-    Validator for international telephone numbers.
+    """Validator for international telephone numbers.
 
     Validates that a phone number is composed of characters found in telephone numbers:
     0-9, spaces, hyphens, full stops, or open/close brackets, optionally preceded with a plus sign.
@@ -35,8 +33,7 @@ class InternationalTelephoneValidator(RegexValidator):
 
 
 class TelephoneCountryCodeValidator(RegexValidator):
-    """
-    Validator for telephone number country code.
+    """Validator for telephone number country code.
     """
 
     regex = r'^\+?\d{1,4}$'

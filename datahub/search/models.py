@@ -14,7 +14,6 @@ from datahub.search.opensearch import (
 )
 from datahub.search.utils import get_model_non_mapped_field_names, serialise_mapping
 
-
 logger = getLogger(__name__)
 
 
@@ -110,8 +109,7 @@ class BaseSearchModel(Document):
 
     @classmethod
     def was_migration_started(cls):
-        """
-        Returns whether a migration was started and has not completed.
+        """Returns whether a migration was started and has not completed.
 
         This could be a a migration still in progress, or an aborted migration.
         """
@@ -138,8 +136,7 @@ class BaseSearchModel(Document):
 
     @classmethod
     def to_document(cls, db_object, index=None, include_index=True, include_source=True):
-        """
-        Creates a dict representation an OpenSearch document.
+        """Creates a dict representation an OpenSearch document.
 
         include_index and include_source can be set to False when the _index and/or _source keys
         aren't required (e.g. when using `datahub.search.deletion.delete_documents()`).

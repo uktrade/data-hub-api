@@ -683,8 +683,7 @@ class TestUpdateEventView(APITestMixin):
 
 
 class TestEventVersioning(APITestMixin):
-    """
-    Tests for versions created when interacting with the event endpoints.
+    """Tests for versions created when interacting with the event endpoints.
     """
 
     def test_add_creates_a_new_version(self):

@@ -23,9 +23,7 @@ from datahub.metadata.models import (
     Sector,
     UKRegion,
 )
-
 from datahub.reminder.models import EmailDeliveryStatus
-
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
@@ -207,8 +205,7 @@ class HVC(BaseExportWinOrderedConstantModel, BaseLegacyModel):
 
     @property
     def campaign(self):
-        """
-        The name of the campaign alone without the code
+        """The name of the campaign alone without the code
         e.g. Africa Agritech or Italy Automotive
         """
         # names are always <Name of HVC: HVC code>

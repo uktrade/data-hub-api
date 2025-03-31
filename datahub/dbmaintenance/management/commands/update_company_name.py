@@ -6,7 +6,6 @@ from datahub.company.models import Company
 from datahub.dbmaintenance.management.base import CSVBaseCommand
 from datahub.dbmaintenance.utils import parse_limited_string, parse_uuid
 
-
 logger = getLogger(__name__)
 
 

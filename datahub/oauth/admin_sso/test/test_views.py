@@ -101,8 +101,7 @@ def test_callback_without_state():
 
 
 def test_callback_without_state_includes_next_url():
-    """
-    Test that a callback without provided state will restart login process including next URL.
+    """Test that a callback without provided state will restart login process including next URL.
     """
     request = get_request_with_session('/oauth/callback/?next=/protected-area')
 
@@ -182,8 +181,7 @@ def test_callback_requests_sso_profile_valid_non_staff_user(
     flags,
     caplog,
 ):
-    """
-    Test that if SSO user has a matching SSO email user ID,
+    """Test that if SSO user has a matching SSO email user ID,
     but Data Hub user has `is_staff` or `is_active`
     flag not set, then the access is forbidden.
     """
@@ -208,8 +206,7 @@ def test_callback_requests_sso_profile_valid_non_staff_user(
 @patch('datahub.oauth.admin_sso.views.get_access_token')
 @patch('datahub.oauth.admin_sso.views.get_sso_user_profile')
 def test_callback_requests_valid_sso_profile(get_sso_user_profile, get_access_token):
-    """
-    Test that if SSO user has a matching SSO email user id (and relevant flags),
+    """Test that if SSO user has a matching SSO email user id (and relevant flags),
     then the access is granted.
     """
     fake_state_id = token_urlsafe(settings.ADMIN_OAUTH2_TOKEN_BYTE_LENGTH)

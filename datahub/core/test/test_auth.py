@@ -53,8 +53,7 @@ class TestPaaSIPAuthentication:
         ),
     )
     def test_401_returned_when_invalid_ip(self, api_client, get_kwargs, expected_json):
-        """
-        If the client IP is not authorised to access, then a 401 is returned.
+        """If the client IP is not authorised to access, then a 401 is returned.
         """
         resolved_get_kwargs = get_kwargs
         response = api_client.get(
@@ -66,8 +65,7 @@ class TestPaaSIPAuthentication:
         assert response.json() == expected_json
 
     def test_empty_object_returned_with_authentication_3_ips(self, api_client):
-        """
-        If the X-Forwarded-For header is correct, with an extra IP address prepended
+        """If the X-Forwarded-For header is correct, with an extra IP address prepended
         to the X-Forwarded-For then the correct data is returned.
         """
         response = api_client.get(

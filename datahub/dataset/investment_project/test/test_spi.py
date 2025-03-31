@@ -3,7 +3,7 @@ from uuid import uuid4
 import pytest
 
 from datahub.company.test.factories import AdviserFactory
-from datahub.dataset.investment_project.spi import proposition_formatter, SPIReportFormatter
+from datahub.dataset.investment_project.spi import SPIReportFormatter, proposition_formatter
 from datahub.investment.project.proposition.models import PropositionStatus
 
 pytestmark = pytest.mark.django_db

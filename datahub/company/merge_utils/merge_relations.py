@@ -19,8 +19,7 @@ def company_list_item_updater(list_item, field, target_company, source_company):
 
 
 def one_list_core_team_member_updater(one_list_item, field, target_company, source_company):
-    """
-    The OneListCoreTeamMember model has a unique together contraint for company and adviser.
+    """The OneListCoreTeamMember model has a unique together contraint for company and adviser.
 
     Before copying, if the target company already contains the adviser from the source company,
     ignore it.
@@ -35,8 +34,7 @@ def one_list_core_team_member_updater(one_list_item, field, target_company, sour
 
 
 def large_capital_opportunity_updater(large_capital_opp, field, target_company, source_company):
-    """
-    If the LargeCapitalOpportunity already exists in the target, ignore it. Otherwise add it.
+    """If the LargeCapitalOpportunity already exists in the target, ignore it. Otherwise add it.
     """
     if LargeCapitalOpportunity.objects.filter(
         id=large_capital_opp.id,

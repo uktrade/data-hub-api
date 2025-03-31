@@ -15,7 +15,6 @@ from datahub.investment.project.test.factories import (
     InvestmentProjectTeamMemberFactory,
 )
 
-
 pytestmark = pytest.mark.django_db
 
 
@@ -53,8 +52,7 @@ def test_interaction_get_absolute_url():
 
 
 def test_client_relationship_manager_team_none():
-    """
-    Tests client_relationship_manager_team for a project without a client relationship
+    """Tests client_relationship_manager_team for a project without a client relationship
     manager.
     """
     project = InvestmentProjectFactory(client_relationship_manager=None)
@@ -62,8 +60,7 @@ def test_client_relationship_manager_team_none():
 
 
 def test_client_relationship_manager_team_valid():
-    """
-    Tests client_relationship_manager_team for a project with a client relationship
+    """Tests client_relationship_manager_team for a project with a client relationship
     manager.
     """
     project = InvestmentProjectFactory()
@@ -71,8 +68,7 @@ def test_client_relationship_manager_team_valid():
 
 
 def test_investor_company_country_none():
-    """
-    Tests client_relationship_manager_team for a project without a client relationship
+    """Tests client_relationship_manager_team for a project without a client relationship
     manager.
     """
     project = InvestmentProjectFactory(investor_company=None)

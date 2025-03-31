@@ -6,7 +6,6 @@ from datahub.company.views import (
     SingleObjectiveV4ViewSet,
 )
 
-
 Objective_v4_collection = CompanyObjectiveV4ViewSet.as_view(
     {
         'get': 'list',

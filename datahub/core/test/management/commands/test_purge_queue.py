@@ -1,8 +1,7 @@
-from unittest.mock import call, MagicMock
+from unittest.mock import MagicMock, call
 
 import pytest
-
-from django.core.management import call_command, CommandError
+from django.core.management import CommandError, call_command
 
 from datahub.core.management.commands import purge_queue
 

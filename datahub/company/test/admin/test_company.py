@@ -20,8 +20,7 @@ pytestmark = pytest.mark.django_db
 
 
 def get_required_company_form_data(company=None):
-    """
-    :returns: dict with all required fields to use in tests when posting
+    """:returns: dict with all required fields to use in tests when posting
     to an add/edit admin company url.
     """
     if not company:
@@ -47,8 +46,7 @@ class TestTradingNamesInCompanyAdmin(AdminTestMixin):
     """Tests for the trading_names array field in the admin."""
 
     def test_default_size_with_new_company(self):
-        """
-        Test that when adding a new company, the default size for the trading names
+        """Test that when adding a new company, the default size for the trading names
         form field is shown and used.
         """
         default_size = CompanyAdminForm.TRADING_NAMES_DEFAULT_FIELD_SIZE
@@ -105,8 +103,7 @@ class TestTradingNamesInCompanyAdmin(AdminTestMixin):
         trading_names_number,
         expected_field_size,
     ):
-        """
-        Test that when editing an existing company, the correct size for the trading_names
+        """Test that when editing an existing company, the correct size for the trading_names
         form field is set.
         """
         company = CompanyFactory(
@@ -196,13 +193,11 @@ class TestOneListMembersInCompanyAdmin(AdminTestMixin):
 
 
 class TestOneListLink(AdminTestMixin):
-    """
-    Tests for the one list export.
+    """Tests for the one list export.
     """
 
     def test_one_list_link_exists(self):
-        """
-        Test that there is a link to export the one list on the company change list.
+        """Test that there is a link to export the one list on the company change list.
         """
         url = reverse('admin:company_company_changelist')
         response = self.client.get(url)

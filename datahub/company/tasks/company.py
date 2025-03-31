@@ -93,8 +93,7 @@ def schedule_automatic_company_archive(limit=1000, simulate=True):
 
 
 def automatic_company_archive(limit=1000, simulate=True):
-    """
-    Archive inactive companies.
+    """Archive inactive companies.
     """
     if not is_feature_flag_active(AUTOMATIC_COMPANY_ARCHIVE_FEATURE_FLAG):
         logger.info(

@@ -4,7 +4,6 @@ from datahub.omis.order.constants import VATStatus
 from datahub.omis.order.pricing import get_pricing_from_order
 from datahub.omis.order.test.factories import OrderAssigneeFactory, OrderFactory
 
-
 pytestmark = pytest.mark.django_db
 
 
@@ -12,8 +11,7 @@ class TestUpdateOrderPricingPreSave:
     """Tests for the update_order_pricing_on_pre_order_save signal receiver."""
 
     def test_pricing_updated_on_order_save(self):
-        """
-        Test that if an order is saved, the related pricing is recalculated and
+        """Test that if an order is saved, the related pricing is recalculated and
         the order updated.
         """
         order = OrderFactory(vat_status=VATStatus.UK, discount_value=0)
@@ -26,8 +24,7 @@ class TestUpdateOrderPricingPreSave:
         assert order.vat_cost == 0
 
     def test_pricing_unchanged_if_update_unrelated(self):
-        """
-        Test that if an unrelated field gets updated, the pricing stays the same.
+        """Test that if an unrelated field gets updated, the pricing stays the same.
         """
         order = OrderFactory()
         pre_update_pricing = get_pricing_from_order(order)
@@ -89,8 +86,7 @@ class TestUpdateOrderPricingOnRelatedObjSave:
         assert pre_update_total_cost != post_update_total_cost
 
     def test_pricing_unchanged_if_update_unrelated(self):
-        """
-        Test that if an assignee is changed in an unrelated way,
+        """Test that if an assignee is changed in an unrelated way,
         the pricing on the order doesn't change.
         """
         order = OrderFactory(discount_value=0)

@@ -140,8 +140,7 @@ class TestAddInteraction(APITestMixin):
         assert response.json() == errors
 
     def test_error_returned_if_contacts_dont_belong_to_company(self):
-        """
-        Test that an error is returned if the contacts don't belong to the specified company.
+        """Test that an error is returned if the contacts don't belong to the specified company.
         """
         company = CompanyFactory()
         contacts = [ContactFactory(), ContactFactory(company=company)]
@@ -233,8 +232,7 @@ class TestAddInteraction(APITestMixin):
         ]
 
     def test_error_returned_if_duplicate_participating_advisers_specified(self):
-        """
-        Test that an error is returned if an adviser is specified as a DIT participant
+        """Test that an error is returned if an adviser is specified as a DIT participant
         multiple times.
         """
         contact = ContactFactory()
@@ -410,8 +408,7 @@ class TestUpdateInteraction(APITestMixin):
         ),
     )
     def test_error_returned_if_contacts_dont_belong_to_company(self, request_data):
-        """
-        Test that an error is returned if an update makes the contacts and company
+        """Test that an error is returned if an update makes the contacts and company
         fields inconsistent.
         """
         interaction = CompanyInteractionFactory()
@@ -428,8 +425,7 @@ class TestUpdateInteraction(APITestMixin):
     @pytest.mark.parametrize('include_company', (True, False))
     @pytest.mark.parametrize('include_contacts', (True, False))
     def test_inconsistent_interaction_can_be_updated(self, include_company, include_contacts):
-        """
-        Test that an interaction with inconsistent company and contact fields can still be
+        """Test that an interaction with inconsistent company and contact fields can still be
         updated.
         """
         interaction = CompanyInteractionFactory(
@@ -622,8 +618,7 @@ class TestUpdateInteraction(APITestMixin):
     )
     @freeze_time('2017-04-18 13:25:30.986208')
     def test_status_change_valid(self, current_status, new_status):
-        """
-        Test the different ways that an Interaction's status can change.
+        """Test the different ways that an Interaction's status can change.
         """
         interaction = CompanyInteractionFactory(status=current_status)
         api_client = self.create_api_client()
@@ -660,8 +655,7 @@ class TestUpdateInteraction(APITestMixin):
     )
     @freeze_time('2017-04-18 13:25:30.986208')
     def test_status_change_invalid(self, current_status, new_status, response_body):
-        """
-        Test the different ways that an Interaction's status can change.
+        """Test the different ways that an Interaction's status can change.
         """
         interaction = CompanyInteractionFactory(status=current_status)
         api_client = self.create_api_client()
@@ -887,8 +881,7 @@ class TestListInteractions(APITestMixin):
 
 
 class TestInteractionVersioning(APITestMixin):
-    """
-    Tests for versions created when interacting with the interaction endpoints.
+    """Tests for versions created when interacting with the interaction endpoints.
     """
 
     def test_add_creates_a_new_version(self):
@@ -977,16 +970,14 @@ class TestInteractionVersioning(APITestMixin):
 
 
 class TestArchiveViews(APITestMixin):
-    """
-    Tests for the archive and unarchive views.
+    """Tests for the archive and unarchive views.
     """
 
     @pytest.mark.parametrize(
         'permissions', NON_RESTRICTED_CHANGE_PERMISSIONS,
     )
     def test_archive_interaction_non_restricted_user(self, permissions):
-        """
-        Tests archiving an interaction for a non-restricted user.
+        """Tests archiving an interaction for a non-restricted user.
         """
         requester = create_test_user(permission_codenames=permissions)
         api_client = self.create_api_client(user=requester)
@@ -1010,8 +1001,7 @@ class TestArchiveViews(APITestMixin):
         assert response_data['archived_reason'] == 'archive reason'
 
     def test_archive_interaction_restricted_user_associated_project(self):
-        """
-        Tests archiving an interaction for a restricted user.
+        """Tests archiving an interaction for a restricted user.
         """
         project_creator = AdviserFactory()
         project = InvestmentProjectFactory(created_by=project_creator)
@@ -1039,8 +1029,7 @@ class TestArchiveViews(APITestMixin):
         assert response_data['archived_reason'] == 'archive reason'
 
     def test_archive_interaction_restricted_user_non_associated_project(self):
-        """
-        Test that a restricted user cannot archive a non-associated interaction.
+        """Test that a restricted user cannot archive a non-associated interaction.
         """
         project_creator = AdviserFactory()
         project = InvestmentProjectFactory(created_by=project_creator)
@@ -1081,8 +1070,7 @@ class TestArchiveViews(APITestMixin):
         ),
     )
     def test_archive_failures(self, data, response_data):
-        """
-        Test archive an interaction without providing a reason.
+        """Test archive an interaction without providing a reason.
         """
         interaction = CompanyInteractionFactory()
         url = reverse(
@@ -1098,8 +1086,7 @@ class TestArchiveViews(APITestMixin):
         'permissions', NON_RESTRICTED_CHANGE_PERMISSIONS,
     )
     def test_unarchive_interaction_non_restricted_user(self, permissions):
-        """
-        Tests un-archiving an interaction for a non-restricted user.
+        """Tests un-archiving an interaction for a non-restricted user.
         """
         requester = create_test_user(permission_codenames=permissions)
         api_client = self.create_api_client(user=requester)
@@ -1124,8 +1111,7 @@ class TestArchiveViews(APITestMixin):
         assert response_data['archived_on'] is None
 
     def test_unarchive_interaction_restricted_user_associated_project(self):
-        """
-        Tests archiving an interaction for a restricted user.
+        """Tests archiving an interaction for a restricted user.
         """
         project_creator = AdviserFactory()
         project = InvestmentProjectFactory(created_by=project_creator)
@@ -1157,8 +1143,7 @@ class TestArchiveViews(APITestMixin):
         assert response_data['archived_on'] is None
 
     def test_unarchive_interaction_restricted_user_non_associated_project(self):
-        """
-        Test that a restricted user cannot un-archive a non-associated interaction.
+        """Test that a restricted user cannot un-archive a non-associated interaction.
         """
         project_creator = AdviserFactory()
         project = InvestmentProjectFactory(created_by=project_creator)

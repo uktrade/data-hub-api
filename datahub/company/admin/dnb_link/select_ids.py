@@ -12,8 +12,7 @@ from datahub.core.utils import reverse_with_query_string
 
 @method_decorator(csrf_protect)
 def dnb_link_select_ids(model_admin, request):
-    """
-    View to select Data Hub company id and D&B duns number for linking records.
+    """View to select Data Hub company id and D&B duns number for linking records.
     Valid POSTs redirect to the change review page.
     """
     if not model_admin.has_change_permission(request):

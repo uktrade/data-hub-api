@@ -1,6 +1,5 @@
 from django.core.exceptions import PermissionDenied
-from django.http import Http404
-from django.http import HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect
 
 from datahub.investment.project.report.models import SPIReport, SPIReportPermission
 

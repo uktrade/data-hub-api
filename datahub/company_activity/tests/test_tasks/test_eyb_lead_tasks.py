@@ -1,5 +1,4 @@
 import datetime
-
 from unittest import mock
 
 import pytest
@@ -14,13 +13,11 @@ from datahub.investment_lead.test.factories import EYBLeadFactory
 
 @pytest.mark.django_db
 class TestCompanyActivityEYBLeadTasks:
-    """
-    Tests for the schedule_sync_data_to_company_activity task.
+    """Tests for the schedule_sync_data_to_company_activity task.
     """
 
     def test_eyb_leads_are_copied_to_company_activity(self):
-        """
-        Test that eyb leads are added to the CompanyActivity model.
+        """Test that eyb leads are added to the CompanyActivity model.
         """
         eyb_leads = EYBLeadFactory.create_batch(5)
 
@@ -42,8 +39,7 @@ class TestCompanyActivityEYBLeadTasks:
 
     @mock.patch('datahub.company_activity.models.CompanyActivity.objects.bulk_create')
     def test_eyb_leads_are_bulk_created_in_batches(self, mocked_bulk_create, caplog):
-        """
-        Test that eyb leads are bulk created in batches.
+        """Test that eyb leads are bulk created in batches.
         """
         caplog.set_level('INFO')
         batch_size = 5
@@ -67,8 +63,7 @@ class TestCompanyActivityEYBLeadTasks:
         assert 'Finished bulk creating CompanyActivities.' in caplog.text
 
     def test_eyb_leads_with_a_company_activity_are_not_added_again(self):
-        """
-        Test that eyb leads which are already part of the `CompanyActivity` model
+        """Test that eyb leads which are already part of the `CompanyActivity` model
         are not added again.
         """
         EYBLeadFactory.create_batch(4)

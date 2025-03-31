@@ -9,7 +9,7 @@ from unittest import mock
 
 import mohawk
 import pytest
-from django.contrib.auth import get_user_model, REDIRECT_FIELD_NAME
+from django.contrib.auth import REDIRECT_FIELD_NAME, get_user_model
 from django.contrib.auth.models import Permission
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.core.serializers.json import DjangoJSONEncoder
@@ -120,8 +120,7 @@ def get_default_test_user():
 
 
 def create_test_user(permission_codenames=(), password=None, **user_attrs):
-    """
-    :returns: user
+    """:returns: user
     :param permission_codenames: list of codename permissions to be
         applied to the user
     :param user_attrs: any user attribute
@@ -243,8 +242,7 @@ class APITestMixin:
 
 
 def format_date_or_datetime(value):
-    """
-    Formats a date or datetime using DRF fields.
+    """Formats a date or datetime using DRF fields.
 
     This is for use in tests when comparing dates and datetimes with JSON-formatted values.
     """
@@ -264,8 +262,7 @@ def random_obj_for_queryset(queryset):
 
 
 def get_attr_or_none(obj, attr):
-    """
-    Gets an attribute of an object, or None if the attribute does not exist.
+    """Gets an attribute of an object, or None if the attribute does not exist.
 
     Dotted paths to attributes can be provided to specify nested attributes.
 
@@ -280,8 +277,7 @@ def get_attr_or_none(obj, attr):
 
 
 def get_attr_or_default(obj, attr, default=None):
-    """
-    Gets an attribute of an object, or returns a default value if the attribute does not exist.
+    """Gets an attribute of an object, or returns a default value if the attribute does not exist.
 
     Dotted paths to attributes can be provided to specify nested attributes.
 
@@ -344,14 +340,12 @@ class MockQuerySet:
         return matches[0]
 
     def order_by(self, *fields):
-        """
-        Mock order_by note: no actual ordering takes place.
+        """Mock order_by note: no actual ordering takes place.
         """
         return self.values_list(self, *fields)
 
     def filter(self, pk__in=()):
-        """
-        Filters the query set.
+        """Filters the query set.
 
         Only supports filtering using pk__in at present.
         """
@@ -407,8 +401,7 @@ class MockQuerySet:
 
 
 def join_attr_values(iterable, attr='name', separator=', '):
-    """
-    Takes all values of a specified attribute for the items of an iterable, sorts the values and
+    """Takes all values of a specified attribute for the items of an iterable, sorts the values and
     joins them using a separator.
 
     attr can also be a dotted path (to specify sub-attributes).
@@ -418,8 +411,7 @@ def join_attr_values(iterable, attr='name', separator=', '):
 
 
 def format_csv_data(rows):
-    """
-    Converts source data into formatted strings as should be written to CSV exports.
+    """Converts source data into formatted strings as should be written to CSV exports.
 
     Expects an iterable of dictionaries with arbitrary objects as values, and outputs a list of
     dictionaries with strings as values.
@@ -430,8 +422,7 @@ def format_csv_data(rows):
 
 
 def construct_mock(**props):
-    """
-    Same as mock.Mock() but using configure_mock as
+    """Same as mock.Mock() but using configure_mock as
     name collides with the kwarg in the Mock constructor.
     """
     obj = mock.Mock(spec_set=tuple(props))
@@ -450,8 +441,7 @@ def identity(value):
 
 
 def resolve_data(data, value_resolver=identity):
-    """
-    Recursively resolve callables in data structures.
+    """Recursively resolve callables in data structures.
 
     Given a value:
 
@@ -479,8 +469,7 @@ def resolve_data(data, value_resolver=identity):
 
 
 def resolve_objects(data, object_resolver=attrgetter('pk')):  # noqa: B008
-    """
-    Recursively resolve callables in data structures and also resolve model objects to pk values.
+    """Recursively resolve callables in data structures and also resolve model objects to pk values.
 
     Used in parametrised tests.
     """
@@ -494,8 +483,7 @@ def resolve_objects(data, object_resolver=attrgetter('pk')):  # noqa: B008
 
 
 def has_reversion_version(model_db, version_count=1):
-    """
-    Check a model db object is stored as a reversion version
+    """Check a model db object is stored as a reversion version
     :param model_db: Database model that is being audited with reversion
     :param version_count: Count the amount of versions found by model data
     """
@@ -504,8 +492,7 @@ def has_reversion_version(model_db, version_count=1):
 
 
 def has_reversion_comment(comment):
-    """
-    Check for comment in the version
+    """Check for comment in the version
     :param comment: Comment to do a case insensitive search of comment value
     """
     revisions = Revision.objects.filter(comment__icontains=comment)
@@ -513,8 +500,7 @@ def has_reversion_comment(comment):
 
 
 class HawkMockJSONResponse:
-    """
-    Mock utility mocking server validation for POST content.
+    """Mock utility mocking server validation for POST content.
     This is needed when mocking responses when using the APIClient and HawkAuth.
 
     The default response is an empty JSON but can be overridden by passing in a
@@ -541,8 +527,7 @@ class HawkMockJSONResponse:
         content_type='application/json',
         response=None,
     ):
-        """
-        Initialise with a dict that can be serialized to json
+        """Initialise with a dict that can be serialized to json
         this reponse body will be validated and returned in the mock reponse.
         """
         self.credentials = {
@@ -556,8 +541,7 @@ class HawkMockJSONResponse:
             self._response = {}
 
     def __call__(self, request, context):
-        """
-        Mock the server authorization response for validating the response content
+        """Mock the server authorization response for validating the response content
         """
         response = json.dumps(self._response)
         credentials = (lambda key: self.credentials)
@@ -579,8 +563,7 @@ class HawkMockJSONResponse:
 
 
 def mock_environ(**env_variables):
-    """
-    Allow for multiple settings inline
+    """Allow for multiple settings inline
     :param env_variables: as dictionary values
     :return: mock.patch.dict of os.environ values
     """

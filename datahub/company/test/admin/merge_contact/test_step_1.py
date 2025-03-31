@@ -71,8 +71,7 @@ class TestMergeWithAnotherContactViewGet(AdminTestMixin):
         ),
     )
     def test_returns_400_if_invalid_contact_passed(self, data):
-        """
-        Test that a 400 is returned when an invalid value is passed in the query string.
+        """Test that a 400 is returned when an invalid value is passed in the query string.
 
         This could only happen if the query string was manipulated, or the referenced contact
         was deleted.

@@ -12,10 +12,8 @@ from datahub.core.throttling import PathRateThrottle
 from datahub.omis.order.constants import OrderStatus
 from datahub.omis.order.models import Order
 from datahub.omis.order.views import BaseNestedOrderViewSet
-from datahub.omis.payment.models import Payment
-from datahub.omis.payment.models import PaymentGatewaySession
-from datahub.omis.payment.serializers import PaymentGatewaySessionSerializer
-from datahub.omis.payment.serializers import PaymentSerializer
+from datahub.omis.payment.models import Payment, PaymentGatewaySession
+from datahub.omis.payment.serializers import PaymentGatewaySessionSerializer, PaymentSerializer
 
 
 class BasePaymentViewSet(BaseNestedOrderViewSet):
@@ -26,8 +24,7 @@ class BasePaymentViewSet(BaseNestedOrderViewSet):
     pagination_class = None
 
     def get_queryset(self):
-        """
-        :returns: the queryset with payments related to the order.
+        """:returns: the queryset with payments related to the order.
         """
         return super().get_queryset().filter(order=self.get_order())
 
@@ -61,8 +58,7 @@ class PublicPaymentViewSet(BasePaymentViewSet):
 
 
 class CreatePaymentGatewaySessionThrottle(PathRateThrottle):
-    """
-    Implementation of PathRateThrottle with a specific scope.
+    """Implementation of PathRateThrottle with a specific scope.
     This is to make it clear that it's for the create payment session only.
     """
 
@@ -90,16 +86,14 @@ class PublicPaymentGatewaySessionViewSet(BaseNestedOrderViewSet):
     serializer_class = PaymentGatewaySessionSerializer
 
     def get_queryset(self):
-        """
-        :returns: the queryset with session gateway payments for the order.
+        """:returns: the queryset with session gateway payments for the order.
         """
         return super().get_queryset().filter(order=self.get_order())
 
     def get_object(self):
-        """
-        :returns: the PaymentGatewaySession instance or 404 if it doesn't exist.
-            It refreshes the data from the related GOV.UK payment record if
-            necessary
+        """:returns: the PaymentGatewaySession instance or 404 if it doesn't exist.
+        It refreshes the data from the related GOV.UK payment record if
+        necessary
         """
         obj = super().get_object()
         obj.refresh_from_govuk_payment()
@@ -112,8 +106,7 @@ class PublicPaymentGatewaySessionViewSet(BaseNestedOrderViewSet):
         return ()
 
     def create(self, request, *args, **kwargs):
-        """
-        Same as the DRF create but it catches the APIConflictException exception and
+        """Same as the DRF create but it catches the APIConflictException exception and
         builds a 409 response from it so that DRF does not roll back the transaction
         and therefore losing the potential database changes that we want to keep.
 

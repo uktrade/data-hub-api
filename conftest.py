@@ -3,7 +3,6 @@ from unittest.mock import Mock, patch
 import boto3
 import factory
 import pytest
-
 from botocore.stub import Stubber
 from django.conf import settings
 from django.core.cache import cache
@@ -15,7 +14,7 @@ from pytest_django.lazy_django import skip_if_no_django
 
 from datahub.core.constants import AdministrativeArea
 from datahub.core.queues.scheduler import DataHubScheduler
-from datahub.core.test_utils import create_test_user, HawkAPITestClient
+from datahub.core.test_utils import HawkAPITestClient, create_test_user
 from datahub.dnb_api.utils import format_dnb_company
 from datahub.documents.utils import get_s3_client_for_bucket
 from datahub.ingest.constants import TEST_AWS_REGION, TEST_S3_BUCKET_NAME
@@ -68,7 +67,7 @@ def api_client():
 @pytest.fixture
 def hawk_api_client():
     """Hawk API client fixture."""
-    yield HawkAPITestClient()
+    return HawkAPITestClient()
 
 
 class _ReturnValueTracker:
@@ -87,8 +86,7 @@ class _ReturnValueTracker:
 
 @pytest.fixture
 def track_return_values(monkeypatch):
-    """
-    Fixture that can be used to track the return values of a callable.
+    """Fixture that can be used to track the return values of a callable.
 
     Usage example:
 
@@ -105,7 +103,7 @@ def track_return_values(monkeypatch):
         monkeypatch.setattr(obj, callable_name, tracker.make_mock())
         return tracker
 
-    yield _patch
+    return _patch
 
 # AWS
 
@@ -143,7 +141,7 @@ def s3_client(aws_credentials, bucket_name):
         yield s3_client
 
 
-@pytest.fixture()
+@pytest.fixture
 def s3_stubber():
     """S3 stubber using the botocore Stubber class."""
     s3_client = get_s3_client_for_bucket('default')
@@ -151,7 +149,7 @@ def s3_stubber():
         yield s3_stubber
 
 
-@pytest.fixture()
+@pytest.fixture
 def local_memory_cache():
     """Get local memory cache."""
     yield
@@ -193,15 +191,14 @@ def hierarchical_sectors():
         sectors.append(sector)
         parent = sector
 
-    yield sectors
+    return sectors
 
 
 # SEARCH
 
 @pytest.fixture(scope='session')
 def _opensearch_client(worker_id):
-    """
-    Makes the OpenSearch test helper client available.
+    """Makes the OpenSearch test helper client available.
 
     Also patches settings.ES_INDEX_PREFIX using the xdist worker ID so that each process
     gets unique indices when running tests using multiple processes using pytest -n.
@@ -213,13 +210,12 @@ def _opensearch_client(worker_id):
     from opensearch_dsl.connections import connections
     client = get_test_client(nowait=False)
     connections.add_connection('default', client)
-    yield client
+    return client
 
 
 @pytest.fixture(scope='session')
 def _opensearch_session(_opensearch_client):
-    """
-    Session-scoped fixture that creates OpenSearch indexes that persist for the entire test
+    """Session-scoped fixture that creates OpenSearch indexes that persist for the entire test
     session.
     """
     # Create models in the test index
@@ -252,8 +248,7 @@ def _opensearch_session(_opensearch_client):
 
 @pytest.fixture
 def opensearch(_opensearch_session):
-    """
-    Function-scoped pytest fixture that:
+    """Function-scoped pytest fixture that:
 
     - ensures OpenSearch is available for the test
     - deletes all documents from OpenSearch at the end of the test.
@@ -271,8 +266,7 @@ def opensearch(_opensearch_session):
 
 @pytest.fixture
 def opensearch_with_signals(opensearch, synchronous_on_commit):
-    """
-    Function-scoped pytest fixture that:
+    """Function-scoped pytest fixture that:
 
     - ensures OpenSearch is available for the test
     - connects search signal receivers so that OpenSearch documents are automatically
@@ -294,14 +288,12 @@ def opensearch_with_signals(opensearch, synchronous_on_commit):
 
 
 class SavedObjectCollector:
-    """
-    Collects the search apps of saved search objects and indexes those apps in bulk in
+    """Collects the search apps of saved search objects and indexes those apps in bulk in
     OpenSearch.
     """
 
     def __init__(self, opensearch_client, apps_to_collect):
-        """
-        Initialises the collector.
+        """Initialises the collector.
 
         :param apps_to_collect: the search apps to monitor the `post_save` signal for (and sync
             saved objects for when `flush_and_refresh()` is called)
@@ -351,8 +343,7 @@ class SavedObjectCollector:
         self.opensearch_client.indices.refresh()
 
     def _collect(self, obj):
-        """
-        Logic run on post_save for models of all search apps.
+        """Logic run on post_save for models of all search apps.
 
         Note: This does not use transaction.on_commit(), because transactions in tests
         are not committed. Be careful if reusing this logic in production code (as you would
@@ -365,8 +356,7 @@ class SavedObjectCollector:
 
 @pytest.fixture
 def opensearch_collector_context_manager(opensearch, synchronous_on_commit, request):
-    """
-    Slightly lower-level version of opensearch_with_collector.
+    """Slightly lower-level version of opensearch_with_collector.
 
     Function-scoped pytest fixture that:
 
@@ -388,13 +378,12 @@ def opensearch_collector_context_manager(opensearch, synchronous_on_commit, requ
     }
     apps = marker_apps or get_search_apps()
 
-    yield SavedObjectCollector(opensearch, apps)
+    return SavedObjectCollector(opensearch, apps)
 
 
 @pytest.fixture
 def opensearch_with_collector(opensearch_collector_context_manager):
-    """
-    Function-scoped pytest fixture that:
+    """Function-scoped pytest fixture that:
 
     - ensures OpenSearch is available for the test
     - collects all model objects saved so they can be synced to OpenSearch in bulk
@@ -414,7 +403,7 @@ def mock_opensearch_client(monkeypatch):
     """Patches the OpenSearch library so that a mock client is used."""
     mock_client = Mock()
     monkeypatch.setattr('opensearch_dsl.connections.connections.get_connection', mock_client)
-    yield mock_client
+    return mock_client
 
 
 @pytest.fixture
@@ -423,13 +412,12 @@ def mock_connection_for_create_index(monkeypatch):
     mock_client = Mock()
     monkeypatch.setattr('opensearch_dsl.connections.connections.get_connection', mock_client)
     monkeypatch.setattr('opensearch_dsl.index.get_connection', mock_client)
-    yield mock_client
+    return mock_client
 
 
 @pytest.fixture
 def dnb_response_uk():
-    """
-    Returns a UK-based DNB company.
+    """Returns a UK-based DNB company.
     """
     return {
         'results': [
@@ -495,16 +483,14 @@ def dnb_response_uk():
 
 @pytest.fixture
 def formatted_dnb_company(dnb_response_uk):
-    """
-    Get formatted DNB company data.
+    """Get formatted DNB company data.
     """
     return format_dnb_company(dnb_response_uk['results'][0])
 
 
 @pytest.fixture
 def formatted_dnb_company_area(dnb_response_uk):
-    """
-    Get formatted DNB company data.
+    """Get formatted DNB company data.
     """
     dnb_response_area = dnb_response_uk['results'][0].copy()
     return format_dnb_company(dnb_response_area)
@@ -512,8 +498,7 @@ def formatted_dnb_company_area(dnb_response_uk):
 
 @pytest.fixture
 def formatted_dnb_company_area_non_uk(dnb_response_non_uk):
-    """
-    Get formatted DNB company data.
+    """Get formatted DNB company data.
     """
     dnb_response_area = dnb_response_non_uk['results'][0].copy()
 
@@ -553,7 +538,7 @@ def pytest_collection_modifyitems(config, items):
             item.add_marker(pytest.mark.skip(reason='Test marked as excluded'))
 
 
-@pytest.fixture()
+@pytest.fixture
 def queue():
     with DataHubScheduler('burst-no-fork') as queue:
         try:
@@ -562,7 +547,7 @@ def queue():
             queue.clear()
 
 
-@pytest.fixture()
+@pytest.fixture
 def async_queue():
     with DataHubScheduler('burst-no-fork', is_async=True) as queue:
         try:
@@ -571,7 +556,7 @@ def async_queue():
             queue.clear()
 
 
-@pytest.fixture()
+@pytest.fixture
 def fork_queue():
     """Don't use this if you are going to do work as this will block any tests running"""
     with DataHubScheduler('fork') as queue:
@@ -588,4 +573,4 @@ def metadata_client(hawk_api_client):
         'test-id-with-metadata-scope',
         'test-key-with-metadata-scope',
     )
-    yield hawk_api_client
+    return hawk_api_client

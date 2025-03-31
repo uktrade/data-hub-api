@@ -85,8 +85,7 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
         )
 
     def test_create_first_session(self, requests_mock, public_omis_api_client):
-        """
-        Test a successful call to create a payment gateway session.
+        """Test a successful call to create a payment gateway session.
 
         This starts a GOV.UK payment and creates an OMIS payment gateway session
         object tracking it.
@@ -141,8 +140,7 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
         }
 
     def test_create_cancels_other_ongoing_sessions(self, requests_mock, public_omis_api_client):
-        """
-        Test that creating a new payment gateway session cancels
+        """Test that creating a new payment gateway session cancels
         the other ongoing sessions and GOV.UK payments.
 
         Given:
@@ -253,8 +251,7 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
         requests_mock,
         public_omis_api_client,
     ):
-        """
-        Test that if GOV.UK Pay errors whilst cancelling some other ongoing
+        """Test that if GOV.UK Pay errors whilst cancelling some other ongoing
         sessions/payments, the endpoint returns 500 to keep the system consistent.
 
         Possible GOV.UK errors when cancelling:
@@ -307,8 +304,7 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
         requests_mock,
         public_omis_api_client,
     ):
-        """
-        Test that if GOV.UK Pay errors whilst creating a new payment, the endpoint returns 500.
+        """Test that if GOV.UK Pay errors whilst creating a new payment, the endpoint returns 500.
 
         Possible GOV.UK errors:
         - 400 - BAD REQUEST
@@ -345,8 +341,7 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
         ),
     )
     def test_409_if_order_in_disallowed_status(self, disallowed_status, public_omis_api_client):
-        """
-        Test that if the order is not in one of the allowed statuses, the endpoint
+        """Test that if the order is not in one of the allowed statuses, the endpoint
         returns 409.
         """
         assert PaymentGatewaySession.objects.count() == 0
@@ -373,8 +368,7 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
         requests_mock,
         public_omis_api_client,
     ):
-        """
-        Test that if the system is not up-to-date, the order is in quote_accepted
+        """Test that if the system is not up-to-date, the order is in quote_accepted
         but the GOV.UK payment happens, the endpoint triggers a check on existing
         sessions, realises that one finished successfully and records the payment
         marking the order as 'paid'.
@@ -659,8 +653,7 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
         requests_mock,
         public_omis_api_client,
     ):
-        """
-        Test a successful call to get a payment gateway session when the session is finished.
+        """Test a successful call to get a payment gateway session when the session is finished.
         The system does not call GOV.UK Pay as the record is up-to-date.
         """
         session = PaymentGatewaySessionFactory(status=session_status)
@@ -700,8 +693,7 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
         requests_mock,
         public_omis_api_client,
     ):
-        """
-        Test that if the GOV.UK payment status is not the same as the payment gateway session one,
+        """Test that if the GOV.UK payment status is not the same as the payment gateway session one,
         the record is updated.
         """
         # choose an initial status != from the govuk one to test the update
@@ -745,8 +737,7 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
         }
 
     def test_with_govuk_payment_success_updates_order(self, requests_mock, public_omis_api_client):
-        """
-        Test that if the GOV.UK payment status is `success` and the payment gateway session is
+        """Test that if the GOV.UK payment status is `success` and the payment gateway session is
         out of date, the record is updated, the related order marked as `paid` and an OMIS
         `payment.Payment` record created from the GOV.UK response data one.
         """
@@ -818,8 +809,7 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
         requests_mock,
         public_omis_api_client,
     ):
-        """
-        Test that if GOV.UK Pay errors whilst getting a payment, the endpoint returns 500.
+        """Test that if GOV.UK Pay errors whilst getting a payment, the endpoint returns 500.
 
         Possible GOV.UK errors:
         - 401 - UNAUTHORIZED
@@ -892,8 +882,7 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     def test_404_if_session_belongs_to_another_order(self, public_omis_api_client):
-        """
-        Test that if the payment gateway session belongs to another order,
+        """Test that if the payment gateway session belongs to another order,
         the endpoint returns 404.
         """
         orders = OrderWithAcceptedQuoteFactory.create_batch(2)

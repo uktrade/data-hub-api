@@ -6,7 +6,6 @@ from uuid import UUID, uuid4
 
 import pytest
 import requests_mock
-
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.test.utils import override_settings
@@ -69,8 +68,7 @@ URL_PARENT_FALSE_SUBSIDIARY_FALSE = (
     ),
 )
 class TestDNBAPICommon(APITestMixin):
-    """
-    Test common functionality in company-search as well
+    """Test common functionality in company-search as well
     as company-create endpoints.
     """
 
@@ -79,8 +77,7 @@ class TestDNBAPICommon(APITestMixin):
         requests_mock,
         url,
     ):
-        """
-        Ensure that a non-authenticated request gets a 401.
+        """Ensure that a non-authenticated request gets a 401.
         """
         requests_mock.post(DNB_V2_SEARCH_URL)
 
@@ -97,14 +94,12 @@ class TestDNBAPICommon(APITestMixin):
 
 
 class TestDNBCompanySearchAPI(APITestMixin):
-    """
-    DNB Company Search view test case.
+    """DNB Company Search view test case.
     """
 
     @override_settings(DNB_SERVICE_BASE_URL=None)
     def test_post_no_dnb_setting(self):
-        """
-        Test that we get an ImproperlyConfigured exception when the DNB_SERVICE_BASE_URL setting
+        """Test that we get an ImproperlyConfigured exception when the DNB_SERVICE_BASE_URL setting
         is not set.
         """
         with pytest.raises(ImproperlyConfigured):
@@ -127,8 +122,7 @@ class TestDNBCompanySearchAPI(APITestMixin):
         content_type,
         expected_status_code,
     ):
-        """
-        Test that 406 is returned if Content Type is not application/json.
+        """Test that 406 is returned if Content Type is not application/json.
         """
         requests_mock.post(
             DNB_V2_SEARCH_URL,
@@ -200,8 +194,7 @@ class TestDNBCompanySearchAPI(APITestMixin):
         upstream_response_content,
         response_data,
     ):
-        """
-        Test success scenarios for POST proxy.
+        """Test success scenarios for POST proxy.
         """
         requests_mock.post(
             DNB_V2_SEARCH_URL,
@@ -252,8 +245,7 @@ class TestDNBCompanySearchAPI(APITestMixin):
         response_status_code,
         upstream_response_content,
     ):
-        """
-        Test error scenarios for POST proxy.
+        """Test error scenarios for POST proxy.
         """
         requests_mock.post(
             DNB_V2_SEARCH_URL,
@@ -349,8 +341,7 @@ class TestDNBCompanySearchAPI(APITestMixin):
         response_data,
         permission_codenames,
     ):
-        """
-        Test for POST proxy permissions.
+        """Test for POST proxy permissions.
         """
         requests_mock.post(
             DNB_V2_SEARCH_URL,
@@ -370,13 +361,11 @@ class TestDNBCompanySearchAPI(APITestMixin):
 
 
 class TestDNBCompanyCreateAPI(APITestMixin):
-    """
-    DNB Company Create view test case.
+    """DNB Company Create view test case.
     """
 
     def _assert_companies_same(self, company, dnb_company):
-        """
-        Check whether the given DataHub company is the same as the given DNB company.
+        """Check whether the given DataHub company is the same as the given DNB company.
         """
         country = Country.objects.filter(
             iso_alpha2_code=dnb_company['address_country'],
@@ -496,8 +485,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
 
     @override_settings(DNB_SERVICE_BASE_URL=None)
     def test_post_no_dnb_setting(self):
-        """
-        Test that we get an ImproperlyConfigured exception when the DNB_SERVICE_BASE_URL setting
+        """Test that we get an ImproperlyConfigured exception when the DNB_SERVICE_BASE_URL setting
         is not set.
         """
         with pytest.raises(ImproperlyConfigured):
@@ -512,8 +500,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         requests_mock,
         dnb_response_non_uk,
     ):
-        """
-        Test create-company endpoint for a non-uk company.
+        """Test create-company endpoint for a non-uk company.
         """
         requests_mock.post(
             DNB_V2_SEARCH_URL,
@@ -546,8 +533,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         requests_mock,
         dnb_response_uk,
     ):
-        """
-        Test create-company endpoint for a UK company.
+        """Test create-company endpoint for a UK company.
         """
         requests_mock.post(
             DNB_V2_SEARCH_URL,
@@ -588,8 +574,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         self,
         data,
     ):
-        """
-        Test that a query without `duns_number` returns 400.
+        """Test that a query without `duns_number` returns 400.
         """
         response = self.api_client.post(
             reverse('api-v4:dnb-api:company-create'),
@@ -626,8 +611,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         expected_status_code,
         expected_message,
     ):
-        """
-        Test if a given `duns_number` gets anything other than a single company
+        """Test if a given `duns_number` gets anything other than a single company
         from dnb-service, the create-company endpoint returns a 400.
 
         """
@@ -663,8 +647,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         missing_required_field,
         expected_error,
     ):
-        """
-        Test if dnb-service returns a company with missing required fields,
+        """Test if dnb-service returns a company with missing required fields,
         the create-company endpoint returns 400.
         """
         dnb_response_uk['results'][0].pop(missing_required_field)
@@ -709,8 +692,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         dnb_response_uk,
         field_overrides,
     ):
-        """
-        Test if dnb-service returns a company with missing optional fields,
+        """Test if dnb-service returns a company with missing optional fields,
         the create-company endpoint still returns 200 and the company is saved
         successfully.
         """
@@ -742,8 +724,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
     def test_post_existing(
         self,
     ):
-        """
-        Test if create-company endpoint returns 400 if the company with the given
+        """Test if create-company endpoint returns 400 if the company with the given
         duns_number already exists in DataHub.
         """
         duns_number = 123456789
@@ -766,8 +747,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         requests_mock,
         dnb_response_uk,
     ):
-        """
-        Test if create-company endpoint returns 400 if the company is based in a country
+        """Test if create-company endpoint returns 400 if the company is based in a country
         that does not exist in DataHub.
         """
         dnb_response_uk['results'][0]['address_country'] = 'FOO'
@@ -799,8 +779,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         dnb_response_uk,
         global_ultimate_override,
     ):
-        """
-        Test if create-company endpoint returns 400 if the global_ultimate_duns_number
+        """Test if create-company endpoint returns 400 if the global_ultimate_duns_number
         returned from D&B is invalid.
         """
         dnb_response_uk['results'][0]['global_ultimate_duns_number'] = global_ultimate_override
@@ -835,8 +814,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         requests_mock,
         status_code,
     ):
-        """
-        Test if create-company endpoint returns 400 if the company is based in a country
+        """Test if create-company endpoint returns 400 if the company is based in a country
         that does not exist in DataHub.
         """
         requests_mock.post(
@@ -857,8 +835,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         self,
         requests_mock,
     ):
-        """
-        Test if create-company endpoint returns 400 if the company is based in a country
+        """Test if create-company endpoint returns 400 if the company is based in a country
         that does not exist in DataHub.
         """
         requests_mock.post(
@@ -889,8 +866,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
         dnb_response_uk,
         permissions,
     ):
-        """
-        Create-company endpoint should return 403 if the user does not
+        """Create-company endpoint should return 403 if the user does not
         have the necessary permissions.
         """
         requests_mock.post(
@@ -911,8 +887,7 @@ class TestDNBCompanyCreateAPI(APITestMixin):
 
 
 class TestCompanyLinkView(APITestMixin):
-    """
-    Test POST `/dnb/company-link` endpoint.
+    """Test POST `/dnb/company-link` endpoint.
     """
 
     @pytest.mark.parametrize(
@@ -927,8 +902,7 @@ class TestCompanyLinkView(APITestMixin):
         content_type,
         expected_status_code,
     ):
-        """
-        Test that 406 is returned if Content Type is not application/json.
+        """Test that 406 is returned if Content Type is not application/json.
         """
         response = self.api_client.post(
             reverse('api-v4:dnb-api:company-link'),
@@ -949,8 +923,7 @@ class TestCompanyLinkView(APITestMixin):
         self,
         permissions,
     ):
-        """
-        The endpoint should return 403 if the user does not have the necessary permissions.
+        """The endpoint should return 403 if the user does not have the necessary permissions.
         """
         user = create_test_user(permission_codenames=permissions)
         api_client = self.create_api_client(user=user)
@@ -977,8 +950,7 @@ class TestCompanyLinkView(APITestMixin):
         self,
         override,
     ):
-        """
-        Test that a query without a valid `duns_number` returns 400.
+        """Test that a query without a valid `duns_number` returns 400.
         """
         company = CompanyFactory()
         response = self.api_client.post(
@@ -1008,8 +980,7 @@ class TestCompanyLinkView(APITestMixin):
         requests_mock,
         status_code,
     ):
-        """
-        Test if company-link endpoint returns 502 if the upstream
+        """Test if company-link endpoint returns 502 if the upstream
         `dnb-service` returns an error.
         """
         company = CompanyFactory()
@@ -1029,8 +1000,7 @@ class TestCompanyLinkView(APITestMixin):
         assert response.status_code == status.HTTP_502_BAD_GATEWAY
 
     def test_already_linked(self):
-        """
-        Test that the endpoint returns 400 for a company that is already linked.
+        """Test that the endpoint returns 400 for a company that is already linked.
         """
         company = CompanyFactory(duns_number='123456789')
         response = self.api_client.post(
@@ -1046,8 +1016,7 @@ class TestCompanyLinkView(APITestMixin):
         }
 
     def test_duplicate_duns_number(self):
-        """
-        Test that the endpoint returns 400 if we try to link a company to a D&B record
+        """Test that the endpoint returns 400 if we try to link a company to a D&B record
         that has already been linked to a different company.
         """
         CompanyFactory(duns_number='123456789')
@@ -1068,8 +1037,7 @@ class TestCompanyLinkView(APITestMixin):
         self,
         requests_mock,
     ):
-        """
-        Test that when a duns_number does not return any company from
+        """Test that when a duns_number does not return any company from
         dnb-service, the endpoint returns 400 status.
         """
         company = CompanyFactory()
@@ -1095,8 +1063,7 @@ class TestCompanyLinkView(APITestMixin):
         requests_mock,
         dnb_response_uk,
     ):
-        """
-        Test that valid request to company-link endpoint returns 200.
+        """Test that valid request to company-link endpoint returns 200.
         """
         company = CompanyFactory()
         requests_mock.post(
@@ -1126,8 +1093,7 @@ class TestCompanyLinkView(APITestMixin):
 
 
 class TestCompanyChangeRequestView(APITestMixin):
-    """
-    Test POST `/dnb/company-change-request` endpoint.
+    """Test POST `/dnb/company-change-request` endpoint.
     """
 
     @pytest.mark.parametrize(
@@ -1142,8 +1108,7 @@ class TestCompanyChangeRequestView(APITestMixin):
         content_type,
         expected_status_code,
     ):
-        """
-        Test that 406 is returned if Content Type is not application/json.
+        """Test that 406 is returned if Content Type is not application/json.
         """
         response = self.api_client.post(
             reverse('api-v4:dnb-api:company-change-request'),
@@ -1164,8 +1129,7 @@ class TestCompanyChangeRequestView(APITestMixin):
         self,
         permissions,
     ):
-        """
-        The endpoint should return 403 if the user does not have the necessary permissions.
+        """The endpoint should return 403 if the user does not have the necessary permissions.
         """
         user = create_test_user(permission_codenames=permissions)
         api_client = self.create_api_client(user=user)
@@ -1177,8 +1141,7 @@ class TestCompanyChangeRequestView(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_company_does_not_exist(self):
-        """
-        The endpoint should return 400 if the company with the given
+        """The endpoint should return 400 if the company with the given
         duns_number does not exist.
         """
         response = self.api_client.post(
@@ -1252,8 +1215,7 @@ class TestCompanyChangeRequestView(APITestMixin):
         change_request,
         expected_response,
     ):
-        """
-        Test that invalid payload results in 400 and an appropriate
+        """Test that invalid payload results in 400 and an appropriate
         error message.
         """
         CompanyFactory(duns_number='123456789')
@@ -1553,8 +1515,7 @@ class TestCompanyChangeRequestView(APITestMixin):
         datahub_response,
         address_area_id,
     ):
-        """
-        The endpoint should return 200 as well as a valid response
+        """The endpoint should return 200 as well as a valid response
         when it is hit with a valid payload.
         """
         CompanyFactory(
@@ -1595,8 +1556,7 @@ class TestCompanyChangeRequestView(APITestMixin):
         requests_mock,
         status_code,
     ):
-        """
-        The  endpoint should return 502 if the upstream
+        """The  endpoint should return 502 if the upstream
         `dnb-service` returns an error.
         """
         CompanyFactory(duns_number='123456789')
@@ -1619,8 +1579,7 @@ class TestCompanyChangeRequestView(APITestMixin):
 
     @override_settings(DNB_SERVICE_BASE_URL=None)
     def test_post_no_dnb_setting(self):
-        """
-        Test that we get an ImproperlyConfigured exception when the DNB_SERVICE_BASE_URL setting
+        """Test that we get an ImproperlyConfigured exception when the DNB_SERVICE_BASE_URL setting
         is not set.
         """
         CompanyFactory(duns_number='123456789')
@@ -1658,8 +1617,7 @@ class TestCompanyChangeRequestView(APITestMixin):
         expected_exception,
         expected_message,
     ):
-        """
-        Test if there is an error connecting to dnb-service, we raise the
+        """Test if there is an error connecting to dnb-service, we raise the
         exception with an appropriate message.
         """
         CompanyFactory(duns_number='123456789')
@@ -1684,8 +1642,7 @@ class TestCompanyChangeRequestView(APITestMixin):
         self,
         requests_mock,
     ):
-        """
-        Test that a partial change-request to address sends
+        """Test that a partial change-request to address sends
         all address fields to dnb-service.
         """
         address_area_id = constants.AdministrativeArea.texas.value.id
@@ -1766,8 +1723,7 @@ class TestCompanyChangeRequestView(APITestMixin):
         expected_exception,
         expected_message,
     ):
-        """
-        Test if there is an error connecting to dnb-service, we raise the
+        """Test if there is an error connecting to dnb-service, we raise the
         exception with an appropriate message.
         """
         CompanyFactory(duns_number='123456789')
@@ -1847,8 +1803,7 @@ class TestCompanyChangeRequestView(APITestMixin):
         dnb_request,
         dnb_response,
     ):
-        """
-        Test that pending change requests stored in the dnb-service can be
+        """Test that pending change requests stored in the dnb-service can be
         retrieved correctly.
         """
         CompanyFactory(duns_number=dnb_request['duns_number'])
@@ -1909,8 +1864,7 @@ class TestCompanyChangeRequestView(APITestMixin):
         change_request,
         expected_response,
     ):
-        """
-        Test that invalid payload results in 400 and an appropriate
+        """Test that invalid payload results in 400 and an appropriate
         error message.
         """
         CompanyFactory(duns_number='123456789')
@@ -1926,8 +1880,7 @@ class TestCompanyChangeRequestView(APITestMixin):
 
 
 class TestCompanyInvestigationView(APITestMixin):
-    """
-    Test POST `/dnb/company-investigation` endpoint.
+    """Test POST `/dnb/company-investigation` endpoint.
     """
 
     @pytest.mark.parametrize(
@@ -1942,8 +1895,7 @@ class TestCompanyInvestigationView(APITestMixin):
         content_type,
         expected_status_code,
     ):
-        """
-        Test that 406 is returned if Content Type is not application/json.
+        """Test that 406 is returned if Content Type is not application/json.
         """
         response = self.api_client.post(
             reverse('api-v4:dnb-api:company-investigation'),
@@ -1953,8 +1905,7 @@ class TestCompanyInvestigationView(APITestMixin):
         assert response.status_code == expected_status_code
 
     def test_unauthenticated_not_authorised(self):
-        """
-        Ensure that a non-authenticated request gets a 401.
+        """Ensure that a non-authenticated request gets a 401.
         """
         unauthorised_api_client = self.create_api_client()
         unauthorised_api_client.credentials(HTTP_AUTHORIZATION='foo')
@@ -1978,8 +1929,7 @@ class TestCompanyInvestigationView(APITestMixin):
         self,
         permissions,
     ):
-        """
-        The endpoint should return 403 if the user does not have the necessary permissions.
+        """The endpoint should return 403 if the user does not have the necessary permissions.
         """
         user = create_test_user(permission_codenames=permissions)
         api_client = self.create_api_client(user=user)
@@ -1991,8 +1941,7 @@ class TestCompanyInvestigationView(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_company_does_not_exist(self):
-        """
-        The endpoint should return 400 if the company when the given company ID does not exist.
+        """The endpoint should return 400 if the company when the given company ID does not exist.
         """
         response = self.api_client.post(
             reverse('api-v4:dnb-api:company-investigation'),
@@ -2085,8 +2034,7 @@ class TestCompanyInvestigationView(APITestMixin):
         investigation_request_overrides,
         expected_response,
     ):
-        """
-        Test that invalid payload results in 400 and an appropriate error message.
+        """Test that invalid payload results in 400 and an appropriate error message.
         """
         company = CompanyFactory()
         investigation_data = {
@@ -2119,8 +2067,7 @@ class TestCompanyInvestigationView(APITestMixin):
         self,
         requests_mock,
     ):
-        """
-        The endpoint should return 200 as well as a valid response when it is hit with a valid
+        """The endpoint should return 200 as well as a valid response when it is hit with a valid
         payload of full investigation details.
         """
         company = CompanyFactory(
@@ -2198,8 +2145,7 @@ class TestCompanyInvestigationView(APITestMixin):
         missing_field_data_hub,
         missing_field_dnb_service,
     ):
-        """
-        The endpoint should return 200 as well as a valid response when it is hit with a valid
+        """The endpoint should return 200 as well as a valid response when it is hit with a valid
         payload of the minimum required investigation details.
         """
         company = CompanyFactory()
@@ -2269,8 +2215,7 @@ class TestCompanyInvestigationView(APITestMixin):
         requests_mock,
         status_code,
     ):
-        """
-        The  endpoint should return 502 if the upstream `dnb-service` returns an error.
+        """The  endpoint should return 502 if the upstream `dnb-service` returns an error.
         """
         company = CompanyFactory()
         requests_mock.post(
@@ -2300,8 +2245,7 @@ class TestCompanyInvestigationView(APITestMixin):
 
     @override_settings(DNB_SERVICE_BASE_URL=None)
     def test_post_no_dnb_setting(self):
-        """
-        Test that we get an ImproperlyConfigured exception when the DNB_SERVICE_BASE_URL setting
+        """Test that we get an ImproperlyConfigured exception when the DNB_SERVICE_BASE_URL setting
         is not set.
         """
         company = CompanyFactory()
@@ -2347,8 +2291,7 @@ class TestCompanyInvestigationView(APITestMixin):
         expected_exception,
         expected_message,
     ):
-        """
-        Test if there is an error connecting to dnb-service, we raise the
+        """Test if there is an error connecting to dnb-service, we raise the
         exception with an appropriate message.
         """
         company = CompanyFactory()
@@ -2401,8 +2344,7 @@ class TestHierarchyAPITestMixin:
 
 
 class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
-    """
-    DNB Company Hierarchy Search view test case.
+    """DNB Company Hierarchy Search view test case.
     """
 
     def test_company_id_is_valid(self):
@@ -2435,8 +2377,7 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
         requests_mock,
         opensearch_with_signals,
     ):
-        """
-        Test when a company has no dnb related companies and no manually linked an empty response
+        """Test when a company has no dnb related companies and no manually linked an empty response
         is returned
         """
         api_client = self.create_api_client()
@@ -2470,8 +2411,7 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
         requests_mock,
         opensearch_with_signals,
     ):
-        """
-        Test when empty results are returned from dnb but the company has manually linked
+        """Test when empty results are returned from dnb but the company has manually linked
         subsidiaries the requested company is returned as the global ultimate of the tree
         """
         api_client = self.create_api_client()
@@ -2578,8 +2518,7 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
         requests_mock,
         opensearch_with_signals,
     ):
-        """
-        Test the scenario where the company returned by the DnB service does match a company found
+        """Test the scenario where the company returned by the DnB service does match a company found
         in the Data Hub dataset and then return the correct id for that company
         """
         faker = Faker()
@@ -2675,8 +2614,7 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
         requests_mock,
         opensearch_with_signals,
     ):
-        """
-        Test the scenario where the ultimate parent is the only company in the response from the
+        """Test the scenario where the ultimate parent is the only company in the response from the
         proxy service that matches a duns number in the datahub dataset
         """
         faker = Faker()
@@ -2840,8 +2778,7 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
         ((ConnectionError), (DNBServiceTimeoutError)),
     )
     def test_dnb_request_connection_error(self, requests_mock, request_exception):
-        """
-        Test dnb api request exceptopn
+        """Test dnb api request exceptopn
         """
         api_client = self.create_api_client()
         company = CompanyFactory(duns_number='123456789')
@@ -3019,8 +2956,7 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
         self,
         opensearch_with_signals,
     ):
-        """
-        Test the scenario where the count of companies returned by the dnb service is above the
+        """Test the scenario where the count of companies returned by the dnb service is above the
         maximum allowed, so a reduced company tree is returned instead
         """
         faker = Faker()
@@ -3085,8 +3021,7 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
         requests_mock,
         opensearch_with_signals,
     ):
-        """
-        Call the endpoint multiple times, and ensure only the first gets through the django
+        """Call the endpoint multiple times, and ensure only the first gets through the django
         caching layer
         """
         faker = Faker()
@@ -3118,8 +3053,7 @@ class TestCompanyHierarchyView(APITestMixin, TestHierarchyAPITestMixin):
 
 
 class TestRelatedCompanyView(APITestMixin, TestHierarchyAPITestMixin):
-    """
-    DNB Company Hierarchy Search view test case.
+    """DNB Company Hierarchy Search view test case.
     """
 
     def test_company_id_is_valid(self):
@@ -3166,8 +3100,7 @@ class TestRelatedCompanyView(APITestMixin, TestHierarchyAPITestMixin):
         requests_mock,
         request_exception,
     ):
-        """
-        Test for POST proxy.
+        """Test for POST proxy.
         """
         api_client = self.create_api_client()
         company = CompanyFactory(duns_number='123456789')
@@ -3190,8 +3123,7 @@ class TestRelatedCompanyView(APITestMixin, TestHierarchyAPITestMixin):
         assert response.status_code == status.HTTP_502_BAD_GATEWAY
 
     def test_empty_results_returned_from_dnb_service(self, requests_mock):
-        """
-        Test for POST proxy.
+        """Test for POST proxy.
         """
         api_client = self.create_api_client()
         company = CompanyFactory(duns_number='123456789')
@@ -3221,8 +3153,7 @@ class TestRelatedCompanyView(APITestMixin, TestHierarchyAPITestMixin):
         requests_mock,
         opensearch_with_signals,
     ):
-        """
-        Test the scenario where the company returned by the DnB service does
+        """Test the scenario where the company returned by the DnB service does
         match a child company found in the Data Hub dataset and then return
         the correct id for that company
         """
@@ -3276,8 +3207,7 @@ class TestRelatedCompanyView(APITestMixin, TestHierarchyAPITestMixin):
         requests_mock,
         opensearch_with_signals,
     ):
-        """
-        Test the scenario where the company returned by the DnB service does
+        """Test the scenario where the company returned by the DnB service does
         match a parent company found in the Data Hub dataset and then return
         the correct id for that company
         """
@@ -3333,8 +3263,7 @@ class TestRelatedCompanyView(APITestMixin, TestHierarchyAPITestMixin):
         requests_mock,
         opensearch_with_signals,
     ):
-        """
-        Test the scenario where the companies returned by the DnB service all have
+        """Test the scenario where the companies returned by the DnB service all have
         Data Hub ids
         """
         faker = Faker()
@@ -3438,8 +3367,7 @@ class TestRelatedCompanyView(APITestMixin, TestHierarchyAPITestMixin):
         requests_mock,
         opensearch_with_signals,
     ):
-        """
-        Test the scenario where not all the companies returned by the DnB service have
+        """Test the scenario where not all the companies returned by the DnB service have
         a Data Hub id so only those that do should have their ID returned
         """
         faker = Faker()
@@ -3528,8 +3456,7 @@ class TestRelatedCompanyView(APITestMixin, TestHierarchyAPITestMixin):
         requests_mock,
         opensearch_with_signals,
     ):
-        """
-        Test the scenario where the no companies returned by the DnB service have
+        """Test the scenario where the no companies returned by the DnB service have
         IDs in a Data Hub
         """
         faker = Faker()
@@ -3608,8 +3535,7 @@ class TestRelatedCompanyView(APITestMixin, TestHierarchyAPITestMixin):
         requests_mock,
         opensearch_with_signals,
     ):
-        """
-        Test the scenario where the many companies returned by the DnB service does match
+        """Test the scenario where the many companies returned by the DnB service does match
         for companies IDs in Data Hub but only those directly related are returned
         """
         faker = Faker()
@@ -3711,8 +3637,7 @@ class TestRelatedCompanyView(APITestMixin, TestHierarchyAPITestMixin):
         requests_mock,
         opensearch_with_signals,
     ):
-        """
-        Test the scenario where the companies returned by the DnB service all have
+        """Test the scenario where the companies returned by the DnB service all have
         Data Hub ids
         """
         faker = Faker()
@@ -3811,8 +3736,7 @@ class TestRelatedCompanyView(APITestMixin, TestHierarchyAPITestMixin):
         requests_mock,
         opensearch_with_signals,
     ):
-        """
-        Test the scenario where the companies returned by the DnB service all have
+        """Test the scenario where the companies returned by the DnB service all have
         Data Hub ids
         """
         faker = Faker()
@@ -3910,8 +3834,7 @@ class TestRelatedCompanyView(APITestMixin, TestHierarchyAPITestMixin):
         requests_mock,
         opensearch_with_signals,
     ):
-        """
-        Test the scenario where the companies returned by the DnB service all have
+        """Test the scenario where the companies returned by the DnB service all have
         Data Hub ids
         """
         faker = Faker()
@@ -4052,8 +3975,7 @@ class TestRelatedCompanyView(APITestMixin, TestHierarchyAPITestMixin):
         opensearch_with_signals,
         query_param,
     ):
-        """
-        Call the endpoint multiple times with different query params, and ensure only the first
+        """Call the endpoint multiple times with different query params, and ensure only the first
         gets through the django caching layer
         """
         faker = Faker()
@@ -4090,8 +4012,7 @@ class TestRelatedCompanyView(APITestMixin, TestHierarchyAPITestMixin):
 
 
 class TestRelatedCompaniesCountView(APITestMixin, TestHierarchyAPITestMixin):
-    """
-    DNB Company Hierarchy Search view test case.
+    """DNB Company Hierarchy Search view test case.
     """
 
     def test_company_id_is_valid(self):
@@ -4297,8 +4218,7 @@ class TestRelatedCompaniesCountView(APITestMixin, TestHierarchyAPITestMixin):
 
 
 class TestCompanyHierarchyReducedView(APITestMixin, TestHierarchyAPITestMixin):
-    """
-    DNB Company Hierarchy Reduced view test case.
+    """DNB Company Hierarchy Reduced view test case.
     """
 
     def test_company_id_is_valid(self):
@@ -4330,8 +4250,7 @@ class TestCompanyHierarchyReducedView(APITestMixin, TestHierarchyAPITestMixin):
         self,
         requests_mock,
     ):
-        """
-        Test empty results from dnb proxy returns error
+        """Test empty results from dnb proxy returns error
         """
         company = CompanyFactory(duns_number='123456789')
 
@@ -4352,8 +4271,7 @@ class TestCompanyHierarchyReducedView(APITestMixin, TestHierarchyAPITestMixin):
         self,
         requests_mock,
     ):
-        """
-        Test more than 1 result from dnb proxy returns error
+        """Test more than 1 result from dnb proxy returns error
         """
         company = CompanyFactory(duns_number='123456789')
 
@@ -4374,8 +4292,7 @@ class TestCompanyHierarchyReducedView(APITestMixin, TestHierarchyAPITestMixin):
         self,
         requests_mock,
     ):
-        """
-        Test when the result from dnb proxy does not match requested duns number
+        """Test when the result from dnb proxy does not match requested duns number
         """
         company = CompanyFactory(duns_number='123456789')
 
@@ -4393,8 +4310,7 @@ class TestCompanyHierarchyReducedView(APITestMixin, TestHierarchyAPITestMixin):
         self,
         opensearch_with_signals,
     ):
-        """
-        Test when the result from dnb proxy is ok a valid tree is generated
+        """Test when the result from dnb proxy is ok a valid tree is generated
         """
         global_company = CompanyFactory(duns_number='111111111')
         company = CompanyFactory(duns_number='222222222', global_ultimate_duns_number='111111111')

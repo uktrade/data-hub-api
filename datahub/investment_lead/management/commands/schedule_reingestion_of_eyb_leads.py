@@ -7,11 +7,10 @@ from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.ingest.models import IngestedObject
 from datahub.investment_lead.tasks.ingest_eyb_marketing import MARKETING_PREFIX
 from datahub.investment_lead.tasks.ingest_eyb_triage import (
-    eyb_triage_identification_task,
     TRIAGE_PREFIX,
+    eyb_triage_identification_task,
 )
 from datahub.investment_lead.tasks.ingest_eyb_user import USER_PREFIX
-
 
 logger = logging.getLogger(__name__)
 

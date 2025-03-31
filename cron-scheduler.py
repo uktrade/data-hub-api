@@ -41,7 +41,7 @@ from datahub.core.queues.constants import (
 )
 from datahub.core.queues.health_check import queue_health_check
 from datahub.core.queues.job_scheduler import job_scheduler
-from datahub.core.queues.scheduler import DataHubScheduler, LONG_RUNNING_QUEUE
+from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE, DataHubScheduler
 from datahub.dnb_api.tasks.sync import schedule_sync_outdated_companies_with_dnb
 from datahub.dnb_api.tasks.update import schedule_get_company_updates
 from datahub.email_ingestion.tasks import process_mailbox_emails

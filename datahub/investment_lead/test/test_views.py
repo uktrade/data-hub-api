@@ -1,5 +1,4 @@
 import uuid
-
 from datetime import datetime, timedelta, timezone
 
 import pytest
@@ -14,7 +13,6 @@ from datahub.investment_lead.test.factories import EYBLeadFactory
 from datahub.investment_lead.test.utils import assert_retrieved_eyb_lead_data
 from datahub.investment_lead.views import EYBLeadAuditViewSet
 from datahub.metadata.models import Country, Sector
-
 
 DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
 EYB_LEAD_COLLECTION_URL = reverse('api-v4:investment-lead:eyb-lead-collection')
@@ -424,8 +422,7 @@ class TestEYBLeadListAPI(APITestMixin):
         assert newest_timestamp > oldest_timestamp
 
     def test_filter_by_hmtc_region(self, test_user_with_view_permissions):
-        """
-        Test filtering EYB leads by one hmtc region.
+        """Test filtering EYB leads by one hmtc region.
 
         note: we test through Country rather than OverseasRegion because
         the region is not exposed via API
@@ -456,8 +453,7 @@ class TestEYBLeadListAPI(APITestMixin):
         assert response_country.overseas_region_id == default_overseas_region
 
     def test_filter_by_multiple_hmtc_regions(self, test_user_with_view_permissions):
-        """
-        Test filtering EYB leads by multiple hmtc regions.
+        """Test filtering EYB leads by multiple hmtc regions.
 
         note: we test through Country rather than OverseasRegion because
         the region is not exposed via API
@@ -501,8 +497,7 @@ class TestEYBLeadListAPI(APITestMixin):
         } == country_ids_in_results
 
     def test_filter_by_non_existing_hmtc_region(self, test_user_with_view_permissions):
-        """
-        Test filtering EYB leads by non existent hmtc region is handled without error.
+        """Test filtering EYB leads by non existent hmtc region is handled without error.
 
         note: we test through Country rather than OverseasRegion because
         the region is not exposed via API

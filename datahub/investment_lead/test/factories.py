@@ -1,7 +1,6 @@
 import hashlib
 import random
 import uuid
-
 from datetime import datetime, timezone
 
 import factory
@@ -11,7 +10,6 @@ from datahub.company.test.factories import CompanyFactory
 from datahub.core import constants
 from datahub.core.test.factories import to_many_field
 from datahub.metadata.models import Sector
-
 
 INTENT_CHOICES = [
     'SET_UP_NEW_PREMISES',
@@ -110,8 +108,7 @@ class EYBLeadFactory(factory.django.DjangoModelFactory):
 
     @to_many_field
     def investment_projects(self):
-        """
-        Add support for setting `investment_projects`.
+        """Add support for setting `investment_projects`.
         """
         return []
 

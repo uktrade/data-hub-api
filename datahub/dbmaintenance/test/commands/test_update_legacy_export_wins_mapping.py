@@ -22,7 +22,7 @@ def test_run(s3_stubber, caplog):
     bucket = 'test_bucket'
     object_key = 'test_key'
     csv_contents = ['export_win_id,data_hub_id']
-    for uuid, company in zip(uuids, companies):
+    for uuid, company in zip(uuids, companies, strict=False):
         csv_contents.append(f'{uuid},{company.id if company else ""}')
 
     bad_company_id = uuid4()
@@ -46,7 +46,7 @@ def test_run(s3_stubber, caplog):
     mappings = LegacyExportWinsToDataHubCompany.objects.all()
     assert mappings.count() == 5
 
-    for mapping, uuid, company in zip(mappings, uuids, companies):
+    for mapping, uuid, company in zip(mappings, uuids, companies, strict=False):
         assert (
             company is None and mapping.company_id is None
         ) or (
@@ -69,7 +69,7 @@ def test_simulate(s3_stubber, caplog):
     object_key = 'test_key'
     csv_contents = ['export_win_id,data_hub_id']
     csv_contents.append(f'{uuid4()},{uuid4()}')
-    for uuid, company in zip(uuids, companies):
+    for uuid, company in zip(uuids, companies, strict=False):
         csv_contents.append(f'{uuid},{company.id if company else ""}')
 
     csv_content = '\n'.join(csv_contents)

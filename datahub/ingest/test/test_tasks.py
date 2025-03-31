@@ -1,5 +1,4 @@
 import logging
-
 from datetime import (
     datetime,
     timezone,
@@ -8,7 +7,6 @@ from unittest import mock
 from uuid import uuid4
 
 import pytest
-
 from moto import mock_aws
 from rq.job import Job
 
@@ -19,17 +17,16 @@ from datahub.ingest.constants import (
 )
 from datahub.ingest.models import IngestedObject
 from datahub.ingest.tasks import (
-    base_ingestion_task,
     BaseObjectIdentificationTask,
     BaseObjectIngestionTask,
     QueueChecker,
     S3ObjectProcessor,
+    base_ingestion_task,
 )
 from datahub.ingest.utils import (
     compressed_json_faker,
     upload_objects_to_s3,
 )
-
 
 pytestmark = pytest.mark.django_db
 

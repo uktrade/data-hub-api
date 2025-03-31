@@ -1,7 +1,6 @@
 from unittest.mock import patch
 
 import pytest
-
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.test.html import parse_html
@@ -49,8 +48,7 @@ class TestSelectPrimaryCompanyViewGet(AdminTestMixin):
         ),
     )
     def test_returns_400_if_invalid_companies_passed(self, data):
-        """
-        Test that a 400 is returned when invalid values are passed for company_1 or company_2.
+        """Test that a 400 is returned when invalid values are passed for company_1 or company_2.
 
         This could only happen if the query string was manipulated, or one of the referenced
         companies was deleted.
@@ -96,8 +94,7 @@ class TestSelectPrimaryCompanyViewGet(AdminTestMixin):
         company_2_factory,
         swap,
     ):
-        """
-        Tests that the radio button to select a company is disabled if it is archived,
+        """Tests that the radio button to select a company is disabled if it is archived,
         or the other company has an OMIS order or other related object
         (other than an interaction, contact or investment project).
         """

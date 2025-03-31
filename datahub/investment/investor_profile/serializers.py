@@ -38,7 +38,6 @@ from datahub.investment.investor_profile.models import (
 from datahub.investment.investor_profile.validate import get_incomplete_fields
 from datahub.investment.validate import is_provided_and_is_date_less_than_a_year_ago
 
-
 BASE_FIELDS = [
     'id',
     'created_on',
@@ -137,8 +136,7 @@ class RequiredChecksConductedSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
     def _update_required_checks_conducted(self, validated_data):
-        """
-        Checks if required checks conducted is being set to a setting that does not require
+        """Checks if required checks conducted is being set to a setting that does not require
         the conditional data. If it is then the conditional fields are blanked.
         """
         if 'required_checks_conducted' in validated_data:
@@ -333,8 +331,7 @@ class LargeCapitalInvestorProfileSerializer(RequiredChecksConductedSerializer):
         )
 
     def validate_investor_company(self, value):
-        """
-        Validates that the company has not changed and that the company does not already
+        """Validates that the company has not changed and that the company does not already
         have a large capital investment profile.
         """
         if self.instance and self.instance.investor_company_id != value.id:

@@ -4,14 +4,13 @@ import pytest
 import reversion
 from django.core.management import call_command
 
-from datahub.company.test.factories import CompanyFactory
-from datahub.company.test.factories import SubsidiaryFactory
+from datahub.company.test.factories import CompanyFactory, SubsidiaryFactory
+
 pytestmark = pytest.mark.django_db
 
 
 def test_merge_id_duns_number(s3_stubber):
-    """
-    Test that the command merge id and duns number
+    """Test that the command merge id and duns number
     """
     with reversion.create_revision():
         company_1 = CompanyFactory(duns_number='123456789')

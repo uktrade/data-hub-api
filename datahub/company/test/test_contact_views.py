@@ -17,9 +17,9 @@ from datahub.core import constants
 from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
 from datahub.core.test_utils import (
     APITestMixin,
+    HawkMockJSONResponse,
     create_test_user,
     format_date_or_datetime,
-    HawkMockJSONResponse,
 )
 from datahub.metadata.test.factories import TeamFactory
 
@@ -1240,8 +1240,7 @@ class TestContactListV4(ContactListBase):
 
 
 class ContactVersioningBase(APITestMixin):
-    """
-    Tests for versions created when interacting with the contact endpoints.
+    """Tests for versions created when interacting with the contact endpoints.
     """
 
     endpoint_namespace = None

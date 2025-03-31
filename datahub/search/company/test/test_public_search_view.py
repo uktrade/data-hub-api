@@ -60,7 +60,7 @@ def public_company_api_client(hawk_api_client):
         'public-company-id',
         'public-company-key',
     )
-    yield hawk_api_client
+    return hawk_api_client
 
 
 @pytest.mark.django_db

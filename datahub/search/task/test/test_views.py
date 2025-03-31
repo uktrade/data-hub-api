@@ -2,7 +2,6 @@ from datetime import datetime, timedelta
 from unittest import mock
 
 import pytest
-
 from rest_framework import status as status_codes
 from rest_framework.reverse import reverse
 
@@ -12,7 +11,6 @@ from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.metadata.test.factories import TeamFactory
 from datahub.search.task.apps import TaskSearchApp
 from datahub.task.test.factories import TaskFactory
-
 
 pytestmark = [
     pytest.mark.django_db,
@@ -122,8 +120,7 @@ class TestTaskSearch(APITestMixin):
         self,
         opensearch_with_collector,
     ):
-        """
-        Tests task not created by id filter works in combination with other parameters.
+        """Tests task not created by id filter works in combination with other parameters.
         We're testing this with an adviser.
         """
         created_by_adviser = AdviserFactory()
@@ -215,8 +212,7 @@ class TestTaskSearch(APITestMixin):
         deep_get,
         opensearch_with_collector,
     ):
-        """
-        Tests edge case where no filter returned from raw_query
+        """Tests edge case where no filter returned from raw_query
         """
         deep_get.return_value = None
 
@@ -243,8 +239,7 @@ class TestTaskSearch(APITestMixin):
         deep_get,
         opensearch_with_collector,
     ):
-        """
-        Test edge case where no filter_index found in raw_query filter
+        """Test edge case where no filter_index found in raw_query filter
         """
         not_created_by_adviser = AdviserFactory()
         deep_get.return_value = [{}]
@@ -523,8 +518,7 @@ class TestTaskInvestmentProjectSearch(APITestMixin):
         opensearch_with_collector,
         archived,
     ):
-        """
-        Only return tasks created by the current adviser or where they have been assigned as an
+        """Only return tasks created by the current adviser or where they have been assigned as an
         adviser even if there additional filters added. This tests uses archived for this.
         """
         current_adviser = AdviserFactory()

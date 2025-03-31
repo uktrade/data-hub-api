@@ -157,8 +157,7 @@ class TestEvidenceDocumentViews(APITestMixin):
 
     @pytest.mark.parametrize('http_method', ('get', 'post'))
     def test_collection_view_returns_404_if_project_doesnt_exist(self, http_method):
-        """
-        Test that the collection view returns a 404 if the project ID specified in the URL path
+        """Test that the collection view returns a 404 if the project ID specified in the URL path
         doesn't exist.
         """
         url = reverse(
@@ -180,8 +179,7 @@ class TestEvidenceDocumentViews(APITestMixin):
         ),
     )
     def test_item_views_return_404_if_project_doesnt_exist(self, viewname, http_method):
-        """
-        Test that the various item views return a 404 if the project ID specified in the URL
+        """Test that the various item views return a 404 if the project ID specified in the URL
         path doesn't exist.
         """
         entity_document = create_evidence_document(user=self.user)

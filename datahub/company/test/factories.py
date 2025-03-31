@@ -91,22 +91,19 @@ class CompanyFactory(factory.django.DjangoModelFactory):
 
     @to_many_field
     def export_to_countries(self):  # noqa: D102
-        """
-        Add support for setting `export_to_countries`.
+        """Add support for setting `export_to_countries`.
         """
         return []
 
     @to_many_field
     def future_interest_countries(self):  # noqa: D102
-        """
-        Add support for setting `future_interest_countries`.
+        """Add support for setting `future_interest_countries`.
         """
         return []
 
     @to_many_field
     def export_countries(self):  # noqa: D102
-        """
-        Add support for setting `export_countries`.
+        """Add support for setting `export_countries`.
         """
         return []
 
@@ -202,8 +199,7 @@ class ContactWithOwnAddressFactory(ContactFactory):
 
 
 class ContactWithOwnAreaFactory(ContactWithOwnAddressFactory):
-    """
-    Factory for a contact with an address different from the contact's
+    """Factory for a contact with an address different from the contact's
     company that includes an area
     """
 

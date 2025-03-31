@@ -8,7 +8,6 @@ from django.core import management
 from django.db.models import QuerySet
 from freezegun import freeze_time
 
-
 from datahub.cleanup.management.commands import delete_old_records
 from datahub.cleanup.management.commands.delete_old_records import (
     COMPANY_EXPIRY_PERIOD,
@@ -970,8 +969,7 @@ MAPPING = {
     delete_old_records.Command.CONFIGS.items(),
 )
 def test_mappings(model_label, config):
-    """
-    Test that `MAPPING` includes all the data necessary for covering all the cases.
+    """Test that `MAPPING` includes all the data necessary for covering all the cases.
     This is to avoid missing tests when new the configurations for delete_old_records are changed.
     """
     assert (
@@ -991,8 +989,7 @@ def test_mappings(model_label, config):
 
 @pytest.mark.parametrize('model_label,config', delete_old_records.Command.CONFIGS.items())
 def test_configs(model_label, config):
-    """
-    Test that configs for delete_old_records cover all relations for the model.
+    """Test that configs for delete_old_records cover all relations for the model.
     This is to make sure any new relations that are added are not missed from the
     configurations.
     """
@@ -1135,8 +1132,7 @@ def test_simulate(
     opensearch_with_signals,
     opensearch_collector_context_manager,
 ):
-    """
-    Test that if --simulate is passed in, the command only simulates the action
+    """Test that if --simulate is passed in, the command only simulates the action
     without making any actual changes.
     """
     # Set up the state before running the command
@@ -1189,8 +1185,7 @@ def test_simulate(
 @pytest.mark.parametrize('model_name,config', delete_old_records.Command.CONFIGS.items())
 @pytest.mark.django_db
 def test_only_print_queries(model_name, config, monkeypatch, caplog):
-    """
-    Test that if --only-print-queries is passed, the SQL query is printed but no deletions or
+    """Test that if --only-print-queries is passed, the SQL query is printed but no deletions or
     simulation occurs.
     """
     caplog.set_level('INFO')
@@ -1227,8 +1222,7 @@ def test_only_print_queries(model_name, config, monkeypatch, caplog):
 @pytest.mark.usefixtures('synchronous_on_commit')
 @pytest.mark.django_db
 def test_with_opensearch_exception(mocked_bulk):
-    """
-    Test that if OpenSearch returns a 5xx error, the command completes but it also
+    """Test that if OpenSearch returns a 5xx error, the command completes but it also
     raises a DataHubError with details of the error.
     """
     mocked_bulk.return_value = (None, [{'delete': {'status': 500}}])

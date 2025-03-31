@@ -5,12 +5,10 @@ import math
 from typing import List
 
 import environ
-
 from dateutil import parser
 from django.conf import settings
 from django.utils import timezone
 from django_pglocks import advisory_lock
-
 from smart_open import open
 
 from datahub.company.models import Contact
@@ -20,7 +18,6 @@ from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
 from datahub.core.realtime_messaging import send_realtime_message
 from datahub.ingest.models import IngestedObject
-
 
 logger = logging.getLogger(__name__)
 
@@ -72,8 +69,7 @@ def schedule_automatic_contact_archive(limit=1000, simulate=False):
 
 
 def automatic_contact_archive(limit=1000, simulate=False):
-    """
-    Archive inactive contacts.
+    """Archive inactive contacts.
     """
     with advisory_lock('automatic_contact_archive', wait=False) as acquired:
 
@@ -131,8 +127,7 @@ class ContactConsentIngestionTask:
         return files_in_bucket[0] if len(files_in_bucket) > 0 else None
 
     def _log_at_interval(self, index: int, message: str):
-        """
-        Log in a way that is suitable for both small and large datasets. Initially
+        """Log in a way that is suitable for both small and large datasets. Initially
         a log info entry will be written every 100 rows, then increasing in frequency
         to every 1000, 10000, 100000 up to every million
         """

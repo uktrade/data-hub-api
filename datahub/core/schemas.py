@@ -2,8 +2,7 @@ from drf_spectacular.openapi import AutoSchema
 
 
 class StubSchema(AutoSchema):
-    """
-    Simple OpenAPI schema without request or response details.
+    """Simple OpenAPI schema without request or response details.
 
     This can be used for extra view methods added to CoreViewSet to suppress the default
     request and response schema generation but still have the endpoints listed in the
@@ -11,8 +10,7 @@ class StubSchema(AutoSchema):
     """
 
     def get_operation(self, path, path_regex, path_prefix, method, registry):
-        """
-        Get the operation schema.
+        """Get the operation schema.
 
         This takes the operationId and parameters that drf-spectacular generate,
         but discards request and response schemas.

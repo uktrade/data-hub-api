@@ -5,6 +5,8 @@ from django.db.models import Q
 
 from datahub.core.constants import (
     InvestmentBusinessActivity as InvestmentBusinessActivityConstant,
+)
+from datahub.core.constants import (
     InvestmentType as InvestmentTypeConstant,
 )
 from datahub.core.queues.constants import HALF_DAY_IN_SECONDS
@@ -32,8 +34,7 @@ def schedule_update_investment_projects_for_gva_multiplier_task(gva_multiplier_i
 
 
 def update_investment_projects_for_gva_multiplier_task(gva_multiplier_id):
-    """
-    Updates the normalised gross_value_added for all investment projects
+    """Updates the normalised gross_value_added for all investment projects
     with the associated GVA Multiplier.
     """
     try:
@@ -48,8 +49,7 @@ def update_investment_projects_for_gva_multiplier_task(gva_multiplier_id):
 
 
 def _update_investment_projects_for_gva_multiplier(gva_multiplier):
-    """
-    Update gross_value_added for a GVA Multipliers related investment projects.
+    """Update gross_value_added for a GVA Multipliers related investment projects.
 
     Saving the projects updates the gross_value_added via pre_save signal.
     """
@@ -72,8 +72,7 @@ def schedule_refresh_gross_value_added_value_for_fdi_investment_projects():
 
 
 def refresh_gross_value_added_value_for_fdi_investment_projects():
-    """
-    Loops over all investment projects that GVA
+    """Loops over all investment projects that GVA
     could be calculated for and saving the project.
 
     Saving the project in turn calls the pre_save method
@@ -110,8 +109,7 @@ def get_investment_projects_to_refresh_gva_values():
 
 
 def get_investment_projects_for_country_of_origin_update():
-    """
-    Get investment projects that do not have set country of origin and have
+    """Get investment projects that do not have set country of origin and have
     investor company assigned.
     """
     return InvestmentProject.objects.select_related(
@@ -135,8 +133,7 @@ def schedule_update_country_of_origin_for_investment_projects():
 
 
 def update_country_of_origin_for_investment_projects():
-    """
-    Loops over all investment projects that do not have country of origin updated and
+    """Loops over all investment projects that do not have country of origin updated and
     copy address country value from the corresponding investor company.
     """
     investment_projects = get_investment_projects_for_country_of_origin_update()

@@ -1,11 +1,9 @@
 from django.urls import path
 
-
 from datahub.task.views import (
-    get_tasks_companies_and_projects,
     TaskV4ViewSet,
+    get_tasks_companies_and_projects,
 )
-
 
 Task_v4_item = TaskV4ViewSet.as_view(
     {

@@ -9,7 +9,6 @@ from datahub.task.signals import set_task_subscriptions_and_schedule_notificatio
 from datahub.task.tasks import update_task_completed_email_status
 from datahub.task.test.factories import TaskFactory
 
-
 pytestmark = [pytest.mark.django_db, pytest.mark.enable_task_signals]
 
 
@@ -73,8 +72,7 @@ class TestTaskAdviserCompletedSubscriptions:
         self,
         schedule_notify_advisers_task_archived_completed_or_amended,
     ):
-        """
-        Note: only the triggering of the schedule is tested not the processing of it.
+        """Note: only the triggering of the schedule is tested not the processing of it.
         """
         adviser = AdviserFactory()
         task = TaskFactory(advisers=[adviser])
@@ -94,8 +92,7 @@ class TestTaskAdviserCompletedSubscriptions:
         self,
         send_task_email,
     ):
-        """
-        Calling with adviser completed should result in sending of TaskCompletedReminder
+        """Calling with adviser completed should result in sending of TaskCompletedReminder
         """
         adviser = AdviserFactory()
         task = TaskFactory(advisers=[adviser], status=Task.Status.COMPLETE)

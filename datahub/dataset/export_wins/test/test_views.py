@@ -1,11 +1,9 @@
 from datetime import date, datetime, timedelta
 
 import pytest
-
 from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 from factory import Iterator
-
 from freezegun import freeze_time
 
 from datahub.company.test.factories import CompanyFactory, ContactFactory
@@ -20,7 +18,6 @@ from datahub.dataset.export_wins import (
 )
 from datahub.export_win.constants import EXPORT_WINS_LEGACY_ID_START_VALUE
 from datahub.export_win.models import HVC, Win
-
 from datahub.export_win.test.factories import (
     AssociatedProgrammeFactory,
     BreakdownFactory,
@@ -36,13 +33,11 @@ from datahub.feature_flag.test.factories import (
     FeatureFlagFactory,
 )
 
-
 pytestmark = pytest.mark.django_db
 
 
 def get_export_wins_legacy_data_feature_flag():
-    """
-    Creates the Export wins legacy dataset feature flag.
+    """Creates the Export wins legacy dataset feature flag.
     """
     return FeatureFlagFactory(
         code=EXPORT_WINS_LEGACY_DATASET_FEATURE_FLAG_NAME,

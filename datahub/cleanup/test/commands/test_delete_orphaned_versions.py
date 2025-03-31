@@ -65,7 +65,6 @@ from datahub.user.company_list.test.factories import (
     PipelineItemFactory,
 )
 
-
 MAPPINGS = {
     'company.Advisor': AdviserFactory,
     'company.Company': CompanyFactory,
@@ -120,8 +119,7 @@ COMPANY_ACTIVITY_CREATED_BY_MODELS = [
 
 
 def test_mappings():
-    """
-    Test that `MAPPINGS` includes all the data necessary for covering all the cases.
+    """Test that `MAPPINGS` includes all the data necessary for covering all the cases.
     This is to avoid missing tests when new fields and models are added or changed.
     """
     assert set(delete_orphaned_versions._get_all_model_labels()) == set(MAPPINGS)
@@ -133,8 +131,7 @@ def test_mappings():
     MAPPINGS.items(),
 )
 def test_with_one_model(model_label, model_factory):
-    """
-    Test that --model_label can be used to specify which model we want the versions deleted.
+    """Test that --model_label can be used to specify which model we want the versions deleted.
     """
     model = apps.get_model(model_label)
 
@@ -160,8 +157,7 @@ def test_with_one_model(model_label, model_factory):
 @pytest.mark.django_db
 @factory.django.mute_signals(signals.post_delete)
 def test_with_all_models(caplog):
-    """
-    Test that if --model_label is not specified, the command cleans up the versions
+    """Test that if --model_label is not specified, the command cleans up the versions
     for all registered models.
     """
     caplog.set_level('INFO')
@@ -204,8 +200,7 @@ def test_with_all_models(caplog):
 
 @pytest.mark.django_db
 def test_delete_revisions_without_versions(caplog):
-    """
-    Test that a revision gets deleted as well if there aren't any more versions referencing it.
+    """Test that a revision gets deleted as well if there aren't any more versions referencing it.
     """
     caplog.set_level('INFO')
 

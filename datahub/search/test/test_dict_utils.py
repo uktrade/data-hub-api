@@ -212,8 +212,7 @@ def test_address_dict(obj, fields_prefix, expected_address_dict):
 
 
 def test_address_dict_raises_error_with_invalid_prefix():
-    """
-    Tests that if address_dict is called with a prefix that
+    """Tests that if address_dict is called with a prefix that
     cannot be found on the object, an AttributeError is raised.
     """
     obj = construct_mock(
@@ -326,8 +325,7 @@ def test_contact_or_adviser_dict_include_dit_team(obj, expected_dict):
 
 @pytest.mark.django_db
 def test_core_team_advisers_list_of_dicts():
-    """
-    Test that core_team_advisers_list_of_dicts returns a list of advisers if
+    """Test that core_team_advisers_list_of_dicts returns a list of advisers if
     they are not global account managers.
     """
     adviser_1 = AdviserFactory()

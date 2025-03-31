@@ -3,12 +3,15 @@ from functools import wraps
 from urllib.parse import urlencode
 
 from django import forms
-from django.contrib import admin, messages as django_messages
+from django.contrib import admin
+from django.contrib import messages as django_messages
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.contrib.admin.views.main import TO_FIELD_VAR
 from django.core.exceptions import ValidationError
 from django.core.files.uploadhandler import FileUploadHandler, SkipFile
-from django.template.defaultfilters import date as date_filter, filesizeformat, time as time_filter
+from django.template.defaultfilters import date as date_filter
+from django.template.defaultfilters import filesizeformat
+from django.template.defaultfilters import time as time_filter
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
@@ -44,16 +47,14 @@ class ViewAndChangeOnlyAdmin(admin.ModelAdmin):
     """ModelAdmin subclass that restricts adding and deletion at all times."""
 
     def has_add_permission(self, request, obj=None):
-        """
-        Gets whether the user can add new objects for this model.
+        """Gets whether the user can add new objects for this model.
 
         Always returns False.
         """
         return False
 
     def has_delete_permission(self, request, obj=None):
-        """
-        Gets whether the user can delete objects for this model.
+        """Gets whether the user can delete objects for this model.
 
         Always returns False.
         """
@@ -61,16 +62,14 @@ class ViewAndChangeOnlyAdmin(admin.ModelAdmin):
 
 
 class ViewOnlyAdmin(ViewAndChangeOnlyAdmin):
-    """
-    ModelAdmin subclass that restricts adding, changing and deleting at all times.
+    """ModelAdmin subclass that restricts adding, changing and deleting at all times.
 
     The user must have the relevant view or change permission in order to be able to view the
     model.
     """
 
     def has_change_permission(self, request, obj=None):
-        """
-        Gets whether the user can change objects for this model.
+        """Gets whether the user can change objects for this model.
 
         Always returns False.
         """
@@ -115,8 +114,7 @@ class ExportWinsAdminMixin(admin.ModelAdmin):
 
 
 class BaseModelAdminMixin(ExportWinsAdminMixin):
-    """
-    Mixin for ModelAdmins which adds extra functionalities.
+    """Mixin for ModelAdmins which adds extra functionalities.
     Useful when the model extends core.BaseModel
 
     It updates created_by and modified_by automatically from the logged in user.
@@ -149,8 +147,7 @@ class BaseModelAdminMixin(ExportWinsAdminMixin):
         return self._get_description_for_timed_event(obj.modified_on, obj.modified_by)
 
     def save_model(self, request, obj, form, change):
-        """
-        Populate created_by/modified_by from the logged in user.
+        """Populate created_by/modified_by from the logged in user.
         """
         if not change:
             obj.created_by = request.user
@@ -160,8 +157,7 @@ class BaseModelAdminMixin(ExportWinsAdminMixin):
 
 
 class RawIdWidget(forms.TextInput):
-    """
-    A widget for selecting a model object using a change list in a pop-up window.
+    """A widget for selecting a model object using a change list in a pop-up window.
 
     This is similar to and based on RawForeignKeyIdWidget, however it is not tied to a
     particular model field (as RawForeignKeyIdWidget is).
@@ -215,8 +211,7 @@ class RawIdWidget(forms.TextInput):
 
 
 class MaxSizeFileUploadHandler(FileUploadHandler):
-    """
-    File upload handler that stops uploads that exceed a certain size.
+    """File upload handler that stops uploads that exceed a certain size.
 
     This aborts the process before the file has been loaded into memory or saved to disk.
 
@@ -254,8 +249,7 @@ class MaxSizeFileUploadHandler(FileUploadHandler):
 
 
 def max_upload_size(max_size):
-    """
-    View decorator to enforce a maximum size on uploads.
+    """View decorator to enforce a maximum size on uploads.
 
     Note: If you want to make a view exempt from CSRF protection, you must ensure that
     the @csrf_exempt decorator is applied first. For example::
@@ -280,8 +274,7 @@ def max_upload_size(max_size):
 
 
 def custom_view_permission(permission_codename):
-    """
-    Decorator that allows a custom view permission to be used with ModelAdmin subclasses.
+    """Decorator that allows a custom view permission to be used with ModelAdmin subclasses.
 
     Usage example::
 
@@ -298,8 +291,7 @@ def custom_view_permission(permission_codename):
 
 
 def custom_add_permission(permission_codename):
-    """
-    Decorator that allows a custom add permission to be used with ModelAdmin subclasses.
+    """Decorator that allows a custom add permission to be used with ModelAdmin subclasses.
 
     Usage example::
 
@@ -316,8 +308,7 @@ def custom_add_permission(permission_codename):
 
 
 def custom_change_permission(permission_codename):
-    """
-    Decorator that allows a custom change permission to be used with ModelAdmin subclasses.
+    """Decorator that allows a custom change permission to be used with ModelAdmin subclasses.
 
     Usage example::
 
@@ -334,8 +325,7 @@ def custom_change_permission(permission_codename):
 
 
 def custom_delete_permission(permission_codename):
-    """
-    Decorator that allows a custom delete permission to be used with ModelAdmin subclasses.
+    """Decorator that allows a custom delete permission to be used with ModelAdmin subclasses.
 
     Usage example::
 
@@ -370,8 +360,7 @@ def get_change_link(obj, site=admin.site):
 
 
 def format_json_as_html(value):
-    """
-    Serialises an object as pretty JSON, and HTML-encodes it in a <pre> tag.
+    """Serialises an object as pretty JSON, and HTML-encodes it in a <pre> tag.
 
     This is useful for displaying JSON fields in the admin site.
 

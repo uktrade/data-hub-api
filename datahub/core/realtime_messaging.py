@@ -8,8 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 def send_realtime_message(message_text):
-    """
-    Send a message to the realtime messaging system.
+    """Send a message to the realtime messaging system.
 
     Do not attempt if the messaging config was not set up properly.
     """

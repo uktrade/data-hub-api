@@ -14,8 +14,7 @@ class TestCompanyExportSerializer:
     """Tests for the Company Export Serializer"""
 
     def test_export_team_members_validation_throws_error_for_more_than_allowed_max(self):
-        """
-        Test the team_members field is validated by the serializer and an error thrown when the
+        """Test the team_members field is validated by the serializer and an error thrown when the
         number of team_members provided is above the max allowed
         """
         request = Mock()

@@ -1,11 +1,8 @@
 from datetime import datetime, timezone
 
 import pytest
-
 from django.urls import reverse
-
 from freezegun import freeze_time
-
 from rest_framework import status
 
 from datahub.company_referral.test.factories import (
@@ -40,8 +37,7 @@ def get_expected_data_from_company_referral(referral):
 
 @pytest.mark.django_db
 class TestCompanyReferralDatasetView(BaseDatasetViewTest):
-    """
-    Tests for CompanyReferralDatasetView
+    """Tests for CompanyReferralDatasetView
     """
 
     view_url = reverse('api-v4:dataset:company-referrals-dataset')

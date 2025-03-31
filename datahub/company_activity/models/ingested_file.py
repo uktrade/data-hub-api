@@ -11,8 +11,7 @@ MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 @reversion.register_base_model()
 class IngestedFile(models.Model):
-    """
-    Model to track which Company Activity data source files have been ingested already
+    """Model to track which Company Activity data source files have been ingested already
     """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)

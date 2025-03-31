@@ -10,8 +10,7 @@ class TestGreatExportEnquiry:
     """Tests for the Great Export Enquiry model."""
 
     def test_save(self):
-        """
-        Test save also saves to the `CompanyActivity` model and does not save to the
+        """Test save also saves to the `CompanyActivity` model and does not save to the
         `CompanyActivity` model if it already exists.
         """
         assert not CompanyActivity.objects.all().exists()
@@ -41,8 +40,7 @@ class TestGreatExportEnquiry:
         assert not CompanyActivity.objects.all().exists()
 
     def test_save_with_no_company(self):
-        """
-        Test save does not save to the `CompanyActivity` model
+        """Test save does not save to the `CompanyActivity` model
         """
         assert not CompanyActivity.objects.all().exists()
 

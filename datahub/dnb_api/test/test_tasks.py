@@ -53,8 +53,7 @@ def test_sync_company_with_dnb_all_fields(
     base_company_dict,
     update_descriptor,
 ):
-    """
-    Test the sync_company_with_dnb task when all fields should be synced.
+    """Test the sync_company_with_dnb task when all fields should be synced.
     """
     requests_mock.post(
         DNB_V2_SEARCH_URL,
@@ -119,8 +118,7 @@ def test_sync_company_with_dnb_partial_fields(
     dnb_response_uk,
     base_company_dict,
 ):
-    """
-    Test the sync_company_with_dnb task when only a subset of fields should be synced.
+    """Test the sync_company_with_dnb task when only a subset of fields should be synced.
     """
     requests_mock.post(
         DNB_V2_SEARCH_URL,
@@ -190,8 +188,7 @@ def test_sync_company_with_dnb_partial_fields(
     ),
 )
 def test_sync_company_with_dnb_bubbles_up_errors(monkeypatch, error):
-    """
-    Test the sync_company_with_dnb task retries server errors.
+    """Test the sync_company_with_dnb task retries server errors.
     """
     company = CompanyFactory(duns_number='123456789')
 
@@ -241,8 +238,7 @@ class TestGetCompanyUpdates:
         ),
     )
     def test_errors(self, monkeypatch, error):
-        """
-        Test the schedule_get_company_updates task retries server errors.
+        """Test the schedule_get_company_updates task retries server errors.
         """
         mocked_get_company_update_page = mock.Mock(side_effect=error)
         monkeypatch.setattr(
@@ -286,8 +282,7 @@ class TestGetCompanyUpdates:
     )
     @freeze_time('2019-01-02T2:00:00')
     def test_updates(self, monkeypatch, data, fields_to_update):
-        """
-        Test if the update_company task is called with the right parameters for all the records
+        """Test if the update_company task is called with the right parameters for all the records
         spread across pages.
         """
         mock_get_company_update_page = mock.Mock(
@@ -329,8 +324,7 @@ class TestGetCompanyUpdates:
         ),
     )
     def test_lock(self, monkeypatch, lock_acquired, call_count):
-        """
-        Test that the task doesn't run if it cannot acquire
+        """Test that the task doesn't run if it cannot acquire
         the advisory_lock.
         """
         mock_advisory_lock = mock.MagicMock()
@@ -390,8 +384,7 @@ class TestGetCompanyUpdates:
     @freeze_time('2019-01-02T2:00:00')
     @override_settings(DNB_AUTOMATIC_UPDATE_LIMIT=2)
     def test_updates_max_update_limit(self, monkeypatch, data):
-        """
-        Test if the update_company task is called with the
+        """Test if the update_company task is called with the
         right parameters for all the records spread across
         pages.
         """
@@ -424,8 +417,7 @@ class TestGetCompanyUpdates:
         monkeypatch,
         dnb_company_updates_response_uk,
     ):
-        """
-        Test full integration for the `get_company_updates` task with the
+        """Test full integration for the `get_company_updates` task with the
         `update_company_from_dnb_data` task when all fields are updated.
         """
         company = CompanyFactory(duns_number='123456789')
@@ -468,8 +460,7 @@ class TestGetCompanyUpdates:
         monkeypatch,
         dnb_company_updates_response_uk,
     ):
-        """
-        Test full integration for the `get_company_updates` task with the
+        """Test full integration for the `get_company_updates` task with the
         `update_company_from_dnb_data` task when the fields are only partially updated.
         """
         company = CompanyFactory(duns_number='123456789')
@@ -513,8 +504,7 @@ class TestGetCompanyUpdates:
         monkeypatch,
         dnb_company_updates_response_uk,
     ):
-        """
-        Test full integration for the `get_company_updates` task with the
+        """Test full integration for the `get_company_updates` task with the
         `update_company_from_dnb_data` task when all fields are updated and one company in the
         dnb-service result does not exist in Data Hub.
         """
@@ -556,8 +546,7 @@ class TestGetCompanyUpdates:
 
 @freeze_time('2019-01-01 11:12:13')
 def test_update_company_from_dnb_data(dnb_response_uk, base_company_dict):
-    """
-    Test the update_company_from_dnb_data command when all DNB fields are updated.
+    """Test the update_company_from_dnb_data command when all DNB fields are updated.
     """
     company = CompanyFactory(duns_number='123456789')
     original_company = Company.objects.get(id=company.id)
@@ -609,8 +598,7 @@ def test_update_company_from_dnb_data(dnb_response_uk, base_company_dict):
 
 @freeze_time('2019-01-01 11:12:13')
 def test_update_company_from_dnb_data_partial_fields(dnb_response_uk, base_company_dict):
-    """
-    Test the update_company_from_dnb_data command when a subset of DNB fields are updated.
+    """Test the update_company_from_dnb_data command when a subset of DNB fields are updated.
     """
     company = CompanyFactory(duns_number='123456789')
     original_company = Company.objects.get(id=company.id)
@@ -665,8 +653,7 @@ def test_update_company_from_dnb_data_partial_fields(dnb_response_uk, base_compa
 
 @freeze_time('2019-01-01 11:12:13')
 def test_update_company_from_dnb_data_does_not_exist(dnb_response_uk, caplog):
-    """
-    Test the update_company_from_dnb_data command when the company does not exist in Data Hub.
+    """Test the update_company_from_dnb_data command when the company does not exist in Data Hub.
     """
     with pytest.raises(Company.DoesNotExist):
         update_company_from_dnb_data(dnb_response_uk['results'][0])
@@ -675,8 +662,7 @@ def test_update_company_from_dnb_data_does_not_exist(dnb_response_uk, caplog):
 
 @freeze_time('2019-01-01 11:12:13')
 def test_update_company_from_dnb_data_fails_validation(dnb_response_uk, caplog):
-    """
-    Test the update_company_from_dnb_data command when the company data does not pass validation
+    """Test the update_company_from_dnb_data command when the company data does not pass validation
     checks.
     """
     CompanyFactory(duns_number='123456789')
@@ -702,8 +688,7 @@ def test_sync_outdated_companies_with_dnb_all_fields(
     existing_company_dnb_modified_on,
     caplog,
 ):
-    """
-    Test the sync_outdated_companies_with_dnb task when all fields should be synced.
+    """Test the sync_outdated_companies_with_dnb task when all fields should be synced.
     """
     caplog.set_level('INFO')
     if callable(existing_company_dnb_modified_on):
@@ -774,8 +759,7 @@ def test_sync_outdated_companies_with_dnb_partial_fields(
     existing_company_dnb_modified_on,
     caplog,
 ):
-    """
-    Test the sync_outdated_companies_with_dnb task when only a subset of fields should be synced.
+    """Test the sync_outdated_companies_with_dnb task when only a subset of fields should be synced.
     """
     caplog.set_level('INFO')
     if callable(existing_company_dnb_modified_on):
@@ -846,8 +830,7 @@ def test_sync_outdated_companies_limit_least_recently_synced_is_updated(
     requests_mock,
     dnb_response_uk,
 ):
-    """
-    Test that running sync_outdated_companies_with_dnb with a limit will update
+    """Test that running sync_outdated_companies_with_dnb with a limit will update
     the least recently synced company.
     """
     requests_mock.post(
@@ -884,8 +867,7 @@ def test_sync_outdated_companies_limit_most_recently_interacted_updated(
     requests_mock,
     dnb_response_uk,
 ):
-    """
-    Test that running sync_outdated_companies_with_dnb with a limit will update
+    """Test that running sync_outdated_companies_with_dnb with a limit will update
     the most recently interacted company.
     """
     requests_mock.post(
@@ -929,8 +911,7 @@ def test_sync_outdated_companies_nothing_to_update(
     requests_mock,
     dnb_response_uk,
 ):
-    """
-    Add two companies (one with dnb_modified_on>dnb_modified_on_before) and
+    """Add two companies (one with dnb_modified_on>dnb_modified_on_before) and
     assert that only the outdated one is synced.
     """
     company = CompanyFactory(
@@ -953,8 +934,7 @@ def test_sync_outdated_companies_nothing_to_update(
 
 @freeze_time('2019-01-01 11:12:13')
 def test_sync_outdated_companies_simulation(caplog):
-    """
-    Test that using simulation mode does not modify companies and logs correctly.
+    """Test that using simulation mode does not modify companies and logs correctly.
     """
     caplog.set_level('INFO')
     company = CompanyFactory(
@@ -977,8 +957,7 @@ def test_sync_outdated_companies_simulation(caplog):
 
 @freeze_time('2019-01-01 11:12:13')
 def test_sync_outdated_companies_sync_task_failure_logs_error(caplog, monkeypatch):
-    """
-    Test that when the sync_company_with_dnb sub-task fails, an error log is
+    """Test that when the sync_company_with_dnb sub-task fails, an error log is
     generated.
     """
     caplog.set_level('WARNING')

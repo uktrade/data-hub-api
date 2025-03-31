@@ -32,8 +32,7 @@ class WhoAmISerializer(serializers.ModelSerializer):
         depth = 2
 
     def get_permissions(self, obj):
-        """
-        Get all of the user's permissions.
+        """Get all of the user's permissions.
 
         To keep backwards compatibility, permissions with codenames that start with view_ are
         replicated as permissions with codenames that start with read_. (Once the front end has

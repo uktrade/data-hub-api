@@ -3,7 +3,6 @@ import uuid
 from django.conf import settings
 from django.db import models
 
-
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
@@ -16,8 +15,7 @@ class MailboxProcessingStatus(models.TextChoices):
 
 
 class MailboxLogging(models.Model):
-    """
-    Model for mailbox logging.
+    """Model for mailbox logging.
     """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)

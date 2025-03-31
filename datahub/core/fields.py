@@ -7,8 +7,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 class MultipleChoiceField(ArrayField):
-    """
-    Simple multi-select choice field.
+    """Simple multi-select choice field.
 
     This has basic validation (suitable for use in the admin site), and uses a
     MultipleChoiceField as the default form field.
@@ -24,8 +23,7 @@ class MultipleChoiceField(ArrayField):
     default_widget = forms.CheckboxSelectMultiple
 
     def __init__(self, max_length=None, choices=None, **kwargs):
-        """
-        Initialises the field.
+        """Initialises the field.
 
         Note that self.choices is deliberately not set as it triggers a lot of unwanted form
         field logic.
@@ -36,8 +34,7 @@ class MultipleChoiceField(ArrayField):
         )
 
     def contribute_to_class(self, cls, name, private_only=False):
-        """
-        Injects a method into the model that returns a display-formatted version of the
+        """Injects a method into the model that returns a display-formatted version of the
         value for the field.
         """
         super().contribute_to_class(cls, name, private_only=False)
@@ -55,8 +52,7 @@ class MultipleChoiceField(ArrayField):
         setattr(cls, f'get_{self.name}_display', _get_display)
 
     def deconstruct(self):
-        """
-        Returns a 4-tuple used by makemigrations to recreate the field.
+        """Returns a 4-tuple used by makemigrations to recreate the field.
 
         Uses the base class of ArrayField as initialisation of ArrayField is internal to
         __init__().

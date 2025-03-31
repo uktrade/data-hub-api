@@ -2,16 +2,14 @@ from rest_framework.permissions import BasePermission
 
 
 class SearchPermissions(BasePermission):
-    """
-    DRF permission class that checks that the user has at least one of the permissions in the
+    """DRF permission class that checks that the user has at least one of the permissions in the
     view_permissions attribute on the search app.
     """
 
     is_export = False
 
     def has_permission(self, request, view):
-        """
-        Return `True` if permission is granted `False` otherwise.
+        """Return `True` if permission is granted `False` otherwise.
         """
         if not (request.user and request.user.is_authenticated):
             return False
@@ -20,8 +18,7 @@ class SearchPermissions(BasePermission):
 
 
 class SearchAndExportPermissions(SearchPermissions):
-    """
-    DRF permission class that checks that the user has at least one of the permissions in the
+    """DRF permission class that checks that the user has at least one of the permissions in the
     view_permissions attribute (on the search app), and additionally has the permission in
     export_permission attribute (on the search app).
     """
@@ -30,8 +27,7 @@ class SearchAndExportPermissions(SearchPermissions):
 
 
 def has_permissions_for_app(user, search_app, is_export=False):
-    """
-    Checks if the user has permission to search for records related to a search app.
+    """Checks if the user has permission to search for records related to a search app.
 
     This is done by checking if the user has at least one of the permissions in the
     view_permissions attribute on the search app.

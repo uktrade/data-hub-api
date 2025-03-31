@@ -13,8 +13,7 @@ from datahub.metadata.query_utils import get_sector_name_subquery, get_service_n
 
 
 class InteractionsDatasetView(BaseFilterDatasetView):
-    """
-    A GET API view to return all interaction data as required for syncing by
+    """A GET API view to return all interaction data as required for syncing by
     Data-flow periodically.
     """
 

@@ -1,7 +1,6 @@
 """Tests for generic document views."""
 import logging
 import uuid
-
 from datetime import (
     datetime,
     timedelta,
@@ -10,7 +9,6 @@ from datetime import (
 from unittest.mock import Mock, patch
 
 import pytest
-
 from django.test.utils import override_settings
 from django.utils.timezone import now
 from freezegun import freeze_time
@@ -30,7 +28,6 @@ from datahub.documents.models import (
 from datahub.documents.test.factories import CompanySharePointDocumentFactory
 from datahub.documents.test.my_entity_document.models import MyEntityDocument
 from datahub.documents.test.test_utils import assert_retrieved_generic_document
-
 
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
 DOCUMENT_COLLECTION_URL = reverse('api-v4:document:generic-document-collection')

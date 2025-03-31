@@ -10,8 +10,7 @@ MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
 class StovaEvent(models.Model):
-    """
-    Stova can also be known as Aventri.
+    """Stova can also be known as Aventri.
 
     This model is filled and based off data from the S3 bucket: ExportAventriEvents
     """
@@ -90,8 +89,7 @@ class StovaEvent(models.Model):
 
     @staticmethod
     def get_stova_event_service_id() -> str:
-        """
-        The frontend expects a service which we don't get from Stova. This service is created for
+        """The frontend expects a service which we don't get from Stova. This service is created for
         ingested stova events called "Stova Event Service". These service are metadata created in
         migrations files so we can guarantee it exists before the application is run.
 
@@ -101,8 +99,7 @@ class StovaEvent(models.Model):
 
     @staticmethod
     def get_or_create_stova_event_type() -> EventType:
-        """
-        Returns or creates an `EventType`.
+        """Returns or creates an `EventType`.
 
         DataHub events require an event type which is not provided by Stova. Therefore, all events
         ingested from Stova will be given the below event type by default.

@@ -1,5 +1,4 @@
 import pytest
-
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -43,31 +42,28 @@ from datahub.reminder.test.factories import (
 from datahub.task.test.factories import TaskFactory
 
 
-@pytest.fixture()
+@pytest.fixture
 def investment_notifications_user_feature_group():
+    """Creates the investment notifications user feature group.
     """
-    Creates the investment notifications user feature group.
-    """
-    yield UserFeatureFlagGroupFactory(
+    return UserFeatureFlagGroupFactory(
         code=INVESTMENT_NOTIFICATIONS_FEATURE_GROUP_NAME,
         is_active=True,
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def export_notifications_user_feature_group():
+    """Creates the export notifications user feature group.
     """
-    Creates the export notifications user feature group.
-    """
-    yield UserFeatureFlagGroupFactory(
+    return UserFeatureFlagGroupFactory(
         code=EXPORT_NOTIFICATIONS_FEATURE_GROUP_NAME,
         is_active=True,
     )
 
 
 class ReminderTestMixin:
-    """
-    Common tests for the reminder views.
+    """Common tests for the reminder views.
     """
 
     @property
@@ -162,8 +158,7 @@ class ReminderTestMixin:
 
 class TaskReminderMixin:
     def test_get_generic_task_reminders(self):
-        """
-        Given some reminders for generic tasks, these should be returned without any references to
+        """Given some reminders for generic tasks, these should be returned without any references to
         other task types
         """
         reminder_count = 3
@@ -196,8 +191,7 @@ class TaskReminderMixin:
         }
 
     def test_get_investment_project_task_reminders(self):
-        """
-        Given some reminders for tasks with an investment project, these should be returned with
+        """Given some reminders for tasks with an investment project, these should be returned with
         the correct investment project data
         """
         investment_project = InvestmentProjectFactory()
@@ -243,8 +237,7 @@ class TaskReminderMixin:
         }
 
     def test_get_company_task_reminders(self):
-        """
-        Given some reminders for tasks with a company, these should be returned with
+        """Given some reminders for tasks with a company, these should be returned with
         the correct company data
         """
         company = CompanyFactory()
@@ -280,8 +273,7 @@ class TaskReminderMixin:
         }
 
     def test_get_interaction_task_reminders(self):
-        """
-        Given some reminders for tasks with an interaction, these should be returned with
+        """Given some reminders for tasks with an interaction, these should be returned with
         the correct interaction data
         """
         interaction = InteractionFactoryBase()
@@ -319,8 +311,7 @@ class TaskReminderMixin:
 
 @freeze_time('2022-12-15T17:00:00.000000Z')
 class TestNewExportInteractionReminderViewset(APITestMixin, ReminderTestMixin):
-    """
-    Tests for the new export interaction reminder view.
+    """Tests for the new export interaction reminder view.
     """
 
     url_name = 'api-v4:reminder:new-export-interaction-reminder'
@@ -422,8 +413,7 @@ class TestNewExportInteractionReminderViewset(APITestMixin, ReminderTestMixin):
 
 @freeze_time('2022-11-07T17:00:00.000000Z')
 class TestNoRecentExportInteractionReminderViewset(APITestMixin, ReminderTestMixin):
-    """
-    Tests for the no recent export interaction reminder view.
+    """Tests for the no recent export interaction reminder view.
     """
 
     url_name = 'api-v4:reminder:no-recent-export-interaction-reminder'
@@ -570,8 +560,7 @@ class TestNoRecentExportInteractionReminderViewset(APITestMixin, ReminderTestMix
 
 @freeze_time('2022-05-05T17:00:00.000000Z')
 class TestNoRecentInvestmentInteractionReminderViewset(APITestMixin, ReminderTestMixin):
-    """
-    Tests for the no recent investment interaction reminder view.
+    """Tests for the no recent investment interaction reminder view.
     """
 
     url_name = 'api-v4:reminder:no-recent-investment-interaction-reminder'
@@ -609,8 +598,7 @@ class TestNoRecentInvestmentInteractionReminderViewset(APITestMixin, ReminderTes
 
 @freeze_time('2022-05-05T17:00:00.000000Z')
 class TestUpcomingEstimatedLandDateReminderViewset(APITestMixin, ReminderTestMixin):
-    """
-    Tests for the upcoming estimated land date reminder view.
+    """Tests for the upcoming estimated land date reminder view.
     """
 
     url_name = 'api-v4:reminder:estimated-land-date-reminder'
@@ -648,8 +636,7 @@ class TestUpcomingEstimatedLandDateReminderViewset(APITestMixin, ReminderTestMix
 
 @freeze_time('2022-05-05T17:00:00.000000Z')
 class TestUpcomingTaskDueDateReminderViewset(APITestMixin, ReminderTestMixin, TaskReminderMixin):
-    """
-    Tests for the upcoming task due date reminder view.
+    """Tests for the upcoming task due date reminder view.
     """
 
     url_name = 'api-v4:reminder:my-tasks-due-date-approaching-reminder'
@@ -664,8 +651,7 @@ class TestTaskAssignedToMeFromOthersReminderViewset(
     ReminderTestMixin,
     TaskReminderMixin,
 ):
-    """
-    Tests for the task assigned to me from others reminder view.
+    """Tests for the task assigned to me from others reminder view.
     """
 
     url_name = 'api-v4:reminder:my-tasks-task-assigned-to-me-from-others-reminder'
@@ -676,8 +662,7 @@ class TestTaskAssignedToMeFromOthersReminderViewset(
 
 @freeze_time('2022-05-05T17:00:00.000000Z')
 class TestTaskOverdueReminderViewset(APITestMixin, ReminderTestMixin, TaskReminderMixin):
-    """
-    Tests for the task overdue view.
+    """Tests for the task overdue view.
     """
 
     url_name = 'api-v4:reminder:my-tasks-task-overdue-reminder'
@@ -692,8 +677,7 @@ class TestTaskCompletedReminderViewset(
     ReminderTestMixin,
     TaskReminderMixin,
 ):
-    """
-    Tests for the task completed reminder view.
+    """Tests for the task completed reminder view.
     """
 
     url_name = 'api-v4:reminder:my-tasks-task-completed-reminder'
@@ -708,8 +692,7 @@ class TestTaskAmendedByOthersReminderViewset(
     ReminderTestMixin,
     TaskReminderMixin,
 ):
-    """
-    Tests for the task amended by others reminder view.
+    """Tests for the task amended by others reminder view.
     """
 
     url_name = 'api-v4:reminder:my-tasks-task-amended-by-others-reminder'
@@ -724,8 +707,7 @@ class TestTaskDeletedByOthersReminderViewset(
     ReminderTestMixin,
     TaskReminderMixin,
 ):
-    """
-    Tests for the task deleted by others reminder view.
+    """Tests for the task deleted by others reminder view.
     """
 
     url_name = 'api-v4:reminder:my-tasks-task-deleted-by-others-reminder'
@@ -735,8 +717,7 @@ class TestTaskDeletedByOthersReminderViewset(
 
 
 class TestGetReminderSummaryView(APITestMixin):
-    """
-    Tests for the reminder summary view.
+    """Tests for the reminder summary view.
     """
 
     url_name = 'api-v4:reminder:summary'
@@ -890,8 +871,7 @@ class TestGetReminderSummaryView(APITestMixin):
         investment_notifications_user_feature_group,
         export_notifications_user_feature_group,
     ):
-        """
-        Should return a summary of reminders.
+        """Should return a summary of reminders.
 
         It should return 0 for reminder category that does not have relevant feature group.
         """

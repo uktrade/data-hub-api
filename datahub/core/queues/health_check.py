@@ -10,7 +10,6 @@ from rq.exceptions import NoSuchJobError
 from datahub.core.queues.errors import RetryError
 from datahub.core.queues.scheduler import DataHubScheduler
 
-
 logger = getLogger(__name__)
 
 

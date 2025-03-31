@@ -41,5 +41,5 @@ def test_object_tuples():
     return [
         (key, content)
         for key, content
-        in list(zip(keys, contents))
+        in list(zip(keys, contents, strict=False))
     ]

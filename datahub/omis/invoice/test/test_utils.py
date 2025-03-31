@@ -12,8 +12,7 @@ from datahub.omis.order.test.factories import OrderWithAcceptedQuoteFactory
 
 @pytest.mark.django_db
 class TestGenerateInvoiceNumber:
-    """
-    Tests for generating the invoice number using `generate_datetime_based_reference`.
+    """Tests for generating the invoice number using `generate_datetime_based_reference`.
 
     These are really extra tests just to make sure things work as expected as the main
     logic is been tested by the generic generate_datetime_based_reference tests.
@@ -66,8 +65,7 @@ class TestCalculatePaymentDueDate:
     """Tests for the calculate_payment_due_date logic."""
 
     def test_with_delivery_date_in_far_future(self):
-        """
-        Quote accepted on = 18/04/2017
+        """Quote accepted on = 18/04/2017
         delivery date = 20/06/2017 (in 2 months)
 
         Therefore payment due date = 18/05/2017 (after 30 days)
@@ -83,8 +81,7 @@ class TestCalculatePaymentDueDate:
         assert payment_due_date == dateutil_parse('2017-05-18').date()
 
     def test_with_close_delivery_date(self):
-        """
-        Quote accepted on = 18/04/2017
+        """Quote accepted on = 18/04/2017
         delivery date = 08/05/2017 (in 20 days)
 
         Therefore payment due date = 24/04/2017 (delivery date - 14 days)

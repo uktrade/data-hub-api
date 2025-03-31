@@ -220,8 +220,7 @@ def test_email_sent_by_dit(
     expected_result,
     expected_warning,
 ):
-    """
-    Tests for was_email_sent_by_dit validator.
+    """Tests for was_email_sent_by_dit validator.
     """
     caplog.set_level(logging.ERROR)
     message = mock.Mock()
@@ -239,8 +238,7 @@ def test_email_sent_by_dit(
 
 
 def test_bad_from_returns_false():
-    """
-    Test was_email_sent_by_dit validator when the from_ attribute is malformed.
+    """Test was_email_sent_by_dit validator when the from_ attribute is malformed.
     """
     message = mock.Mock()
     # This should be an iterable of pairs - simulate a malformed from attribute

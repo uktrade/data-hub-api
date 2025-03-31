@@ -9,6 +9,7 @@ from django.db.models import CharField, F, Max, Q, Value
 from django.db.models.functions import Cast, Left
 
 from datahub.core.query_utils import (
+    JSONBBuildObject,
     get_aggregate_subquery,
     get_array_agg_subquery,
     get_bracketed_concat_expression,
@@ -19,7 +20,6 @@ from datahub.core.query_utils import (
     get_queryset_object,
     get_string_agg_subquery,
     get_top_related_expression_subquery,
-    JSONBBuildObject,
 )
 from datahub.core.test.support.factories import BookFactory, PersonFactory, PersonListItemFactory
 from datahub.core.test.support.models import Book, Person, PersonListItem
@@ -64,8 +64,7 @@ class TestGetStringAggSubquery:
         ),
     )
     def test_can_annotate_queryset(self, names, distinct, expected_result):
-        """
-        Test that the first names of all authors for each book can be concatenated into
+        """Test that the first names of all authors for each book can be concatenated into
         one field as a query set annotation for various cases.
         """
         authors = PersonFactory.create_batch(
@@ -102,8 +101,7 @@ class TestGetArrayAggSubquery:
         ),
     )
     def test_aggregates_as_array(self, names, distinct):
-        """
-        Test that the first names of all authors for each book can be aggregated into an array
+        """Test that the first names of all authors for each book can be aggregated into an array
         for various cases, and with distinct on and off.
         """
         authors = PersonFactory.create_batch(
@@ -145,8 +143,7 @@ class TestGetArrayAggSubquery:
         ),
     )
     def test_aggregates_as_filtered_array(self, names, desired_names):
-        """
-        Test that the desired first names of authors for each book can be aggregated into an array
+        """Test that the desired first names of authors for each book can be aggregated into an array
         for various cases.
         """
         authors = PersonFactory.create_batch(
@@ -201,8 +198,7 @@ class TestGetAggregateSubquery:
 
     @pytest.mark.parametrize('num_books', (0, 5))
     def test_with_max_aggregate_expression(self, num_books):
-        """
-        Test that Max() can be used to calculate the maximum published-on date for the books a
+        """Test that Max() can be used to calculate the maximum published-on date for the books a
         person has proofread.
         """
         proofreader = PersonFactory()
@@ -217,8 +213,7 @@ class TestGetAggregateSubquery:
         assert actual_max_published == expected_max_published
 
     def test_get_aggregate_subquery_raises_error_on_on_aggregate_expression(self):
-        """
-        Test that an error is raised when passed a non-aggregate expression.
+        """Test that an error is raised when passed a non-aggregate expression.
         """
         with pytest.raises(ValueError):
             get_aggregate_subquery(Person, Left('proofread_books__name', 5))
@@ -229,8 +224,7 @@ class TestGetTopRelatedExpressionSubquery:
 
     @pytest.mark.parametrize('expression', ('name', F('name')))
     def test_with_default_outer_field(self, expression):
-        """
-        Test that a Person query set can annotated with the name of the most
+        """Test that a Person query set can annotated with the name of the most
         recently published book.
 
         This considers a single many-to-one relationship between Book and Person.
@@ -258,8 +252,7 @@ class TestGetTopRelatedExpressionSubquery:
         assert queryset.first().name_of_latest_book == 'newest'
 
     def test_with_custom_outer_field(self):
-        """
-        Test that a PersonListItem query set can be annotated with the name of the most
+        """Test that a PersonListItem query set can be annotated with the name of the most
         recently published book for the person in the list item.
 
         This involves two relationships:
@@ -291,8 +284,7 @@ class TestGetTopRelatedExpressionSubquery:
         assert queryset.first().name_of_latest_book == 'newest'
 
     def test_with_no_related_objects(self):
-        """
-        Test that, if a Person query set is annotated with the name of the most
+        """Test that, if a Person query set is annotated with the name of the most
         recently published proofread books, and there are no such books, the annotation
         value is None.
 
@@ -314,8 +306,7 @@ class TestGetTopRelatedExpressionSubquery:
 
 @pytest.mark.parametrize('genre', ('horror', 'non_fiction', 'invalid-option', None))
 def test_get_choices_as_case_expression(genre):
-    """
-    Test that get_choices_as_case_expression() generates display names for a field with
+    """Test that get_choices_as_case_expression() generates display names for a field with
     choices the same way that model_obj.get_FIELD_display() does.
     """
     book = BookFactory(genre=genre)
@@ -355,8 +346,7 @@ class TestGetFullNameExpression:
     @pytest.mark.parametrize('include_country', (True, False))
     @pytest.mark.parametrize('country', ('French', '', None))
     def test_full_name_related_annotation(self, include_country, country):
-        """
-        Tests that a Book query set can be annotated with the full name of the proofreader
+        """Tests that a Book query set can be annotated with the full name of the proofreader
         of each book.
         """
         book = BookFactory(proofreader__country=country)
@@ -447,8 +437,7 @@ class TestBracketedConcatExpression:
         bracketed_field,
         expected_value,
     ):
-        """
-        Tests that a Person query set can be annotated using get_bracketed_concat_expression().
+        """Tests that a Person query set can be annotated using get_bracketed_concat_expression().
         """
         PersonFactory(first_name=first_name, last_name=last_name, country=country)
         queryset = Person.objects.annotate(

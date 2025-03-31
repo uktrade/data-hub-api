@@ -1,9 +1,7 @@
 import logging
 
 import boto3
-
 from django.conf import settings
-
 from redis import Redis
 from rq import Queue, Worker
 
@@ -62,8 +60,7 @@ class CompanyActivityIngestionTask:
         return False
 
     def ingest(self):
-        """
-        Gets the most recent file in the data-flow S3 bucket for each
+        """Gets the most recent file in the data-flow S3 bucket for each
         data source (prefix) and enqueues a job to process each file
         that hasn't already been ingested
         """

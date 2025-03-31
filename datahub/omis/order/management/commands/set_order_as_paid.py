@@ -9,8 +9,7 @@ from datahub.omis.payment.models import Payment
 
 
 class Command(BaseCommand):
-    """
-    Command to complete the order creation process after initial test data added to database
+    """Command to complete the order creation process after initial test data added to database
     by adding an assignee to the order, generating a quote, then marking it as paid.
     Example of executing the command locally:
         python manage.py set_order_as_paid

@@ -1,5 +1,4 @@
-"""
-Feature flag functionality.
+"""Feature flag functionality.
 
 Feature flags are used to control whether a piece of new functionality is visible
 to a user. They're usually used to hide functionality from users when it's not yet

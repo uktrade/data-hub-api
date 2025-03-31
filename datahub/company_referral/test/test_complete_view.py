@@ -33,8 +33,7 @@ def _complete_url(pk):
 
 
 class TestCompleteCompanyReferral(APITestMixin):
-    """
-    Tests for the complete a company referral view.
+    """Tests for the complete a company referral view.
 
     There is some overlap between these and the tests for adding an interaction. However,
     these are subtly different, as the company field is not required here, and the referral

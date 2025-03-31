@@ -1,9 +1,12 @@
 from django.db import transaction
 from django.db.models.signals import post_delete, post_save
 
-from datahub.company.models import Company as DBCompany, Contact as DBContact
+from datahub.company.models import Company as DBCompany
+from datahub.company.models import Contact as DBContact
 from datahub.interaction.models import (
     Interaction as DBInteraction,
+)
+from datahub.interaction.models import (
     InteractionDITParticipant as DBInteractionDITParticipant,
 )
 from datahub.investment.project.models import InvestmentProject as DBInvestmentProject

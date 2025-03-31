@@ -101,7 +101,7 @@ def advisers():
         },
     )
 
-    yield [AdviserFactory(**kwargs) for kwargs in factory_kwarg_list]
+    return [AdviserFactory(**kwargs) for kwargs in factory_kwarg_list]
 
 
 class TestAdviser(APITestMixin):

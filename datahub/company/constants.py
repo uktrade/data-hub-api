@@ -3,14 +3,12 @@ from uuid import UUID
 
 from datahub.core.constants import Constant
 
-
 AUTOMATIC_COMPANY_ARCHIVE_FEATURE_FLAG = 'automatic-company-archive'
 CONSENT_SERVICE_EMAIL_CONSENT_TYPE = 'email_marketing'
 
 
 class BusinessTypeConstant(Enum):
-    """
-    Business type constants.
+    """Business type constants.
 
     Note:
         These are automatically loaded to the database via a post_migrate signal receiver (which

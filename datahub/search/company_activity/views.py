@@ -6,8 +6,8 @@ from datahub.search.company_activity.serializers import (
     SearchCompanyActivityQuerySerializer,
 )
 from datahub.search.views import (
-    register_v4_view,
     SearchAPIView,
+    register_v4_view,
 )
 
 

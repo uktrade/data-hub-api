@@ -360,8 +360,7 @@ class TestCreateEventView(APITestMixin):
         }
 
     def test_has_no_trade_agreements_but_should(self):
-        """
-        Tests for validation failure when there are no related
+        """Tests for validation failure when there are no related
         trade agreements but has_related_trade_agreements is true.
         """
         url = reverse('api-v4:event:collection')
@@ -393,8 +392,7 @@ class TestCreateEventView(APITestMixin):
         }
 
     def test_trade_agreements_but_shouldnt(self):
-        """
-        Tests for validation failure when there are no related
+        """Tests for validation failure when there are no related
         trade agreements but has_related_trade_agreements is true.
         """
         url = reverse('api-v4:event:collection')
@@ -756,8 +754,7 @@ class TestUpdateEventView(APITestMixin):
 
 
 class TestEventVersioning(APITestMixin):
-    """
-    Tests for versions created when interacting with the event endpoints.
+    """Tests for versions created when interacting with the event endpoints.
     """
 
     def test_add_creates_a_new_version(self):

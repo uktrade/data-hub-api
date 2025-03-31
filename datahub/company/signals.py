@@ -40,8 +40,7 @@ def company_one_list_account_owner_changed(sender, instance, **kwargs):
     dispatch_uid='company_business_type_post_migrate',
 )
 def company_business_type_post_migrate(sender, **kwargs):
-    """
-    Ensures all business types are loaded to the database.
+    """Ensures all business types are loaded to the database.
 
     Any new business types are created, and any existing ones are updated if the label has changed.
     """
@@ -54,8 +53,7 @@ def company_business_type_post_migrate(sender, **kwargs):
     dispatch_uid='record_export_country_history_update',
 )
 def record_export_country_history_update(sender, instance, created, by, **kwargs):
-    """
-    Record export country changes to history.
+    """Record export country changes to history.
     """
     action = CompanyExportCountryHistory.HistoryType.UPDATE
     if created:
@@ -70,16 +68,14 @@ def record_export_country_history_update(sender, instance, created, by, **kwargs
     dispatch_uid='record_export_country_history_delete',
 )
 def record_export_country_history_delete(sender, instance, by, **kwargs):
-    """
-    Record export country deletions to history.
+    """Record export country deletions to history.
     """
     action = CompanyExportCountryHistory.HistoryType.DELETE
     _record_export_country_history(instance, action, by)
 
 
 def _record_export_country_history(export_country, action, adviser):
-    """
-    Records each change made to `CompanyExportCountry` model
+    """Records each change made to `CompanyExportCountry` model
     into companion log model, `CompanyExportCountryHistory`.
     Along with type of change, insert, update or delete.
     """

@@ -11,13 +11,11 @@ from datahub.search.apps import get_search_app, get_search_app_by_model, get_sea
 from datahub.search.bulk_sync import sync_app
 from datahub.search.migrate_utils import resync_after_migrate
 
-
 logger = getLogger(__name__)
 
 
 def sync_all_models():
-    """
-    Task that starts sub-tasks to sync all models to OpenSearch.
+    """Task that starts sub-tasks to sync all models to OpenSearch.
     """
     for search_app in get_search_apps():
         schedule_model_sync((search_app.name,))
@@ -36,16 +34,14 @@ def schedule_model_sync(search_app: tuple):
 
 
 def sync_model(search_app_name):
-    """
-    Task that syncs a single model to OpenSearch.
+    """Task that syncs a single model to OpenSearch.
     """
     search_app = get_search_app(search_app_name)
     sync_app(search_app)
 
 
 def sync_object_task(search_app_name, pk):
-    """
-    Syncs a single object to OpenSearch.
+    """Syncs a single object to OpenSearch.
 
     If an error occurs, the task will be automatically retried with an exponential back-off.
     The wait between attempts is approximately 2 ** attempt_num seconds (with some jitter
@@ -66,8 +62,7 @@ def sync_related_objects_task(
     related_obj_filter=None,
     search_app_name=None,
 ):
-    """
-    Syncs objects related to another object via a specified field.
+    """Syncs objects related to another object via a specified field.
 
     For example, this task would sync the interactions of a company if given the following
     arguments:
@@ -116,8 +111,7 @@ def sync_related_objects_task(
 
 
 def complete_model_migration(search_app_name, new_mapping_hash):
-    """
-    Completes a migration by performing a full resync, updating aliases and removing old indices.
+    """Completes a migration by performing a full resync, updating aliases and removing old indices.
     """
     search_app = get_search_app(search_app_name)
     if search_app.search_model.get_target_mapping_hash() != new_mapping_hash:

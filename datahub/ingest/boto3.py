@@ -1,9 +1,7 @@
 import logging
-
 from datetime import datetime
 
 import boto3
-
 from botocore.exceptions import ClientError
 from django.conf import settings
 
@@ -12,7 +10,6 @@ from datahub.ingest.constants import (
     S3_BUCKET_NAME,
 )
 from datahub.ingest.models import IngestedObject
-
 
 logger = logging.getLogger(__name__)
 

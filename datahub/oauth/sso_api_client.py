@@ -24,8 +24,7 @@ class SSOUserDoesNotExistError(Exception):
 
 
 class IntrospectionSerializer(serializers.Serializer):
-    """
-    Serializer used only to validate introspection responses.
+    """Serializer used only to validate introspection responses.
 
     Note: This includes only the fields we care about.
     """
@@ -61,8 +60,7 @@ def introspect_token(token, request=None):
 
 
 def get_user_by_email(email, request=None):
-    """
-    Look up details about a user in Staff SSO using an email address.
+    """Look up details about a user in Staff SSO using an email address.
 
     Any of a user's email addresses can be specified.
     """
@@ -84,8 +82,7 @@ def _get_user(**params):
 
 
 def _request(method, path, response_serializer_class=None, request=None, **kwargs):
-    """
-    Internal utility function to make a generic API request to Staff SSO.
+    """Internal utility function to make a generic API request to Staff SSO.
 
     As this deals with authentication, this aims to be more robust than might be the case
     for other API requests.

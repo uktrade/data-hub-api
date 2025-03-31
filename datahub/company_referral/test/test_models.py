@@ -18,8 +18,7 @@ class TestCompanyReferral:
         assert str(referral) == 'Mars Ltd – Wants to export to the Far East'
 
     def test_save(self):
-        """
-        Test save also saves to the `CompanyActivity` model.
+        """Test save also saves to the `CompanyActivity` model.
         Test save does not save to the `CompanyActivity` model if it already exists.
         """
         assert not CompanyActivity.objects.all().exists()

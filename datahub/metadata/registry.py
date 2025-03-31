@@ -11,8 +11,7 @@ MetadataMapping = namedtuple(
 
 
 class MetadataRegistry:
-    """
-    Registry for all metadata.
+    """Registry for all metadata.
 
     To register a new metadata from your specific django app, create a new module
     called `metadata.py` and add these lines:

@@ -36,7 +36,7 @@ pytestmark = pytest.mark.django_db
 DATE_FORMAT = '%-d %B %Y'
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_notify_gateway(monkeypatch):
     mock_notify_gateway = mock.Mock()
     monkeypatch.setattr(
@@ -48,8 +48,7 @@ def mock_notify_gateway(monkeypatch):
 
 @pytest.fixture
 def mock_job_scheduler(monkeypatch):
-    """
-    Mocks the job_scheduler function.
+    """Mocks the job_scheduler function.
     """
     mock_job_scheduler = mock.Mock()
     monkeypatch.setattr(
@@ -61,8 +60,7 @@ def mock_job_scheduler(monkeypatch):
 
 @pytest.fixture
 def mock_notify_adviser_by_rq_email(monkeypatch):
-    """
-    Mocks the notify_adviser_by_rq_email function.
+    """Mocks the notify_adviser_by_rq_email function.
     """
     mock_notify_adviser_by_rq_email = mock.Mock()
     monkeypatch.setattr(
@@ -74,8 +72,7 @@ def mock_notify_adviser_by_rq_email(monkeypatch):
 
 @pytest.fixture
 def mock_logger(monkeypatch):
-    """
-    Returns a mock logger client instance.
+    """Returns a mock logger client instance.
     """
     mock_logger = mock.Mock()
     monkeypatch.setattr(
@@ -265,8 +262,7 @@ class TestEmailFunctions:
         mock_notify_adviser_by_rq_email,
         mock_logger,
     ):
-        """
-        Test it sends a no recent export interaction notification
+        """Test it sends a no recent export interaction notification
         where there are no interactions at all.
         """
         days = 5
@@ -310,8 +306,7 @@ class TestEmailFunctions:
         self,
         mock_job_scheduler,
     ):
-        """
-        Tests the notify_adviser_by_rq_email function.
+        """Tests the notify_adviser_by_rq_email function.
 
         It should schedule a task to:
             * notify an adviser
@@ -371,8 +366,7 @@ class TestEmailFunctions:
         mock_notify_gateway,
         mock_job_scheduler,
     ):
-        """
-        Tests email notification task queued with RQ.
+        """Tests email notification task queued with RQ.
 
         The id it receives in response should be used to queue a second task
         to update the email delivery status.
@@ -418,8 +412,7 @@ class TestEmailFunctions:
     def test_update_no_recent_export_interaction_reminder_email_status(
         self,
     ):
-        """
-        Test it updates reminder data with the connected email notification information.
+        """Test it updates reminder data with the connected email notification information.
         """
         reminder_number = 3
         notification_id = str(uuid4())

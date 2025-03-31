@@ -52,7 +52,6 @@ from datahub.search.interaction.views import (
     SearchInteractionPolicyFeedbackExportAPIView,
 )
 
-
 pytestmark = [
     pytest.mark.django_db,
     # Index objects for this search app only
@@ -124,7 +123,7 @@ def interactions(opensearch_with_collector):
 
     opensearch_with_collector.flush_and_refresh()
 
-    yield data
+    return data
 
 
 class TestInteractionEntitySearchView(APITestMixin):
@@ -139,8 +138,7 @@ class TestInteractionEntitySearchView(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_get_all(self, interactions):
-        """
-        Tests that all interactions are returned with an empty POST body.
+        """Tests that all interactions are returned with an empty POST body.
         """
         url = reverse('api-v3:search:interaction')
 
@@ -492,8 +490,7 @@ class TestInteractionEntitySearchView(APITestMixin):
         self,
         opensearch_with_collector,
     ):
-        """
-        Test that we can filter by one list tier group.
+        """Test that we can filter by one list tier group.
         """
         one_list_tier = OneListTier.objects.all().order_by('?')[0]
         company_1 = CompanyFactory(
@@ -539,8 +536,7 @@ class TestInteractionEntitySearchView(APITestMixin):
         self,
         opensearch_with_collector,
     ):
-        """
-        Test that we can filter by multiple one list tier groups.
+        """Test that we can filter by multiple one list tier groups.
         """
         one_list_tiers = list(OneListTier.objects.all().order_by('?')[0:2])
         company_1 = CompanyFactory(
@@ -676,8 +672,7 @@ class TestInteractionEntitySearchView(APITestMixin):
         ),
     )
     def test_filter_by_policy_fields(self, opensearch_with_collector, field, field_model):
-        """
-        Tests filtering interactions by:
+        """Tests filtering interactions by:
         - policy area
         - policy issue type
         """
@@ -971,8 +966,7 @@ class TestInteractionExportView(APITestMixin):
         request_sortby,
         orm_ordering,
     ):
-        """
-        Test export of interaction search results with a policy feedback user.
+        """Test export of interaction search results with a policy feedback user.
 
         Checks that all interaction kinds except for policy feedback are included in the export.
         """
@@ -1106,8 +1100,7 @@ class TestInteractionExportView(APITestMixin):
         request_sortby,
         orm_ordering,
     ):
-        """
-        Test export of interaction policy feedback
+        """Test export of interaction policy feedback
         """
         # Faker generates job titles containing commas which complicates comparisons,
         # so all contact job titles are explicitly set

@@ -154,8 +154,7 @@ RelaxedDateField = partial(serializers.DateField, input_formats=('iso-8601', '%Y
 
 
 class RelaxedDateTimeField(serializers.Field):
-    """
-    Relaxed DateTime field.
+    """Relaxed DateTime field.
 
     Front end uses free text field for data filters, that's why
     we need to accept date/datetime in various different formats.
@@ -210,8 +209,7 @@ class _Choices:
 
 
 class AddressSerializer(serializers.ModelSerializer):
-    """
-    ModelSerializer that can be used to simulate nested address objects.
+    """ModelSerializer that can be used to simulate nested address objects.
 
     E.g.
 
@@ -357,8 +355,7 @@ class AddressSerializer(serializers.ModelSerializer):
             address_source_prefix='address', area_can_be_required=False,
             postcode_can_be_required=False, **kwargs,
     ):
-        """
-        Initialises the serializer.
+        """Initialises the serializer.
 
         It populates all necessary parts (e.g. Meta model, source, fields' source).
         """
@@ -381,8 +378,7 @@ class AddressSerializer(serializers.ModelSerializer):
         self.address_source_prefix = address_source_prefix
 
     def add_area_validator(self, validators):
-        """
-        Mark area as required for US and Canadian companies.
+        """Mark area as required for US and Canadian companies.
         """
         validators.append(
             RulesBasedValidator(
@@ -401,8 +397,7 @@ class AddressSerializer(serializers.ModelSerializer):
         )
 
     def add_postcode_validator(self, validators):
-        """
-        Mark postcode as required for US and Canadian companies.
+        """Mark postcode as required for US and Canadian companies.
         """
         validators.append(
             RulesBasedValidator(
@@ -421,8 +416,7 @@ class AddressSerializer(serializers.ModelSerializer):
         )
 
     def get_validators(self):
-        """
-        Append ValidationRule for area/postcode depending on feature flag/context
+        """Append ValidationRule for area/postcode depending on feature flag/context
 
         Only mark area/postcode required if country is US/Canada & called from context where area
         is safe to require, and if feature flag enabled. Currently the only context where area is
@@ -439,8 +433,7 @@ class AddressSerializer(serializers.ModelSerializer):
         return validators
 
     def run_validation(self, data=serializers.empty):
-        """
-        Converts None to dict with default values so that those values can be used to
+        """Converts None to dict with default values so that those values can be used to
         reset the fields on the model.
         """
         if data or not self.allow_null:
@@ -453,8 +446,7 @@ class AddressSerializer(serializers.ModelSerializer):
         return super().run_validation(data=normalised_data)
 
     def to_representation(self, value):
-        """
-        It returns None if none of the address values is set.
+        """It returns None if none of the address values is set.
         E.g.
         {
             'address': None
@@ -485,8 +477,7 @@ class AddressSerializer(serializers.ModelSerializer):
         return address_dict
 
     def should_validate(self, data_combiner):
-        """
-        Returns true if the data should be validated.
+        """Returns true if the data should be validated.
         """
         if self.required:
             return True
@@ -497,8 +488,7 @@ class AddressSerializer(serializers.ModelSerializer):
         )
 
     def validate(self, attrs):
-        """
-        Validates the data if necessary.
+        """Validates the data if necessary.
         This is needed because some addresses only need to be validated
         if they are passed in.
         """

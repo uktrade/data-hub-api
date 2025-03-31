@@ -36,8 +36,7 @@ class CompanyListItemSerializer(serializers.ModelSerializer):
     latest_interaction = serializers.SerializerMethodField()
 
     def get_latest_interaction(self, obj):
-        """
-        Construct a latest interaction object from the latest_interaction_id,
+        """Construct a latest interaction object from the latest_interaction_id,
         latest_interaction_date and latest_interaction_subject query set annotations.
         """
         if not obj.latest_interaction_id:
@@ -110,8 +109,7 @@ class PipelineItemSerializer(serializers.ModelSerializer):
         return name
 
     def validate(self, data):
-        """
-        Raise a validation error if:
+        """Raise a validation error if:
         - anything else other than allowed fields is updated.
         - name field is empty when editing.
         - contact doesn't belong to the company being added
@@ -147,8 +145,7 @@ class PipelineItemSerializer(serializers.ModelSerializer):
         return data
 
     def update(self, instance, validated_data):
-        """
-        Update modified_on field with current date time
+        """Update modified_on field with current date time
         during PATCH transactions
         """
         if self.partial and self.instance:

@@ -2,12 +2,11 @@ import pytest
 
 from datahub.company.contact_matching import (
     ContactMatchingStatus,
-    find_active_contact_by_email_address,
     MatchStrategy,
+    find_active_contact_by_email_address,
 )
 from datahub.company.test.factories import ContactFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
-
 
 EMAIL_MATCHING_CONTACT_TEST_DATA = [
     {

@@ -9,16 +9,15 @@ from django.forms import BaseInlineFormSet, ModelForm, ValidationError
 from django.urls import reverse
 from reversion.admin import VersionAdmin
 
-from datahub.core.admin import BaseModelAdminMixin, EXPORT_WIN_GROUP_NAME
-
+from datahub.core.admin import EXPORT_WIN_GROUP_NAME, BaseModelAdminMixin
 from datahub.export_win.models import (
     AnonymousWin,
     Breakdown,
     CustomerResponse,
     DeletedWin,
     Win,
-    WinAdviser)
-
+    WinAdviser,
+)
 from datahub.export_win.tasks import (
     create_token_for_contact,
     get_all_fields_for_client_email_receipt,
@@ -111,8 +110,7 @@ class BaseStackedInline(admin.StackedInline):
 
 
 class CustomerResponseInlineForm(ModelForm):
-    """
-    Customer Response in line form.
+    """Customer Response in line form.
     Field name is not required and field id should be read-only
     """
 
@@ -564,8 +562,7 @@ class WinAdviserAdmin(BaseModelAdminMixin):
         return obj.adviser.name if obj.adviser else obj.name
 
     def delete_view(self, request, object_id, extra_context=None):
-        """
-        Redirect to the winadviser list view after successful deletion.
+        """Redirect to the winadviser list view after successful deletion.
         """
         response = super().delete_view(request, object_id, extra_context=extra_context)
         if response.status_code == 302:  # Redirect status code

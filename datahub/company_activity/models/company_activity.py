@@ -10,8 +10,7 @@ MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 @reversion.register_base_model()
 class CompanyActivity(models.Model):
-    """
-    Representation of a company and its related activities (interactions, events,
+    """Representation of a company and its related activities (interactions, events,
     investments, referrals etc).
 
     This is to be used with OpenSearch so we can view, filter and sort all activities

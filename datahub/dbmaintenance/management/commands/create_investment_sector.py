@@ -10,7 +10,6 @@ from datahub.investment.project.models import (
 )
 from datahub.metadata.models import Sector
 
-
 logger = getLogger(__name__)
 
 

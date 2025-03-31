@@ -41,8 +41,7 @@ class DatetimeLessThanCleanupFilter(NamedTuple):
 
 
 class ModelCleanupConfig(NamedTuple):
-    """
-    Clean-up configuration for a model.
+    """Clean-up configuration for a model.
 
     Defines the criteria for determining which records should be cleaned up.
     """

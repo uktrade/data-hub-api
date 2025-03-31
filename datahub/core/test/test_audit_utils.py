@@ -13,7 +13,6 @@ from datahub.core.audit_utils import (
 from datahub.core.test.support.factories import BookFactory
 from datahub.core.test.support.models import Book
 
-
 pytestmark = pytest.mark.django_db
 
 
@@ -89,8 +88,7 @@ def test_get_changes(old_version, new_version, expected_result):
 def test_make_value_friendly(
     mock_get_repr, field_name, values, expected_result, number_of_times_get_repr_called,
 ):
-    """
-    Tests get a friendly value for a given field and return object name.
+    """Tests get a friendly value for a given field and return object name.
     Tests foreign key, many to many and char fields.
     """
     mock_get_repr.return_value = 'fake'

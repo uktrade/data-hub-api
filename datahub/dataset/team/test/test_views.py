@@ -1,7 +1,5 @@
 import pytest
-
 from rest_framework import status
-
 from rest_framework.reverse import reverse
 
 from datahub.core.test_utils import format_date_or_datetime
@@ -24,8 +22,7 @@ def get_expected_data_from_team(team):
 
 @pytest.mark.django_db
 class TestTeamDatasetViewSet(BaseDatasetViewTest):
-    """
-    Tests for the teams data-flow export endpoint
+    """Tests for the teams data-flow export endpoint
     """
 
     view_url = reverse('api-v4:dataset:teams-dataset')

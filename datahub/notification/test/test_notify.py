@@ -19,8 +19,7 @@ from datahub.notification.notify import (
     ),
 )
 def test_notify_adviser_by_email(async_queue, adviser_data, notify_service_name):
-    """
-    Test the notify_adviser_by_email utility.
+    """Test the notify_adviser_by_email utility.
     """
     expected_notify_service_name = notify_service_name or DEFAULT_SERVICE_NAME
     notification_api_client = notify_gateway.clients[expected_notify_service_name]
@@ -42,8 +41,7 @@ def test_notify_adviser_by_email(async_queue, adviser_data, notify_service_name)
     ),
 )
 def test_notify_contact_by_email(notify_service_name):
-    """
-    Test the notify_contact_by_email utility.
+    """Test the notify_contact_by_email utility.
     """
     expected_notify_service_name = notify_service_name or DEFAULT_SERVICE_NAME
     notification_api_client = notify_gateway.clients[expected_notify_service_name]
@@ -65,8 +63,7 @@ def test_notify_contact_by_email(notify_service_name):
     ),
 )
 def test_notify_by_email(notify_service_name):
-    """
-    Test the notify_by_email utility.
+    """Test the notify_by_email utility.
     """
     expected_notify_service_name = notify_service_name or DEFAULT_SERVICE_NAME
     notification_api_client = notify_gateway.clients[expected_notify_service_name]

@@ -2,8 +2,7 @@ from django.core.exceptions import FieldDoesNotExist, ValidationError
 
 
 def diff_versions(model_meta, old_version, new_version):
-    """
-    Audit versions comparision with the delta returned.
+    """Audit versions comparision with the delta returned.
 
     For related objects only the pk is stored in the audit history.
     A user friendly representation of the related object (the object name)
@@ -50,8 +49,7 @@ def _get_field_or_none(model_meta, db_column_name):
 
 
 def _make_value_friendly(field, value):
-    """
-    Checks field and if required retrieves the object name from related model.
+    """Checks field and if required retrieves the object name from related model.
 
     If the field is None or not a related field then the value can be
     returned as the value is not an object pk.
@@ -73,8 +71,7 @@ def _make_value_friendly(field, value):
 
 
 def _get_object_name_for_pk(model, pk):
-    """
-    Gets the name for a given object pk or returns the pk if it cannot be found.
+    """Gets the name for a given object pk or returns the pk if it cannot be found.
     """
     try:
         result = model.objects.get(pk=pk)

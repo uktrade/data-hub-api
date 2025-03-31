@@ -10,8 +10,7 @@ from datahub.core.view_utils import enforce_request_content_type
 
 
 class ActivityFeedView(APIView):
-    """
-    Activity Feed View.
+    """Activity Feed View.
 
     At the moment it just authenticates the user using the default authentication
     for the internal_front_end and acts as a proxy for reading from Activity Stream.

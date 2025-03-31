@@ -11,7 +11,7 @@ from rest_framework import status
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.core.test_utils import AdminTestMixin, create_test_user
-from datahub.oauth.admin.forms import AddAccessTokenForm, NO_SSO_EMAIL_USER_ID_MESSAGE
+from datahub.oauth.admin.forms import NO_SSO_EMAIL_USER_ID_MESSAGE, AddAccessTokenForm
 
 admin_index_url = reverse('admin:index')
 add_access_token_url = reverse('admin_oauth:add-access-token')
@@ -41,8 +41,7 @@ class TestAddAccessTokenAdminView(AdminTestMixin):
 
     @pytest.mark.parametrize('http_method', ('get', 'post'))
     def test_permission_denied_if_staff_and_not_superuser(self, http_method):
-        """
-        The view should return a 403 response if the staff user does not have the add adviser
+        """The view should return a 403 response if the staff user does not have the add adviser
         permission.
         """
         user = create_test_user(is_staff=True, password=self.PASSWORD)

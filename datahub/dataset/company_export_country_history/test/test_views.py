@@ -1,7 +1,5 @@
 import pytest
-
 from django.urls import reverse
-
 from freezegun import freeze_time
 
 from datahub.company.test.factories import CompanyExportCountryHistoryFactory
@@ -25,8 +23,7 @@ def get_expected_data_from_export_country_history(export_country_history):
 
 @pytest.mark.django_db
 class TestCompanyExportCountryHistoryDatasetView(BaseDatasetViewTest):
-    """
-    Tests for CompanyExportCountryHistoryDatasetView
+    """Tests for CompanyExportCountryHistoryDatasetView
     """
 
     factory = CompanyExportCountryHistoryFactory

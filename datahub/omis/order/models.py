@@ -18,7 +18,7 @@ from datahub.core.models import (
     BaseModel,
     BaseOrderedConstantModel,
 )
-from datahub.core.utils import get_front_end_url, StrEnum
+from datahub.core.utils import StrEnum, get_front_end_url
 from datahub.metadata.models import Country, Sector, Team, UKRegion
 from datahub.omis.core.utils import generate_reference
 from datahub.omis.invoice.models import Invoice
@@ -42,15 +42,13 @@ MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
 class ServiceType(BaseOrderedConstantModel):
-    """
-    Order service type.
+    """Order service type.
     E.g. 'Validated contacts', 'Event', 'Market Research'
     """
 
 
 class HourlyRate(BaseConstantModel):
-    """
-    Values for the hourly rates used to calculate order pricing and for the
+    """Values for the hourly rates used to calculate order pricing and for the
     current VAT to apply.
     """
 
@@ -89,8 +87,7 @@ class OrderPermission(StrEnum):
 
 @reversion.register_base_model()
 class Order(BaseModel):
-    """
-    Details regarding an OMIS Order.
+    """Details regarding an OMIS Order.
 
     States:
 
@@ -316,15 +313,13 @@ class Order(BaseModel):
         return get_front_end_url(self)
 
     def get_current_contact_email(self):
-        """
-        :returns: the most up-to-date email address for the contact
+        """:returns: the most up-to-date email address for the contact
         """
         return self.contact_email or self.contact.email
 
     @classmethod
     def generate_reference(cls):
-        """
-        :returns: a random unused reference of form:
+        """:returns: a random unused reference of form:
             <(3) letters><(3) numbers>/<year> e.g. GEA962/16
         :raises RuntimeError: if no reference can be generated
         """
@@ -340,8 +335,7 @@ class Order(BaseModel):
 
     @classmethod
     def generate_public_token(cls):
-        """
-        :returns: a random unused public token of form
+        """:returns: a random unused public token of form
             <50 uppercase/lowercase letters, digits and symbols>
         :raises RuntimeError: if no public_token can be generated
         """
@@ -349,8 +343,7 @@ class Order(BaseModel):
         return generate_reference(model=cls, gen=gen, field='public_token')
 
     def save(self, *args, **kwargs):
-        """
-        Like the django save but it creates a reference and a public token if needed.
+        """Like the django save but it creates a reference and a public token if needed.
         """
         if not self.reference:
             self.reference = self.generate_reference()
@@ -371,8 +364,7 @@ class Order(BaseModel):
             )
 
     def get_lead_assignee(self):
-        """
-        :returns: lead OrderAssignee for this order is it exists, None otherwise
+        """:returns: lead OrderAssignee for this order is it exists, None otherwise
         """
         return self.assignees.filter(is_lead=True).first()
 
@@ -386,8 +378,7 @@ class Order(BaseModel):
 
     @transaction.atomic
     def generate_quote(self, by, commit=True):
-        """
-        Generate a new quote and assign it to the current order.
+        """Generate a new quote and assign it to the current order.
         The status of the order changes to "Quote awaiting acceptance".
 
         :returns: a quote for this order
@@ -424,8 +415,7 @@ class Order(BaseModel):
 
     @transaction.atomic
     def reopen(self, by):
-        """
-        Cancel quote and reopen order if possible.
+        """Cancel quote and reopen order if possible.
         The status of the order changes back to "Draft".
 
         :param by: the adviser who is cancelling the quote
@@ -461,8 +451,7 @@ class Order(BaseModel):
 
     @transaction.atomic
     def accept_quote(self, by):
-        """
-        Accept quote and change the status of the order to "Quote accepted".
+        """Accept quote and change the status of the order to "Quote accepted".
 
         :param by: the contact who is accepting the quote
         """
@@ -488,8 +477,7 @@ class Order(BaseModel):
 
     @transaction.atomic
     def mark_as_paid(self, by, payments_data):
-        """
-        Mark an order as "Paid".
+        """Mark an order as "Paid".
 
         :param by: the adviser who created the record
         :param payments_data: list of payments data.
@@ -532,8 +520,7 @@ class Order(BaseModel):
 
     @transaction.atomic
     def complete(self, by):
-        """
-        Complete an order.
+        """Complete an order.
 
         :param by: the adviser who marked the order as complete
         """
@@ -559,8 +546,7 @@ class Order(BaseModel):
 
     @transaction.atomic
     def cancel(self, by, reason, force=False):
-        """
-        Cancel an order.
+        """Cancel an order.
 
         :param by: the adviser who cancelled the order
         :param reason: CancellationReason
@@ -581,8 +567,7 @@ class Order(BaseModel):
 
 
 class OrderSubscriber(BaseModel):
-    """
-    A subscribed adviser receives notifications when new changes happen to an Order.
+    """A subscribed adviser receives notifications when new changes happen to an Order.
     """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
@@ -605,8 +590,7 @@ class OrderSubscriber(BaseModel):
 
 
 class OrderAssignee(BaseModel):
-    """
-    An adviser assigned to an Order and responsible for deliverying the final report(s).
+    """An adviser assigned to an Order and responsible for deliverying the final report(s).
     """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
@@ -635,8 +619,7 @@ class OrderAssignee(BaseModel):
         )
 
     def __init__(self, *args, **kwargs):
-        """
-        Keep the original adviser value so that we can see if it changes when saving.
+        """Keep the original adviser value so that we can see if it changes when saving.
         """
         super().__init__(*args, **kwargs)
         self.__adviser = self.adviser
@@ -649,8 +632,7 @@ class OrderAssignee(BaseModel):
         )
 
     def save(self, *args, **kwargs):
-        """
-        Makes sure that the adviser cannot be changed after creation.
+        """Makes sure that the adviser cannot be changed after creation.
         When creating a new instance, it also denormalises `team` and `country` for
         future-proofing reasons, that is, if an adviser moves to another team in the future
         we don't want to change history.

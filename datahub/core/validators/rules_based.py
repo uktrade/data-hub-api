@@ -40,8 +40,7 @@ class IsObjectBeingCreated(BaseRule):
     """Rule to check if an object is being added."""
 
     def __call__(self, combiner) -> bool:
-        """
-        Returns True if the object is being created.
+        """Returns True if the object is being created.
         """
         return not combiner.instance
 
@@ -50,8 +49,7 @@ class IsFieldBeingUpdatedRule(BaseRule):
     """Rule to check if a field is being updated."""
 
     def __call__(self, combiner) -> bool:
-        """
-        Returns True if the field is being updated.
+        """Returns True if the field is being updated.
 
         Checks the post data to see if the field has been supplied then if
         so checks the current value to see if it is being updated.
@@ -65,8 +63,7 @@ class IsFieldBeingUpdatedAndIsNotBlankRule(BaseRule):
     """Rule to check if a field is being updated and the value is not blank."""
 
     def __call__(self, combiner) -> bool:
-        """
-        Returns True if the field is being updated and the value is not blank.
+        """Returns True if the field is being updated and the value is not blank.
         """
         if self.field not in combiner.data:
             return False
@@ -74,8 +71,7 @@ class IsFieldBeingUpdatedAndIsNotBlankRule(BaseRule):
 
 
 class IsFieldRule(BaseRule):
-    """
-    Rule to check if a field meets a provided condition.
+    """Rule to check if a field meets a provided condition.
 
     A callable function is provided and if the field is present the
     value from the request data is passed to the function to be evaluated.
@@ -86,8 +82,7 @@ class IsFieldRule(BaseRule):
         field: str,
         function_: Callable,
     ):
-        """
-        Initialises the rule.
+        """Initialises the rule.
 
         :param field:     The name of the field the rule applies to.
         :param function_: Callable that returns a truthy or falsey value (indicating whether the
@@ -112,8 +107,7 @@ class OperatorRule(BaseRule):
         field: str,
         operator_: Callable,
     ):
-        """
-        Initialises the rule.
+        """Initialises the rule.
 
         :param field:     The name of the field the rule applies to.
         :param operator_: Callable that returns a truthy or falsey value (indicating whether the
@@ -133,8 +127,7 @@ class EqualsRule(OperatorRule):
     """Equals operator-based rule for a field."""
 
     def __init__(self, field: str, value: Any):
-        """
-        Initialises the rule.
+        """Initialises the rule.
 
         :param field: The name of the field the rule applies to.
         :param value: Value to test equality with.
@@ -146,8 +139,7 @@ class InRule(OperatorRule):
     """Contains operator-based rule for a field. Checks that field value is in values"""
 
     def __init__(self, field: str, value: Iterable[Any]):
-        """
-        Initialises the rule.
+        """Initialises the rule.
 
         :param field: The name of the field the rule applies to.
         :param value: a list of Values to test equality with.
@@ -156,15 +148,13 @@ class InRule(OperatorRule):
 
 
 class IsSubsetByIdRule(OperatorRule):
-    """
-    Contains operator-based rule for a field. Checks that id value is in field values.
+    """Contains operator-based rule for a field. Checks that id value is in field values.
 
     It should be used to validate ManyToMany fields by their Id.
     """
 
     def __init__(self, field: str, value: Iterable[Any]):
-        """
-        Initialises the rule.
+        """Initialises the rule.
 
         :param field: The name of the field the rule applies to.
         :param value: a list of Values to test equality with.
@@ -176,8 +166,7 @@ class ConditionalRule:
     """A rule that is only checked when a condition is met."""
 
     def __init__(self, rule: AbstractRule, when: AbstractRule = None):
-        """
-        Initialises the rule.
+        """Initialises the rule.
 
         :param rule: Rule that must pass.
         :param when: Optional conditional rule to check before applying this rule.
@@ -209,8 +198,7 @@ class AllIsBlankRule(BaseRule):
     """A rule that checks if all fields in a list are blank."""
 
     def __init__(self, *fields):
-        """
-        Initialises the rule.
+        """Initialises the rule.
 
         :param fields: Fields to check for blankness.
         """
@@ -226,8 +214,7 @@ class AnyIsNotBlankRule(BaseRule):
     """A rule that checks if any of a list of specified fields is not blank."""
 
     def __init__(self, *fields: str):
-        """
-        Initialises the rule.
+        """Initialises the rule.
 
         :param fields: Fields to check for non-blankness.
         """
@@ -240,8 +227,7 @@ class AnyIsNotBlankRule(BaseRule):
 
 
 class AndRule(BaseRule):
-    """
-    Field-less AND rule that can be used to combine other rules in the `when` argument in
+    """Field-less AND rule that can be used to combine other rules in the `when` argument in
     `ValidationRule.__init__`.
 
     (It's not intended to be used with the `rules` argument in `ValidationRule.__init__`,
@@ -249,8 +235,7 @@ class AndRule(BaseRule):
     """
 
     def __init__(self, *rules: AbstractRule):
-        """
-        Initialise the rule.
+        """Initialise the rule.
 
         :param rules: Sub-rules to combine using the AND operator.
         """
@@ -263,8 +248,7 @@ class AndRule(BaseRule):
 
 
 class NotRule(AbstractRule):
-    """
-    Field-less NOT rule that can be test on a rule in the `when` argument in
+    """Field-less NOT rule that can be test on a rule in the `when` argument in
     `ValidationRule.__init__`.
     """
 
@@ -295,8 +279,7 @@ class AbstractValidationRule(ABC):
 
 
 class ValidationRule(AbstractValidationRule):
-    """
-    A simple validation rule, taking a list of rules that must be met if a condition is also met.
+    """A simple validation rule, taking a list of rules that must be met if a condition is also met.
 
     Used with RulesBasedValidator.
     """
@@ -307,8 +290,7 @@ class ValidationRule(AbstractValidationRule):
         *rules: AbstractRule,
         when: AbstractRule = None,
     ):
-        """
-        Initialises a validation rule.
+        """Initialises a validation rule.
 
         :param error_key: The key of the error message associated with this rule.
         :param rule:      Rule that must pass.
@@ -336,8 +318,7 @@ class ValidationRule(AbstractValidationRule):
 
 
 class RulesBasedValidator:
-    """
-    Class-level DRF validator for cross-field validation.
+    """Class-level DRF validator for cross-field validation.
 
     Validation is performed using rules (instances of AbstractValidationRule).
     """
@@ -345,14 +326,12 @@ class RulesBasedValidator:
     requires_context = True
 
     def __init__(self, *rules: AbstractValidationRule):
-        """
-        Initialises the validator with rules.
+        """Initialises the validator with rules.
         """
         self._rules = rules
 
     def __call__(self, data, serializer):
-        """
-        Performs validation.
+        """Performs validation.
 
         Called by DRF.
         """

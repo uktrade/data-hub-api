@@ -20,7 +20,6 @@ from datahub.interaction.admin_csv_import.cache_utils import (
 from datahub.interaction.admin_csv_import.duplicate_checking import DuplicateTracker
 from datahub.interaction.admin_csv_import.row_form import InteractionCSVRowForm
 
-
 REVISION_COMMENT = 'Imported from file via the admin site.'
 
 
@@ -36,8 +35,7 @@ class UnmatchedRowCollector:
         self.rows.append(row_form.data)
 
     def to_raw_csv(self):
-        """
-        Generate a CSV file from collected unmatched rows.
+        """Generate a CSV file from collected unmatched rows.
 
         The CSV file is in the same format as the input file (so that it can be re-uploaded
         at a later date if required).
@@ -80,8 +78,7 @@ class InteractionCSVForm(BaseCSVImportForm):
             yield from row_form.get_flat_error_list_iterator()
 
     def get_matching_summary(self, max_rows):
-        """
-        Get a summary of the contact matching results of the rows.
+        """Get a summary of the contact matching results of the rows.
 
         This is used as part of the preview page displayed once a file has been uploaded.
 
@@ -132,8 +129,7 @@ class InteractionCSVForm(BaseCSVImportForm):
         return matching_counts, unmatched_row_collector
 
     def save_to_cache(self):
-        """
-        Generate a token and store the file in the configured cache with a timeout.
+        """Generate a token and store the file in the configured cache with a timeout.
 
         Can only be called on a validated form.
         """
@@ -148,8 +144,7 @@ class InteractionCSVForm(BaseCSVImportForm):
 
     @classmethod
     def from_token(cls, token):
-        """
-        Create a InteractionCSVForm instance using a token.
+        """Create a InteractionCSVForm instance using a token.
 
         Returns None if serialised data for the token can't be found in the cache.
         """
@@ -167,8 +162,7 @@ class InteractionCSVForm(BaseCSVImportForm):
         )
 
     def _get_row_form_iterator(self, raise_error_if_invalid=False):
-        """
-        Get a generator over InteractionCSVRowForm instances.
+        """Get a generator over InteractionCSVRowForm instances.
 
         This should only be called if the rows have previously been validated.
         """

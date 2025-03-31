@@ -1,7 +1,6 @@
 from datetime import datetime, timezone
 
 import pytest
-
 from django.urls import reverse
 from freezegun import freeze_time
 from rest_framework import status
@@ -67,8 +66,7 @@ def get_expected_data_from_order(order):
 
 @pytest.mark.django_db
 class TestOMISDatasetViewSet(BaseDatasetViewTest):
-    """
-    Tests for OMISDatasetView
+    """Tests for OMISDatasetView
     """
 
     view_url = reverse('api-v4:dataset:omis-dataset')

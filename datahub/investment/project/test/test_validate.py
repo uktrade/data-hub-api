@@ -5,9 +5,7 @@ import pytest
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
 from datahub.core.test_utils import random_obj_for_model
-
 from datahub.investment.project.constants import InvestorType, Involvement, SpecificProgramme
-
 from datahub.investment.project.models import InvestmentDeliveryPartner
 from datahub.investment.project.serializers import (
     CORE_FIELDS,

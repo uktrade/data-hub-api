@@ -40,8 +40,7 @@ def test_delete_document(s3_stubber):
 
 
 def test_delete_document_s3_failure(s3_stubber):
-    """
-    Tests if delete_document task won't delete document from the
+    """Tests if delete_document task won't delete document from the
     database if deletion from S3 fails.
     """
     entity_document = MyEntityDocument.objects.create(

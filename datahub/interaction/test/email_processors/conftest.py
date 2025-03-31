@@ -6,10 +6,9 @@ from datahub.company.test.factories import AdviserFactory, CompanyFactory, Conta
 from datahub.interaction.test.factories import CompanyInteractionFactory
 
 
-@pytest.fixture()
+@pytest.fixture
 def interaction_email_fixture():
-    """
-    Create advisers, contacts and companies so that our email samples can be
+    """Create advisers, contacts and companies so that our email samples can be
     attributed to some DB entities.
     """
     advisers = [
@@ -56,4 +55,3 @@ def interaction_email_fixture():
         company=company_1,
     )
     CompanyInteractionFactory(contacts=[contact_with_interactions], company=company_1)
-    yield

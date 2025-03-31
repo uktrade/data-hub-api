@@ -170,8 +170,7 @@ class TestCreatePayments(APITestMixin):
         assert response.json() == errors
 
     def test_ok_if_amounts_greater_than_total_cost(self):
-        """
-        Test that if the sum of the amounts is greater than order.total_cost,
+        """Test that if the sum of the amounts is greater than order.total_cost,
         the reconciliation is successful.
         """
         order = OrderWithAcceptedQuoteFactory()
@@ -204,8 +203,7 @@ class TestCreatePayments(APITestMixin):
         ),
     )
     def test_409_if_order_in_disallowed_status(self, disallowed_status):
-        """
-        Test that if the order is not in one of the allowed statuses, the endpoint
+        """Test that if the order is not in one of the allowed statuses, the endpoint
         returns 409.
         """
         order = OrderFactory(status=disallowed_status)

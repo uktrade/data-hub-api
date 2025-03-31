@@ -6,7 +6,6 @@ from datahub.company.models import Company
 from datahub.company_activity.models import GreatExportEnquiry
 from datahub.metadata.models import Country
 
-
 UNITED_KINGDOM = Country.objects.get(iso_alpha2_code='GB')
 
 

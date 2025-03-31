@@ -11,8 +11,7 @@ pytestmark = pytest.mark.django_db
 
 
 def test_run(s3_stubber, caplog):
-    """
-    Test that the command updates the specified records.
+    """Test that the command updates the specified records.
 
     Ignores ones with global hq already assigned or with errors.
     """
@@ -82,8 +81,7 @@ def test_run(s3_stubber, caplog):
 
 
 def test_overwrite(s3_stubber, caplog):
-    """
-    Test that the command updates all specified records (ignoring ones with errors).
+    """Test that the command updates all specified records (ignoring ones with errors).
     """
     caplog.set_level('ERROR')
     global_hq = CompanyFactory(

@@ -38,8 +38,7 @@ def test_updated_interaction_synced(opensearch_with_signals):
 
 
 def test_deleted_interaction_deleted_from_opensearch(opensearch_with_signals):
-    """
-    Test that when an interaction is deleted from db it is also
+    """Test that when an interaction is deleted from db it is also
     deleted from OpenSearch.
     """
     interaction = InvestmentProjectInteractionFactory()
@@ -86,8 +85,7 @@ def test_interaction_synced_when_dit_participant_added(opensearch_with_signals):
 
 
 def test_updating_company_name_updates_interaction(opensearch_with_signals):
-    """
-    Test that when a company name is updated, the company's interactions are synced to OpenSearch.
+    """Test that when a company name is updated, the company's interactions are synced to OpenSearch.
     """
     interaction = CompanyInteractionFactory()
     new_company_name = 'exogenous'
@@ -103,8 +101,7 @@ def test_updating_company_name_updates_interaction(opensearch_with_signals):
 
 
 def test_updating_contact_name_updates_interaction(opensearch_with_signals):
-    """
-    Test that when a contact's name is updated, the contact's interactions are
+    """Test that when a contact's name is updated, the contact's interactions are
     synced to OpenSearch.
     """
     interaction = CompanyInteractionFactory()
@@ -129,8 +126,7 @@ def test_updating_contact_name_updates_interaction(opensearch_with_signals):
 
 
 def test_updating_project_name_updates_interaction(opensearch_with_signals):
-    """
-    Test that when an investment project's name is updated, the project's interactions are
+    """Test that when an investment project's name is updated, the project's interactions are
     synced to OpenSearch.
     """
     interaction = InvestmentProjectInteractionFactory()

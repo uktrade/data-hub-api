@@ -12,13 +12,11 @@ from datahub.omis.order.test.factories import OrderFactory
 
 @pytest.mark.django_db
 class TestCompanyActivityOrderTasks:
-    """
-    Tests for the schedule_sync_data_to_company_activity task.
+    """Tests for the schedule_sync_data_to_company_activity task.
     """
 
     def test_orders_are_copied_to_company_activity(self):
-        """
-        Test that omis orders are added to the CompanyActivity model.
+        """Test that omis orders are added to the CompanyActivity model.
         """
         orders = OrderFactory.create_batch(5)
 
@@ -38,8 +36,7 @@ class TestCompanyActivityOrderTasks:
 
     @mock.patch('datahub.company_activity.models.CompanyActivity.objects.bulk_create')
     def test_order_are_bulk_created_in_batches(self, mocked_bulk_create, caplog):
-        """
-        Test that omis orders are bulk created in batches.
+        """Test that omis orders are bulk created in batches.
         """
         caplog.set_level('INFO')
         batch_size = 5
@@ -63,8 +60,7 @@ class TestCompanyActivityOrderTasks:
         assert 'Finished bulk creating CompanyActivities.' in caplog.text
 
     def test_order_with_a_company_activity_are_not_added_again(self):
-        """
-        Test that investment projects which are already part of the `CompanyActivity` model
+        """Test that investment projects which are already part of the `CompanyActivity` model
         are not added again.
         """
         OrderFactory.create_batch(4)

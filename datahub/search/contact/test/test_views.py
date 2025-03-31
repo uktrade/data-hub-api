@@ -24,10 +24,10 @@ from datahub.company.test.factories import (
 from datahub.core.constants import Country, Sector, UKRegion
 from datahub.core.test_utils import (
     APITestMixin,
+    HawkMockJSONResponse,
     create_test_user,
     format_csv_data,
     get_attr_or_none,
-    HawkMockJSONResponse,
     random_obj_for_queryset,
 )
 from datahub.interaction.test.factories import (
@@ -59,7 +59,7 @@ def setup_data():
         ),
         ContactFactory(first_name='first', last_name='last'),
     ]
-    yield contacts
+    return contacts
 
 
 def generate_hawk_response(payload):
