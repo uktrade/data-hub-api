@@ -33,9 +33,7 @@ class InvestmentProjectModelPermissions(ViewBasedModelPermissions):
     model = InvestmentProject
 
     permission_mapping = {
-        'add': (
-            _PermissionTemplate.standard,
-        ),
+        'add': (_PermissionTemplate.standard,),
         'view': (
             _PermissionTemplate.all,
             _PermissionTemplate.associated,
@@ -45,15 +43,12 @@ class InvestmentProjectModelPermissions(ViewBasedModelPermissions):
             _PermissionTemplate.associated,
             _PermissionTemplate.stage_to_won,
         ),
-        'delete': (
-            _PermissionTemplate.standard,
-        ),
+        'delete': (_PermissionTemplate.standard,),
     }
 
 
 class InvestmentProjectAssociationCheckerBase(ObjectAssociationCheckerBase):
-    """Base class for investment project association checkers.
-    """
+    """Base class for investment project association checkers."""
 
     many_to_many = False
     restricted_actions = None
@@ -68,8 +63,9 @@ class InvestmentProjectAssociationCheckerBase(ObjectAssociationCheckerBase):
         if self.should_exclude_all(request):
             return False
 
-        return any(request.user.dit_team_id == user.dit_team_id
-                   for user in obj.get_associated_advisers())
+        return any(
+            request.user.dit_team_id == user.dit_team_id for user in obj.get_associated_advisers()
+        )
 
     def should_apply_restrictions(self, request, view_action):
         """Check if restrictions should be applied."""
@@ -121,7 +117,7 @@ class IsAssociatedToInvestmentProjectPermission(IsAssociatedToObjectPermission):
 
 
 class IsAssociatedToInvestmentProjectPermissionMixin:
-    """This checks if user has permission to access a view attached to Investment Project.
+    """Checks if user has permission to access a view attached to Investment Project.
 
     It is meant to be used with IsAssociatedToObjectPermission.
     """
@@ -169,8 +165,9 @@ class IsAssociatedToInvestmentProjectFilter(BaseFilterBackend):
             query |= Q(**{full_field_name: value})
 
         for field, value in to_many_filters:
-            full_field_name = (f'{field_prefix}{field.field_name}__'
-                               f'{field.subfield_name}__dit_team_id')
+            full_field_name = (
+                f'{field_prefix}{field.field_name}__{field.subfield_name}__dit_team_id'
+            )
             query |= Q(**{full_field_name: value})
         return queryset.filter(query).distinct()
 

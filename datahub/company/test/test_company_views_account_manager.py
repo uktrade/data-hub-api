@@ -87,8 +87,9 @@ class TestAssignRegionalCompanyAccountManagerView(APITestMixin):
         ],
     )
     def test_assigns_account_manager(self, company_factory, international_trade_adviser):
-        """Test that an account manager can be assigned to:
+        """Test that an account manager can be assigned.
 
+        Test cases include:
         - a company not on the One List
         - a company on the One List tier 'Tier D - International Trade Adviser Accounts'
         """
@@ -153,8 +154,9 @@ class TestAssignRegionalCompanyAccountManagerView(APITestMixin):
         regional_account_manager_fn,
         international_trade_adviser,
     ):
-        """Test that an account manager can't be assigned:
+        """Test that an account manager can't be assigned.
 
+        Test cases include:
         - to a company on a One List tier other than
         'Tier D - International Trade Adviser Accounts'
         - to a company on that is a subsidiary of any One List company
@@ -227,8 +229,9 @@ class TestSelfAssignCompanyAccountManagerView(APITestMixin):
     )
     @pytest.mark.django_db
     def test_assigns_account_manager(self, company_factory, international_trade_adviser):
-        """Test that an account manager can be assigned to:
+        """Test that an account manager can be assigned.
 
+        Test cases include:
         - a company not on the One List
         - a company on the One List tier 'Tier D - International Trade Adviser Accounts'
         """
@@ -275,8 +278,9 @@ class TestSelfAssignCompanyAccountManagerView(APITestMixin):
     )
     @pytest.mark.django_db
     def test_validation(self, company_factory, expected_errors, international_trade_adviser):
-        """Test that an account manager can't be assigned to:
+        """Test that an account manager can't be assigned.
 
+        Test cases include:
         - a company on a One List tier other than 'Tier D - International Trade Adviser Accounts'
         - a company on that is a subsidiary of any One List company
         """
@@ -344,8 +348,9 @@ class TestRemoveCompanyAccountManagerView(APITestMixin):
     )
     @pytest.mark.django_db
     def test_removes_account_manager_and_tier(self, company_factory, international_trade_adviser):
-        """Test that an account manager can be removed from:
+        """Test that an account manager can be removed.
 
+        Test cases include:
         - a company not on the One List
         - a company on the One List tier 'Tier D - International Trade Adviser Accounts'
         """

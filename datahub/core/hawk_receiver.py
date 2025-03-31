@@ -23,7 +23,7 @@ class HawkAuthentication(BaseAuthentication):
     """DRF authentication class that uses Hawk authentication."""
 
     def authenticate_header(self, request):
-        """This is returned as the WWW-Authenticate header when
+        """Returned as the WWW-Authenticate header when
         AuthenticationFailed is raised. DRF also requires this
         to send a 401 (as opposed to 403).
         """

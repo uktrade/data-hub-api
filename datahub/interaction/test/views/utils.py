@@ -3,8 +3,9 @@ from datahub.interaction.models import InteractionPermission
 
 
 def resolve_data(data):
-    """Given a value:
+    """Resolves data with caveats.
 
+    Given a value:
     - if it's a callable, it resolves it
     - if it's an object with a 'pk' attribute, it uses that instead
     - if it's a sequence it resolves each of the sequence's values

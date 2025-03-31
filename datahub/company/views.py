@@ -280,7 +280,8 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
             | HasPermissions(
                 f'company.{CompanyPermission.change_company}',
                 f'company.{CompanyPermission.change_one_list_tier_and_global_account_manager}',
-            )],
+            )
+        ],
         schema=StubSchema(),
     )
     def update_one_list_core_team(self, request, *args, **kwargs):
@@ -306,8 +307,7 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
         detail=True,
     )
     def update_export_detail(self, request, *args, **kwargs):
-        """Update export related information for the company.
-        """
+        """Update export related information for the company."""
         instance = self.get_object()
         serializer = UpdateExportDetailsSerializer(
             instance=instance,
@@ -636,7 +636,7 @@ class CompanyObjectiveV4ViewSet(ArchivableViewSetMixin, CoreViewSet):
     filterset_fields = ['archived']
 
     def get_queryset(self):
-        """This view is return a list of all the objectives associated
+        """Returns a list of all the objectives associated
         with a specific company.
         """
         company_id = self.kwargs['company_id']

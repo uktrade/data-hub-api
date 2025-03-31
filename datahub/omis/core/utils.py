@@ -4,7 +4,7 @@ from django.utils.timezone import now
 
 
 def generate_reference(model, gen, field='reference', prefix='', max_retries=10):
-    """Generate a unique reference given:
+    """Generate a unique reference.
 
     :param model: the class of the django model
     :param gen: a function without arguments that returns part or all the reference

@@ -12,9 +12,10 @@ pytestmark = pytest.mark.django_db
 
 
 def test_run__fake_uuids(caplog):
-    """Test that the command:
+    """Test the command.
 
-    - ignores rows with unmatched adviser UUIDs
+    It should:
+    - ignore rows with unmatched adviser UUIDs
     """
     caplog.set_level('INFO')
 
@@ -71,9 +72,10 @@ def test_run__update_interaction_participant(simulate):
 
 
 def test_run__no_update_for_advisers_with_same_interaction(caplog):
-    """Test that the command:
+    """Test the command.
 
-    - does not update advisers which have the same interaction as this breaks
+    It should:
+    - not update advisers which have the same interaction as this breaks
         the unique_together constraint.
     """
     caplog.set_level('INFO')
@@ -82,11 +84,13 @@ def test_run__no_update_for_advisers_with_same_interaction(caplog):
     same_interaction = CompaniesInteractionFactory()
     old_adviser = AdviserFactory()
     interaction_with_old_adviser = InteractionDITParticipantFactory(
-        adviser=old_adviser, interaction=same_interaction,
+        adviser=old_adviser,
+        interaction=same_interaction,
     )
     new_adviser = AdviserFactory()
     interaction_with_new_adviser = InteractionDITParticipantFactory(
-        adviser=new_adviser, interaction=same_interaction,
+        adviser=new_adviser,
+        interaction=same_interaction,
     )
 
     call_command('update_interactions_to_new_adviser', old_adviser.id, new_adviser.id)
@@ -96,14 +100,8 @@ def test_run__no_update_for_advisers_with_same_interaction(caplog):
 
     # No changes expected as would fail unique constraint
     assert 'No interactions to update.' in caplog.text
-    assert (
-        interaction_with_new_adviser.adviser_id
-        == interaction_with_new_adviser.adviser_id
-    )
-    assert (
-        interaction_with_old_adviser.adviser_id
-        == interaction_with_old_adviser.adviser_id
-    )
+    assert interaction_with_new_adviser.adviser_id == interaction_with_new_adviser.adviser_id
+    assert interaction_with_old_adviser.adviser_id == interaction_with_old_adviser.adviser_id
 
 
 def test_audit_log():

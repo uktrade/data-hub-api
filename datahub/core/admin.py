@@ -22,7 +22,7 @@ EXPORT_WIN_GROUP_NAME = 'ExportWinAdmin'
 
 
 class DisabledOnFilter(admin.SimpleListFilter):
-    """This filter allows us to filter values that have disabled_on value."""
+    """Filter values that have disabled_on value."""
 
     title = 'Is disabled'
     parameter_name = 'disabled_on'
@@ -128,10 +128,12 @@ class BaseModelAdminMixin(ExportWinsAdminMixin):
     def _get_description_for_timed_event(self, event_on, event_by):
         text_parts = []
         if event_on:
-            text_parts.extend((
-                f'on {date_filter(event_on)}',
-                f'at {time_filter(event_on)}',
-            ))
+            text_parts.extend(
+                (
+                    f'on {date_filter(event_on)}',
+                    f'at {time_filter(event_on)}',
+                ),
+            )
         if event_by:
             adviser_admin_url = get_change_link(event_by)
             text_parts.append(f'by {adviser_admin_url}')
@@ -147,8 +149,7 @@ class BaseModelAdminMixin(ExportWinsAdminMixin):
         return self._get_description_for_timed_event(obj.modified_on, obj.modified_by)
 
     def save_model(self, request, obj, form, change):
-        """Populate created_by/modified_by from the logged in user.
-        """
+        """Populate created_by/modified_by from the logged in user."""
         if not change:
             obj.created_by = request.user
         obj.modified_by = request.user
@@ -256,9 +257,9 @@ def max_upload_size(max_size):
 
         @max_upload_size(...)
         @csrf_exempt
-        def view():
-            ...
+        def view(): ...
     """
+
     def decorator(view_func):
         @csrf_exempt
         @wraps(view_func)
@@ -283,6 +284,7 @@ def custom_view_permission(permission_codename):
         class InvestmentProjectAdmin(admin.ModelAdmin):
             pass
     """
+
     def decorator(admin_cls):
         admin_cls.has_view_permission = _make_admin_permission_getter(permission_codename)
         return admin_cls
@@ -300,6 +302,7 @@ def custom_add_permission(permission_codename):
         class InvestmentProjectAdmin(admin.ModelAdmin):
             pass
     """
+
     def decorator(admin_cls):
         admin_cls.has_add_permission = _make_admin_permission_getter(permission_codename)
         return admin_cls
@@ -317,6 +320,7 @@ def custom_change_permission(permission_codename):
         class InvestmentProjectAdmin(admin.ModelAdmin):
             pass
     """
+
     def decorator(admin_cls):
         admin_cls.has_change_permission = _make_admin_permission_getter(permission_codename)
         return admin_cls
@@ -334,6 +338,7 @@ def custom_delete_permission(permission_codename):
         class InvestmentProjectAdmin(admin.ModelAdmin):
             pass
     """
+
     def decorator(admin_cls):
         admin_cls.has_delete_permission = _make_admin_permission_getter(permission_codename)
         return admin_cls
@@ -382,7 +387,6 @@ def format_json_as_html(value):
 
 
 def handle_export_wins_admin_permissions(request, app_label, check_permission_function):
-
     # The autocomplete fields in django admin have their own permission check on the models
     # referenced by that field. As we have explicitly denied export win admins permission to
     # access anything other than export win models, they will receive errors using these
@@ -403,7 +407,6 @@ def handle_export_wins_admin_permissions(request, app_label, check_permission_fu
 
 def _make_admin_permission_getter(codename):
     def _has_permission(self, request, obj=None):
-
         app_label = self.opts.app_label
         qualified_name = f'{app_label}.{codename}'
 
@@ -412,4 +415,5 @@ def _make_admin_permission_getter(codename):
             app_label,
             request.user.has_perm(qualified_name),
         )
+
     return _has_permission

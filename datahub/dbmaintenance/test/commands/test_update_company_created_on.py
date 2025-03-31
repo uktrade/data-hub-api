@@ -1,4 +1,5 @@
 """Tests for the update_company_uk_region management command."""
+
 from datetime import datetime, timezone
 from io import BytesIO
 
@@ -21,12 +22,13 @@ pytestmark = pytest.mark.django_db
     ],
 )
 def test_run(s3_stubber, caplog, simulate):
-    """Test that the command:
+    """Test the command.
 
-    - updates records only if simulate=False is passed
-    - does not update records if simulate=True is passed
-    - does not update created_on if it exists already
-    - ignores rows with unmatched Company UUIDs
+    It should:
+    - update records only if simulate=False is passed
+    - not update records if simulate=True is passed
+    - not update created_on if it exists already
+    - ignore rows with unmatched Company UUIDs
     """
     caplog.set_level('WARNING')
 

@@ -77,8 +77,9 @@ class TestUpdateOneListTierAndGlobalAccountManager(APITestMixin):
         company_factory,
         one_list_editor,
     ):
-        """Test that a One List tier and account manager can be assigned to:
+        """Test that a One List tier and account manager can be assigned.
 
+        Test cases include:
         - a company not on the One List
         - a company on random One List tier except 'Tier D - International Trade Adviser Accounts'
         """
@@ -120,7 +121,8 @@ class TestUpdateOneListTierAndGlobalAccountManager(APITestMixin):
     @pytest.mark.django_db
     def test_assigns_one_list_tier_by_account_manager(
         self,
-        permission_codenames, allowed,
+        permission_codenames,
+        allowed,
     ):
         """Test that an account manager:
         - can update the One List tier of the company they are managing
@@ -148,7 +150,7 @@ class TestUpdateOneListTierAndGlobalAccountManager(APITestMixin):
                 'global_account_manager': company.one_list_account_owner.id,
             },
         )
-        if (not allowed):
+        if not allowed:
             assert response.status_code == status.HTTP_403_FORBIDDEN
         else:
             assert response.status_code == status.HTTP_204_NO_CONTENT
@@ -162,8 +164,10 @@ class TestUpdateOneListTierAndGlobalAccountManager(APITestMixin):
             versions = Version.objects.get_for_object(company)
             assert versions.count() == 1
             assert versions[0].field_dict['one_list_tier_id'] == new_one_list_tier.id
-            assert versions[0].field_dict['one_list_account_owner_id'] == \
-                company.one_list_account_owner.id
+            assert (
+                versions[0].field_dict['one_list_account_owner_id']
+                == company.one_list_account_owner.id
+            )
 
     @pytest.mark.django_db
     def test_returns_403_on_editing_one_list_tier_by_other_account_manager(
@@ -266,8 +270,9 @@ class TestUpdateOneListTierAndGlobalAccountManager(APITestMixin):
         expected_errors,
         one_list_editor,
     ):
-        """Test that a One List tier and account manager can't be assigned to:
+        """Test that a One List tier and account manager can't be assigned.
 
+        Test cases include:
         - a company on a One List tier 'Tier D - International Trade Adviser Accounts'
         - a company on that is a subsidiary of any One List company
         """
@@ -345,8 +350,9 @@ class TestRemoveCompanyFromOneList(APITestMixin):
         company_factory,
         one_list_editor,
     ):
-        """Test that a company can be removed from One List:
+        """Test that a company can be removed from One List.
 
+        Test cases include:
         - a company not on the One List
         - a company on the One List tier other than 'Tier D - International Trade Adviser Accounts'
         """

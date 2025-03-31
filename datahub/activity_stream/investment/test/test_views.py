@@ -32,8 +32,8 @@ def test_investment_project_added(api_client):
         'summary': 'Investment Activities Added',
         'type': 'OrderedCollectionPage',
         'next': 'http://testserver/v3/activity-stream/investment/project-added'
-                + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
-                + f'&cursor={str(project.id)}',
+        + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
+        + f'&cursor={str(project.id)}',
         'orderedItems': [
             {
                 'id': f'dit:DataHubInvestmentProject:{project.id}:Add',
@@ -43,8 +43,8 @@ def test_investment_project_added(api_client):
                 'actor': {
                     'id': f'dit:DataHubAdviser:{project.created_by.pk}',
                     'type': ['Person', 'dit:Adviser'],
-                    'dit:emailAddress':
-                        project.created_by.contact_email or project.created_by.email,
+                    'dit:emailAddress': project.created_by.contact_email
+                    or project.created_by.email,
                     'name': project.created_by.name,
                 },
                 'object': {
@@ -104,8 +104,8 @@ def test_investment_project_with_pm_added(api_client):
         'summary': 'Investment Activities Added',
         'type': 'OrderedCollectionPage',
         'next': 'http://testserver/v3/activity-stream/investment/project-added'
-                + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
-                + f'&cursor={str(project.id)}',
+        + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
+        + f'&cursor={str(project.id)}',
         'orderedItems': [
             {
                 'id': f'dit:DataHubInvestmentProject:{project.id}:Add',
@@ -115,8 +115,8 @@ def test_investment_project_with_pm_added(api_client):
                 'actor': {
                     'id': f'dit:DataHubAdviser:{project.created_by.pk}',
                     'type': ['Person', 'dit:Adviser'],
-                    'dit:emailAddress':
-                        project.created_by.contact_email or project.created_by.email,
+                    'dit:emailAddress': project.created_by.contact_email
+                    or project.created_by.email,
                     'name': project.created_by.name,
                 },
                 'object': {
@@ -179,8 +179,8 @@ def test_investment_project_verify_win_added(api_client):
         'summary': 'Investment Activities Added',
         'type': 'OrderedCollectionPage',
         'next': 'http://testserver/v3/activity-stream/investment/project-added'
-                + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
-                + f'&cursor={str(project.id)}',
+        + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
+        + f'&cursor={str(project.id)}',
         'orderedItems': [
             {
                 'id': f'dit:DataHubInvestmentProject:{project.id}:Add',
@@ -190,8 +190,8 @@ def test_investment_project_verify_win_added(api_client):
                 'actor': {
                     'id': f'dit:DataHubAdviser:{project.created_by.pk}',
                     'type': ['Person', 'dit:Adviser'],
-                    'dit:emailAddress':
-                        project.created_by.contact_email or project.created_by.email,
+                    'dit:emailAddress': project.created_by.contact_email
+                    or project.created_by.email,
                     'name': project.created_by.name,
                 },
                 'object': {
@@ -237,7 +237,7 @@ def test_investment_project_verify_win_added(api_client):
 
 @pytest.mark.django_db
 def test_investment_project_added_with_gva(api_client):
-    """This test adds the necessary fields to compute gross_value_added property
+    """Adds the necessary fields to compute gross_value_added property
     and tests if its included in the response.
     """
     start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
@@ -257,8 +257,8 @@ def test_investment_project_added_with_gva(api_client):
         'summary': 'Investment Activities Added',
         'type': 'OrderedCollectionPage',
         'next': 'http://testserver/v3/activity-stream/investment/project-added'
-                + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
-                + f'&cursor={str(project.id)}',
+        + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
+        + f'&cursor={str(project.id)}',
         'orderedItems': [
             {
                 'id': f'dit:DataHubInvestmentProject:{project.id}:Add',
@@ -268,8 +268,8 @@ def test_investment_project_added_with_gva(api_client):
                 'actor': {
                     'id': f'dit:DataHubAdviser:{project.created_by.pk}',
                     'type': ['Person', 'dit:Adviser'],
-                    'dit:emailAddress':
-                        project.created_by.contact_email or project.created_by.email,
+                    'dit:emailAddress': project.created_by.contact_email
+                    or project.created_by.email,
                     'name': project.created_by.name,
                 },
                 'object': {

@@ -16,7 +16,7 @@ class TeamModelPermissionsBackend(ModelBackend):
     """Extension of CDMSUserBackend to include a team based permissions for user."""
 
     def _get_team_permissions(self, user_obj):
-        """This method is called by the ModelBackend _get_permissions() dynamically
+        """Called by the ModelBackend _get_permissions() dynamically
         as part of aggregating user, group and team permissions.
         """
         if user_obj.dit_team and user_obj.dit_team.role:
@@ -49,7 +49,7 @@ class PaaSIPAuthentication(BaseAuthentication):
     """DRF authentication class that checks client IP addresses."""
 
     def authenticate_header(self, request):
-        """This is returned as the WWW-Authenticate header when
+        """Returned as the WWW-Authenticate header when
         AuthenticationFailed is raised. DRF also requires this
         to send a 401 (as opposed to 403).
         """

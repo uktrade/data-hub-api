@@ -230,8 +230,7 @@ def create_task_assigned_to_me_from_others_subscription(adviser):
 
 
 def notify_adviser_added_to_task(task, adviser_id):
-    """Send a notification to the adviser added to the task.
-    """
+    """Send a notification to the adviser added to the task."""
     if adviser_id == task.created_by.id:
         return
     if adviser_id == task.modified_by.id:
@@ -418,7 +417,7 @@ def notify_adviser_archived_completed_or_amended_task(
     return
 
 
-def notify_advisers_of_task(
+def notify_advisers_of_task(  # noqa: D417
     task,
     adviser_ids_pre_m2m_change,
     reminder_class,
@@ -451,10 +450,14 @@ def notify_advisers_of_task(
         return
 
     for adviser in advisers_to_notify:
-        existing_reminder = apps.get_model('reminder', reminder_class.__name__).objects.filter(
-            task=task,
-            adviser=adviser,
-        ).first()
+        existing_reminder = (
+            apps.get_model('reminder', reminder_class.__name__)
+            .objects.filter(
+                task=task,
+                adviser=adviser,
+            )
+            .first()
+        )
         if existing_reminder:
             continue
         reminder = apps.get_model('reminder', reminder_class.__name__).objects.create(
@@ -463,12 +466,16 @@ def notify_advisers_of_task(
             task=task,
         )
 
-        adviser_subscription = apps.get_model(
-            'reminder',
-            subscription_class.__name__,
-        ).objects.filter(
-            adviser=adviser,
-        ).first()
+        adviser_subscription = (
+            apps.get_model(
+                'reminder',
+                subscription_class.__name__,
+            )
+            .objects.filter(
+                adviser=adviser,
+            )
+            .first()
+        )
         if not adviser_subscription:
             return
 
@@ -583,8 +590,12 @@ def generate_reminders_tasks_overdue():
             return
         now = timezone.now()
         yesterday = datetime.date.today() - datetime.timedelta(days=1)
-        tasks = Task.objects.filter(due_date=yesterday).exclude(archived=True).exclude(
-            status=Task.Status.COMPLETE,
+        tasks = (
+            Task.objects.filter(due_date=yesterday)
+            .exclude(archived=True)
+            .exclude(
+                status=Task.Status.COMPLETE,
+            )
         )
         for task in tasks:
             # Get all active advisers assigned to the task

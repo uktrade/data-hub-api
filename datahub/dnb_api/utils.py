@@ -45,50 +45,43 @@ COMPANY_TREE_TIMEOUT = int(timedelta(days=1).total_seconds())
 
 
 class DNBServiceBaseError(Exception):
-    """Base exception class for DNBService related errors.
-    """
+    """Base exception class for DNBService related errors."""
 
 
 class DNBServiceError(DNBServiceBaseError):
-    """Exception for when DNB service doesn't return a response with a status code of 200.
-    """
+    """Exception for when DNB service doesn't return a response with a status code of 200."""
 
     def __init__(self, message, status_code):
-        """Initialise the exception.
-        """
+        """Initialise the exception."""
         super().__init__(message)
         self.message = message
         self.status_code = status_code
 
 
 class DNBServiceInvalidRequestError(DNBServiceBaseError):
-    """Exception for when the request to DNB service is not valid.
-    """
+    """Exception for when the request to DNB service is not valid."""
 
 
 class DNBServiceInvalidResponseError(DNBServiceBaseError):
-    """Exception for when the response from DNB service is not valid.
-    """
+    """Exception for when the response from DNB service is not valid."""
 
 
 class DNBServiceConnectionError(DNBServiceBaseError):
-    """Exception for when an error was encountered when connecting to DNB service.
-    """
+    """Exception for when an error was encountered when connecting to DNB service."""
 
 
 class DNBServiceTimeoutError(DNBServiceBaseError):
-    """Exception for when a timeout was encountered when connecting to DNB service.
-    """
+    """Exception for when a timeout was encountered when connecting to DNB service."""
 
 
 class RevisionNotFoundError(Exception):
-    """Exception for when a revision with the specified comment is not found.
-    """
+    """Exception for when a revision with the specified comment is not found."""
 
 
 def search_dnb(query_params, request=None):
-    """Queries the dnb-service with the given query_params. E.g.:
+    """Queries the dnb-service with the given query_params.
 
+    E.g.:
     {"duns_number": "29393217", "page_size": 1}
     {"search_term": "brompton", "page_size": 10}
     """
@@ -167,12 +160,10 @@ def extract_address_from_dnb_company(dnb_company, prefix, ignore_when_missing=()
 
     area = None
     if country and dnb_company.get(f'{prefix}_area_name'):
-        area = (
-            AdministrativeArea.objects.filter(
-                name=dnb_company[f'{prefix}_area_name'],
-                country_id=country.id,
-            ).first()
-        )
+        area = AdministrativeArea.objects.filter(
+            name=dnb_company[f'{prefix}_area_name'],
+            country_id=country.id,
+        ).first()
 
     extracted_address = {
         'line_1': dnb_company.get(f'{prefix}_line_1') or '',
@@ -399,8 +390,7 @@ def rollback_dnb_company_update(
 
 
 def _request_changes(payload, request=None):
-    """Submit change request to dnb-service.
-    """
+    """Submit change request to dnb-service."""
     if not settings.DNB_SERVICE_BASE_URL:
         raise ImproperlyConfigured('The setting DNB_SERVICE_BASE_URL has not been set')
 
@@ -442,8 +432,7 @@ def request_changes(duns_number, changes, request=None):
 
 
 def _get_change_request(params, request=None):
-    """Get change request from dnb-service.
-    """
+    """Get change request from dnb-service."""
     if not settings.DNB_SERVICE_BASE_URL:
         raise ImproperlyConfigured('The setting DNB_SERVICE_BASE_URL has not been set')
     api_client = _get_api_client(request)
@@ -485,8 +474,7 @@ def get_change_request(duns_number, status, request=None):
 
 
 def _create_investigation(payload, request=None):
-    """Submit change request to dnb-service.
-    """
+    """Submit change request to dnb-service."""
     if not settings.DNB_SERVICE_BASE_URL:
         raise ImproperlyConfigured('The setting DNB_SERVICE_BASE_URL has not been set')
 
@@ -552,8 +540,7 @@ def validate_company_id(company_id):
 
 
 def get_full_company_hierarchy_data(duns_number) -> HierarchyData:
-    """Get a full set of company hierarchy data direct from the dnb service.
-    """
+    """Get a full set of company hierarchy data direct from the dnb service."""
     if not settings.DNB_SERVICE_BASE_URL:
         raise ImproperlyConfigured('The setting DNB_SERVICE_BASE_URL has not been set')
 
@@ -586,8 +573,7 @@ def get_full_company_hierarchy_data(duns_number) -> HierarchyData:
 
 
 def get_company_hierarchy_data(duns_number) -> HierarchyData:
-    """Get company hierarchy data.
-    """
+    """Get company hierarchy data."""
     companies_count = get_company_hierarchy_count(duns_number)
     if companies_count > settings.DNB_MAX_COMPANIES_IN_TREE_COUNT:
         return get_reduced_company_hierarchy_data(duns_number)
@@ -689,8 +675,7 @@ def create_company_tree(companies: list, duns_number):
 
 
 def create_company_hierarchy_dataframe(family_tree_members: list, duns_number):
-    """Create a dataframe from the list of family tree members.
-    """
+    """Create a dataframe from the list of family tree members."""
     append_datahub_details(family_tree_members)
 
     normalized_df = pd.json_normalize(family_tree_members)
@@ -745,8 +730,7 @@ def create_company_hierarchy_dataframe(family_tree_members: list, duns_number):
 
 
 def append_datahub_details(family_tree_members: list):
-    """Appended any known datahub details to the list of family tree members provided.
-    """
+    """Appended any known datahub details to the list of family tree members provided."""
     family_tree_members_duns = [object['duns'] for object in family_tree_members]
     family_tree_members_datahub_details = load_datahub_details(family_tree_members_duns)
     empty_address = {
@@ -845,16 +829,14 @@ def _batch_opensearch_query(duns_numbers: list, fields_to_include):
 
 
 def get_datahub_company_ids(family_tree_members: list):
-    """Get company ids for related companies returned from D&B.
-    """
+    """Get company ids for related companies returned from D&B."""
     results = _batch_opensearch_query(family_tree_members, 'id')
 
     return [result.id for result in results]
 
 
 def load_datahub_details(family_tree_members_duns):
-    """Load any known datahub details for the duns numbers provided.
-    """
+    """Load any known datahub details for the duns numbers provided."""
     results = _batch_opensearch_query(
         family_tree_members_duns,
         (
@@ -878,8 +860,7 @@ def load_datahub_details(family_tree_members_duns):
 
 
 def get_company_hierarchy_count(duns_number):
-    """Get the count of companies in the hierarchy.
-    """
+    """Get the count of companies in the hierarchy."""
     if not settings.DNB_SERVICE_BASE_URL:
         raise ImproperlyConfigured('The setting DNB_SERVICE_BASE_URL has not been set')
 
@@ -908,8 +889,7 @@ def get_company_hierarchy_count(duns_number):
 
 
 def call_api_request_with_exception_handling(api_request_function):
-    """Call the dnb service api client and handle any common errors.
-    """
+    """Call the dnb service api client and handle any common errors."""
     api_client = _get_api_client()
     try:
         result = api_request_function(api_client)
@@ -938,8 +918,7 @@ def call_api_request_with_exception_handling(api_request_function):
 
 
 def get_reduced_company_hierarchy_data(duns_number) -> HierarchyData:
-    """Get company data that only includes direct parents of the duns number.
-    """
+    """Get company data that only includes direct parents of the duns number."""
     hierarchy = []
     while duns_number:
         company_response = get_cached_dnb_company(duns_number)
@@ -1026,8 +1005,7 @@ def get_cached_dnb_company(duns_number):
 
 
 def format_company_for_family_tree(company):
-    """Format the response from the search api to the format needed by the family tree.
-    """
+    """Format the response from the search api to the format needed by the family tree."""
     company_object = {
         'duns': None,
         'corporateLinkage.parent.duns': None,

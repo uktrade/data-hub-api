@@ -15,11 +15,12 @@ pytestmark = pytest.mark.django_db
 
 @pytest.mark.parametrize('simulate', [True, False])
 def test_run(s3_stubber, caplog, simulate):
-    """Test that the command:
+    """Test the command.
 
-    - updates records if simulate=False
-    - doesn't update records if simulate=True
-    - ignores rows with errors
+    It should:
+    - update records if simulate=False
+    - not update records if simulate=True
+    - ignore rows with errors
     """
     caplog.set_level('ERROR')
 

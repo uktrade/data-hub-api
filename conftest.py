@@ -61,6 +61,7 @@ def api_client():
     skip_if_no_django()
 
     from rest_framework.test import APIClient
+
     return APIClient()
 
 
@@ -98,6 +99,7 @@ def track_return_values(monkeypatch):
 
             assert tracker.return_values == [1, 2, 3]
     """
+
     def _patch(obj, callable_name):
         tracker = _ReturnValueTracker(obj, callable_name)
         monkeypatch.setattr(obj, callable_name, tracker.make_mock())
@@ -105,19 +107,23 @@ def track_return_values(monkeypatch):
 
     return _patch
 
+
 # AWS
 
 
 @pytest.fixture
 def aws_credentials():
     """Mocked AWS credentials for moto."""
-    with patch.dict('os.environ', {
-        'AWS_ACCESS_KEY_ID': 'test-key-id',
-        'AWS_SECRET_ACCESS_KEY': 'test-secret',
-        'AWS_SECURITY_TOKEN': 'test-token',
-        'AWS_SESSION_TOKEN': 'test-token',
-        'AWS_DEFAULT_REGION': TEST_AWS_REGION,
-    }):
+    with patch.dict(
+        'os.environ',
+        {
+            'AWS_ACCESS_KEY_ID': 'test-key-id',
+            'AWS_SECRET_ACCESS_KEY': 'test-secret',
+            'AWS_SECURITY_TOKEN': 'test-token',
+            'AWS_SESSION_TOKEN': 'test-token',
+            'AWS_DEFAULT_REGION': TEST_AWS_REGION,
+        },
+    ):
         yield
 
 
@@ -196,6 +202,7 @@ def hierarchical_sectors():
 
 # SEARCH
 
+
 @pytest.fixture(scope='session')
 def _opensearch_client(worker_id):
     """Makes the OpenSearch test helper client available.
@@ -208,6 +215,7 @@ def _opensearch_client(worker_id):
     settings.OPENSEARCH_INDEX_PREFIX = f'test_{worker_id}'
 
     from opensearch_dsl.connections import connections
+
     client = get_test_client(nowait=False)
     connections.add_connection('default', client)
     return client
@@ -237,7 +245,9 @@ def _opensearch_session(_opensearch_client):
         # Create indices and aliases
         alias_names = (read_alias, write_alias)
         create_index(
-            index_name, search_app.search_model._doc_type.mapping, alias_names=alias_names,
+            index_name,
+            search_app.search_model._doc_type.mapping,
+            alias_names=alias_names,
         )
 
     yield _opensearch_client
@@ -248,8 +258,9 @@ def _opensearch_session(_opensearch_client):
 
 @pytest.fixture
 def opensearch(_opensearch_session):
-    """Function-scoped pytest fixture that:
+    """Function-scoped pytest fixture.
 
+    It:
     - ensures OpenSearch is available for the test
     - deletes all documents from OpenSearch at the end of the test.
     """
@@ -266,8 +277,9 @@ def opensearch(_opensearch_session):
 
 @pytest.fixture
 def opensearch_with_signals(opensearch, synchronous_on_commit):
-    """Function-scoped pytest fixture that:
+    """Function-scoped pytest fixture.
 
+    It:
     - ensures OpenSearch is available for the test
     - connects search signal receivers so that OpenSearch documents are automatically
     created for model instances saved during the test
@@ -383,8 +395,9 @@ def opensearch_collector_context_manager(opensearch, synchronous_on_commit, requ
 
 @pytest.fixture
 def opensearch_with_collector(opensearch_collector_context_manager):
-    """Function-scoped pytest fixture that:
+    """Function-scoped pytest fixture.
 
+    It:
     - ensures OpenSearch is available for the test
     - collects all model objects saved so they can be synced to OpenSearch in bulk
     - deletes all documents from OpenSearch at the end of the test
@@ -417,8 +430,7 @@ def mock_connection_for_create_index(monkeypatch):
 
 @pytest.fixture
 def dnb_response_uk():
-    """Returns a UK-based DNB company.
-    """
+    """Returns a UK-based DNB company."""
     return {
         'results': [
             {
@@ -483,23 +495,20 @@ def dnb_response_uk():
 
 @pytest.fixture
 def formatted_dnb_company(dnb_response_uk):
-    """Get formatted DNB company data.
-    """
+    """Get formatted DNB company data."""
     return format_dnb_company(dnb_response_uk['results'][0])
 
 
 @pytest.fixture
 def formatted_dnb_company_area(dnb_response_uk):
-    """Get formatted DNB company data.
-    """
+    """Get formatted DNB company data."""
     dnb_response_area = dnb_response_uk['results'][0].copy()
     return format_dnb_company(dnb_response_area)
 
 
 @pytest.fixture
 def formatted_dnb_company_area_non_uk(dnb_response_non_uk):
-    """Get formatted DNB company data.
-    """
+    """Get formatted DNB company data."""
     dnb_response_area = dnb_response_non_uk['results'][0].copy()
 
     administrative_areas = [area.value.name for area in AdministrativeArea]
@@ -519,7 +528,8 @@ def search_support_user():
 def pytest_addoption(parser):
     """Adds a new flag to pytest to skip excluded tests."""
     parser.addoption(
-        '--skip-excluded', '--se',
+        '--skip-excluded',
+        '--se',
         action='store_true',
         default=False,
         help='Skip excluded tests from running',
@@ -531,10 +541,9 @@ def pytest_collection_modifyitems(config, items):
     if config.getoption('--skip-excluded') is False:
         return
     for item in items:
-        if any([
-            m.name == 'excluded' or m.name.startswith('excluded_')
-            for m in item.iter_markers()
-        ]):
+        if any(
+            [m.name == 'excluded' or m.name.startswith('excluded_') for m in item.iter_markers()],
+        ):
             item.add_marker(pytest.mark.skip(reason='Test marked as excluded'))
 
 
