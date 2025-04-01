@@ -1,6 +1,6 @@
 # Django and django related
 django==4.2.20
-djangorestframework==3.15.2
+djangorestframework==3.16.0
 drf-redesign==0.5.0
 drf-spectacular==0.28.0
 drf-spectacular-sidecar==2025.3.1
@@ -30,13 +30,13 @@ dj-database-url==2.3.0
 psycopg2-binary==2.9.10
 psycogreen==1.0.2
 
-boto3==1.37.18
+boto3==1.37.23
 
 notifications-python-client==10.0.1
 
 # Email
 mail-parser==4.1.2
-icalendar==6.1.2
+icalendar==6.1.3
 
 # Slack
 slackclient==2.9.4
@@ -60,7 +60,7 @@ gevent==24.11.1
 mohawk==1.1.0
 requests==2.32.3
 requests_toolbelt==1.0.0
-sentry_sdk==2.24.0
+sentry_sdk==2.24.1
 
 # RQ and associated helpers
 rq==2.1.0
