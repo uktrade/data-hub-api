@@ -41,7 +41,6 @@ ignore = [
     'B019',    # Use of functools.lru_cache or functools.cache on methods can lead to memory leaks
     'B026',    # Star-arg unpacking after a keyword argument is strongly discouraged
     'B904',    # Within an except* clause, raise exceptions with raise ... from err or raise ... from None to distinguish them from errors in exception handling
-    'COM812',  # Trailing comma missing: this rule may cause conflicts when used with the formatter and it is recommended to disable it
     'D100',    # Missing docstring in public module 
     'D101',    # Missing docstring in public class
     'D102',    # Missing docstring in public method
