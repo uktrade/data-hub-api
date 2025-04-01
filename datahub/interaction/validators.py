@@ -30,10 +30,11 @@ class ServiceAnswersValidator:
         service = data_combiner.get_value('service')
         service_answers = data_combiner.get_value('service_answers')
 
-        expected_questions = {
-            str(question.pk): question
-            for question in service.interaction_questions.all()
-        } if service else {}
+        expected_questions = (
+            {str(question.pk): question for question in service.interaction_questions.all()}
+            if service
+            else {}
+        )
 
         self._validate_type_and_truthiness(expected_questions, service_answers)
 
@@ -43,19 +44,25 @@ class ServiceAnswersValidator:
     @classmethod
     def _validate_type_and_truthiness(cls, expected_questions, service_answers):
         if service_answers is not None and not isinstance(service_answers, dict):
-            raise serializers.ValidationError({
-                'service_answers': cls.answer_invalid_format_message,
-            })
+            raise serializers.ValidationError(
+                {
+                    'service_answers': cls.answer_invalid_format_message,
+                },
+            )
 
         if not expected_questions and service_answers:
-            raise serializers.ValidationError({
-                'service_answers': cls.answer_not_required_message,
-            })
+            raise serializers.ValidationError(
+                {
+                    'service_answers': cls.answer_not_required_message,
+                },
+            )
 
         if expected_questions and not service_answers:
-            raise serializers.ValidationError({
-                'service_answers': cls.required_message,
-            })
+            raise serializers.ValidationError(
+                {
+                    'service_answers': cls.required_message,
+                },
+            )
 
     @classmethod
     def _validate_questions(cls, expected_questions, service_answers):
@@ -84,14 +91,18 @@ class ServiceAnswersValidator:
     @classmethod
     def _validate_question_answers(cls, question_id, provided_answer_options):
         if len(provided_answer_options) == 0:
-            raise serializers.ValidationError({
-                question_id: cls.required_message,
-            })
+            raise serializers.ValidationError(
+                {
+                    question_id: cls.required_message,
+                },
+            )
 
         if len(provided_answer_options) > 1:
-            raise serializers.ValidationError({
-                question_id: cls.only_one_answer_per_question_message,
-            })
+            raise serializers.ValidationError(
+                {
+                    question_id: cls.only_one_answer_per_question_message,
+                },
+            )
 
         (answer_option_id,) = provided_answer_options
 
@@ -101,9 +112,11 @@ class ServiceAnswersValidator:
         ).exists()
 
         if not answer_option_is_valid:
-            raise serializers.ValidationError({
-                answer_option_id: cls.answer_does_not_exist_message,
-            })
+            raise serializers.ValidationError(
+                {
+                    answer_option_id: cls.answer_does_not_exist_message,
+                },
+            )
 
     @staticmethod
     def _add_errors_to_dict(target, exc):
@@ -164,8 +177,7 @@ class StatusChangeValidator:
     requires_context = True
 
     def __call__(self, data, serializer):
-        """Performs validation.
-        """
+        """Performs validation."""
         instance = serializer.instance
         if not instance:
             return

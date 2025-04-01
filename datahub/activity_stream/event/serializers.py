@@ -15,16 +15,10 @@ class EventActivitySerializer(ActivitySerializer):
         }
 
     def _get_related_programmes(self, programmes):
-        return [
-            self._get_related_programme(programme)
-            for programme in programmes.order_by('pk')
-        ]
+        return [self._get_related_programme(programme) for programme in programmes.order_by('pk')]
 
     def _get_teams(self, teams):
-        return [
-            self._get_team(team)
-            for team in teams.order_by('pk')
-        ]
+        return [self._get_team(team) for team in teams.order_by('pk')]
 
     def to_representation(self, instance):
         event_id = f'dit:DataHubEvent:{instance.pk}'

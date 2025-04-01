@@ -358,7 +358,7 @@ def test_indexed_doc(opensearch):
     )
 
     doc = SearchLargeCapitalOpportunity.to_document(opportunity)
-    opensearch_client.bulk(actions=(doc, ), chunk_size=1)
+    opensearch_client.bulk(actions=(doc,), chunk_size=1)
 
     opensearch.indices.refresh()
 

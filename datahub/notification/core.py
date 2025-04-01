@@ -9,12 +9,10 @@ from datahub.notification.constants import DEFAULT_SERVICE_NAME, NOTIFY_KEYS
 
 
 class NotifyGateway:
-    """For accessing underlying GOVUK notification service.
-    """
+    """For accessing underlying GOVUK notification service."""
 
     def __init__(self):
-        """Init underlying notification client(s).
-        """
+        """Init underlying notification client(s)."""
         self._initialise_clients()
 
     def _initialise_clients(self):
@@ -50,8 +48,7 @@ class NotifyGateway:
         context=None,
         notify_service_name=None,
     ):
-        """Send an email notification using the GOVUK notification service.
-        """
+        """Send an email notification using the GOVUK notification service."""
         # TODO: the default notify service name should be in a setting, not a constant.
         # This will be fixed when we fully move over OMIS notifications from its
         # own notification package to this app
@@ -67,8 +64,7 @@ class NotifyGateway:
         )
 
     def get_notification_by_id(self, notification_id, notify_service_name=None):
-        """Gets notification status by notification id.
-        """
+        """Gets notification status by notification id."""
         if not notify_service_name:
             notify_service_name = DEFAULT_SERVICE_NAME
         client = self.clients[notify_service_name]

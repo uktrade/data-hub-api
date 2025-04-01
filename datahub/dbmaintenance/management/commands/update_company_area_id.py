@@ -14,8 +14,10 @@ class Command(BaseCommand):
     and area id match.
     """
 
-    help = ('Updates address_area_id to None for companies with the specified '
-            'address_country_id and area_id criteria.')
+    help = (
+        'Updates address_area_id to None for companies with the specified '
+        'address_country_id and area_id criteria.'
+    )
 
     def add_arguments(self, parser):
         parser.add_argument('area_id', type=str, help='UUID of the AdministrativeArea')
@@ -43,10 +45,14 @@ class Command(BaseCommand):
                 reversion.set_comment('Set address_area_id to None')
 
             # Output message
-            self.stdout.write(self.style.SUCCESS(
-                f'Updated {matching_companies.count()} companies, set address_area_id to None.',
-            ))
+            self.stdout.write(
+                self.style.SUCCESS(
+                    f'Updated {matching_companies.count()} companies, set address_area_id to None.',
+                ),
+            )
         else:
-            self.stdout.write(self.style.WARNING(
-                'No matching companies found. No updates were made.',
-            ))
+            self.stdout.write(
+                self.style.WARNING(
+                    'No matching companies found. No updates were made.',
+                ),
+            )

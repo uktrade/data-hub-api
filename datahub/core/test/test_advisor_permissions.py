@@ -14,8 +14,7 @@ class TestPermissions(APITestMixin):
     """Tests for team permissions."""
 
     def test_view_returns_200(self):
-        """Tests view returns 200.
-        """
+        """Tests view returns 200."""
         permission = Permission.objects.get(codename='view_permissionmodel')
         permission_group = GroupFactory()
         permission_group.permissions.add(permission)
@@ -38,8 +37,7 @@ class TestPermissions(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
 
     def test_view_returns_403(self):
-        """Tests view returns 403.
-        """
+        """Tests view returns 403."""
         user = create_test_user(dit_team=TeamFactory())
         token = self.get_token(user=user)
 
@@ -57,8 +55,7 @@ class TestPermissions(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_user_without_team_returns_403(self):
-        """Tests view returns 403 for user without team and permission.
-        """
+        """Tests view returns 403 for user without team and permission."""
         user = create_test_user()
 
         token = self.get_token(user=user)

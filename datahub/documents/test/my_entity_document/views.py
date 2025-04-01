@@ -1,4 +1,5 @@
 """Document test views."""
+
 from rest_framework.permissions import IsAuthenticated
 
 from datahub.documents.test.my_entity_document.models import MyEntityDocument

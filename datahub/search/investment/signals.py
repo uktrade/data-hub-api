@@ -20,6 +20,7 @@ from datahub.search.sync_object import sync_object_async
 
 def investment_project_sync_search(instance):
     """Sync investment project to the OpenSearch."""
+
     def sync_search_wrapper():
         if isinstance(instance, InvestmentProjectTeamMember):
             pk = instance.investment_project.pk
@@ -51,14 +52,15 @@ def investment_project_sync_search_interaction_change(instance):
     if instance.investment_project is not None:
         pks.append(instance.investment_project.pk)
 
-    previous_version = Version.objects.get_for_object(
-        instance,
-    ).order_by('-revision__date_created').first()
+    previous_version = (
+        Version.objects.get_for_object(
+            instance,
+        )
+        .order_by('-revision__date_created')
+        .first()
+    )
 
-    if (
-        previous_version is not None
-        and 'investment_project_id' in previous_version.field_dict
-    ):
+    if previous_version is not None and 'investment_project_id' in previous_version.field_dict:
         pks.append(previous_version.field_dict['investment_project_id'])
 
     for pk in set([pk for pk in pks if pk is not None]):
@@ -71,6 +73,7 @@ def investment_project_sync_search_adviser_change(instance):
 
     This is primarily to update the teams stored against the project in OpenSearch.
     """
+
     def sync_search_wrapper():
         queryset = DBInvestmentProject.objects.filter(
             Q(created_by_id=instance.pk)
@@ -90,12 +93,11 @@ def investment_project_sync_search_adviser_change(instance):
 
 
 def investment_project_sync_m2m_opensearch(instance, action, reverse, pk_set, **kwargs):
-    """Sync opensearch when m2m fields change on the investment project.
-    """
+    """Sync opensearch when m2m fields change on the investment project."""
     if action not in ('post_add', 'post_remove', 'post_clear'):
         return
 
-    pks = pk_set if reverse else (instance.pk, )
+    pks = pk_set if reverse else (instance.pk,)
 
     for pk in pks:
         sync_object_async(InvestmentSearchApp, pk)

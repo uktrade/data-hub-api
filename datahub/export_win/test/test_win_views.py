@@ -178,15 +178,18 @@ class TestGetWinView(APITestMixin):
 
         response_breakdowns = sorted(response_data.pop('breakdowns'), key=lambda k: k['id'])
 
-        expected_breakdowns = [{
-            'id': str(breakdown.id),
-            'type': {
-                'id': str(breakdown.type.id),
-                'name': breakdown.type.name,
-            },
-            'value': breakdown.value,
-            'year': breakdown.year,
-        } for breakdown in breakdowns]
+        expected_breakdowns = [
+            {
+                'id': str(breakdown.id),
+                'type': {
+                    'id': str(breakdown.type.id),
+                    'name': breakdown.type.name,
+                },
+                'value': breakdown.value,
+                'year': breakdown.year,
+            }
+            for breakdown in breakdowns
+        ]
         expected_breakdowns = sorted(expected_breakdowns, key=lambda k: k['id'])
 
         assert response_breakdowns == expected_breakdowns
@@ -354,18 +357,13 @@ class TestGetWinView(APITestMixin):
                 'responded_on': customer_response.responded_on,
                 'case_study_willing': customer_response.case_study_willing,
                 'comments': customer_response.comments,
-                'company_was_at_risk_of_not_exporting':
-                    customer_response.company_was_at_risk_of_not_exporting,
-                'has_enabled_expansion_into_existing_market':
-                    customer_response.has_enabled_expansion_into_existing_market,
-                'has_enabled_expansion_into_new_market':
-                    customer_response.has_enabled_expansion_into_new_market,
+                'company_was_at_risk_of_not_exporting': customer_response.company_was_at_risk_of_not_exporting,
+                'has_enabled_expansion_into_existing_market': customer_response.has_enabled_expansion_into_existing_market,
+                'has_enabled_expansion_into_new_market': customer_response.has_enabled_expansion_into_new_market,
                 'has_explicit_export_plans': customer_response.has_explicit_export_plans,
-                'has_increased_exports_as_percent_of_turnover':
-                    customer_response.has_increased_exports_as_percent_of_turnover,
+                'has_increased_exports_as_percent_of_turnover': customer_response.has_increased_exports_as_percent_of_turnover,
                 'involved_state_enterprise': customer_response.involved_state_enterprise,
-                'interventions_were_prerequisite':
-                    customer_response.interventions_were_prerequisite,
+                'interventions_were_prerequisite': customer_response.interventions_were_prerequisite,
                 'name': customer_response.name,
                 'other_marketing_source': customer_response.other_marketing_source,
                 'support_improved_speed': customer_response.support_improved_speed,
@@ -541,9 +539,12 @@ class TestListWinView(APITestMixin):
         Win.objects.update(adviser=self.user)
         url = reverse('api-v4:export-win:collection')
 
-        response = self.api_client.get(url, data={
-            'confirmed': confirmed,
-        })
+        response = self.api_client.get(
+            url,
+            data={
+                'confirmed': confirmed,
+            },
+        )
         assert response.status_code == status.HTTP_200_OK
         results = response.json()
 
@@ -558,10 +559,13 @@ class TestListWinView(APITestMixin):
             'null': None,
         }
 
-        assert all(
-            result['customer_response']['agree_with_win'] == expected[confirmed]
-            for result in results['results']
-        ) is True
+        assert (
+            all(
+                result['customer_response']['agree_with_win'] == expected[confirmed]
+                for result in results['results']
+            )
+            is True
+        )
 
     @pytest.mark.parametrize(
         ('params', 'related_objects', 'results_length'),
@@ -1251,10 +1255,12 @@ class TestCreateWinView(APITestMixin):
         assert 'Export Wins API Bad Request' in caplog.text
         assert caplog.records[0].request_data == request_data
         response_text = str(caplog.records[0].response_data)
-        assert any([
-            'Invalid data' in response_text,
-            'This field is required' in response_text,
-        ])
+        assert any(
+            [
+                'Invalid data' in response_text,
+                'This field is required' in response_text,
+            ],
+        )
 
     def test_create_win_with_html_script_tags(self, mock_export_win_serializer_notify):
         """Tests handling of HTML/script tags within submitted data."""
@@ -1288,15 +1294,17 @@ class TestCreateWinView(APITestMixin):
             'goods_vs_services': {'id': ExpectedValueRelationConstant.both.value.id},
             'sector': {'id': SectorConstant.aerospace_assembly_aircraft.value.id},
             'type_of_support': [
-                {'id': SupportTypeConstant.political_and_economic_briefing.value.id}],
+                {'id': SupportTypeConstant.political_and_economic_briefing.value.id},
+            ],
             'associated_programme': [{'id': AssociatedProgrammeConstant.afterburner.value.id}],
             'is_personally_confirmed': False,
             'is_line_manager_confirmed': False,
             'name_of_customer': 'Overseas Customer<script>alert("hack");</script>',
             'name_of_customer_confidential': True,
             'export_experience': {'id': str(export_experience.id)},
-            'breakdowns': [{'type': {'id': BreakdownTypeConstant.export.value.id},
-                            'value': 1000, 'year': 3}],
+            'breakdowns': [
+                {'type': {'id': BreakdownTypeConstant.export.value.id}, 'value': 1000, 'year': 3},
+            ],
         }
         first_sent = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
         with freeze_time(first_sent):
@@ -1308,8 +1316,9 @@ class TestCreateWinView(APITestMixin):
         assert 'error' in response_data
         error_message = response_data['error']
 
-        assert 'Input contains disallowed HTML or script tags or symbols' in error_message, \
+        assert 'Input contains disallowed HTML or script tags or symbols' in error_message, (
             'The error message should warn about script or HTML tags.'
+        )
 
         mock_export_win_serializer_notify.assert_not_called()
 
@@ -2033,10 +2042,12 @@ class TestUpdateWinView(APITestMixin):
         assert 'Export Wins API Bad Request' in caplog.text
         assert caplog.records[0].request_data == request_data
         response_text = str(caplog.records[0].response_data)
-        assert any([
-            'Invalid data' in response_text,
-            'Must be a valid UUID' in response_text,
-        ])
+        assert any(
+            [
+                'Invalid data' in response_text,
+                'Must be a valid UUID' in response_text,
+            ],
+        )
 
     def test_update_win_with_html_and_script_tags(self):
         """Tests updating an export win with HTML and script tags."""
@@ -2235,11 +2246,11 @@ class TestResendExportWinView(APITestMixin):
         ],
     )
     def test_resend_export_win_success(
-            self,
-            mock_notify_export_win_email_by_rq_email,
-            params,
-            related_objects,
-            resent,
+        self,
+        mock_notify_export_win_email_by_rq_email,
+        params,
+        related_objects,
+        resent,
     ):
         """Test to resend win to the right contact."""
         contact = ContactFactory()

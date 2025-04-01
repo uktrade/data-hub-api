@@ -61,7 +61,7 @@ def test_run(s3_stubber, caplog):
         company.refresh_from_db()
 
     assert 'Company matching query does not exist' in caplog.text
-    assert "KeyError: \'dummy\'" in caplog.text
+    assert "KeyError: 'dummy'" in caplog.text
     assert len(caplog.records) == 2
 
     assert [company.export_potential for company in companies] == [

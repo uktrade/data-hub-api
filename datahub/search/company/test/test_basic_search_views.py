@@ -79,7 +79,6 @@ class TestBasicSearch(APITestMixin):
             ('his', 'whiskers and tabby'),
             ('ers', 'whiskers and tabby'),
             ('1a', '1a'),
-
             # trading names
             ('maine coon egyptian mau', 'whiskers and tabby'),
             ('maine', 'whiskers and tabby'),
@@ -87,7 +86,6 @@ class TestBasicSearch(APITestMixin):
             ('ine oon', 'whiskers and tabby'),
             ('ine mau', 'whiskers and tabby'),
             ('3a', '1a'),
-
             # non-matches
             ('whi lorem', None),
             ('wh', None),

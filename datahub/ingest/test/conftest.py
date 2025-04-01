@@ -34,12 +34,5 @@ def test_object_tuples():
     ]
     keys = [f'{TEST_PREFIX}{path}' for path in paths]
     # Contents
-    contents = [
-        compressed_json_faker([{'test': 'content'}])
-        for _ in range(len(keys))
-    ]
-    return [
-        (key, content)
-        for key, content
-        in list(zip(keys, contents, strict=False))
-    ]
+    contents = [compressed_json_faker([{'test': 'content'}]) for _ in range(len(keys))]
+    return [(key, content) for key, content in list(zip(keys, contents, strict=False))]

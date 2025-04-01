@@ -22,8 +22,7 @@ class Command(CSVBaseCommand):
         return super()._handle(*args, **options)
 
     def _process_row(self, row, simulate=False, **options):
-        """Process one single row.
-        """
+        """Process one single row."""
         pk = parse_uuid(row['datahub_company_id'])
         company = Company.objects.get(pk=pk)
         has_profile = parse_bool(row['has_find_a_supplier_profile'])

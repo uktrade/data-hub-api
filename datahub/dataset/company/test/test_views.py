@@ -101,8 +101,7 @@ def get_expected_data_from_company(company):
 
 @pytest.mark.django_db
 class TestCompaniesDatasetViewSet(BaseDatasetViewTest):
-    """Tests for CompaniesDatasetView.
-    """
+    """Tests for CompaniesDatasetView."""
 
     view_url = reverse('api-v4:dataset:companies-dataset')
     factory = CompanyWithAreaFactory

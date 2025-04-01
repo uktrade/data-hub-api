@@ -58,8 +58,7 @@ class GrossValueAddedCalculator:
             if self.investment_project.foreign_equity_investment is None:
                 return None
             return Decimal(
-                self.gva_multiplier.multiplier
-                * self.investment_project.foreign_equity_investment,
+                self.gva_multiplier.multiplier * self.investment_project.foreign_equity_investment,
             ).quantize(
                 Decimal('1.'),
                 rounding=ROUND_HALF_UP,
@@ -71,8 +70,7 @@ class GrossValueAddedCalculator:
             if self.investment_project.number_new_jobs is None:
                 return None
             return Decimal(
-                self.gva_multiplier.multiplier
-                * self.investment_project.number_new_jobs,
+                self.gva_multiplier.multiplier * self.investment_project.number_new_jobs,
             ).quantize(
                 Decimal('1.'),
                 rounding=ROUND_HALF_UP,
@@ -81,10 +79,7 @@ class GrossValueAddedCalculator:
 
     def _get_gva_multiplier_for_investment_project(self):
         """:returns a GVA multiplier for an investment project."""
-        if (
-            str(self.investment_project.investment_type_id)
-            != InvestmentTypeConstant.fdi.value.id
-        ):
+        if str(self.investment_project.investment_type_id) != InvestmentTypeConstant.fdi.value.id:
             return None
 
         if str(self.investment_project.fdi_type_id) == FDITypeConstant.retention.value.id:

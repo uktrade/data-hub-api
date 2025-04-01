@@ -16,7 +16,7 @@ class BaseDatasetView(HawkResponseSigningMixin, APIView):
     """
 
     authentication_classes = (PaaSIPAuthentication, HawkAuthentication)
-    permission_classes = (HawkScopePermission, )
+    permission_classes = (HawkScopePermission,)
     required_hawk_scope = HawkScope.data_flow_api
     pagination_class = DatasetCursorPagination
 
@@ -54,7 +54,7 @@ class BaseFilterDatasetView(HawkResponseSigningMixin, APIView):
     """
 
     authentication_classes = (PaaSIPAuthentication, HawkAuthentication)
-    permission_classes = (HawkScopePermission, )
+    permission_classes = (HawkScopePermission,)
     required_hawk_scope = HawkScope.data_flow_api
     pagination_class = DatasetCursorPagination
 

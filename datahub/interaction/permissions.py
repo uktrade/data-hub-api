@@ -36,9 +36,7 @@ class InteractionModelPermissions(ViewBasedModelPermissions):
             _PermissionTemplate.all,
             _PermissionTemplate.associated_investmentproject,
         ),
-        'delete': (
-            _PermissionTemplate.standard,
-        ),
+        'delete': (_PermissionTemplate.standard,),
     }
 
 

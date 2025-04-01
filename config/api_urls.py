@@ -109,8 +109,10 @@ v4_urls = [
         include((investment_lead_urls, 'investment-lead'), namespace='investment-lead'),
     ),
     path(
-        'company-activity/', include(
-            (company_activity_urls, 'company-activity'), namespace='company-activity',
+        'company-activity/',
+        include(
+            (company_activity_urls, 'company-activity'),
+            namespace='company-activity',
         ),
     ),
     path('document/', include((document_urls, 'document'), namespace='document')),

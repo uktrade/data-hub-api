@@ -11,6 +11,7 @@ SPI5_START  - when project has been moved to won
 SPI5_END    - earliest interaction when aftercare was offered, only for new investor,
               only for IST managed projects
 """
+
 from dateutil.parser import parse as dateutil_parse
 from django.db.models import Q
 
@@ -63,11 +64,7 @@ def format_date(d):
 def _filter_row_dicts(rows, field_titles):
     """Filter row dicts to exclude keys which are not present in field_titles."""
     for row in rows:
-        yield {
-            key: value
-            for key, value in row.items()
-            if key in field_titles
-        }
+        yield {key: value for key, value in row.items() if key in field_titles}
 
 
 def write_report(file):
@@ -145,10 +142,7 @@ class SPIReport:
         data = {}
         for interaction in investment_project.spi_interactions:
             for service_ids, field_name in self.MAPPINGS:
-                if (
-                    str(interaction['service_id']) in service_ids
-                    and field_name not in data
-                ):
+                if str(interaction['service_id']) in service_ids and field_name not in data:
                     data[field_name] = {
                         'created_by_id': interaction['created_by_id'],
                         'created_by_name': interaction['created_by_name'],
@@ -172,9 +166,13 @@ class SPIReport:
 
         Earliest date counts.
         """
-        stage_log = investment_project.stage_log.filter(
-            stage_id=Stage.won.value.id,
-        ).order_by('created_on').first()
+        stage_log = (
+            investment_project.stage_log.filter(
+                stage_id=Stage.won.value.id,
+            )
+            .order_by('created_on')
+            .first()
+        )
 
         return stage_log.created_on if stage_log else None
 
@@ -246,8 +244,7 @@ class SPIReport:
         spi_propositions = investment_project.spi_propositions or []
 
         formatter = (
-            self.proposition_formatter
-            if self.proposition_formatter else self._format_propositions
+            self.proposition_formatter if self.proposition_formatter else self._format_propositions
         )
 
         data[self.SPI3] = formatter(spi_propositions)
@@ -297,33 +294,37 @@ class SPIReport:
 
 def get_spi_report_queryset():
     """Get SPI Report queryset."""
-    return InvestmentProject.objects.select_related(
-        'investmentprojectcode',
-        'project_manager__dit_team',
-    ).annotate(
-        spi_propositions=get_array_agg_subquery(
-            Proposition,
-            'investment_project',
-            JSONBBuildObject(
-                deadline='deadline',
-                status='status',
-                adviser_id='adviser_id',
-                adviser_name=get_full_name_expression('adviser'),
-                modified_on='modified_on',
+    return (
+        InvestmentProject.objects.select_related(
+            'investmentprojectcode',
+            'project_manager__dit_team',
+        )
+        .annotate(
+            spi_propositions=get_array_agg_subquery(
+                Proposition,
+                'investment_project',
+                JSONBBuildObject(
+                    deadline='deadline',
+                    status='status',
+                    adviser_id='adviser_id',
+                    adviser_name=get_full_name_expression('adviser'),
+                    modified_on='modified_on',
+                ),
+                ordering=('created_on',),
             ),
-            ordering=('created_on',),
-        ),
-        spi_interactions=get_array_agg_subquery(
-            Interaction,
-            'investment_project',
-            JSONBBuildObject(
-                service_id='service_id',
-                service_name=get_service_name_subquery('service'),
-                created_by_id='created_by_id',
-                created_by_name=get_full_name_expression('created_by'),
-                created_on='created_on',
+            spi_interactions=get_array_agg_subquery(
+                Interaction,
+                'investment_project',
+                JSONBBuildObject(
+                    service_id='service_id',
+                    service_name=get_service_name_subquery('service'),
+                    created_by_id='created_by_id',
+                    created_by_name=get_full_name_expression('created_by'),
+                    created_on='created_on',
+                ),
+                filter=Q(service_id__in=ALL_SPI_SERVICE_IDS),
+                ordering=('created_on',),
             ),
-            filter=Q(service_id__in=ALL_SPI_SERVICE_IDS),
-            ordering=('created_on',),
-        ),
-    ).order_by('created_on')
+        )
+        .order_by('created_on')
+    )

@@ -134,12 +134,16 @@ def test_run(s3_stubber, caplog, reset_unmatched):
 
     # non_one_list_companies[1]: nothing changed
     assert_did_not_change(
-        non_one_list_companies[1], 'one_list_tier_id', 'one_list_account_owner_id',
+        non_one_list_companies[1],
+        'one_list_tier_id',
+        'one_list_account_owner_id',
     )
 
     # non_one_list_companies[2]: nothing changed
     assert_did_not_change(
-        non_one_list_companies[2], 'one_list_tier_id', 'one_list_account_owner_id',
+        non_one_list_companies[2],
+        'one_list_tier_id',
+        'one_list_account_owner_id',
     )
 
     # one_list_companies[6] / [7]: if reset_unmatched == False => nothing changed else all changed
@@ -153,14 +157,18 @@ def test_run(s3_stubber, caplog, reset_unmatched):
         assert one_list_companies[7].one_list_account_owner is None
     else:
         assert_did_not_change(
-            one_list_companies[6], 'one_list_tier_id', 'one_list_account_owner_id',
+            one_list_companies[6],
+            'one_list_tier_id',
+            'one_list_account_owner_id',
         )
         assert_did_not_change(
-            one_list_companies[7], 'one_list_tier_id', 'one_list_account_owner_id',
+            one_list_companies[7],
+            'one_list_tier_id',
+            'one_list_account_owner_id',
         )
 
 
-@pytest.mark.parametrize('reset_unmatched', [False ])
+@pytest.mark.parametrize('reset_unmatched', [False])
 def test_simulate(s3_stubber, caplog, reset_unmatched):
     """Test that the command simulates updates if --simulate is passed in."""
     caplog.set_level('ERROR')

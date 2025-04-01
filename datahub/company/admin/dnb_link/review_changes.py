@@ -24,11 +24,7 @@ from datahub.dnb_api.utils import (
 
 
 def _build_error_messages(all_errors):
-    messages = [
-        f'{field}: {error}'
-        for field, errors in all_errors.items()
-        for error in errors
-    ]
+    messages = [f'{field}: {error}' for field, errors in all_errors.items() for error in errors]
 
     return messages
 

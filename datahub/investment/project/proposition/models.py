@@ -104,11 +104,15 @@ class Proposition(BaseModel):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     investment_project = models.ForeignKey(
-        'investment.InvestmentProject', on_delete=models.CASCADE, related_name='proposition',
+        'investment.InvestmentProject',
+        on_delete=models.CASCADE,
+        related_name='proposition',
     )
     # adviser to whom a proposition is assigned
     adviser = models.ForeignKey(
-        'company.Advisor', on_delete=models.CASCADE, related_name='+',
+        'company.Advisor',
+        on_delete=models.CASCADE,
+        related_name='+',
     )
     deadline = models.DateField()
     status = models.CharField(
@@ -146,9 +150,11 @@ class Proposition(BaseModel):
         :raises APIConflictException: when proposition status is not ongoing
         """
         if self.documents.filter(document__status=UploadStatus.VIRUS_SCANNED).count() == 0:
-            raise ValidationError({
-                'non_field_errors': ['Proposition has no documents uploaded.'],
-            })
+            raise ValidationError(
+                {
+                    'non_field_errors': ['Proposition has no documents uploaded.'],
+                },
+            )
         self._change_status(PropositionStatus.COMPLETED, by, details)
 
     def abandon(self, by, details):

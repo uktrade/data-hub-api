@@ -4,23 +4,31 @@ from django.urls import path
 
 from datahub.documents.test.my_entity_document.views import MyEntityDocumentViewSet
 
-my_entity_document_collection = MyEntityDocumentViewSet.as_view({
-    'get': 'list',
-    'post': 'create',
-})
+my_entity_document_collection = MyEntityDocumentViewSet.as_view(
+    {
+        'get': 'list',
+        'post': 'create',
+    },
+)
 
-my_entity_document_item = MyEntityDocumentViewSet.as_view({
-    'get': 'retrieve',
-    'delete': 'destroy',
-})
+my_entity_document_item = MyEntityDocumentViewSet.as_view(
+    {
+        'get': 'retrieve',
+        'delete': 'destroy',
+    },
+)
 
-my_entity_document_callback = MyEntityDocumentViewSet.as_view({
-    'post': 'upload_complete_callback',
-})
+my_entity_document_callback = MyEntityDocumentViewSet.as_view(
+    {
+        'post': 'upload_complete_callback',
+    },
+)
 
-my_entity_document_download = MyEntityDocumentViewSet.as_view({
-    'get': 'download',
-})
+my_entity_document_download = MyEntityDocumentViewSet.as_view(
+    {
+        'get': 'download',
+    },
+)
 
 urlpatterns = [
     path(

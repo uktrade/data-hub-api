@@ -183,12 +183,15 @@ class TestConfirmMergeViewPost(AdminTestMixin):
         for obj in source_related_objects:
             obj.refresh_from_db()
 
-        if (len(source_related_objects) > 0 and hasattr(obj, 'contacts')):
-            assert all([*list(obj.contacts.all())][0]
-                       == target_contact for obj in source_related_objects)
-        elif (len(source_related_objects) > 0 and hasattr(obj, 'client_contacts')):
-            assert all([*list(obj.client_contacts.all())][0]
-                       == target_contact for obj in source_related_objects)
+        if len(source_related_objects) > 0 and hasattr(obj, 'contacts'):
+            assert all(
+                [*list(obj.contacts.all())][0] == target_contact for obj in source_related_objects
+            )
+        elif len(source_related_objects) > 0 and hasattr(obj, 'client_contacts'):
+            assert all(
+                [*list(obj.client_contacts.all())][0] == target_contact
+                for obj in source_related_objects
+            )
         else:
             assert all(obj.contact == target_contact for obj in source_related_objects)
             assert all(obj.modified_on == merge_time for obj in source_related_objects)
@@ -265,8 +268,7 @@ class TestConfirmMergeViewPost(AdminTestMixin):
         factory_relation_kwarg,
         num_related_objects,
     ):
-        """Test that the merge fails when the source contact cannot be merged into the target contact.
-        """
+        """Test that the merge fails when the source contact cannot be merged into the target contact."""
         creation_time = datetime(2010, 12, 1, 15, 0, 10, tzinfo=timezone.utc)
         with freeze_time(creation_time):
             source_contact = _contact_factory(
@@ -304,12 +306,15 @@ class TestConfirmMergeViewPost(AdminTestMixin):
         for obj in source_related_objects:
             obj.refresh_from_db()
 
-        if (len(source_related_objects) > 0 and hasattr(obj, 'contacts')):
-            assert all([*list(obj.contacts.all())][0]
-                       == source_contact for obj in source_related_objects)
-        elif (len(source_related_objects) > 0 and hasattr(obj, 'client_contacts')):
-            assert all([*list(obj.client_contacts.all())][0]
-                       == source_contact for obj in source_related_objects)
+        if len(source_related_objects) > 0 and hasattr(obj, 'contacts'):
+            assert all(
+                [*list(obj.contacts.all())][0] == source_contact for obj in source_related_objects
+            )
+        elif len(source_related_objects) > 0 and hasattr(obj, 'client_contacts'):
+            assert all(
+                [*list(obj.client_contacts.all())][0] == source_contact
+                for obj in source_related_objects
+            )
         else:
             assert all(obj.contact == source_contact for obj in source_related_objects)
 
@@ -323,11 +328,11 @@ class TestConfirmMergeViewPost(AdminTestMixin):
 
 
 def _contact_factory(
-        num_interactions=0,
-        num_investment_projects=0,
-        num_orders=0,
-        num_referrals=0,
-        num_export=0,
+    num_interactions=0,
+    num_investment_projects=0,
+    num_orders=0,
+    num_referrals=0,
+    num_export=0,
 ):
     """Factory for a contact that has company referrals, orders, company
     exports, interactions and OMIS orders.

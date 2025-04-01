@@ -177,6 +177,7 @@ class CompleteLargeCapitalOpportunityFactory(LargeCapitalOpportunityFactory):
     def sources_of_funding(self):
         """Sources of funding."""
         return [SourceOfFundingConstant.international.value.id]
+
     funding_supporting_details = factory.Faker('text')
 
     @to_many_field

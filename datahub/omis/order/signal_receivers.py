@@ -15,8 +15,7 @@ def update_order_pricing_on_pre_order_save(sender, instance, **kwargs):
 
 @receiver(post_save, sender=OrderAssignee)
 def update_order_pricing_on_related_obj_save(sender, instance, **kwargs):
-    """Update the order pricing after an order assignee is saved or deleted.
-    """
+    """Update the order pricing after an order assignee is saved or deleted."""
     update_order_pricing(instance.order, commit=True)
 
 

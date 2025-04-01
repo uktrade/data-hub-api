@@ -11,10 +11,13 @@ class TasksDatasetView(BaseFilterDatasetView):
     def get_dataset(self, request):
         """Returns queryset of Task records."""
         queryset = Task.objects.annotate(
-            adviser_ids=ArrayAgg('advisers__id', ordering=[
-                'advisers__first_name',
+            adviser_ids=ArrayAgg(
                 'advisers__id',
-            ]),
+                ordering=[
+                    'advisers__first_name',
+                    'advisers__id',
+                ],
+            ),
         ).values(
             'created_on',
             'created_by_id',

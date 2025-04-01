@@ -50,8 +50,7 @@ def setup_s3_bucket(bucket_name, test_files):
 class TestCompanyActivityIngestionTasks:
     @patch('os.system')
     def test_company_activity_ingestion_task_schedule(self, mock_system):
-        """Test that a task is scheduled to check for new Company Activity data.
-        """
+        """Test that a task is scheduled to check for new Company Activity data."""
         # Import inside test to prevent the os.system call from running before the patch
         cron = importlib.import_module('cron-scheduler')
         cron.schedule_jobs()
@@ -111,8 +110,7 @@ class TestCompanyActivityIngestionTasks:
     )
     @mock_aws
     def test_ingestion_job_is_not_queued_for_already_ingested_file(self, mock, test_files, caplog):
-        """Test that when the latest file found has already been ingested no job is queued.
-        """
+        """Test that when the latest file found has already been ingested no job is queued."""
         new_file = GREAT_PREFIX + '20240920T000000/full_ingestion.jsonl.gz'
         setup_s3_bucket(BUCKET, test_files)
         for file in test_files:
@@ -167,8 +165,7 @@ class TestCompanyActivityIngestionTasks:
     @patch('datahub.company_activity.tasks.ingest_company_activity.Worker')
     @mock_aws
     def test_job_not_queued_when_already_running(self, mock_worker, mock_scheduler, test_files):
-        """Test that we don't queue a job to ingest a file when a job is already running for it.
-        """
+        """Test that we don't queue a job to ingest a file when a job is already running for it."""
         new_file = GREAT_PREFIX + '20240920T000000/full_ingestion.jsonl.gz'
         setup_s3_bucket(BUCKET, test_files)
 
@@ -211,8 +208,7 @@ class TestCompanyActivityIngestionTasks:
     @pytest.mark.django_db
     @mock_aws
     def test_child_job(self, caplog, test_files):
-        """Test that scheduled child job is run successfully.
-        """
+        """Test that scheduled child job is run successfully."""
         new_file = GREAT_PREFIX + '20240920T000000/full_ingestion.jsonl.gz'
         setup_s3_bucket(BUCKET, test_files)
         redis = Redis.from_url(settings.REDIS_BASE_URL)
@@ -228,8 +224,7 @@ class TestCompanyActivityIngestionTasks:
 
     @mock_aws
     def test_empty_s3_bucket(self, caplog):
-        """Test that the task can handle an empty S3 bucket.
-        """
+        """Test that the task can handle an empty S3 bucket."""
         setup_s3_bucket(BUCKET, [])
         with caplog.at_level(logging.INFO):
             company_activity_identification_task()

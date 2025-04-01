@@ -29,9 +29,11 @@ class ContactWorksAtCompanyValidator:
         contact = data_combiner.get_value(self.contact_field)
 
         if contact.company != company:
-            raise ValidationError({
-                self.contact_field: self.message,
-            })
+            raise ValidationError(
+                {
+                    self.contact_field: self.message,
+                },
+            )
 
 
 class OrderEditableFieldsValidator:
@@ -56,7 +58,8 @@ class OrderEditableFieldsValidator:
         """
         field_value = combiner.get_value_auto(field)
         instance_value = DataCombiner(
-            combiner.instance, {},
+            combiner.instance,
+            {},
             model=combiner.instance.__class__,
         ).get_value_auto(field)
 
@@ -101,22 +104,28 @@ class VATSubValidator:
 
         vat_status = data_combiner.get_value('vat_status')
         if not vat_status:
-            raise ValidationError({
-                'vat_status': [self.message],
-            })
+            raise ValidationError(
+                {
+                    'vat_status': [self.message],
+                },
+            )
 
         if vat_status == VATStatus.EU:
             vat_verified = data_combiner.get_value('vat_verified')
             if vat_verified is None:
-                raise ValidationError({
-                    'vat_verified': [self.message],
-                })
+                raise ValidationError(
+                    {
+                        'vat_verified': [self.message],
+                    },
+                )
 
             vat_number = data_combiner.get_value('vat_number')
             if vat_verified and not vat_number:
-                raise ValidationError({
-                    'vat_number': [self.message],
-                })
+                raise ValidationError(
+                    {
+                        'vat_number': [self.message],
+                    },
+                )
 
 
 class AssigneesFilledInSubValidator:
@@ -132,19 +141,25 @@ class AssigneesFilledInSubValidator:
     def __call__(self, data=None, order=None):
         """Validate that the information about the assignees is set."""
         if not order.assignees.count():
-            raise ValidationError({
-                'assignees': [self.no_assignees_message],
-            })
+            raise ValidationError(
+                {
+                    'assignees': [self.no_assignees_message],
+                },
+            )
 
         if not order.assignees.filter(is_lead=True).count():
-            raise ValidationError({
-                'assignee_lead': [self.no_lead_assignee_message],
-            })
+            raise ValidationError(
+                {
+                    'assignee_lead': [self.no_lead_assignee_message],
+                },
+            )
 
         if not order.assignees.aggregate(sum=models.Sum('estimated_time'))['sum']:
-            raise ValidationError({
-                'assignee_time': [self.no_estimated_time_message],
-            })
+            raise ValidationError(
+                {
+                    'assignee_time': [self.no_estimated_time_message],
+                },
+            )
 
 
 class OrderDetailsFilledInSubValidator:
@@ -260,8 +275,7 @@ class OrderInStatusSubValidator:
 
 
 class OrderInStatusValidator:
-    """Validator which checks that the order is in one of the given statuses.
-    """
+    """Validator which checks that the order is in one of the given statuses."""
 
     requires_context = True
 
@@ -298,9 +312,11 @@ class CompletableOrderSubValidator:
     def __call__(self, data=None, order=None):
         """Validate that the actual_time field for all the assignees is set."""
         if any(assignee.actual_time is None for assignee in order.assignees.all()):
-            raise ValidationError({
-                api_settings.NON_FIELD_ERRORS_KEY: self.message,
-            })
+            raise ValidationError(
+                {
+                    api_settings.NON_FIELD_ERRORS_KEY: self.message,
+                },
+            )
 
 
 class CancellableOrderSubValidator(OrderInStatusSubValidator):

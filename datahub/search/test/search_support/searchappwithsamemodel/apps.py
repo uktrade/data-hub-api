@@ -6,8 +6,7 @@ from datahub.search.test.search_support.searchappwithsamemodel.models import (
 
 
 class RelatedModelWithSameDBModelApp(SearchApp):
-    """SearchApp which contains the same DB model.
-    """
+    """SearchApp which contains the same DB model."""
 
     name = 'related_search_with_same_model'
     search_model = SearchAppWithSameDBModel

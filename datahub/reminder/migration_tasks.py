@@ -146,7 +146,8 @@ def get_post_user_ids_to_migrate():
             (
                 Q(feature_groups__code=EXPORT_NOTIFICATIONS_FEATURE_GROUP_NAME)
                 & Q(feature_groups__code=INVESTMENT_NOTIFICATIONS_FEATURE_GROUP_NAME)
-            ) | Q(feature_groups__code=NO_NOTIFICATIONS_FEATURE_GROUP_NAME),
+            )
+            | Q(feature_groups__code=NO_NOTIFICATIONS_FEATURE_GROUP_NAME),
         )
         .values_list(
             'id',
@@ -293,7 +294,6 @@ def _add_advisor_to_export_subscriptions(
 
 
 def _log_ita_advisor_migration(advisor_id, logger):
-
     logger.info(f'Migrating ITA user "{advisor_id}" to receive reminders.')
 
 
@@ -302,8 +302,7 @@ def _log_post_advisor_migration(advisor_id, logger):
 
 
 def _generate_advisor_investment_project_query(role):
-    """Generate a django Q object using the advisor role to match against an investment project.
-    """
+    """Generate a django Q object using the advisor role to match against an investment project."""
     return Q(
         **{
             f'{role}__isnull': False,

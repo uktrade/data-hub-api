@@ -102,7 +102,9 @@ def test_non_existent_pipeline_item(s3_stubber, caplog):
     assert len(caplog.records) == 1
 
     assert [pipeline_item.sector for pipeline_item in pipeline_items] == [
-        new_sectors[0], new_sectors[1], old_sectors[2],
+        new_sectors[0],
+        new_sectors[1],
+        old_sectors[2],
     ]
 
 
@@ -153,7 +155,9 @@ def test_non_existent_sector(s3_stubber, caplog):
     assert len(caplog.records) == 1
 
     assert [pipeline_item.sector for pipeline_item in pipeline_items] == [
-        new_sectors[0], new_sectors[1], old_sectors[2],
+        new_sectors[0],
+        new_sectors[1],
+        old_sectors[2],
     ]
 
 
@@ -211,7 +215,9 @@ def test_no_change(s3_stubber, caplog):
     assert len(caplog.records) == 2
 
     assert [pipeline_item.sector for pipeline_item in pipeline_items] == [
-        new_sectors[0], old_sectors[1], old_sectors[2],
+        new_sectors[0],
+        old_sectors[1],
+        old_sectors[2],
     ]
 
 

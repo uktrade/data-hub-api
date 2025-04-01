@@ -31,9 +31,7 @@ class CompanyReferralAdmin(BaseModelAdminMixin, admin.ModelAdmin):
         'status',
         'created_on',
     )
-    list_select_related = (
-        'company',
-    )
+    list_select_related = ('company',)
     exclude = (
         'created_on',
         'created_by',

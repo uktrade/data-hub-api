@@ -53,17 +53,14 @@ postcode_filter = analysis.token_filter(
         # Index postcode area
         # See the Royal Mail programmer's guide for the exact definitions
         rf'^({AREA_REGEX}){DISTRICT_REGEX} {SECTOR_REGEX}{UNIT_REGEX}',
-
         # Index postcode district (with sub-district code ignored)
         # This is so `wc1` query would match `wc1ab` and `wc1a1ab`, but not `wc111ab`
         # Area + one or two digits
         rf'^(({AREA_REGEX}[0-9]) {SECTOR_REGEX}{UNIT_REGEX}|'
         rf'({AREA_REGEX}[0-9]{{2}}) {SECTOR_REGEX}{UNIT_REGEX}|'
         rf'({AREA_REGEX}[0-9])[a-z]? {SECTOR_REGEX}{UNIT_REGEX})',
-
         # Index postcode district (including sub-district)
         rf'^({AREA_REGEX}{DISTRICT_REGEX}) {SECTOR_REGEX}{UNIT_REGEX}',
-
         # Index postcode sector
         rf'^({AREA_REGEX}{DISTRICT_REGEX} {SECTOR_REGEX}){UNIT_REGEX}',
     ],
@@ -74,11 +71,11 @@ normalise_postcode_filter = analysis.token_filter(
     'normalise_postcode_filter',
     type='pattern_replace',
     pattern=rf'^'
-            rf'(?<area>{AREA_REGEX})'
-            rf'(?<district>{DISTRICT_REGEX})'
-            rf'(?<sector>{SECTOR_REGEX})'
-            rf'(?<unit>{UNIT_REGEX})'
-            rf'$',
+    rf'(?<area>{AREA_REGEX})'
+    rf'(?<district>{DISTRICT_REGEX})'
+    rf'(?<sector>{SECTOR_REGEX})'
+    rf'(?<unit>{UNIT_REGEX})'
+    rf'$',
     replacement=r'${area}${district} ${sector}${unit}',
 )
 
@@ -222,28 +219,34 @@ class _AliasUpdater:
 
     def associate_indices_with_alias(self, alias_name, index_names):
         """Adds a pending operation to associate a new or existing alias with a set of indices."""
-        self.actions.append({
-            'add': {
-                'alias': alias_name,
-                'indices': list(index_names),
+        self.actions.append(
+            {
+                'add': {
+                    'alias': alias_name,
+                    'indices': list(index_names),
+                },
             },
-        })
+        )
 
     def dissociate_indices_from_alias(self, alias_name, index_names):
         """Adds a pending operation to dissociate an existing alias from a set of indices."""
-        self.actions.append({
-            'remove': {
-                'alias': alias_name,
-                'indices': list(index_names),
+        self.actions.append(
+            {
+                'remove': {
+                    'alias': alias_name,
+                    'indices': list(index_names),
+                },
             },
-        })
+        )
 
     def commit(self):
         """Commits (flushes) pending operations."""
         client = get_client()
-        client.indices.update_aliases(body={
-            'actions': self.actions,
-        })
+        client.indices.update_aliases(
+            body={
+                'actions': self.actions,
+            },
+        )
         self.actions = []
 
 

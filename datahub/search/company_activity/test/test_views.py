@@ -85,8 +85,7 @@ class TestCompanyActivityEntitySearchView(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_get_all(self, company_activities):
-        """Tests that all company activities are returned with an empty POST body.
-        """
+        """Tests that all company activities are returned with an empty POST body."""
         url = reverse('api-v4:search:company-activity')
 
         response = self.api_client.post(url, {})
@@ -94,12 +93,8 @@ class TestCompanyActivityEntitySearchView(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         assert response_data['count'] == len(company_activities)
-        expected_ids = Counter(str(activity.id)
-                               for activity in company_activities)
-        assert (
-            Counter([item['id']
-                    for item in response_data['results']]) == expected_ids
-        )
+        expected_ids = Counter(str(activity.id) for activity in company_activities)
+        assert Counter([item['id'] for item in response_data['results']]) == expected_ids
 
     def test_limit(self, company_activities):
         """Tests that results can be limited."""
@@ -152,8 +147,7 @@ class TestCompanyActivityEntitySearchView(APITestMixin):
         sorted_dates = sorted(dates, reverse=True)
         expected_dates = [d.isoformat() for d in sorted_dates]
         assert response_data['count'] == len(dates)
-        assert [item['date']
-                for item in response_data['results']] == expected_dates
+        assert [item['date'] for item in response_data['results']] == expected_dates
 
     @pytest.mark.parametrize(
         ('sortby', 'error'),
@@ -351,9 +345,7 @@ class TestCompanyActivityEntitySearchView(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
 
         response_data = response.json()
-        names = {
-            result['interaction']['subject'] for result in response_data['results']
-        }
+        names = {result['interaction']['subject'] for result in response_data['results']}
         assert names == results
 
     @mock.patch(
@@ -524,5 +516,6 @@ class TestCompanyActivityEntitySearchView(APITestMixin):
         assert response_data['count'] == len(interactions)
 
         # Assert the sorted subjects in the response match the expected sorted subjects
-        assert [item['interaction']['subject']
-                for item in response_data['results']] == sorted_subjects
+        assert [
+            item['interaction']['subject'] for item in response_data['results']
+        ] == sorted_subjects

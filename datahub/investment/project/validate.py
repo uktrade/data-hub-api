@@ -1,4 +1,5 @@
 """Performs stage-dependent validation on investment projects."""
+
 from collections import namedtuple
 from functools import partial
 from operator import not_
@@ -79,60 +80,72 @@ class InvestmentProjectStageValidationConfig:
     def get_conditional_rules_after_stage(cls):
         """Conditional validation rules. Mapping from field names to validation rules."""
         return {
-            'referral_source_activity_event':
-                CondValRule(
-                    'referral_source_activity', Activity.event.value.id, Stage.prospect.value,
-                ),
-            'other_business_activity':
-                CondValRule(
-                    'business_activities',
-                    partial(_contains_id, BusinessActivity.other.value.id),
-                    Stage.prospect.value,
-                ),
-            'referral_source_activity_marketing':
-                CondValRule(
-                    'referral_source_activity', Activity.marketing.value.id, Stage.prospect.value,
-                ),
-            'referral_source_activity_website':
-                CondValRule(
-                    'referral_source_activity', Activity.website.value.id, Stage.prospect.value,
-                ),
-            'fdi_type':
-                CondValRule(
-                    'investment_type', InvestmentType.fdi.value.id, Stage.prospect.value,
-                ),
-            'total_investment':
-                CondValRule(
-                    'client_cannot_provide_total_investment', not_, Stage.assign_pm.value,
-                ),
-            'competitor_countries':
-                CondValRule(
-                    'client_considering_other_countries', True, Stage.assign_pm.value,
-                ),
-            'uk_region_locations':
-                CondValRule(
-                    'allow_blank_possible_uk_regions', False, Stage.assign_pm.value,
-                ),
-            'address_1':
-                CondValRule(
-                    'site_address_is_company_address', _is_not_none, Stage.verify_win.value,
-                ),
-            'address_town':
-                CondValRule(
-                    'site_address_is_company_address', _is_not_none, Stage.verify_win.value,
-                ),
-            'address_postcode':
-                CondValRule(
-                    'site_address_is_company_address', _is_not_none, Stage.verify_win.value,
-                ),
-            'foreign_equity_investment':
-                CondValRule(
-                    'client_cannot_provide_foreign_investment', not_, Stage.verify_win.value,
-                ),
-            'average_salary':
-                CondValRule('number_new_jobs', bool, Stage.verify_win.value),
-            'associated_non_fdi_r_and_d_project':
-                CondValRule('non_fdi_r_and_d_budget', bool, Stage.verify_win.value),
+            'referral_source_activity_event': CondValRule(
+                'referral_source_activity',
+                Activity.event.value.id,
+                Stage.prospect.value,
+            ),
+            'other_business_activity': CondValRule(
+                'business_activities',
+                partial(_contains_id, BusinessActivity.other.value.id),
+                Stage.prospect.value,
+            ),
+            'referral_source_activity_marketing': CondValRule(
+                'referral_source_activity',
+                Activity.marketing.value.id,
+                Stage.prospect.value,
+            ),
+            'referral_source_activity_website': CondValRule(
+                'referral_source_activity',
+                Activity.website.value.id,
+                Stage.prospect.value,
+            ),
+            'fdi_type': CondValRule(
+                'investment_type',
+                InvestmentType.fdi.value.id,
+                Stage.prospect.value,
+            ),
+            'total_investment': CondValRule(
+                'client_cannot_provide_total_investment',
+                not_,
+                Stage.assign_pm.value,
+            ),
+            'competitor_countries': CondValRule(
+                'client_considering_other_countries',
+                True,
+                Stage.assign_pm.value,
+            ),
+            'uk_region_locations': CondValRule(
+                'allow_blank_possible_uk_regions',
+                False,
+                Stage.assign_pm.value,
+            ),
+            'address_1': CondValRule(
+                'site_address_is_company_address',
+                _is_not_none,
+                Stage.verify_win.value,
+            ),
+            'address_town': CondValRule(
+                'site_address_is_company_address',
+                _is_not_none,
+                Stage.verify_win.value,
+            ),
+            'address_postcode': CondValRule(
+                'site_address_is_company_address',
+                _is_not_none,
+                Stage.verify_win.value,
+            ),
+            'foreign_equity_investment': CondValRule(
+                'client_cannot_provide_foreign_investment',
+                not_,
+                Stage.verify_win.value,
+            ),
+            'average_salary': CondValRule('number_new_jobs', bool, Stage.verify_win.value),
+            'associated_non_fdi_r_and_d_project': CondValRule(
+                'non_fdi_r_and_d_budget',
+                bool,
+                Stage.verify_win.value,
+            ),
         }
 
 
@@ -151,18 +164,20 @@ def validate(instance=None, update_data=None, fields=None, next_stage=False):
 
     errors = {}
 
-    for field, req_stage in (
-        InvestmentProjectStageValidationConfig.get_required_fields_after_stage().items()
-    ):
+    for (
+        field,
+        req_stage,
+    ) in InvestmentProjectStageValidationConfig.get_required_fields_after_stage().items():
         if _should_skip_rule(field, fields, desired_stage_order, req_stage.order):
             continue
 
         if field_incomplete(combiner, field):
             errors[field] = REQUIRED_MESSAGE
 
-    for field, rule in (
-        InvestmentProjectStageValidationConfig.get_conditional_rules_after_stage().items()
-    ):
+    for (
+        field,
+        rule,
+    ) in InvestmentProjectStageValidationConfig.get_conditional_rules_after_stage().items():
         if _should_skip_rule(field, fields, desired_stage_order, rule.stage.order):
             continue
 

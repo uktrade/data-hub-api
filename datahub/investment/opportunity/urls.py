@@ -20,9 +20,11 @@ collection = LargeCapitalOpportunityViewSet.as_view(actions=GET_AND_POST_COLLECT
 
 item = LargeCapitalOpportunityViewSet.as_view(actions=GET_AND_PATCH_ITEM)
 
-item_audit = LargeCapitalOpportunityAuditViewSet.as_view({
-    'get': 'list',
-})
+item_audit = LargeCapitalOpportunityAuditViewSet.as_view(
+    {
+        'get': 'list',
+    },
+)
 
 
 urlpatterns = [

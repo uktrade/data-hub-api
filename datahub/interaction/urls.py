@@ -2,15 +2,19 @@ from django.urls import path
 
 from datahub.interaction.views import InteractionViewSet, InteractionViewSetV4
 
-collection = InteractionViewSet.as_view({
-    'get': 'list',
-    'post': 'create',
-})
+collection = InteractionViewSet.as_view(
+    {
+        'get': 'list',
+        'post': 'create',
+    },
+)
 
-item = InteractionViewSet.as_view({
-    'get': 'retrieve',
-    'patch': 'partial_update',
-})
+item = InteractionViewSet.as_view(
+    {
+        'get': 'retrieve',
+        'patch': 'partial_update',
+    },
+)
 
 archive_item = InteractionViewSet.as_action_view('archive')
 
@@ -31,15 +35,19 @@ urls_v3 = [
     ),
 ]
 
-collection_v4 = InteractionViewSetV4.as_view({
-    'get': 'list',
-    'post': 'create',
-})
+collection_v4 = InteractionViewSetV4.as_view(
+    {
+        'get': 'list',
+        'post': 'create',
+    },
+)
 
-item_v4 = InteractionViewSetV4.as_view({
-    'get': 'retrieve',
-    'patch': 'partial_update',
-})
+item_v4 = InteractionViewSetV4.as_view(
+    {
+        'get': 'retrieve',
+        'patch': 'partial_update',
+    },
+)
 
 archive_item_v4 = InteractionViewSetV4.as_action_view('archive')
 

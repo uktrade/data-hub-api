@@ -8,32 +8,44 @@ from datahub.investment.project.proposition.views import (
     PropositionViewSet,
 )
 
-proposition_collection = ProjectPropositionViewSet.as_view({
-    'get': 'list',
-    'post': 'create',
-})
+proposition_collection = ProjectPropositionViewSet.as_view(
+    {
+        'get': 'list',
+        'post': 'create',
+    },
+)
 
-proposition_item = ProjectPropositionViewSet.as_view({
-    'get': 'retrieve',
-})
+proposition_item = ProjectPropositionViewSet.as_view(
+    {
+        'get': 'retrieve',
+    },
+)
 
-proposition_complete = ProjectPropositionViewSet.as_view({
-    'post': 'complete',
-})
+proposition_complete = ProjectPropositionViewSet.as_view(
+    {
+        'post': 'complete',
+    },
+)
 
-proposition_abandon = ProjectPropositionViewSet.as_view({
-    'post': 'abandon',
-})
+proposition_abandon = ProjectPropositionViewSet.as_view(
+    {
+        'post': 'abandon',
+    },
+)
 
-proposition_document_collection = ProjectPropositionDocumentViewSet.as_view({
-    'get': 'list',
-    'post': 'create',
-})
+proposition_document_collection = ProjectPropositionDocumentViewSet.as_view(
+    {
+        'get': 'list',
+        'post': 'create',
+    },
+)
 
-proposition_document_item = ProjectPropositionDocumentViewSet.as_view({
-    'get': 'retrieve',
-    'delete': 'destroy',
-})
+proposition_document_item = ProjectPropositionDocumentViewSet.as_view(
+    {
+        'get': 'retrieve',
+        'delete': 'destroy',
+    },
+)
 
 proposition_document_callback = ProjectPropositionDocumentViewSet.as_action_view(
     'upload_complete_callback',
@@ -71,9 +83,11 @@ urls_v3 = [
 ]
 
 # API V4
-proposition_collection_v4 = PropositionViewSet.as_view({
-    'get': 'list',
-})
+proposition_collection_v4 = PropositionViewSet.as_view(
+    {
+        'get': 'list',
+    },
+)
 
 urls_v4 = [
     path('proposition', proposition_collection_v4, name='collection'),

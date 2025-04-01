@@ -25,9 +25,7 @@ class Command(CSVBaseCommand):
 
             with reversion.create_revision():
                 company.save(
-                    update_fields=(
-                        'headquarter_type',
-                    ),
+                    update_fields=('headquarter_type',),
                 )
                 reversion.set_comment('Headquarter type data migration correction.')
 

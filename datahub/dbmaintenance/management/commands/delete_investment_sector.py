@@ -22,9 +22,7 @@ class Command(CSVBaseCommand):
         )
         if len(matches) == 0:
             error_msg = (
-                'InvestmentSector does not exist\n'
-                'sector_id: {0}'
-                'fdi_sic_grouping_id: {1}'
+                'InvestmentSector does not exist\nsector_id: {0}fdi_sic_grouping_id: {1}'
             ).format(sector_id, fdi_sic_grouping_id)
             raise Exception(error_msg)
 

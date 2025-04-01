@@ -310,7 +310,7 @@ def test_indexed_doc(opensearch):
     )
 
     doc = SearchLargeInvestorProfile.to_document(large_investor_profile)
-    opensearch_client.bulk(actions=(doc, ), chunk_size=1)
+    opensearch_client.bulk(actions=(doc,), chunk_size=1)
 
     opensearch.indices.refresh()
 

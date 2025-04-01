@@ -26,10 +26,15 @@ def get_latest_exchange_rate():
 
     :returns: A numeric value for latest USD to GBP exchange rate
     """
-    return ExchangeRate.objects.filter(
-        from_currency_code='USD',
-        to_currency_code='GBP',
-    ).order_by('-created_on').first().exchange_rate
+    return (
+        ExchangeRate.objects.filter(
+            from_currency_code='USD',
+            to_currency_code='GBP',
+        )
+        .order_by('-created_on')
+        .first()
+        .exchange_rate
+    )
 
 
 def get_country_by_country_name(name: str, default_iso='') -> Country:

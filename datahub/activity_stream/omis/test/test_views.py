@@ -37,8 +37,8 @@ def test_omis_order_added_activity(api_client, order_overrides):
         'summary': 'OMIS Order Added Activity',
         'type': 'OrderedCollectionPage',
         'next': 'http://testserver/v3/activity-stream/omis/order-added'
-                + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
-                + f'&cursor={str(order.id)}',
+        + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
+        + f'&cursor={str(order.id)}',
         'orderedItems': [
             {
                 'id': f'dit:DataHubOMISOrder:{order.id}:Add',
@@ -77,8 +77,7 @@ def test_omis_order_added_activity(api_client, order_overrides):
         expected_data['orderedItems'][0]['actor'] = {
             'id': f'dit:DataHubAdviser:{order.created_by.pk}',
             'type': ['Person', 'dit:Adviser'],
-            'dit:emailAddress':
-                order.created_by.contact_email or order.created_by.email,
+            'dit:emailAddress': order.created_by.contact_email or order.created_by.email,
             'name': order.created_by.name,
         }
 

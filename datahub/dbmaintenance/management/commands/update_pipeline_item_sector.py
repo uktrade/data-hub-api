@@ -22,7 +22,8 @@ class Command(CSVBaseCommand):
 
         if any(
             [
-                pipeline_item.sector.pk != old_sector_id, pipeline_item.sector.pk == new_sector_id,
+                pipeline_item.sector.pk != old_sector_id,
+                pipeline_item.sector.pk == new_sector_id,
             ],
         ):
             logger.warning(

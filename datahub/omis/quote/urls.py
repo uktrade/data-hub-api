@@ -6,10 +6,12 @@ from datahub.omis.quote.views import PublicQuoteViewSet, QuoteViewSet
 internal_frontend_urls = [
     path(
         'order/<uuid:order_pk>/quote',
-        QuoteViewSet.as_view({
-            'post': 'create',
-            'get': 'retrieve',
-        }),
+        QuoteViewSet.as_view(
+            {
+                'post': 'create',
+                'get': 'retrieve',
+            },
+        ),
         name='detail',
     ),
     path(

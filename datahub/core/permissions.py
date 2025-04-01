@@ -85,18 +85,10 @@ class ViewBasedModelPermissions(BasePermission):
     model = None
     permission_template = '{app_label}.{action}_{model_name}'
     permission_mapping = {
-        'add': (
-            permission_template,
-        ),
-        'view': (
-            permission_template,
-        ),
-        'change': (
-            permission_template,
-        ),
-        'delete': (
-            permission_template,
-        ),
+        'add': (permission_template,),
+        'view': (permission_template,),
+        'change': (permission_template,),
+        'delete': (permission_template,),
     }
 
     extra_view_to_action_mapping = None
@@ -112,8 +104,7 @@ class ViewBasedModelPermissions(BasePermission):
         return any(request.user.has_perm(perm) for perm in perms)
 
     def _get_required_permissions(self, request, view, model_cls):
-        """Returns the permissions that a user should have one of for a particular method.
-        """
+        """Returns the permissions that a user should have one of for a particular method."""
         action = get_model_action_for_view_action(
             request.method,
             view.action,
@@ -150,8 +141,7 @@ class ObjectAssociationCheckerBase(ABC):
 
     @abstractmethod
     def should_apply_restrictions(self, request, view_action) -> bool:
-        """Checks whether a request should be restricted to objects that the user is associated with.
-        """
+        """Checks whether a request should be restricted to objects that the user is associated with."""
 
 
 class IsAssociatedToObjectPermission(BasePermission):
@@ -176,8 +166,7 @@ class IsAssociatedToObjectPermission(BasePermission):
         return obj
 
     def has_object_permission(self, request, view, obj):
-        """Determines whether the user has permission for the specified object, using checker_class.
-        """
+        """Determines whether the user has permission for the specified object, using checker_class."""
         actual_obj = self.get_actual_object(obj)
 
         return self._check_actual_object_permission(request, view, actual_obj)
@@ -203,7 +192,8 @@ def get_model_action_for_view_action(
 
     mapping = (
         _MANY_TO_MANY_VIEW_TO_ACTION_MAPPING.copy()
-        if many_to_many else _VIEW_TO_ACTION_MAPPING.copy()
+        if many_to_many
+        else _VIEW_TO_ACTION_MAPPING.copy()
     )
 
     if extra_view_to_action_mapping is not None:

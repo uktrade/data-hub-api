@@ -48,8 +48,7 @@ def get_expected_data_from_contact(contact):
 
 @pytest.mark.django_db
 class TestContactsDatasetViewSet(BaseDatasetViewTest):
-    """Tests for ContactsDatasetView.
-    """
+    """Tests for ContactsDatasetView."""
 
     view_url = reverse('api-v4:dataset:contacts-dataset')
     factory = ContactFactory

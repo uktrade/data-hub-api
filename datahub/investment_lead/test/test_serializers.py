@@ -77,14 +77,17 @@ class TestCreateEYBLeadTriageSerializer:
         wales_region = UKRegion.objects.get(
             pk=constants.UKRegion.wales.value.id,
         )
-        level_zero_segment, level_one_segment, level_two_segment = \
+        level_zero_segment, level_one_segment, level_two_segment = (
             Sector.get_segments_from_sector_instance(mining_sector)
-        eyb_lead_triage_data.update({
-            'sector': level_zero_segment,
-            'sectorSub': level_one_segment,
-            'sectorSubSub': level_two_segment,
-            'location': wales_region.name,
-        })
+        )
+        eyb_lead_triage_data.update(
+            {
+                'sector': level_zero_segment,
+                'sectorSub': level_one_segment,
+                'sectorSubSub': level_two_segment,
+                'location': wales_region.name,
+            },
+        )
         serializer = CreateEYBLeadTriageSerializer(data=eyb_lead_triage_data)
         assert serializer.is_valid(), serializer.errors
         validated_data = serializer.validated_data
@@ -93,9 +96,11 @@ class TestCreateEYBLeadTriageSerializer:
 
     def test_create_lead_from_invalid_choice(self, eyb_lead_triage_data):
         """Tests invalid choice-field data raises validation errors."""
-        eyb_lead_triage_data.update({
-            'location': 'Invalid location name',
-        })
+        eyb_lead_triage_data.update(
+            {
+                'location': 'Invalid location name',
+            },
+        )
         serializer = CreateEYBLeadTriageSerializer(data=eyb_lead_triage_data)
         assert not serializer.is_valid()
         assert 'location' in serializer.errors
@@ -105,11 +110,13 @@ class TestCreateEYBLeadTriageSerializer:
         level_one_segment = 'Invalid sector name'
         level_two_segment = 'Invalid sectorSub name'
         level_three_segment = None
-        eyb_lead_triage_data.update({
-            'sector': level_one_segment,
-            'sectorSub': level_two_segment,
-            'sectorSubSub': level_three_segment,
-        })
+        eyb_lead_triage_data.update(
+            {
+                'sector': level_one_segment,
+                'sectorSub': level_two_segment,
+                'sectorSubSub': level_three_segment,
+            },
+        )
         serializer = CreateEYBLeadTriageSerializer(data=eyb_lead_triage_data)
         assert not serializer.is_valid()
         sector_name = Sector.get_name_from_segments(
@@ -145,19 +152,21 @@ class TestCreateEYBLeadTriageSerializer:
     )
     def test_non_required_fields_when_value_is_null_or_empty(self, eyb_lead_triage_data, value):
         """Tests null values and empty strings are handled correctly for non-required fields."""
-        eyb_lead_triage_data.update({
-            'sectorSub': value,
-            'sectorSubSub': value,
-            'intent': [value] if value == '' else value,
-            'intentOther': value,
-            'location': value,
-            'locationCity': value,
-            'locationNone': value,
-            'hiring': value,
-            'spend': value,
-            'spendOther': value,
-            'isHighValue': value,
-        })
+        eyb_lead_triage_data.update(
+            {
+                'sectorSub': value,
+                'sectorSubSub': value,
+                'intent': [value] if value == '' else value,
+                'intentOther': value,
+                'location': value,
+                'locationCity': value,
+                'locationNone': value,
+                'hiring': value,
+                'spend': value,
+                'spendOther': value,
+                'isHighValue': value,
+            },
+        )
         serializer = CreateEYBLeadTriageSerializer(data=eyb_lead_triage_data)
         assert serializer.is_valid()
         instance = serializer.save()
@@ -189,7 +198,6 @@ class TestCreateEYBLeadUserSerializer:
             'companyLocation': faker.country_code(),
             'fullName': faker.name(),
             'email': faker.email(),
-
         }
         serializer = CreateEYBLeadUserSerializer(data=partially_valid_data)
         assert serializer.is_valid(), serializer.errors
@@ -221,9 +229,11 @@ class TestCreateEYBLeadUserSerializer:
         canada_country = Country.objects.get(
             pk=constants.Country.canada.value.id,
         )
-        eyb_lead_user_data.update({
-            'companyLocation': canada_country.iso_alpha2_code,
-        })
+        eyb_lead_user_data.update(
+            {
+                'companyLocation': canada_country.iso_alpha2_code,
+            },
+        )
         serializer = CreateEYBLeadUserSerializer(data=eyb_lead_user_data)
         assert serializer.is_valid(), serializer.errors
         validated_data = serializer.validated_data
@@ -231,9 +241,11 @@ class TestCreateEYBLeadUserSerializer:
 
     def test_create_lead_from_invalid_related_data(self, eyb_lead_user_data):
         """Tests invalid related-field data raises validation errors."""
-        eyb_lead_user_data.update({
-            'companyLocation': 'Invalid country name',
-        })
+        eyb_lead_user_data.update(
+            {
+                'companyLocation': 'Invalid country name',
+            },
+        )
         serializer = CreateEYBLeadUserSerializer(data=eyb_lead_user_data)
         assert not serializer.is_valid()
         assert 'companyLocation' in serializer.errors
@@ -265,19 +277,21 @@ class TestCreateEYBLeadUserSerializer:
     )
     def test_non_required_fields_when_value_is_null_or_empty(self, eyb_lead_user_data, value):
         """Tests null values and empty strings are handled correctly for non-required fields."""
-        eyb_lead_user_data.update({
-            'dunsNumber': value,
-            'fullName': value,
-            'addressLine2': value,
-            'county': value,
-            'postcode': value,
-            'companyWebsite': value,
-            'role': value,
-            'telephoneNumber': value,
-            'agreeTerms': value,
-            'agreeInfoEmail': value,
-            'landingTimeframe': value,
-        })
+        eyb_lead_user_data.update(
+            {
+                'dunsNumber': value,
+                'fullName': value,
+                'addressLine2': value,
+                'county': value,
+                'postcode': value,
+                'companyWebsite': value,
+                'role': value,
+                'telephoneNumber': value,
+                'agreeTerms': value,
+                'agreeInfoEmail': value,
+                'landingTimeframe': value,
+            },
+        )
         serializer = CreateEYBLeadUserSerializer(data=eyb_lead_user_data)
         assert serializer.is_valid()
         instance = serializer.save()
@@ -300,9 +314,11 @@ class TestCreateEYBLeadUserSerializer:
         expected_value,
     ):
         """Tests null values and empty strings are handled correctly for non-required fields."""
-        eyb_lead_user_data.update({
-            'fullName': value,
-        })
+        eyb_lead_user_data.update(
+            {
+                'fullName': value,
+            },
+        )
         serializer = CreateEYBLeadUserSerializer(data=eyb_lead_user_data)
         assert serializer.is_valid()
         instance = serializer.save()
@@ -336,7 +352,9 @@ class TestCreateEYBLeadMarketingSerializer:
         assert_ingested_eyb_marketing_data(instance, serializer.data)
 
     def test_missing_required_marketing_fields_raises_validation_error(
-            self, eyb_lead_marketing_data):
+        self,
+        eyb_lead_marketing_data,
+    ):
         """Tests missing required fields raises validation error."""
         required_fields = [
             'hashed_uuid',
@@ -367,15 +385,18 @@ class TestCreateEYBLeadMarketingSerializer:
         [None, ''],
     )
     def test_non_required_fields_with_null_or_empty_values_are_handled_correctly(
-        self, value,
+        self,
+        value,
     ):
         """Tests null values and empty strings are handled correctly for non-required fields."""
-        marketing_data = eyb_lead_marketing_record_faker({
-            'name': value,
-            'medium': value,
-            'source': value,
-            'content': value,
-        })
+        marketing_data = eyb_lead_marketing_record_faker(
+            {
+                'name': value,
+                'medium': value,
+                'source': value,
+                'content': value,
+            },
+        )
         serializer = CreateEYBLeadMarketingSerializer(data=marketing_data)
         assert serializer.is_valid()
         instance = serializer.save()

@@ -145,15 +145,19 @@ def _copy_foreign_key_to_m2m_field(
     )
 
     # Select a batch of rows. The rows are locked to avoid race conditions.
-    batch_queryset = model.objects.select_for_update().filter(
-        has_no_m2m_values_subquery,
-        **{
-            f'{source_fk_field_name}__isnull': False,
-        },
-    ).values(
-        'pk',
-        source_fk_field.attname,
-    )[:batch_size]
+    batch_queryset = (
+        model.objects.select_for_update()
+        .filter(
+            has_no_m2m_values_subquery,
+            **{
+                f'{source_fk_field_name}__isnull': False,
+            },
+        )
+        .values(
+            'pk',
+            source_fk_field.attname,
+        )[:batch_size]
+    )
 
     objects_to_create = [
         m2m_model(
@@ -161,7 +165,8 @@ def _copy_foreign_key_to_m2m_field(
                 m2m_column_name: row['pk'],
                 m2m_reverse_column_name: row[source_fk_field.attname],
             },
-        ) for row in batch_queryset
+        )
+        for row in batch_queryset
     ]
 
     # Create many-to-many objects for the batch
@@ -179,8 +184,7 @@ def copy_export_countries_to_company_export_country_model(
     status,
     batch_size=5000,
 ):
-    """Task that copies all export countries from Company model to CompanyExportCountry.
-    """
+    """Task that copies all export countries from Company model to CompanyExportCountry."""
     key_switch = {
         'future_interest': 'future_interest_countries',
         'currently_exporting': 'export_to_countries',
@@ -215,8 +219,7 @@ def _copy_export_countries(key, status, batch_size):
     )
 
     logger.info(
-        f'Company.{key} copied to CompanyExportCountry '
-        f'for {num_updated} Company export countries',
+        f'Company.{key} copied to CompanyExportCountry for {num_updated} Company export countries',
     )
 
     return num_updated
@@ -237,11 +240,15 @@ def _get_company_countries(source_field, status, batch_size):
             },
         ),
     )
-    batch_queryset = Company.objects.select_for_update().filter(
-        no_company_country_subquery,
-        has_existing_old_countries,
-    ).only(
-        'pk',
+    batch_queryset = (
+        Company.objects.select_for_update()
+        .filter(
+            no_company_country_subquery,
+            has_existing_old_countries,
+        )
+        .only(
+            'pk',
+        )
     )
     return batch_queryset[:batch_size]
 

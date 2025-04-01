@@ -151,8 +151,7 @@ class TestCreateLargeCapitalProfileView(APITestMixin):
 
         response_data = response.json()
         assert response_data == {
-            'investor_company':
-                ['Investor company already has large capital investor profile'],
+            'investor_company': ['Investor company already has large capital investor profile'],
         }
 
 
@@ -189,7 +188,9 @@ class TestLargeCapitalProfileListView(APITestMixin):
         ],
     )
     def test_large_capital_profile_list_view_invalid_search(
-        self, search_parameter, expected_response,
+        self,
+        search_parameter,
+        expected_response,
     ):
         """Test creating a large capital profile without an investor company."""
         url = reverse('api-v4:large-investor-profile:collection')
@@ -202,7 +203,8 @@ class TestLargeCapitalProfileListView(APITestMixin):
         assert response_data == expected_response
 
     def test_large_capital_profile_list_view_search_by_investor_company(
-        self, get_large_capital_profile_for_search,
+        self,
+        get_large_capital_profile_for_search,
     ):
         """Test searching large capital profile by investor company pk."""
         large_capital_profile = get_large_capital_profile_for_search
@@ -265,8 +267,7 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
 
         response_data = response.json()
         assert response_data == {
-            'investor_company':
-                ['Investor company can not be updated'],
+            'investor_company': ['Investor company can not be updated'],
         }
 
     @freeze_time('2019-05-01')
@@ -300,18 +301,15 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
         assert response_data['investor_description'] == 'Description'
         assert response_data['investable_capital'] == 1000
         assert response_data['global_assets_under_management'] == 3000
-        assert (
-            response_data['investor_type']['id']
-            == str(InvestorTypeConstant.state_pension_fund.value.id)
+        assert response_data['investor_type']['id'] == str(
+            InvestorTypeConstant.state_pension_fund.value.id,
         )
-        assert (
-            response_data['required_checks_conducted']['id']
-            == str(RequiredChecksConductedConstant.cleared.value.id)
+        assert response_data['required_checks_conducted']['id'] == str(
+            RequiredChecksConductedConstant.cleared.value.id,
         )
         assert response_data['required_checks_conducted_on'] == '2017-05-01'
-        assert (
-            response_data['required_checks_conducted_by']['id']
-            == str(required_checks_conducted_by.id)
+        assert response_data['required_checks_conducted_by']['id'] == str(
+            required_checks_conducted_by.id,
         )
 
     def test_patch_large_capital_profile_all_requirements_fields(self):
@@ -346,7 +344,6 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
             'restrictions': [
                 {'id': RestrictionConstant.liquidity.value.id},
                 {'id': RestrictionConstant.inflation_adjustment.value.id},
-
             ],
             'asset_classes_of_interest': [
                 {'id': AssetClassInterestConstant.biofuel.value.id},
@@ -358,18 +355,15 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
         response_data = response.json()
         assert response.status_code == status.HTTP_200_OK, response_data
         assert response_data['incomplete_requirements_fields'] == []
-        assert (
-            response_data['deal_ticket_sizes'][0]['id']
-            == str(DealTicketSizeConstant.up_to_forty_nine_million.value.id)
+        assert response_data['deal_ticket_sizes'][0]['id'] == str(
+            DealTicketSizeConstant.up_to_forty_nine_million.value.id,
         )
         assert response_data['investment_types'][0]['id'] == str(direct_investment_equity_id)
-        assert (
-            response_data['minimum_return_rate']['id']
-            == str(ReturnRateConstant.up_to_five_percent.value.id)
+        assert response_data['minimum_return_rate']['id'] == str(
+            ReturnRateConstant.up_to_five_percent.value.id,
         )
-        assert (
-            response_data['minimum_equity_percentage']['id']
-            == str(EquityPercentageConstant.zero_percent.value.id)
+        assert response_data['minimum_equity_percentage']['id'] == str(
+            EquityPercentageConstant.zero_percent.value.id,
         )
 
         expected_time_horizons = [
@@ -383,7 +377,9 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
             ConstructionRiskConstant.brownfield.value.id,
         ]
         self._assert_many_field_ids(
-            response_data, 'construction_risks', expected_construction_risks,
+            response_data,
+            'construction_risks',
+            expected_construction_risks,
         )
 
         expected_desired_deal_roles = [
@@ -391,7 +387,9 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
             DesiredDealRoleConstant.co_leader_manager.value.id,
         ]
         self._assert_many_field_ids(
-            response_data, 'desired_deal_roles', expected_desired_deal_roles,
+            response_data,
+            'desired_deal_roles',
+            expected_desired_deal_roles,
         )
 
         expected_restrictions = [
@@ -399,7 +397,9 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
             RestrictionConstant.inflation_adjustment.value.id,
         ]
         self._assert_many_field_ids(
-            response_data, 'restrictions', expected_restrictions,
+            response_data,
+            'restrictions',
+            expected_restrictions,
         )
 
         expected_asset_classes_of_interest = [
@@ -407,7 +407,9 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
             AssetClassInterestConstant.biomass.value.id,
         ]
         self._assert_many_field_ids(
-            response_data, 'asset_classes_of_interest', expected_asset_classes_of_interest,
+            response_data,
+            'asset_classes_of_interest',
+            expected_asset_classes_of_interest,
         )
 
     def test_patch_large_capital_profile_all_location_fields(self):
@@ -436,7 +438,9 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
             UKRegionConstant.north_west.value.id,
         ]
         self._assert_many_field_ids(
-            response_data, 'uk_region_locations', expected_uk_region_locations,
+            response_data,
+            'uk_region_locations',
+            expected_uk_region_locations,
         )
 
         expected_other_countries_being_considered = [
@@ -451,9 +455,9 @@ class TestUpdateLargeCapitalProfileView(APITestMixin):
 
     def _assert_many_field_ids(self, response_data, field_name, expected_ids):
         assert len(response_data[field_name]) == len(expected_ids)
-        assert (
-            set([field['id'] for field in response_data[field_name]]) == set(expected_ids)
-        ), field_name
+        assert set([field['id'] for field in response_data[field_name]]) == set(expected_ids), (
+            field_name
+        )
 
 
 @pytest.mark.django_db
@@ -560,7 +564,10 @@ class TestUpdateLargeCapitalProfileConditionalFields(APITestMixin):
     )
     @freeze_time('2011-01-01')
     def test_patch_large_capital_conditional_required_checks_fields(
-        self, request_data, expected_status, expected_error_response,
+        self,
+        request_data,
+        expected_status,
+        expected_error_response,
     ):
         """Test updating the conditional required checks fields for a large capital profile."""
         investor_company = CompanyFactory()
@@ -575,9 +582,8 @@ class TestUpdateLargeCapitalProfileConditionalFields(APITestMixin):
         if expected_status == status.HTTP_400_BAD_REQUEST:
             assert response_data == expected_error_response
         else:
-            assert (
-                response_data['required_checks_conducted']['id']
-                == str(request_data['required_checks_conducted']['id'])
+            assert response_data['required_checks_conducted']['id'] == str(
+                request_data['required_checks_conducted']['id'],
             )
 
     @pytest.mark.parametrize(
@@ -588,7 +594,8 @@ class TestUpdateLargeCapitalProfileConditionalFields(APITestMixin):
         ],
     )
     def test_patch_large_capital_conditional_required_checks_fields_removes_old_data(
-        self, required_checks_conducted,
+        self,
+        required_checks_conducted,
     ):
         """Test updating the conditional required checks fields for a large capital profile."""
         investor_company = CompanyFactory()
@@ -610,9 +617,7 @@ class TestUpdateLargeCapitalProfileConditionalFields(APITestMixin):
         response_data = response.json()
         assert response.status_code == status.HTTP_200_OK, response_data
 
-        assert (
-            response_data['required_checks_conducted']['id'] == str(required_checks_conducted)
-        )
+        assert response_data['required_checks_conducted']['id'] == str(required_checks_conducted)
 
         assert not response_data['required_checks_conducted_by']
         assert not response_data['required_checks_conducted_on']

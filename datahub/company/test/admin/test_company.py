@@ -63,8 +63,7 @@ class TestTradingNamesInCompanyAdmin(AdminTestMixin):
         # check that posting data for all form fields related to trading names
         # saves the model correctly
         trading_names_data = {
-            f'trading_names_{i}': f'trading name {i}'
-            for i in range(default_size)
+            f'trading_names_{i}': f'trading name {i}' for i in range(default_size)
         }
 
         data = {
@@ -107,10 +106,7 @@ class TestTradingNamesInCompanyAdmin(AdminTestMixin):
         form field is set.
         """
         company = CompanyFactory(
-            trading_names=[
-                f'trading name {i}'
-                for i in range(trading_names_number)
-            ],
+            trading_names=[f'trading name {i}' for i in range(trading_names_number)],
         )
         url = reverse('admin:company_company_change', args=(company.id,))
 
@@ -136,7 +132,6 @@ class TestOneListMembersInCompanyAdmin(AdminTestMixin):
 
         data = {
             **get_required_company_form_data(company),
-
             'one_list_core_team_members-TOTAL_FORMS': team_size,
             'one_list_core_team_members-INITIAL_FORMS': 0,
             'one_list_core_team_members-MIN_NUM_FORMS': 0,
@@ -145,12 +140,14 @@ class TestOneListMembersInCompanyAdmin(AdminTestMixin):
 
         for index, adviser in enumerate(team_member_advisers):
             team_member_id = uuid.uuid4()
-            data.update({
-                f'initial-one_list_core_team_members-{index}-id': team_member_id,
-                f'one_list_core_team_members-{index}-id': team_member_id,
-                f'one_list_core_team_members-{index}-company': company.pk,
-                f'one_list_core_team_members-{index}-adviser': adviser.pk,
-            })
+            data.update(
+                {
+                    f'initial-one_list_core_team_members-{index}-id': team_member_id,
+                    f'one_list_core_team_members-{index}-id': team_member_id,
+                    f'one_list_core_team_members-{index}-company': company.pk,
+                    f'one_list_core_team_members-{index}-adviser': adviser.pk,
+                },
+            )
 
         response = self.client.post(url, data, follow=True)
 
@@ -167,7 +164,6 @@ class TestOneListMembersInCompanyAdmin(AdminTestMixin):
 
         data = {
             **get_required_company_form_data(company),
-
             'one_list_core_team_members-TOTAL_FORMS': team_size,
             'one_list_core_team_members-INITIAL_FORMS': team_size,
             'one_list_core_team_members-MIN_NUM_FORMS': 0,
@@ -175,13 +171,14 @@ class TestOneListMembersInCompanyAdmin(AdminTestMixin):
         }
 
         for index, team_member in enumerate(core_team_members):
-            data.update({
-                f'initial-one_list_core_team_members-{index}-id': team_member.pk,
-                f'one_list_core_team_members-{index}-id': team_member.pk,
-                f'one_list_core_team_members-{index}-company': company.pk,
-                f'one_list_core_team_members-{index}-adviser': team_member.adviser.pk,
-
-            })
+            data.update(
+                {
+                    f'initial-one_list_core_team_members-{index}-id': team_member.pk,
+                    f'one_list_core_team_members-{index}-id': team_member.pk,
+                    f'one_list_core_team_members-{index}-company': company.pk,
+                    f'one_list_core_team_members-{index}-adviser': team_member.adviser.pk,
+                },
+            )
 
         # mark first one for deletion
         data['one_list_core_team_members-0-DELETE'] = '1'
@@ -193,12 +190,10 @@ class TestOneListMembersInCompanyAdmin(AdminTestMixin):
 
 
 class TestOneListLink(AdminTestMixin):
-    """Tests for the one list export.
-    """
+    """Tests for the one list export."""
 
     def test_one_list_link_exists(self):
-        """Test that there is a link to export the one list on the company change list.
-        """
+        """Test that there is a link to export the one list on the company change list."""
         url = reverse('admin:company_company_changelist')
         response = self.client.get(url)
         assert response.status_code == status.HTTP_200_OK

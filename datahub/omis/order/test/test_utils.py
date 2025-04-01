@@ -30,7 +30,6 @@ class TestPopulateBillingData:
                     'address_county': 'Antrim',
                     'address_postcode': 'BT41 4QE',
                     'address_country_id': Country.ireland.value.id,
-
                     'registered_address_1': '2',
                     'registered_address_2': 'Main Road',
                     'registered_address_town': 'London',
@@ -47,7 +46,6 @@ class TestPopulateBillingData:
                     'billing_address_country_id': uuid.UUID(Country.united_kingdom.value.id),
                 },
             ),
-
             # registered address blank
             (
                 {
@@ -57,7 +55,6 @@ class TestPopulateBillingData:
                     'address_county': 'Antrim',
                     'address_postcode': 'BT41 4QE',
                     'address_country_id': Country.ireland.value.id,
-
                     'registered_address_1': '',
                     'registered_address_2': '',
                     'registered_address_town': '',
@@ -74,7 +71,6 @@ class TestPopulateBillingData:
                     'billing_address_country_id': uuid.UUID(Country.ireland.value.id),
                 },
             ),
-
             # very minimal address
             (
                 {
@@ -84,7 +80,6 @@ class TestPopulateBillingData:
                     'address_county': None,
                     'address_postcode': '',
                     'address_country_id': None,
-
                     'registered_address_1': None,
                     'registered_address_2': None,
                     'registered_address_town': None,
@@ -119,7 +114,6 @@ class TestPopulateBillingData:
             billing_address_county='',
             billing_address_postcode='',
             billing_address_country_id=None,
-
             company=company,
             contact=ContactFactory.build(),
         )
@@ -194,8 +188,7 @@ class TestPopulateBillingData:
 
         # check that the fields didn't get overridden
         actual_billing_address = {
-            field_name: getattr(order, field_name)
-            for field_name in billing_address
+            field_name: getattr(order, field_name) for field_name in billing_address
         }
         assert actual_billing_address == billing_address
 
@@ -215,7 +208,6 @@ class TestComposeOfficialAddress:
                     'address_county': 'Antrim',
                     'address_postcode': 'BT41 4QE',
                     'address_country_id': Country.ireland.value.id,
-
                     'registered_address_1': '2',
                     'registered_address_2': 'Main Road',
                     'registered_address_town': 'London',
@@ -232,7 +224,6 @@ class TestComposeOfficialAddress:
                     'country.pk': uuid.UUID(Country.united_kingdom.value.id),
                 },
             ),
-
             # registered address blank
             (
                 {
@@ -242,7 +233,6 @@ class TestComposeOfficialAddress:
                     'address_county': 'Antrim',
                     'address_postcode': 'BT41 4QE',
                     'address_country_id': Country.ireland.value.id,
-
                     'registered_address_1': '',
                     'registered_address_2': '',
                     'registered_address_town': '',
@@ -259,7 +249,6 @@ class TestComposeOfficialAddress:
                     'country.pk': uuid.UUID(Country.ireland.value.id),
                 },
             ),
-
             # very minimal address
             (
                 {
@@ -269,7 +258,6 @@ class TestComposeOfficialAddress:
                     'address_county': None,
                     'address_postcode': '',
                     'address_country_id': None,
-
                     'registered_address_1': '',
                     'registered_address_2': '',
                     'registered_address_town': '',
@@ -289,13 +277,11 @@ class TestComposeOfficialAddress:
         ],
     )
     def test(self, initial_model_values, expected_address_values):
-        """Test that registered address is used if defined or address otherwise.
-        """
+        """Test that registered address is used if defined or address otherwise."""
         company = CompanyFactory.build(**initial_model_values)
         address = compose_official_address(company)
 
         actual_address = {
-            attr_name: attrgetter(attr_name)(address)
-            for attr_name in expected_address_values
+            attr_name: attrgetter(attr_name)(address) for attr_name in expected_address_values
         }
         assert actual_address == expected_address_values

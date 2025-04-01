@@ -5,15 +5,13 @@ from datahub.interaction.queryset import get_base_interaction_queryset
 
 
 class InteractionCursorPagination(ActivityCursorPagination):
-    """Cursor pagination for interaction.
-    """
+    """Cursor pagination for interaction."""
 
     summary = 'Interaction Activities'
 
 
 class InteractionActivityViewSet(ActivityViewSet):
-    """Interaction ViewSet for the activity stream.
-    """
+    """Interaction ViewSet for the activity stream."""
 
     pagination_class = InteractionCursorPagination
     serializer_class = InteractionActivitySerializer

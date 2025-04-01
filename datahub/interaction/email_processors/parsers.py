@@ -152,8 +152,7 @@ class CalendarInteractionEmailParser(BaseEmailParser):
                 'The iCalendar attachment was badly formatted.',
             )
         calendar_event_components = [
-            comp for comp in calendar.walk()
-            if comp.name == CALENDAR_COMPONENT_VEVENT
+            comp for comp in calendar.walk() if comp.name == CALENDAR_COMPONENT_VEVENT
         ]
         if len(calendar_event_components) == 0:
             raise BadCalendarInviteError(

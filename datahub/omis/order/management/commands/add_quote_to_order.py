@@ -20,8 +20,13 @@ class Command(BaseCommand):
         order = Order.objects.get(pk='59ad99d9-f589-4e5b-bea2-c1b0096671b7')
         serializer = OrderAssigneeSerializer(
             many=True,
-            data=[{'adviser': {'id': 'b4848b30-f532-4cfc-a063-b064d8435b65'},
-                   'estimated_time': 6000, 'is_lead': True}],
+            data=[
+                {
+                    'adviser': {'id': 'b4848b30-f532-4cfc-a063-b064d8435b65'},
+                    'estimated_time': 6000,
+                    'is_lead': True,
+                },
+            ],
             context={
                 'order': order,
                 'modified_by': user,

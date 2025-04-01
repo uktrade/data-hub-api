@@ -25,12 +25,10 @@ def calculate_payment_due_date(order):
     and there is always a gap between the quote expiry date and the payment due date
     of at least 7 days.
     """
-    x_days_before_delivery = (
-        order.delivery_date - timedelta(days=PAYMENT_DUE_DAYS_BEFORE_DELIVERY)
-    )
+    x_days_before_delivery = order.delivery_date - timedelta(days=PAYMENT_DUE_DAYS_BEFORE_DELIVERY)
 
-    y_days_from_acceptance = (
-        order.quote.accepted_on.date() + timedelta(days=PAYMENT_DUE_DAYS_FROM_NOW)
+    y_days_from_acceptance = order.quote.accepted_on.date() + timedelta(
+        days=PAYMENT_DUE_DAYS_FROM_NOW,
     )
 
     return min(x_days_before_delivery, y_days_from_acceptance)

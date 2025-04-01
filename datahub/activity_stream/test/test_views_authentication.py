@@ -23,7 +23,6 @@ def test_401_noauth(api_client, endpoint):
         get_url(endpoint),
         content_type='',
         HTTP_X_FORWARDED_FOR='1.2.3.4, 123.123.123.123',
-
     )
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
     assert response.json() == {

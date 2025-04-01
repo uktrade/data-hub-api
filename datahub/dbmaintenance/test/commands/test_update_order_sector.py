@@ -104,7 +104,9 @@ def test_non_existent_order(s3_stubber, caplog):
     assert len(caplog.records) == 1
 
     assert [order.sector for order in orders] == [
-        new_sectors[0], new_sectors[1], old_sectors[2],
+        new_sectors[0],
+        new_sectors[1],
+        old_sectors[2],
     ]
 
 
@@ -156,7 +158,9 @@ def test_non_existent_sector(s3_stubber, caplog):
     assert len(caplog.records) == 1
 
     assert [order.sector for order in orders] == [
-        new_sectors[0], new_sectors[1], old_sectors[2],
+        new_sectors[0],
+        new_sectors[1],
+        old_sectors[2],
     ]
 
 
@@ -211,7 +215,9 @@ def test_no_change(s3_stubber, caplog):
     assert len(caplog.records) == 2
 
     assert [order.sector for order in orders] == [
-        new_sectors[0], old_sectors[1], old_sectors[2],
+        new_sectors[0],
+        old_sectors[1],
+        old_sectors[2],
     ]
 
 

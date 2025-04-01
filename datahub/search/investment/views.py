@@ -327,15 +327,15 @@ class SearchInvestmentProjectAPIView(SearchInvestmentProjectAPIViewMixin, Search
                     investor_company_id = validated_data['investor_company'][0]
                     last_won_project = self.get_latest_won(investor_company_id)
                     if last_won_project:
-                        response['summary'][stage.name]['last_won_project'][
-                            'id'
-                        ] = last_won_project['id']
-                        response['summary'][stage.name]['last_won_project'][
-                            'name'
-                        ] = last_won_project['name']
-                        response['summary'][stage.name]['last_won_project'][
-                            'last_changed'
-                        ] = last_won_project['created_on']
+                        response['summary'][stage.name]['last_won_project']['id'] = (
+                            last_won_project['id']
+                        )
+                        response['summary'][stage.name]['last_won_project']['name'] = (
+                            last_won_project['name']
+                        )
+                        response['summary'][stage.name]['last_won_project']['last_changed'] = (
+                            last_won_project['created_on']
+                        )
 
                 response['summary'][stage.name]['value'] = stage_summary['doc_count']
 

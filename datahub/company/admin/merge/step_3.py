@@ -148,7 +148,8 @@ def _build_success_msg(source, target, merge_results):
             merge_entry.count,
             verbose_name_for_count(merge_entry.count, merge_entry.model_meta),
             merge_entry.description,
-        ) for merge_entry in merge_entries
+        )
+        for merge_entry in merge_entries
     )
 
     html_merge_entries = format_html_join(', ', MERGE_ENTRY_MSG_FRAGMENT, messages)

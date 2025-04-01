@@ -16,7 +16,6 @@ from datahub.search.contact import dict_utils
             'address_1',
             '2',
         ),
-
         # address_same_as_company = False and nested field
         (
             construct_mock(
@@ -32,7 +31,6 @@ from datahub.search.contact import dict_utils
                 'name': 'United Kingdom',
             },
         ),
-
         # address_same_as_company = True and char field
         (
             construct_mock(
@@ -45,7 +43,6 @@ from datahub.search.contact import dict_utils
             'address_1',
             '3',
         ),
-
         # address_same_as_company = True and company is None
         (
             construct_mock(
@@ -56,7 +53,6 @@ from datahub.search.contact import dict_utils
             'address_1',
             None,
         ),
-
         # address_same_as_company = True and nested field
         (
             construct_mock(

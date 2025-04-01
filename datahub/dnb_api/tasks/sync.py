@@ -171,15 +171,20 @@ def sync_outdated_companies_with_dnb(
     `dnb_modified_on_before` and will then interact with dnb-service to get the latest data to sync
     these companies.
     """
-    company_ids = Company.objects.filter(
-        Q(dnb_modified_on__lte=dnb_modified_on_before) | Q(dnb_modified_on__isnull=True),
-        duns_number__isnull=False,
-    ).annotate(
-        most_recent_interaction_date=Max('interactions__date'),
-    ).order_by(
-        F('most_recent_interaction_date').desc(nulls_last=True),
-        'dnb_modified_on',
-    ).values_list('id', flat=True)[:limit]
+    company_ids = (
+        Company.objects.filter(
+            Q(dnb_modified_on__lte=dnb_modified_on_before) | Q(dnb_modified_on__isnull=True),
+            duns_number__isnull=False,
+        )
+        .annotate(
+            most_recent_interaction_date=Max('interactions__date'),
+        )
+        .order_by(
+            F('most_recent_interaction_date').desc(nulls_last=True),
+            'dnb_modified_on',
+        )
+        .values_list('id', flat=True)[:limit]
+    )
 
     for company_id in company_ids:
         schedule_sync_company_with_dnb_rate_limited(

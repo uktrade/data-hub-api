@@ -1,4 +1,5 @@
 """Document views."""
+
 from django.core.exceptions import PermissionDenied
 from rest_framework import (
     filters,
@@ -108,13 +109,13 @@ class GenericDocumentViewSet(SoftDeleteCoreViewSet):
 
         ```
         {
-            "document_type": "documents.sharepointdocument",
-            "document_data": {
-                "title": "Project Proposal",
-                "url": "https://sharepoint.example.com/project-proposal.docx"
+            'document_type': 'documents.sharepointdocument',
+            'document_data': {
+                'title': 'Project Proposal',
+                'url': 'https://sharepoint.example.com/project-proposal.docx',
             },
-            "related_object_type": "company.company",
-            "related_object_id": "<uuid of company>"
+            'related_object_type': 'company.company',
+            'related_object_id': '<uuid of company>',
         }
         ```
         """

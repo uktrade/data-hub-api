@@ -42,6 +42,8 @@ receivers = (
     SignalReceiver(post_save, DBLargeCapitalInvestorProfile, investor_profile_sync_search),
     SignalReceiver(post_save, DBCompany, related_investor_profiles_sync_search),
     SignalReceiver(
-        post_delete, DBLargeCapitalInvestorProfile, remove_investor_profile_from_opensearch,
+        post_delete,
+        DBLargeCapitalInvestorProfile,
+        remove_investor_profile_from_opensearch,
     ),
 )

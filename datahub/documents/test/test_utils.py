@@ -26,10 +26,14 @@ def assert_retrieved_sharepoint_document(instance, retrieved_instance):
     assert str(instance.created_by.id) == retrieved_instance['created_by']['id']
     assert str(instance.modified_by.id) == retrieved_instance['modified_by']['id']
 
-    assert instance.created_on.timestamp() == \
-        datetime.strptime(retrieved_instance['created_on'], DATETIME_FORMAT).timestamp()
-    assert instance.modified_on.timestamp() == \
-        datetime.strptime(retrieved_instance['modified_on'], DATETIME_FORMAT).timestamp()
+    assert (
+        instance.created_on.timestamp()
+        == datetime.strptime(retrieved_instance['created_on'], DATETIME_FORMAT).timestamp()
+    )
+    assert (
+        instance.modified_on.timestamp()
+        == datetime.strptime(retrieved_instance['modified_on'], DATETIME_FORMAT).timestamp()
+    )
 
     assert instance.archived == retrieved_instance['archived']
     assert instance.archived_on == retrieved_instance['archived_on']
@@ -46,10 +50,14 @@ def assert_retrieved_generic_document(instance, retrieved_instance):
     assert str(instance.created_by.id) == retrieved_instance['created_by']['id']
     assert str(instance.modified_by.id) == retrieved_instance['modified_by']['id']
 
-    assert instance.created_on.timestamp() == \
-        datetime.strptime(retrieved_instance['created_on'], DATETIME_FORMAT).timestamp()
-    assert instance.modified_on.timestamp() == \
-        datetime.strptime(retrieved_instance['modified_on'], DATETIME_FORMAT).timestamp()
+    assert (
+        instance.created_on.timestamp()
+        == datetime.strptime(retrieved_instance['created_on'], DATETIME_FORMAT).timestamp()
+    )
+    assert (
+        instance.modified_on.timestamp()
+        == datetime.strptime(retrieved_instance['modified_on'], DATETIME_FORMAT).timestamp()
+    )
 
     assert instance.archived == retrieved_instance['archived']
     assert instance.archived_on == retrieved_instance['archived_on']
@@ -61,5 +69,7 @@ def assert_retrieved_generic_document(instance, retrieved_instance):
     assert str(instance.related_object_id) == retrieved_instance['related_object_id']
 
     assert format_content_type(instance.document_type) == retrieved_instance['document_type']
-    assert format_content_type(instance.related_object_type) == \
-        retrieved_instance['related_object_type']
+    assert (
+        format_content_type(instance.related_object_type)
+        == retrieved_instance['related_object_type']
+    )

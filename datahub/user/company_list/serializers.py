@@ -81,7 +81,8 @@ class PipelineItemSerializer(serializers.ModelSerializer):
     sector = NestedRelatedField(
         metadata_models.Sector,
         extra_fields=('id', 'segment'),
-        required=False, allow_null=True,
+        required=False,
+        allow_null=True,
     )
     contacts = NestedRelatedField(
         Contact,
@@ -115,7 +116,7 @@ class PipelineItemSerializer(serializers.ModelSerializer):
         - contact doesn't belong to the company being added.
         """
         if self.instance is None:
-            if (data.get('name') in (None, '')):
+            if data.get('name') in (None, ''):
                 raise serializers.ValidationError(
                     self.error_messages['field_is_required'],
                 )
@@ -137,8 +138,7 @@ class PipelineItemSerializer(serializers.ModelSerializer):
             extra_fields = fields - allowed_fields
             if extra_fields:
                 errors = {
-                    field: self.error_messages['field_cannot_be_updated']
-                    for field in extra_fields
+                    field: self.error_messages['field_cannot_be_updated'] for field in extra_fields
                 }
                 raise serializers.ValidationError(errors)
 

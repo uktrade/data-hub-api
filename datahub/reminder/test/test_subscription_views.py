@@ -26,8 +26,7 @@ from datahub.reminder.test.factories import (
 
 @pytest.fixture
 def investment_notifications_user_feature_group():
-    """Creates the investment notifications user feature group.
-    """
+    """Creates the investment notifications user feature group."""
     return UserFeatureFlagGroupFactory(
         code=INVESTMENT_NOTIFICATIONS_FEATURE_GROUP_NAME,
         is_active=True,
@@ -36,8 +35,7 @@ def investment_notifications_user_feature_group():
 
 @pytest.fixture
 def export_notifications_user_feature_group():
-    """Creates the export notifications user feature group.
-    """
+    """Creates the export notifications user feature group."""
     return UserFeatureFlagGroupFactory(
         code=EXPORT_NOTIFICATIONS_FEATURE_GROUP_NAME,
         is_active=True,
@@ -145,8 +143,7 @@ class TestNoRecentInvestmentInteractionSubscriptionViewset(
     SubscriptionWithReminderValidationViewsetTestMixin,
     APITestMixin,
 ):
-    """Tests for the no recent investment interaction subscription view.
-    """
+    """Tests for the no recent investment interaction subscription view."""
 
     url_name = 'api-v4:reminder:no-recent-investment-interaction-subscription'
     factory = NoRecentInvestmentInteractionSubscriptionFactory
@@ -156,8 +153,7 @@ class TestUpcomingEstimatedLandDateSubscriptionViewset(
     SubscriptionViewsetTestMixin,
     APITestMixin,
 ):
-    """Tests for the upcoming estimated land date subscription view.
-    """
+    """Tests for the upcoming estimated land date subscription view."""
 
     url_name = 'api-v4:reminder:estimated-land-date-subscription'
     factory = UpcomingEstimatedLandDateSubscriptionFactory
@@ -168,8 +164,7 @@ class TestNoRecentExportInteractionSubscriptionViewset(
     SubscriptionWithReminderValidationViewsetTestMixin,
     APITestMixin,
 ):
-    """Tests for the no recent export interaction subscription view.
-    """
+    """Tests for the no recent export interaction subscription view."""
 
     url_name = 'api-v4:reminder:no-recent-export-interaction-subscription'
     factory = NoRecentExportInteractionSubscriptionFactory
@@ -180,8 +175,7 @@ class TestNewExportInteractionSubscriptionViewset(
     SubscriptionWithReminderValidationViewsetTestMixin,
     APITestMixin,
 ):
-    """Tests for the no recent export interaction subscription view.
-    """
+    """Tests for the no recent export interaction subscription view."""
 
     url_name = 'api-v4:reminder:new-export-interaction-subscription'
     factory = NewExportInteractionSubscriptionFactory
@@ -191,8 +185,7 @@ class TestUpcomingTaskReminderSubscriptionViewset(
     SubscriptionViewsetTestMixin,
     APITestMixin,
 ):
-    """Tests for the upcoming task reminder subscription view.
-    """
+    """Tests for the upcoming task reminder subscription view."""
 
     url_name = 'api-v4:reminder:my-tasks-due-date-approaching-subscription'
     factory = UpcomingTaskReminderSubscriptionFactory
@@ -202,8 +195,7 @@ class TestTaskOverdueReminderSubscriptionViewset(
     SubscriptionViewsetTestMixin,
     APITestMixin,
 ):
-    """Tests for the task overdue reminder subscription view.
-    """
+    """Tests for the task overdue reminder subscription view."""
 
     url_name = 'api-v4:reminder:my-tasks-task-overdue-subscription'
     factory = TaskOverdueSubscriptionFactory
@@ -291,8 +283,7 @@ class TestTaskSubscriptionViewset(APITestMixin):
 
 
 class TestGetReminderSubscriptionSummaryView(APITestMixin):
-    """Tests for the reminder subscription summary view.
-    """
+    """Tests for the reminder subscription summary view."""
 
     url_name = 'api-v4:reminder:subscription-summary'
 

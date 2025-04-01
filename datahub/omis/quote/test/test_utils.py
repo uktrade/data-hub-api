@@ -113,7 +113,6 @@ class TestGenerateQuoteContent:
             address_county='',
             address_postcode='SW1A 1AA',
             address_country_id=None,
-
             registered_address_1='',
             registered_address_2='',
             registered_address_town='',

@@ -40,19 +40,20 @@ def deactivateable_adviser(**kwargs):
     defaults. They would typically be used to make the adviser not deactivatable
     in tests
     """
-    return AdviserFactory(**{
-        'sso_email_user_id': None,
-        'date_joined': date.today() - relativedelta(years=2, days=1),
-        'last_login': date.today() - relativedelta(months=6, days=1),
-        'is_active': True,
-        **kwargs,
-    })
+    return AdviserFactory(
+        **{
+            'sso_email_user_id': None,
+            'date_joined': date.today() - relativedelta(years=2, days=1),
+            'last_login': date.today() - relativedelta(months=6, days=1),
+            'is_active': True,
+            **kwargs,
+        },
+    )
 
 
 @pytest.mark.django_db
 class TestAdviserDeactivateTask:
-    """Tests for the task that deactivate advisers.
-    """
+    """Tests for the task that deactivate advisers."""
 
     @pytest.mark.parametrize(
         ('lock_acquired', 'call_count'),
@@ -67,8 +68,7 @@ class TestAdviserDeactivateTask:
         lock_acquired,
         call_count,
     ):
-        """Test that the task doesn't run if it cannot acquire the advisory_lock.
-        """
+        """Test that the task doesn't run if it cannot acquire the advisory_lock."""
         mock_advisory_lock = mock.MagicMock()
         mock_advisory_lock.return_value.__enter__.return_value = lock_acquired
         monkeypatch.setattr(
@@ -84,8 +84,7 @@ class TestAdviserDeactivateTask:
         assert mock_automatic_adviser_deactivate.call_count == call_count
 
     def test_limit(self):
-        """Test adviser deactivating query limit.
-        """
+        """Test adviser deactivating query limit."""
         limit = 2
         advisers = [deactivateable_adviser() for _ in range(3)]
         automatic_adviser_deactivate(limit=limit)
@@ -99,8 +98,7 @@ class TestAdviserDeactivateTask:
 
     @pytest.mark.parametrize('simulate', [True, False])
     def test_simulate(self, caplog, simulate):
-        """Test adviser deactivating simulate flag.
-        """
+        """Test adviser deactivating simulate flag."""
         caplog.set_level(logging.INFO, logger='datahub.company.tasks.adviser')
         date = datetime.now() - relativedelta(days=10)
         with freeze_time(date):
@@ -138,8 +136,7 @@ class TestAdviserDeactivateTask:
         advisers,
         message,
     ):
-        """Test that appropriate realtime messaging is sent which reflects the deactivating actions.
-        """
+        """Test that appropriate realtime messaging is sent which reflects the deactivating actions."""
         for deactivate in advisers:
             deactivateable_adviser(is_active=deactivate)
 
@@ -152,15 +149,14 @@ class TestAdviserDeactivateTask:
         mock_send_realtime_message.assert_called_once_with(message)
 
     def test_recently_joined_adviser_does_not_deactivate(self):
-        """Test adviser does not deactivate if recently joined.
-        """
+        """Test adviser does not deactivate if recently joined."""
         with freeze_time('2017-02-21'):
             two_years_ago = date.today() - relativedelta(years=2)
             adviser1 = deactivateable_adviser()
             adviser2 = deactivateable_adviser(
-                date_joined=two_years_ago - relativedelta(years=2, day=1))
-            adviser3 = deactivateable_adviser(
-                date_joined=two_years_ago)
+                date_joined=two_years_ago - relativedelta(years=2, day=1),
+            )
+            adviser3 = deactivateable_adviser(date_joined=two_years_ago)
             assert adviser1.is_active is True
             assert adviser2.is_active is True
             assert adviser3.is_active is True
@@ -250,8 +246,7 @@ class TestAdviserDeactivateTask:
         ],
     )
     def test_adviser_with_recent_activity_does_not_deactivate(self, factory, attribute_name):
-        """Test adviser with recent activity doesn't deactivate.
-        """
+        """Test adviser with recent activity doesn't deactivate."""
         with freeze_time('2017-02-21'):
             two_years_ago = date.today() - relativedelta(years=2)
 
@@ -296,10 +291,10 @@ class TestAdviserDeactivateTask:
         ],
     )
     def test_adviser_with_old_activity_but_recently_dated_object_does_not_deactivate(
-            self,
-            factory,
-            adviser_attribute_name,
-            date_attribute_name,
+        self,
+        factory,
+        adviser_attribute_name,
+        date_attribute_name,
     ):
         """Test adviser with recently dated object doesn't deactivate.
 
@@ -314,17 +309,21 @@ class TestAdviserDeactivateTask:
 
             adviser2 = deactivateable_adviser()
             with freeze_time(three_years_ago):
-                factory(**{
-                    adviser_attribute_name: adviser2,
-                    date_attribute_name: two_years_ago - relativedelta(days=1),
-                })
+                factory(
+                    **{
+                        adviser_attribute_name: adviser2,
+                        date_attribute_name: two_years_ago - relativedelta(days=1),
+                    },
+                )
 
             adviser3 = deactivateable_adviser()
             with freeze_time(three_years_ago):
-                factory(**{
-                    adviser_attribute_name: adviser3,
-                    date_attribute_name: two_years_ago,
-                })
+                factory(
+                    **{
+                        adviser_attribute_name: adviser3,
+                        date_attribute_name: two_years_ago,
+                    },
+                )
 
             assert adviser1.is_active is True
             assert adviser2.is_active is True
@@ -350,10 +349,11 @@ class TestAdviserDeactivateTask:
         ],
     )
     def test_adviser_that_is_a_member_of_team_does_not_deactivate(
-        self, factory, attribute_name,
+        self,
+        factory,
+        attribute_name,
     ):
-        """Test adviser that is a member of a team does not deactivate, even if old.
-        """
+        """Test adviser that is a member of a team does not deactivate, even if old."""
         with freeze_time('2017-02-21'):
             three_years_ago = date.today() - relativedelta(years=3)
 
@@ -379,8 +379,10 @@ class TestAdviserDeactivateTask:
         actual_job = schedule_automatic_adviser_deactivate(limit=1000, simulate=True)
 
         assert actual_job is not None
-        assert actual_job._func_name == 'datahub.company.tasks.adviser.automatic' \
-            + '_adviser_deactivate'
+        assert (
+            actual_job._func_name
+            == 'datahub.company.tasks.adviser.automatic' + '_adviser_deactivate'
+        )
         assert actual_job._args == (1000, True)
         assert actual_job.retries_left == 3
         assert actual_job.origin == 'long-running'

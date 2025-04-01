@@ -23,8 +23,7 @@ from datahub.user_event_log.utils import record_user_event
 
 class TasksMixin(CoreViewSet):
     def get_tasks(self, request):
-        """Get the task queryset that is filtered using common filters from the query params.
-        """
+        """Get the task queryset that is filtered using common filters from the query params."""
         queryset = (
             Task.objects.all()
             .prefetch_related('advisers')
@@ -90,8 +89,7 @@ class TaskV4ViewSet(ArchivableViewSetMixin, TasksMixin):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_tasks_companies_and_projects(request):
-    """Get the list of companies and projects that have tasks.
-    """
+    """Get the list of companies and projects that have tasks."""
     user_id = request.user.id
 
     adviser_tasks = Task.objects.filter(

@@ -40,8 +40,7 @@ class TestGreatExportEnquiry:
         assert not CompanyActivity.objects.all().exists()
 
     def test_save_with_no_company(self):
-        """Test save does not save to the `CompanyActivity` model.
-        """
+        """Test save does not save to the `CompanyActivity` model."""
         assert not CompanyActivity.objects.all().exists()
 
         # Try to save the great export enquiry with no company id which will not work

@@ -14,8 +14,7 @@ logger = getLogger(__name__)
 
 
 def resync_after_migrate(search_app):
-    """Completes a migration by performing a full resync, updating aliases and removing old indices.
-    """
+    """Completes a migration by performing a full resync, updating aliases and removing old indices."""
     if not search_app.search_model.was_migration_started():
         logger.warning(
             f'No pending migration detected for the {search_app.name} search app, aborting '

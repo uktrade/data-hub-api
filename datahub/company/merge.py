@@ -37,7 +37,7 @@ def _default_object_updater(obj, field, target, source):
 
     setattr(obj, field, target)
 
-    update_fields = (field, )
+    update_fields = (field,)
 
     # Not all models have modified_on field.
     if hasattr(obj, 'modified_on'):

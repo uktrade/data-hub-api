@@ -18,8 +18,7 @@ from datahub.metadata.models import Sector
 
 
 class TestCompanyVersioning(APITestMixin):
-    """Tests for versions created when interacting with the company endpoints.
-    """
+    """Tests for versions created when interacting with the company endpoints."""
 
     def test_add_creates_a_new_version(self):
         """Test that creating a company creates a new version."""
@@ -136,7 +135,9 @@ class TestCompanyVersioning(APITestMixin):
     def test_unarchive_creates_a_new_version(self):
         """Test that unarchiving a company creates a new version."""
         company = CompanyFactory(
-            archived=True, archived_on=now(), archived_reason='foo',
+            archived=True,
+            archived_on=now(),
+            archived_reason='foo',
         )
         assert Version.objects.get_for_object(company).count() == 0
 

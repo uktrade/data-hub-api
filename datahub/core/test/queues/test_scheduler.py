@@ -51,7 +51,7 @@ def test_can_queue_one_thing(async_queue: DataHubScheduler):
 
 def test_can_enqueue_in_using_time_delta(monkeypatch, async_queue: DataHubScheduler):
     datahub_enqueue_in_mock = rq_enqueue_in_mock(monkeypatch)
-    time_delta = (timedelta(seconds=10))
+    time_delta = timedelta(seconds=10)
     job = async_queue.enqueue_in(
         queue_name='enqueue_in_using_time_delta',
         time_delta=time_delta,

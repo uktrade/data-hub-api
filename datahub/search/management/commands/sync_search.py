@@ -25,7 +25,7 @@ class Command(BaseCommand):
             '--foreground',
             action='store_true',
             help='If specified, the command runs in the foreground without needing RQ '
-                 'running. (By default, it runs asynchronously using RQ.)',
+            'running. (By default, it runs asynchronously using RQ.)',
         )
 
     def handle(self, *args, **options):

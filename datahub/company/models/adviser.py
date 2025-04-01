@@ -165,13 +165,11 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
         send_mail(subject, message, from_email, [self.get_current_email()], **kwargs)
 
     def get_current_email(self):
-        """:returns: the most up-to-date email address for this adviser.
-        """
+        """:returns: the most up-to-date email address for this adviser."""
         return self.contact_email or self.email
 
     def get_email_domain(self):
-        """:returns: Domain for adviser's current email.
-        """
+        """:returns: Domain for adviser's current email."""
         email = self.get_current_email()
         try:
             _, domain = email.rsplit('@', maxsplit=1)
@@ -181,8 +179,7 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
 
     @cached_property
     def active_features(self):
-        """:returns: Features that are currently active.
-        """
+        """:returns: Features that are currently active."""
         features = []
         for feature_group in self.feature_groups.filter(is_active=True):
             features += feature_group.features.filter(is_active=True).values_list(
@@ -194,6 +191,5 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
 
     @cached_property
     def active_feature_groups(self):
-        """:returns: Feature groups that are currently active.
-        """
+        """:returns: Feature groups that are currently active."""
         return self.feature_groups.filter(is_active=True).values_list('code', flat=True)

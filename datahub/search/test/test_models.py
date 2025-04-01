@@ -93,9 +93,9 @@ def test_validate_model_search_fields(search_app):
         field for field in search_model.SEARCH_FIELDS if not mapping.resolve_field(field)
     }
 
-    assert (
-        not invalid_fields
-    ), f'Invalid search fields {invalid_fields} detected on {search_model.__name__} search model'
+    assert not invalid_fields, (
+        f'Invalid search fields {invalid_fields} detected on {search_model.__name__} search model'
+    )
 
 
 def _get_db_model_fields(db_model):

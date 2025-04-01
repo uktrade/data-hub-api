@@ -37,8 +37,7 @@ pytestmark = pytest.mark.django_db
 
 
 def get_export_wins_legacy_data_feature_flag():
-    """Creates the Export wins legacy dataset feature flag.
-    """
+    """Creates the Export wins legacy dataset feature flag."""
     return FeatureFlagFactory(
         code=EXPORT_WINS_LEGACY_DATASET_FEATURE_FLAG_NAME,
         is_active=True,
@@ -63,7 +62,6 @@ class TestExportWinsAdvisersDatasetView(BaseDatasetViewTest):
         }
 
     def test_success(self, data_flow_api_client):
-
         win_adviser = self.factory(location='Somewhere')
 
         response = data_flow_api_client.get(self.view_url).json()
@@ -143,7 +141,8 @@ class TestExportWinsAdvisersDatasetView(BaseDatasetViewTest):
             self.view_url,
             {
                 'win_id': win_advisers[0].win_id,
-            }).json()
+            },
+        ).json()
 
         assert len(response['results']) == 1
         self._assert_win_adviser_matches_result(win_advisers[0], response['results'][0])
@@ -241,7 +240,8 @@ class TestExportWinsBreakdownDatasetView(BaseDatasetViewTest):
             self.view_url,
             {
                 'win_id': breakdowns[0].win_id,
-            }).json()
+            },
+        ).json()
 
         assert len(response['results']) == 1
         self._assert_breakdown_matches_result(
@@ -263,7 +263,6 @@ class TestExportWinsHVCDatasetView(BaseDatasetViewTest):
         }
 
     def test_success(self, data_flow_api_client):
-
         hvc = HVC.objects.filter(legacy_id=1).first()
 
         response = data_flow_api_client.get(self.view_url).json()
@@ -276,7 +275,8 @@ class TestExportWinsHVCDatasetView(BaseDatasetViewTest):
 
         legacy_ids = [
             result['id']
-            for result in response['results'] if result['id'] < EXPORT_WINS_LEGACY_ID_START_VALUE
+            for result in response['results']
+            if result['id'] < EXPORT_WINS_LEGACY_ID_START_VALUE
         ]
 
         assert len(legacy_ids) > 0
@@ -288,9 +288,7 @@ class TestExportWinsHVCDatasetView(BaseDatasetViewTest):
 
         legacy_ids = [result['id'] for result in response['results']]
         assert len(legacy_ids) > 0
-        assert all(
-            legacy_id >= EXPORT_WINS_LEGACY_ID_START_VALUE for legacy_id in legacy_ids
-        )
+        assert all(legacy_id >= EXPORT_WINS_LEGACY_ID_START_VALUE for legacy_id in legacy_ids)
 
     def test_success_with_feature_flag(
         self,
@@ -303,7 +301,8 @@ class TestExportWinsHVCDatasetView(BaseDatasetViewTest):
 
         legacy_ids = [
             result['id']
-            for result in response['results'] if result['id'] < EXPORT_WINS_LEGACY_ID_START_VALUE
+            for result in response['results']
+            if result['id'] < EXPORT_WINS_LEGACY_ID_START_VALUE
         ]
         assert len(legacy_ids) > 0
 
@@ -330,63 +329,84 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
             'cdms_reference': win.company.company_number,
             'company_name': win.company.name if win.migrated_on is None else win.company_name,
             'complete': len(tokens) > 0 if win.migrated_on is None else win.complete,
-            'confirmation__access_to_contacts':
-                win.customer_response.our_support.export_win_id if has_responded else None,
-            'confirmation__access_to_information':
-                win.customer_response.access_to_information.export_win_id
-                if has_responded else None,
+            'confirmation__access_to_contacts': win.customer_response.our_support.export_win_id
+            if has_responded
+            else None,
+            'confirmation__access_to_information': win.customer_response.access_to_information.export_win_id
+            if has_responded
+            else None,
             'confirmation__agree_with_win': win.customer_response.agree_with_win,
-            'confirmation__case_study_willing':
-                win.customer_response.case_study_willing if has_responded else None,
+            'confirmation__case_study_willing': win.customer_response.case_study_willing
+            if has_responded
+            else None,
             'confirmation__comments': win.customer_response.comments,
-            'confirmation__company_was_at_risk_of_not_exporting':
-                win.customer_response.company_was_at_risk_of_not_exporting
-                if has_responded else None,
+            'confirmation__company_was_at_risk_of_not_exporting': win.customer_response.company_was_at_risk_of_not_exporting
+            if has_responded
+            else None,
             'confirmation__created': format_date_or_datetime(
                 win.customer_response.responded_on,
             ),
-            'confirmation__developed_relationships':
-                win.customer_response.developed_relationships.export_win_id
-                if has_responded else None,
-            'confirmation__gained_confidence':
-                win.customer_response.gained_confidence.export_win_id if has_responded else None,
-            'confirmation__has_enabled_expansion_into_existing_market':
-                win.customer_response.has_enabled_expansion_into_existing_market
-                if has_responded else None,
-            'confirmation__has_enabled_expansion_into_new_market':
-                win.customer_response.has_enabled_expansion_into_new_market
-                if has_responded else None,
-            'confirmation__has_explicit_export_plans':
-                win.customer_response.has_explicit_export_plans if has_responded else None,
-            'confirmation__has_increased_exports_as_percent_of_turnover':
-                win.customer_response.has_increased_exports_as_percent_of_turnover
-                if has_responded else None,
-            'confirmation__improved_profile':
-                win.customer_response.improved_profile.export_win_id if has_responded else None,
-            'confirmation__interventions_were_prerequisite':
-                win.customer_response.interventions_were_prerequisite if has_responded else None,
-            'confirmation__involved_state_enterprise':
-                win.customer_response.involved_state_enterprise if has_responded else None,
+            'confirmation__developed_relationships': win.customer_response.developed_relationships.export_win_id
+            if has_responded
+            else None,
+            'confirmation__gained_confidence': win.customer_response.gained_confidence.export_win_id
+            if has_responded
+            else None,
+            'confirmation__has_enabled_expansion_into_existing_market': win.customer_response.has_enabled_expansion_into_existing_market
+            if has_responded
+            else None,
+            'confirmation__has_enabled_expansion_into_new_market': win.customer_response.has_enabled_expansion_into_new_market
+            if has_responded
+            else None,
+            'confirmation__has_explicit_export_plans': win.customer_response.has_explicit_export_plans
+            if has_responded
+            else None,
+            'confirmation__has_increased_exports_as_percent_of_turnover': win.customer_response.has_increased_exports_as_percent_of_turnover
+            if has_responded
+            else None,
+            'confirmation__improved_profile': win.customer_response.improved_profile.export_win_id
+            if has_responded
+            else None,
+            'confirmation__interventions_were_prerequisite': win.customer_response.interventions_were_prerequisite
+            if has_responded
+            else None,
+            'confirmation__involved_state_enterprise': win.customer_response.involved_state_enterprise
+            if has_responded
+            else None,
             'confirmation__name': contact.name
-                if contact else win.customer_name if win.customer_name else None,
-            'confirmation__other_marketing_source':
-                win.customer_response.other_marketing_source if has_responded else None,
-            'confirmation__our_support':
-                win.customer_response.our_support.export_win_id if has_responded else None,
-            'confirmation__overcame_problem':
-                win.customer_response.overcame_problem.export_win_id if has_responded else None,
-            'confirmation__support_improved_speed':
-                win.customer_response.support_improved_speed if has_responded else None,
+            if contact
+            else win.customer_name
+            if win.customer_name
+            else None,
+            'confirmation__other_marketing_source': win.customer_response.other_marketing_source
+            if has_responded
+            else None,
+            'confirmation__our_support': win.customer_response.our_support.export_win_id
+            if has_responded
+            else None,
+            'confirmation__overcame_problem': win.customer_response.overcame_problem.export_win_id
+            if has_responded
+            else None,
+            'confirmation__support_improved_speed': win.customer_response.support_improved_speed
+            if has_responded
+            else None,
             'country': win.country.iso_alpha2_code,
             'created': format_date_or_datetime(win.created_on),
             'customer_email_address': contact.email
-                if win.migrated_on is None else win.customer_email_address
-                if win.customer_email_address else None,
+            if win.migrated_on is None
+            else win.customer_email_address
+            if win.customer_email_address
+            else None,
             'customer_job_title': contact.job_title
-                if win.migrated_on is None else win.customer_job_title
-                if win.customer_job_title else None,
+            if win.migrated_on is None
+            else win.customer_job_title
+            if win.customer_job_title
+            else None,
             'customer_name': contact.name
-                if win.migrated_on is None else win.customer_name if win.customer_name else None,
+            if win.migrated_on is None
+            else win.customer_name
+            if win.customer_name
+            else None,
             'date': format_date_or_datetime(win.date),
             'description': win.description,
             'has_hvo_specialist_involvement': win.has_hvo_specialist_involvement,
@@ -395,12 +415,12 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
             'is_line_manager_confirmed': win.is_line_manager_confirmed,
             'is_personally_confirmed': win.is_personally_confirmed,
             'is_prosperity_fund_related': win.is_prosperity_fund_related,
-            'lead_officer_email_address':
-                win.lead_officer.contact_email
-                if win.migrated_on is None else win.lead_officer_email_address,
-            'lead_officer_name':
-                win.lead_officer.name
-                if win.migrated_on is None else win.lead_officer_name,
+            'lead_officer_email_address': win.lead_officer.contact_email
+            if win.migrated_on is None
+            else win.lead_officer_email_address,
+            'lead_officer_name': win.lead_officer.name
+            if win.migrated_on is None
+            else win.lead_officer_name,
             'line_manager_name': win.line_manager_name,
             'name_of_customer': win.name_of_customer,
             'name_of_export': win.name_of_export,
@@ -411,13 +431,13 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
             'migrated_on': format_date_or_datetime(win.migrated_on),
             'data_hub_company_id': str(win.company_id),
             'user__email': win.adviser.contact_email
-                if win.migrated_on is None else win.adviser_email_address,
+            if win.migrated_on is None
+            else win.adviser_email_address,
             'user__name': win.adviser.name if win.migrated_on is None else win.adviser_name,
             'business_potential_display': win.business_potential.name,
             'confirmation_last_export': win.customer_response.last_export.name,
             'confirmation_marketing_source': win.customer_response.marketing_source.name,
-            'confirmation_portion_without_help':
-                win.customer_response.expected_portion_without_help.name,
+            'confirmation_portion_without_help': win.customer_response.expected_portion_without_help.name,
             'country_name': win.country.name,
             'customer_location_display': win.customer_location.name,
             'export_experience_display': win.export_experience.name,
@@ -429,21 +449,25 @@ class TestExportWinsWinDatasetView(BaseDatasetViewTest):
             'num_notifications': len(tokens),
             'customer_email_date': format_date_or_datetime(
                 min(tokens, key=lambda item: item.created_on).created_on,
-            ) if len(tokens) > 0 else None,
+            )
+            if len(tokens) > 0
+            else None,
         }
         max_associated_programmes = len(associated_programmes)
         for i, associated_programme in enumerate(associated_programmes):
-            expected[f'associated_programme_{i+1}_display'] = associated_programme.name
+            expected[f'associated_programme_{i + 1}_display'] = associated_programme.name
         if max_associated_programmes < 5:
             for i in range(5 - max_associated_programmes):
-                expected[f'associated_programme_{i+max_associated_programmes+1}_display'] = None
+                expected[f'associated_programme_{i + max_associated_programmes + 1}_display'] = (
+                    None
+                )
 
         max_types_of_support = len(types_of_support)
         for i, type_of_support in enumerate(types_of_support):
-            expected[f'type_of_support_{i+1}_display'] = type_of_support.name
+            expected[f'type_of_support_{i + 1}_display'] = type_of_support.name
         if max_types_of_support < 3:
             for i in range(3 - max_types_of_support):
-                expected[f'type_of_support_{i+max_types_of_support+1}_display'] = None
+                expected[f'type_of_support_{i + max_types_of_support + 1}_display'] = None
 
         assert result == expected
 

@@ -110,7 +110,8 @@ class TestUserView(APITestMixin):
         )
         inactive_feature_flag_group.features.add(
             UserFeatureFlagFactory(
-                code='irrelevant', is_active=True,
+                code='irrelevant',
+                is_active=True,
             ),
         )
 

@@ -13,7 +13,6 @@ def test_run(s3_stubber):
     """Test that the command updates the relevant records ignoring ones with errors."""
     advisers = [
         # order in CSV doesn't exist so row should fail
-
         # region should get updated
         AdviserFactory(telephone_number='000000000'),
         # region should get updated

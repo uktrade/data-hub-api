@@ -64,9 +64,11 @@ def setup_data(opensearch_with_collector):
     gross_development_value = OpportunityValueTypeConstant.gross_development_value.value.id
     with freeze_time('2010-02-01'):
         frozen_created_on_opportunity = LargeCapitalOpportunityFactory(
-            promoters=[CompanyFactory(
-                name='Frozen promoter',
-            )],
+            promoters=[
+                CompanyFactory(
+                    name='Frozen promoter',
+                ),
+            ],
             name='Frozen project',
             description='frozen in 2010',
             construction_risks=[
@@ -82,9 +84,11 @@ def setup_data(opensearch_with_collector):
 
     with freeze_time('2018-01-01 10:00:00'):
         south_project = LargeCapitalOpportunityFactory(
-            promoters=[CompanyFactory(
-                name='Distinct promoter',
-            )],
+            promoters=[
+                CompanyFactory(
+                    name='Distinct promoter',
+                ),
+            ],
             name='South project',
             description='South project',
             investment_types=[
@@ -97,9 +101,11 @@ def setup_data(opensearch_with_collector):
         north_project = LargeCapitalOpportunityFactory(
             total_investment_sought=20,
             current_investment_secured=7,
-            promoters=[CompanyFactory(
-                name='Another promoter',
-            )],
+            promoters=[
+                CompanyFactory(
+                    name='Another promoter',
+                ),
+            ],
             name='North project',
             description='North project',
             uk_region_locations=[
@@ -266,7 +272,6 @@ class TestSearch(APITestMixin):
                 'name',
                 ['Frozen project', 'Business centre'],
             ),
-
             # Requirement filters
             (
                 {
@@ -311,7 +316,6 @@ class TestSearch(APITestMixin):
                 'name',
                 ['Railway', 'Skyscraper'],
             ),
-
         ],
     )
     def test_filters(self, search, check_response_item, expected_results):
@@ -327,10 +331,9 @@ class TestSearch(APITestMixin):
         expected_number_of_results = len(expected_results)
         assert response.data['count'] == expected_number_of_results, response.data['results']
         assert len(response.data['results']) == expected_number_of_results
-        assert (
-            Counter(result[check_response_item] for result in response.data['results'])
-            == Counter(expected_results)
-        )
+        assert Counter(
+            result[check_response_item] for result in response.data['results']
+        ) == Counter(expected_results)
 
     def test_investable_capital_filter_error(self):
         """Test investable capital filter error."""
@@ -425,7 +428,6 @@ class TestSearch(APITestMixin):
                     '2010-02-01T00:00:00+00:00',
                 ],
             ),
-
         ],
     )
     def test_sorts(self, sort_by, check_item_key, expected_results):
@@ -464,15 +466,11 @@ class TestLargeCapitalOpportunityExportView(APITestMixin):
                 status.HTTP_403_FORBIDDEN,
             ),
             (
-                (
-                    LargeCapitalOpportunityPermission.view_large_capital_opportunity,
-                ),
+                (LargeCapitalOpportunityPermission.view_large_capital_opportunity,),
                 status.HTTP_403_FORBIDDEN,
             ),
             (
-                (
-                    LargeCapitalOpportunityPermission.export,
-                ),
+                (LargeCapitalOpportunityPermission.export,),
                 status.HTTP_403_FORBIDDEN,
             ),
             # User has all necessary permissions, allow export
@@ -486,7 +484,10 @@ class TestLargeCapitalOpportunityExportView(APITestMixin):
         ],
     )
     def test_user_with_correct_permissions_can_export_data(
-        self, opensearch, permissions, expected_status_code,
+        self,
+        opensearch,
+        permissions,
+        expected_status_code,
     ):
         """Test that only a user with correct permissions can export data."""
         user = create_test_user(dit_team=TeamFactory(), permission_codenames=permissions)
@@ -523,7 +524,8 @@ class TestLargeCapitalOpportunityExportView(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert parse_header(response.get('Content-Disposition')) == (
-            'attachment', {
+            'attachment',
+            {
                 'filename': 'Data Hub - Large capital opportunities - 2018-01-01-11-12-13.csv',
             },
         )
@@ -561,10 +563,12 @@ def _build_expected_export_response(opportunity):
         'Name': opportunity.name,
         'Description': opportunity.description,
         'Type': get_attr_or_none(
-            opportunity, 'type.name',
+            opportunity,
+            'type.name',
         ),
         'Status': get_attr_or_none(
-            opportunity, 'status.name',
+            opportunity,
+            'status.name',
         ),
         'UK region locations': join_attr_values(
             opportunity.uk_region_locations.order_by('name'),
@@ -574,20 +578,24 @@ def _build_expected_export_response(opportunity):
         ),
         'Lead DIT relationship manager': opportunity.lead_dit_relationship_manager.name,
         'Other DIT contacts': get_attr_or_none(
-            opportunity, 'other_dit_contacts.name',
+            opportunity,
+            'other_dit_contacts.name',
         ),
         'Required checks conducted': get_attr_or_none(
-            opportunity, 'required_checks_conducted.name',
+            opportunity,
+            'required_checks_conducted.name',
         ),
         'Required checks conducted by': get_attr_or_none(
-            opportunity, 'required_checks_conducted_by.name',
+            opportunity,
+            'required_checks_conducted_by.name',
         ),
         'Required checks conducted on': opportunity.required_checks_conducted_on,
         'Asset classes': join_attr_values(
             opportunity.asset_classes.order_by('name'),
         ),
         'Opportunity value type': get_attr_or_none(
-            opportunity, 'opportunity_value_type.name',
+            opportunity,
+            'opportunity_value_type.name',
         ),
         'Opportunity value': opportunity.opportunity_value,
         'Construction risks': join_attr_values(
@@ -599,7 +607,8 @@ def _build_expected_export_response(opportunity):
             opportunity.investment_types.order_by('name'),
         ),
         'Estimated return rate': get_attr_or_none(
-            opportunity, 'estimated_return_rate.name',
+            opportunity,
+            'estimated_return_rate.name',
         ),
         'Time horizons': join_attr_values(
             opportunity.time_horizons.order_by('name'),

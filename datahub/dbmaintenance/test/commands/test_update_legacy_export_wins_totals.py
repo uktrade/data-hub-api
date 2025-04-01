@@ -34,13 +34,15 @@ def test_run(s3_stubber, caplog):
 
     bucket = 'test_bucket'
     object_key = 'test_key'
-    csv_contents = ['id,total_expected_export_value,total_expected_non_export_value,'
-                    'total_expected_odi_value']
+    csv_contents = [
+        'id,total_expected_export_value,total_expected_non_export_value,total_expected_odi_value',
+    ]
     for uuid, export_value, non_export_value, odi_value in zip(
         uuids,
         total_expected_export_values,
         total_expected_non_export_values,
-        total_expected_odi_values, strict=False,
+        total_expected_odi_values,
+        strict=False,
     ):
         csv_contents.append(f'{uuid},{export_value},{non_export_value},{odi_value}')
 
@@ -65,7 +67,8 @@ def test_run(s3_stubber, caplog):
         uuids,
         total_expected_export_values,
         total_expected_non_export_values,
-        total_expected_odi_values, strict=False,
+        total_expected_odi_values,
+        strict=False,
     ):
         win = Win.objects.get(id=uuid)
         if win == dh_win:
@@ -105,13 +108,15 @@ def test_simulate(s3_stubber, caplog):
 
     bucket = 'test_bucket'
     object_key = 'test_key'
-    csv_contents = ['id,total_expected_export_value,total_expected_non_export_value,'
-                    'total_expected_odi_value']
+    csv_contents = [
+        'id,total_expected_export_value,total_expected_non_export_value,total_expected_odi_value',
+    ]
     for uuid, export_value, non_export_value, odi_value in zip(
         uuids,
         total_expected_export_values,
         total_expected_non_export_values,
-        total_expected_odi_values, strict=False,
+        total_expected_odi_values,
+        strict=False,
     ):
         csv_contents.append(f'{uuid},{export_value},{non_export_value},{odi_value}')
 

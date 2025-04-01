@@ -28,7 +28,15 @@ class TestRefreshGrossValueAddedCommand:
     """Test refreshing gross value added values command."""
 
     @pytest.mark.parametrize(
-        ('investment_type', 'sector', 'business_activities', 'multiplier_value', 'foreign_equity_investment', 'number_new_jobs', 'gross_value_added'),
+        (
+            'investment_type',
+            'sector',
+            'business_activities',
+            'multiplier_value',
+            'foreign_equity_investment',
+            'number_new_jobs',
+            'gross_value_added',
+        ),
         [
             (
                 InvestmentTypeConstant.fdi.value.id,
@@ -165,8 +173,8 @@ class TestRefreshGrossValueAddedCommand:
             assert project.gross_value_added == Decimal(gross_value_added)
 
         assert any(
-            'Task refresh_gross_value_added_value_for_fdi_investment_projects completed'
-            in message for message in caplog.messages
+            'Task refresh_gross_value_added_value_for_fdi_investment_projects completed' in message
+            for message in caplog.messages
         )
 
     def test_schedule_refresh_gross_value_added_value_for_fdi_investment_projects(
@@ -179,8 +187,8 @@ class TestRefreshGrossValueAddedCommand:
         self._run_command()
 
         assert any(
-            'schedule_refresh_gross_value_added_value_for_fdi_investment_projects'
-            in message for message in caplog.messages
+            'schedule_refresh_gross_value_added_value_for_fdi_investment_projects' in message
+            for message in caplog.messages
         )
 
     def _run_command(self):

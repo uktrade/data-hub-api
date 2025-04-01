@@ -29,9 +29,7 @@ MODELS_TO_REGISTER_READ_ONLY = (
     models.SectorCluster,
 )
 
-MODELS_TO_REGISTER_EDITABLE_ORDER_ONLY = (
-    models.HeadquarterType,
-)
+MODELS_TO_REGISTER_EDITABLE_ORDER_ONLY = (models.HeadquarterType,)
 
 
 @admin.register(*MODELS_TO_REGISTER_DISABLEABLE)

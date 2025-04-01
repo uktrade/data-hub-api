@@ -43,8 +43,7 @@ class Command(BaseCommand):
     """
 
     def add_arguments(self, parser):
-        """Set arguments for the management command.
-        """
+        """Set arguments for the management command."""
         parser.add_argument(
             '--one-list-tier-ids',
             nargs='+',
@@ -59,8 +58,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        """Run the query and output the results as an info message to the log file.
-        """
+        """Run the query and output the results as an info message to the log file."""
         one_list_tier_ids = options['one_list_tier_ids']
         account_manager_ids = options.get('account_manager_ids') or []
         ids = _get_company_ids(one_list_tier_ids, account_manager_ids)

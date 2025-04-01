@@ -59,7 +59,8 @@ class HourlyRate(BaseConstantModel):
         help_text='Rate in pence. E.g. 1 pound should be stored as 100 (100 pence).',
     )
     vat_value = models.DecimalField(
-        max_digits=5, decimal_places=2,
+        max_digits=5,
+        decimal_places=2,
         help_text='VAT to apply as percentage value (0.00 to 100.00).',
         validators=[
             MinValueValidator(0),
@@ -118,7 +119,9 @@ class Order(BaseModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     reference = models.CharField(max_length=100)
     public_token = models.CharField(
-        max_length=100, unique=True, help_text='Used for public facing access.',
+        max_length=100,
+        unique=True,
+        help_text='Used for public facing access.',
     )
 
     status = models.CharField(
@@ -147,13 +150,15 @@ class Order(BaseModel):
     sector = TreeForeignKey(
         Sector,
         related_name='+',
-        null=True, blank=True,
+        null=True,
+        blank=True,
         on_delete=models.SET_NULL,
     )
     uk_region = models.ForeignKey(
         UKRegion,
         related_name='%(class)ss',
-        null=True, blank=True,
+        null=True,
+        blank=True,
         on_delete=models.SET_NULL,
     )
 
@@ -183,13 +188,15 @@ class Order(BaseModel):
 
     quote = models.OneToOneField(
         Quote,
-        null=True, blank=True,
+        null=True,
+        blank=True,
         on_delete=models.SET_NULL,
     )
 
     invoice = models.OneToOneField(
         Invoice,
-        null=True, blank=True,
+        null=True,
+        blank=True,
         on_delete=models.SET_NULL,
     )
 
@@ -209,16 +216,20 @@ class Order(BaseModel):
     vat_verified = models.BooleanField(null=True)
 
     net_cost = models.PositiveIntegerField(
-        default=0, help_text='Total hours * hourly rate in pence.',
+        default=0,
+        help_text='Total hours * hourly rate in pence.',
     )
     subtotal_cost = models.PositiveIntegerField(
-        default=0, help_text='Net cost - discount value in pence.',
+        default=0,
+        help_text='Net cost - discount value in pence.',
     )
     vat_cost = models.PositiveIntegerField(
-        default=0, help_text='VAT amount of subtotal in pence.',
+        default=0,
+        help_text='VAT amount of subtotal in pence.',
     )
     total_cost = models.PositiveIntegerField(
-        default=0, help_text='Subtotal + VAT cost in pence.',
+        default=0,
+        help_text='Subtotal + VAT cost in pence.',
     )
 
     billing_company_name = models.CharField(max_length=MAX_LENGTH, blank=True)
@@ -240,7 +251,8 @@ class Order(BaseModel):
     completed_on = models.DateTimeField(null=True, blank=True)
     completed_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        null=True, blank=True,
+        null=True,
+        blank=True,
         on_delete=models.SET_NULL,
         related_name='+',
     )
@@ -248,57 +260,70 @@ class Order(BaseModel):
     cancelled_on = models.DateTimeField(null=True, blank=True)
     cancelled_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        null=True, blank=True,
+        null=True,
+        blank=True,
         on_delete=models.SET_NULL,
         related_name='+',
     )
     cancellation_reason = models.ForeignKey(
         CancellationReason,
-        null=True, blank=True,
+        null=True,
+        blank=True,
         on_delete=models.SET_NULL,
         related_name='+',
     )
 
     # legacy fields, only meant to be used in readonly mode as reference
     product_info = models.TextField(
-        blank=True, editable=False,
+        blank=True,
+        editable=False,
         help_text='Legacy field. What is the product?',
     )
     permission_to_approach_contacts = models.TextField(
-        blank=True, editable=False,
+        blank=True,
+        editable=False,
         help_text='Legacy field. Can DIT speak to the contacts?',
     )
     archived_documents_url_path = models.CharField(
-        max_length=MAX_LENGTH, blank=True, editable=False,
+        max_length=MAX_LENGTH,
+        blank=True,
+        editable=False,
         help_text='Legacy field. Link to the archived documents for this order.',
     )
     billing_contact_name = models.CharField(
-        max_length=MAX_LENGTH, blank=True, editable=False,
+        max_length=MAX_LENGTH,
+        blank=True,
+        editable=False,
         help_text='Legacy field. Billing contact name.',
     )
     billing_email = models.EmailField(
-        max_length=MAX_LENGTH, blank=True, editable=False,
+        max_length=MAX_LENGTH,
+        blank=True,
+        editable=False,
         help_text='Legacy field. Billing email address.',
     )
     billing_phone = models.CharField(
-        max_length=150, blank=True, editable=False,
+        max_length=150,
+        blank=True,
+        editable=False,
         help_text='Legacy field. Billing phone number.',
     )
     contact_email = models.EmailField(
-        blank=True, editable=False,
+        blank=True,
+        editable=False,
         help_text='Legacy field. Contact email specified for this order.',
     )
     contact_phone = models.CharField(
-        max_length=254, blank=True, editable=False,
+        max_length=254,
+        blank=True,
+        editable=False,
         help_text='Legacy field. Contact phone number specified for this order.',
     )
 
     objects = OrderQuerySet.as_manager()
 
     class Meta:
-        permissions = (
-            ('export_order', 'Can export order'),
-        )
+        permissions = (('export_order', 'Can export order'),)
         indexes = [
             # For activity stream
             models.Index(fields=('modified_on', 'id')),
@@ -313,8 +338,7 @@ class Order(BaseModel):
         return get_front_end_url(self)
 
     def get_current_contact_email(self):
-        """:returns: the most up-to-date email address for the contact
-        """
+        """:returns: the most up-to-date email address for the contact"""
         return self.contact_email or self.contact.email
 
     @classmethod
@@ -323,6 +347,7 @@ class Order(BaseModel):
             <(3) letters><(3) numbers>/<year> e.g. GEA962/16
         :raises RuntimeError: if no reference can be generated
         """
+
         def gen():
             year_suffix = now().strftime('%y')
             return '{letters}{numbers}/{year}'.format(
@@ -343,8 +368,7 @@ class Order(BaseModel):
         return generate_reference(model=cls, gen=gen, field='public_token')
 
     def save(self, *args, **kwargs):
-        """Like the django save but it creates a reference and a public token if needed.
-        """
+        """Like the django save but it creates a reference and a public token if needed."""
         if not self.reference:
             self.reference = self.generate_reference()
         if not self.public_token:
@@ -364,8 +388,7 @@ class Order(BaseModel):
             )
 
     def get_lead_assignee(self):
-        """:returns: lead OrderAssignee for this order is it exists, None otherwise
-        """
+        """:returns: lead OrderAssignee for this order is it exists, None otherwise"""
         return self.assignees.filter(is_lead=True).first()
 
     def get_datahub_frontend_url(self):
@@ -457,9 +480,7 @@ class Order(BaseModel):
         """
         for validator in [
             validators.OrderInStatusSubValidator(
-                allowed_statuses=(
-                    OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
-                ),
+                allowed_statuses=(OrderStatus.QUOTE_AWAITING_ACCEPTANCE,),
             ),
         ]:
             validator(order=self)
@@ -497,9 +518,7 @@ class Order(BaseModel):
         """
         for order_validator in [
             validators.OrderInStatusSubValidator(
-                allowed_statuses=(
-                    OrderStatus.QUOTE_ACCEPTED,
-                ),
+                allowed_statuses=(OrderStatus.QUOTE_ACCEPTED,),
             ),
         ]:
             order_validator(order=self)
@@ -526,9 +545,7 @@ class Order(BaseModel):
         """
         for order_validator in [
             validators.OrderInStatusSubValidator(
-                allowed_statuses=(
-                    OrderStatus.PAID,
-                ),
+                allowed_statuses=(OrderStatus.PAID,),
             ),
         ]:
             order_validator(order=self)
@@ -567,22 +584,23 @@ class Order(BaseModel):
 
 
 class OrderSubscriber(BaseModel):
-    """A subscribed adviser receives notifications when new changes happen to an Order.
-    """
+    """A subscribed adviser receives notifications when new changes happen to an Order."""
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     order = models.ForeignKey(
-        Order, on_delete=models.CASCADE, related_name='subscribers',
+        Order,
+        on_delete=models.CASCADE,
+        related_name='subscribers',
     )
     adviser = models.ForeignKey(
-        Advisor, on_delete=models.CASCADE, related_name='+',
+        Advisor,
+        on_delete=models.CASCADE,
+        related_name='+',
     )
 
     class Meta:
         ordering = ['created_on']
-        unique_together = (
-            ('order', 'adviser'),
-        )
+        unique_together = (('order', 'adviser'),)
 
     def __str__(self):
         """Human-readable representation."""
@@ -590,8 +608,7 @@ class OrderSubscriber(BaseModel):
 
 
 class OrderAssignee(BaseModel):
-    """An adviser assigned to an Order and responsible for deliverying the final report(s).
-    """
+    """An adviser assigned to an Order and responsible for deliverying the final report(s)."""
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
 
@@ -606,7 +623,8 @@ class OrderAssignee(BaseModel):
         help_text='Estimated time in minutes.',
     )
     actual_time = models.IntegerField(
-        blank=True, null=True,
+        blank=True,
+        null=True,
         validators=(MinValueValidator(0),),
         help_text='Actual time in minutes.',
     )
@@ -614,21 +632,17 @@ class OrderAssignee(BaseModel):
 
     class Meta:
         ordering = ['created_on']
-        unique_together = (
-            ('order', 'adviser'),
-        )
+        unique_together = (('order', 'adviser'),)
 
     def __init__(self, *args, **kwargs):
-        """Keep the original adviser value so that we can see if it changes when saving.
-        """
+        """Keep the original adviser value so that we can see if it changes when saving."""
         super().__init__(*args, **kwargs)
         self.__adviser = self.adviser
 
     def __str__(self):
         """Human-readable representation."""
         return (
-            f'{"" if self.is_lead else "Not "}Lead Assignee '
-            f'{self.adviser} for order {self.order}'
+            f'{"" if self.is_lead else "Not "}Lead Assignee {self.adviser} for order {self.order}'
         )
 
     def save(self, *args, **kwargs):

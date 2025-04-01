@@ -28,7 +28,6 @@ class DocumentFactory(factory.django.DjangoModelFactory):
 
 
 class SharePointDocumentFactory(factory.django.DjangoModelFactory):
-
     title = factory.Faker('text', max_nb_chars=20)
     url = factory.Faker('url')
     created_by = factory.SubFactory(AdviserFactory)

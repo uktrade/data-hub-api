@@ -83,8 +83,7 @@ class Task(ArchivableModel, BaseModel):
         return get_front_end_url(self)
 
     def get_company(self):
-        """Get the company from the available foreign keys.
-        """
+        """Get the company from the available foreign keys."""
         if self.investment_project:
             return self.investment_project.investor_company
         if self.company:

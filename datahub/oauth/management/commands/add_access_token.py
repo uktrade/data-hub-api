@@ -28,7 +28,7 @@ class Command(BaseCommand):
             '--token',
             type=str,
             help='If specified, a token will not be randomly generated and the specified value '
-                 'will be used instead.',
+            'will be used instead.',
         )
 
     def handle(self, *args, **options):

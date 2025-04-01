@@ -77,8 +77,7 @@ def mock_job_scheduler(monkeypatch):
 
 @pytest.fixture
 def mock_notify_adviser_by_rq_email(monkeypatch):
-    """Mocks the notify_adviser_by_rq_email function.
-    """
+    """Mocks the notify_adviser_by_rq_email function."""
     mock_notify_adviser_by_rq_email = mock.Mock()
     monkeypatch.setattr(
         'datahub.task.tasks.notify_adviser_by_rq_email',
@@ -89,8 +88,7 @@ def mock_notify_adviser_by_rq_email(monkeypatch):
 
 @pytest.fixture
 def mock_logger(monkeypatch):
-    """Returns a mock logger client instance.
-    """
+    """Returns a mock logger client instance."""
     mock_logger = mock.Mock()
     monkeypatch.setattr(
         'datahub.reminder.tasks.logger',
@@ -423,8 +421,7 @@ class TestTaskReminders:
     def test_update_task_reminder_email_status(
         self,
     ):
-        """Test it updates reminder data with the connected email notification information.
-        """
+        """Test it updates reminder data with the connected email notification information."""
         task = TaskFactory()
         reminder_number = 3
         notification_id = str(uuid4())
@@ -663,8 +660,7 @@ class TestTasksAssignedToMeFromOthers:
     def test_task_assigned_to_me_from_others_reminder_email_status(
         self,
     ):
-        """Test it updates reminder data with the connected email notification information.
-        """
+        """Test it updates reminder data with the connected email notification information."""
         task = TaskFactory()
         reminder_number = 3
         notification_id = str(uuid4())
@@ -689,8 +685,7 @@ class TestTasksAssignedToMeFromOthers:
     def test_update_task_deleted_email_status(
         self,
     ):
-        """Test it updates reminder data with the connected email notification information.
-        """
+        """Test it updates reminder data with the connected email notification information."""
         task = TaskFactory()
         reminder_number = 3
         notification_id = str(uuid4())
@@ -1448,8 +1443,7 @@ class TestTasksOverdue:
     def test_update_task_reminder_email_status(
         self,
     ):
-        """Test it updates reminder data with the connected email notification information.
-        """
+        """Test it updates reminder data with the connected email notification information."""
         task1 = TaskFactory()
         reminder_number = 3
         notification_id = str(uuid4())

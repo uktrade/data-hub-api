@@ -93,8 +93,13 @@ MARKETING_FIELDS = [
     'marketing_hashed_uuid',
 ]
 
-ALL_FIELDS = ARCHIVABLE_FIELDS + INVESTMENT_LEAD_BASE_FIELDS + \
-    TRIAGE_FIELDS + USER_FIELDS + MARKETING_FIELDS
+ALL_FIELDS = (
+    ARCHIVABLE_FIELDS
+    + INVESTMENT_LEAD_BASE_FIELDS
+    + TRIAGE_FIELDS
+    + USER_FIELDS
+    + MARKETING_FIELDS
+)
 
 
 class BaseEYBLeadSerializer(serializers.ModelSerializer):
@@ -178,36 +183,64 @@ class CreateEYBLeadTriageSerializer(BaseEYBLeadSerializer):
     modified = serializers.DateTimeField(source='triage_modified', required=True)
     sector = serializers.CharField(required=True)
     sectorSub = serializers.CharField(  # noqa: N815
-        read_only=True, required=False, allow_null=True,
+        read_only=True,
+        required=False,
+        allow_null=True,
     )
     sectorSubSub = serializers.CharField(  # noqa: N815
-        read_only=True, required=False, allow_null=True,
+        read_only=True,
+        required=False,
+        allow_null=True,
     )
     intent = serializers.ListField(required=False, allow_null=True, allow_empty=True, default=list)
     intentOther = serializers.CharField(  # noqa: N815
-        source='intent_other', required=False, allow_null=True, allow_blank=True, default='',
+        source='intent_other',
+        required=False,
+        allow_null=True,
+        allow_blank=True,
+        default='',
     )
     location = serializers.CharField(
-        source='proposed_investment_region', required=False, allow_null=True, allow_blank=True,
+        source='proposed_investment_region',
+        required=False,
+        allow_null=True,
+        allow_blank=True,
     )
     locationCity = serializers.CharField(  # noqa: N815
         source='proposed_investment_city',
-        required=False, allow_null=True, allow_blank=True, default='',
+        required=False,
+        allow_null=True,
+        allow_blank=True,
+        default='',
     )
     locationNone = serializers.BooleanField(  # noqa: N815
-        source='proposed_investment_location_none', required=False, allow_null=True,
+        source='proposed_investment_location_none',
+        required=False,
+        allow_null=True,
     )
     hiring = serializers.CharField(
-        required=False, allow_null=True, allow_blank=True, default='',
+        required=False,
+        allow_null=True,
+        allow_blank=True,
+        default='',
     )
     spend = serializers.CharField(
-        required=False, allow_null=True, allow_blank=True, default='',
+        required=False,
+        allow_null=True,
+        allow_blank=True,
+        default='',
     )
     spendOther = serializers.CharField(  # noqa: N815
-        source='spend_other', required=False, allow_null=True, allow_blank=True, default='',
+        source='spend_other',
+        required=False,
+        allow_null=True,
+        allow_blank=True,
+        default='',
     )
     isHighValue = serializers.BooleanField(  # noqa: N815
-        source='is_high_value', required=False, allow_null=True,
+        source='is_high_value',
+        required=False,
+        allow_null=True,
     )
 
     def validate_location(self, value):
@@ -290,14 +323,16 @@ class CreateEYBLeadTriageSerializer(BaseEYBLeadSerializer):
 
     def get_related_fields_representation(self, instance):
         """Provides related fields in a representation-friendly format."""
-        level_zero_segment, level_one_segment, level_two_segment = \
+        level_zero_segment, level_one_segment, level_two_segment = (
             Sector.get_segments_from_sector_instance(instance.sector)
+        )
         return {
             'sector': level_zero_segment,
             'sectorSub': level_one_segment,
             'sectorSubSub': level_two_segment,
             'location': instance.proposed_investment_region.name
-            if instance.proposed_investment_region else None,
+            if instance.proposed_investment_region
+            else None,
         }
 
 
@@ -351,36 +386,69 @@ class CreateEYBLeadUserSerializer(BaseEYBLeadSerializer):
     modified = serializers.DateTimeField(source='user_modified', required=True)
     companyName = serializers.CharField(source='company_name', required=True)  # noqa: N815
     dunsNumber = serializers.CharField(  # noqa: N815
-        source='duns_number', required=False, allow_null=True, allow_blank=True, default=None,
+        source='duns_number',
+        required=False,
+        allow_null=True,
+        allow_blank=True,
+        default=None,
     )
     addressLine1 = serializers.CharField(source='address_1', required=True)  # noqa: N815
     addressLine2 = serializers.CharField(  # noqa: N815
-        source='address_2', required=False, allow_null=True, allow_blank=True, default='',
+        source='address_2',
+        required=False,
+        allow_null=True,
+        allow_blank=True,
+        default='',
     )
     town = serializers.CharField(source='address_town', required=True)
     county = serializers.CharField(
-        source='address_county', required=False, allow_null=True, allow_blank=True, default='',
+        source='address_county',
+        required=False,
+        allow_null=True,
+        allow_blank=True,
+        default='',
     )
     companyLocation = serializers.CharField(source='address_country', required=True)  # noqa: N815
     postcode = serializers.CharField(
-        source='address_postcode', required=False, allow_null=True, allow_blank=True, default='',
+        source='address_postcode',
+        required=False,
+        allow_null=True,
+        allow_blank=True,
+        default='',
     )
     companyWebsite = serializers.CharField(  # noqa: N815
-        source='company_website', required=False, allow_null=True, allow_blank=True, default='',
+        source='company_website',
+        required=False,
+        allow_null=True,
+        allow_blank=True,
+        default='',
     )
     fullName = serializers.CharField(  # noqa: N815
-        source='full_name', allow_null=True, allow_blank=True, default=NOT_SET,
+        source='full_name',
+        allow_null=True,
+        allow_blank=True,
+        default=NOT_SET,
     )
     role = serializers.CharField(required=False, allow_null=True, allow_blank=True, default='')
     email = serializers.CharField(required=True)
     telephoneNumber = serializers.CharField(  # noqa: N815
-        source='telephone_number', required=False, allow_null=True, allow_blank=True, default='',
+        source='telephone_number',
+        required=False,
+        allow_null=True,
+        allow_blank=True,
+        default='',
     )
     agreeTerms = serializers.BooleanField(  # noqa: N815
-        source='agree_terms', required=False, allow_null=True, default=None,
+        source='agree_terms',
+        required=False,
+        allow_null=True,
+        default=None,
     )
     agreeInfoEmail = serializers.BooleanField(  # noqa: N815
-        source='agree_info_email', required=False, allow_null=True, default=None,
+        source='agree_info_email',
+        required=False,
+        allow_null=True,
+        default=None,
     )
     landingTimeframe = serializers.CharField(  # noqa: N815
         source='landing_timeframe',
@@ -445,7 +513,8 @@ class CreateEYBLeadUserSerializer(BaseEYBLeadSerializer):
         """Provides related fields in a representation-friendly format."""
         return {
             'companyLocation': instance.address_country.iso_alpha2_code
-            if instance.address_country else None,
+            if instance.address_country
+            else None,
         }
 
 
@@ -460,16 +529,32 @@ class CreateEYBLeadMarketingSerializer(BaseEYBLeadSerializer):
         ]
 
     name = serializers.CharField(
-        source='utm_name', required=False, allow_null=True, allow_blank=True, default='',
+        source='utm_name',
+        required=False,
+        allow_null=True,
+        allow_blank=True,
+        default='',
     )
     medium = serializers.CharField(
-        source='utm_medium', required=False, allow_null=True, allow_blank=True, default='',
+        source='utm_medium',
+        required=False,
+        allow_null=True,
+        allow_blank=True,
+        default='',
     )
     source = serializers.CharField(
-        source='utm_source', required=False, allow_null=True, allow_blank=True, default='',
+        source='utm_source',
+        required=False,
+        allow_null=True,
+        allow_blank=True,
+        default='',
     )
     content = serializers.CharField(
-        source='utm_content', required=False, allow_null=True, allow_blank=True, default='',
+        source='utm_content',
+        required=False,
+        allow_null=True,
+        allow_blank=True,
+        default='',
     )
     hashed_uuid = serializers.CharField(source='marketing_hashed_uuid', required=True)
 
@@ -493,12 +578,12 @@ class CreateEYBLeadMarketingSerializer(BaseEYBLeadSerializer):
 
 
 class RetrieveEYBLeadSerializer(BaseEYBLeadSerializer):
-
     class Meta(BaseEYBLeadSerializer.Meta):
-        fields = [
-            f for f in ALL_FIELDS
-            if f not in ADDRESS_FIELDS
-        ] + ['address', 'investment_projects', 'audit_log']
+        fields = [f for f in ALL_FIELDS if f not in ADDRESS_FIELDS] + [
+            'address',
+            'investment_projects',
+            'audit_log',
+        ]
 
     sector = NestedRelatedField(Sector)
     proposed_investment_region = NestedRelatedField(UKRegion)

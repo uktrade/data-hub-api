@@ -31,7 +31,7 @@ class Command(CSVBaseCommand):
         :param old_sector: instance of Company or None
         :return: True if investment project needs to be updated
         """
-        return (investment_project.sector == old_sector)
+        return investment_project.sector == old_sector
 
     def _process_row(self, row, simulate=False, **options):
         """Process one single row."""
@@ -48,8 +48,6 @@ class Command(CSVBaseCommand):
             if not simulate:
                 with reversion.create_revision():
                     investment_project.save(
-                        update_fields=(
-                            'sector',
-                        ),
+                        update_fields=('sector',),
                     )
                     reversion.set_comment('Sector migration.')

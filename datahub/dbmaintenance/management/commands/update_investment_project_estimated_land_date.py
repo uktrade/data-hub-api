@@ -21,8 +21,10 @@ class Command(CSVBaseCommand):
         allow_blank_estimated_land_date = parse_bool(row['allow_blank_estimated_land_date'])
         estimated_land_date = parse_date(row['estimated_land_date'])
 
-        if (investment_project.allow_blank_estimated_land_date == allow_blank_estimated_land_date
-                and investment_project.estimated_land_date == estimated_land_date):
+        if (
+            investment_project.allow_blank_estimated_land_date == allow_blank_estimated_land_date
+            and investment_project.estimated_land_date == estimated_land_date
+        ):
             return
 
         investment_project.allow_blank_estimated_land_date = allow_blank_estimated_land_date

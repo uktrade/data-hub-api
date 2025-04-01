@@ -112,8 +112,7 @@ def test_view_name_generation():
 
 
 def test_ordered_metadata_order_view(ordered_mapping, metadata_client):
-    """Test that views with BaseOrderedConstantModel are ordered by the `order` field.
-    """
+    """Test that views with BaseOrderedConstantModel are ordered by the `order` field."""
     metadata_view_name, queryset = ordered_mapping
 
     url = reverse(viewname=metadata_view_name)
@@ -121,9 +120,7 @@ def test_ordered_metadata_order_view(ordered_mapping, metadata_client):
 
     assert response.status_code == status.HTTP_200_OK
     response_names = [value['name'] for value in response.json()]
-    assert response_names == [
-        obj.name for obj in queryset.order_by('order')
-    ]
+    assert response_names == [obj.name for obj in queryset.order_by('order')]
 
 
 def test_administrative_area_view(metadata_client):
@@ -150,9 +147,13 @@ def test_administrative_area_view(metadata_client):
 def test_administrative_area_by_country_view(metadata_client):
     """Test that the administrative area view is filtered by country."""
     usa = Country.objects.get(id='81756b9a-5d95-e211-a939-e4115bead28a')
-    administrative_area = AdministrativeArea.objects.filter(
-        country=usa,
-    ).order_by('name').first()
+    administrative_area = (
+        AdministrativeArea.objects.filter(
+            country=usa,
+        )
+        .order_by('name')
+        .first()
+    )
 
     url = reverse(viewname='api-v4:metadata:administrative-area')
     response = metadata_client.get(url, params={'country': usa.id})
@@ -175,19 +176,22 @@ def test_administrative_area_by_country_view(metadata_client):
 
 def test_country_view(metadata_client):
     """Test that the country view includes the country field."""
-    country = Country.objects.filter(
-        overseas_region__isnull=False,
-    ).order_by(
-        'name',
-    ).first()
+    country = (
+        Country.objects.filter(
+            overseas_region__isnull=False,
+        )
+        .order_by(
+            'name',
+        )
+        .first()
+    )
 
     url = reverse(viewname='api-v4:metadata:country')
     response = metadata_client.get(url)
 
     assert response.status_code == status.HTTP_200_OK
     first_result_with_overseas_region = next(
-        result for result in response.json()
-        if result['overseas_region'] is not None
+        result for result in response.json() if result['overseas_region'] is not None
     )
     assert first_result_with_overseas_region == {
         'id': str(country.pk),
@@ -204,9 +208,12 @@ def test_country_view(metadata_client):
 def test_country_is_export_win_view(metadata_client):
     """Test that the country view can be filtered by is_export_win."""
     url = reverse(viewname='api-v4:metadata:country')
-    response = metadata_client.get(url, params={
-        'is_export_win': True,
-    })
+    response = metadata_client.get(
+        url,
+        params={
+            'is_export_win': True,
+        },
+    )
 
     assert response.status_code == status.HTTP_200_OK
     country_ids = [result['id'] for result in response.json()]
@@ -238,8 +245,7 @@ def test_team_view(metadata_client):
     }
 
     disabled_team = next(
-        team for team in teams
-        if team['name'] == 'Business Information Centre Bhopal India'
+        team for team in teams if team['name'] == 'Business Information Centre Bhopal India'
     )
     assert disabled_team == {
         'id': 'ff8333c8-9698-e211-a939-e4115bead28a',
@@ -258,17 +264,18 @@ def test_team_view(metadata_client):
 
 
 def test_exchange_rate_view(metadata_client):
-    """Tests exchange rate returns from_currency_code, to_currency_code, exchange_rate & created_on.
-    """
+    """Tests exchange rate returns from_currency_code, to_currency_code, exchange_rate & created_on."""
     url = reverse(viewname='api-v4:metadata:exchange-rate')
     exchange_rate = ExchangeRate.objects.first()
     response = metadata_client.get(url)
-    assert response.json() == [{
-        'from_currency_code': exchange_rate.from_currency_code,
-        'to_currency_code': exchange_rate.to_currency_code,
-        'exchange_rate': exchange_rate.exchange_rate,
-        'created_on': format_date_or_datetime(exchange_rate.created_on),
-    }]
+    assert response.json() == [
+        {
+            'from_currency_code': exchange_rate.from_currency_code,
+            'to_currency_code': exchange_rate.to_currency_code,
+            'exchange_rate': exchange_rate.exchange_rate,
+            'created_on': format_date_or_datetime(exchange_rate.created_on),
+        },
+    ]
 
 
 def test_autocomplete_teams_view(metadata_client):
@@ -389,7 +396,9 @@ class TestServiceView:
                     'name': question.name,
                     'disabled_on': format_date_or_datetime(
                         question.disabled_on,
-                    ) if question.disabled_on else None,
+                    )
+                    if question.disabled_on
+                    else None,
                     'answer_options': [
                         {
                             'id': str(answer_option.id),
@@ -398,9 +407,11 @@ class TestServiceView:
                                 answer_option,
                                 'disabled_on',
                             ),
-                        } for answer_option in question.answer_options.all()
+                        }
+                        for answer_option in question.answer_options.all()
                     ],
-                } for question in db_service.interaction_questions.all()
+                }
+                for question in db_service.interaction_questions.all()
             ],
         }
 
@@ -409,8 +420,7 @@ class TestSectorView:
     """Tests for the /v4/metadata/sector/ view."""
 
     def test_list(self, metadata_client):
-        """Test listing sectors.
-        """
+        """Test listing sectors."""
         url = reverse(viewname='api-v4:metadata:sector')
         response = metadata_client.get(url)
         sector = Sector.objects.order_by('tree_id', 'lft')[0]
@@ -426,7 +436,9 @@ class TestSectorView:
             'parent': {
                 'id': str(sector.parent.pk),
                 'name': sector.parent.name,
-            } if sector.parent else None,
+            }
+            if sector.parent
+            else None,
             'disabled_on': disabled_on,
         }
 

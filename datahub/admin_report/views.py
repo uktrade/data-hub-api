@@ -1,5 +1,3 @@
-
-
 from django.contrib.admin import site
 from django.http import Http404
 from django.template.response import TemplateResponse

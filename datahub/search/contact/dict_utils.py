@@ -3,6 +3,7 @@ from datahub.search import dict_utils
 
 def computed_address_field(field):
     """Gets Contact address from Company if address_same_as_company."""
+
     def get_field(contact):
         obj = contact.company if contact.address_same_as_company else contact
         value = getattr(obj, field, None)

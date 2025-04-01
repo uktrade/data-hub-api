@@ -154,8 +154,7 @@ class BaseEditTaskTests(BaseTaskTests):
         self._call_task_endpoint_assert_response(adviser, task, data, status.HTTP_200_OK)
 
     def _call_task_endpoint_assert_response(self, adviser, task, data, status_code):
-        """Call the task endpoint and check the response is expected.
-        """
+        """Call the task endpoint and check the response is expected."""
         id = task.id
 
         if self.task_type_factory:

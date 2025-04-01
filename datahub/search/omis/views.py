@@ -102,22 +102,27 @@ class SearchOrderExportAPIView(SearchOrderAPIViewMixin, SearchExportAPIView):
         subtotal_in_pounds=Cast(
             'subtotal_cost',
             DecimalField(max_digits=19, decimal_places=2),
-        ) / 100,
+        )
+        / 100,
         # This follows the example from
         # https://docs.djangoproject.com/en/2.1/ref/models/expressions/#using-aggregates-within-a-subquery-expression
         net_refund_in_pounds=Subquery(
             Refund.objects.filter(
                 order=OuterRef('pk'),
                 status=RefundStatus.APPROVED,
-            ).order_by(
-            ).values(
+            )
+            .order_by()
+            .values(
                 'order',
-            ).annotate(
+            )
+            .annotate(
                 total_refund=Cast(
                     Sum('net_amount'),
                     DecimalField(max_digits=19, decimal_places=2),
-                ) / 100,
-            ).values(
+                )
+                / 100,
+            )
+            .values(
                 'total_refund',
             ),
             output_field=DecimalField(max_digits=19, decimal_places=2),

@@ -102,7 +102,9 @@ def test_non_existent_company(s3_stubber, caplog):
     assert len(caplog.records) == 1
 
     assert [company.sector for company in companies] == [
-        new_sectors[0], new_sectors[1], old_sectors[2],
+        new_sectors[0],
+        new_sectors[1],
+        old_sectors[2],
     ]
 
 
@@ -153,7 +155,9 @@ def test_non_existent_sector(s3_stubber, caplog):
     assert len(caplog.records) == 1
 
     assert [company.sector for company in companies] == [
-        new_sectors[0], new_sectors[1], old_sectors[2],
+        new_sectors[0],
+        new_sectors[1],
+        old_sectors[2],
     ]
 
 
@@ -207,7 +211,9 @@ def test_no_change(s3_stubber, caplog):
     assert len(caplog.records) == 2
 
     assert [company.sector for company in companies] == [
-        new_sectors[0], old_sectors[1], old_sectors[2],
+        new_sectors[0],
+        old_sectors[1],
+        old_sectors[2],
     ]
 
 

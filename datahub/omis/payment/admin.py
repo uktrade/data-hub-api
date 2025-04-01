@@ -60,9 +60,7 @@ class RefundForm(forms.ModelForm):
         # set up the status field
         refund_status = self.instance.status or RefundStatus.APPROVED
 
-        self.fields['status'].choices = (
-            (refund_status, RefundStatus(refund_status).label),
-        )
+        self.fields['status'].choices = ((refund_status, RefundStatus(refund_status).label),)
 
         # set up mandatory fields when status == approved
         if refund_status == RefundStatus.APPROVED:
@@ -93,7 +91,8 @@ class RefundForm(forms.ModelForm):
                     _('Please specify a value greater than or equal to %(compared_value)s.'),
                     params={
                         'compared_value': date_formatter(
-                            compared_value, settings.DATETIME_FORMAT,
+                            compared_value,
+                            settings.DATETIME_FORMAT,
                         ),
                     },
                     code='invalid_date',
@@ -187,9 +186,7 @@ class RefundAdmin(BaseModelAdminMixin, admin.ModelAdmin):
         'status',
         'requested_on',
     )
-    list_filter = (
-        'status',
-    )
+    list_filter = ('status',)
     raw_id_fields = (
         'order',
         'requested_by',
@@ -203,9 +200,7 @@ class RefundAdmin(BaseModelAdminMixin, admin.ModelAdmin):
         'modified',
         'total_amount',
     )
-    list_select_related = (
-        'order',
-    )
+    list_select_related = ('order',)
 
     def save_model(self, request, obj, form, change):
         """Populate total_amount from other fields."""

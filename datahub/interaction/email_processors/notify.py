@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_domain_label(domain):
-    """"." is not a valid character in a prometheus label and the recommended
+    """`.` is not a valid character in a prometheus label and the recommended
     practice is to replace it with an "_".
     """
     return domain.replace('.', '_')
@@ -25,8 +25,7 @@ def notify_meeting_ingest_failure(adviser, errors, recipients):
     logger.info(f'rq.calendar-invite-ingest.failure.{domain_label}')
     if not is_feature_flag_active(MAILBOX_NOTIFICATION_FEATURE_FLAG_NAME):
         logger.info(
-            f'Feature flag "{MAILBOX_NOTIFICATION_FEATURE_FLAG_NAME}" is not active, '
-            'exiting.',
+            f'Feature flag "{MAILBOX_NOTIFICATION_FEATURE_FLAG_NAME}" is not active, exiting.',
         )
         return
 
@@ -51,8 +50,7 @@ def notify_meeting_ingest_success(adviser, interaction, recipients):
     logger.info(f'rq.calendar-invite-ingest.success.{domain_label}')
     if not is_feature_flag_active(MAILBOX_NOTIFICATION_FEATURE_FLAG_NAME):
         logger.info(
-            f'Feature flag "{MAILBOX_NOTIFICATION_FEATURE_FLAG_NAME}" is not active, '
-            'exiting.',
+            f'Feature flag "{MAILBOX_NOTIFICATION_FEATURE_FLAG_NAME}" is not active, exiting.',
         )
         return
 

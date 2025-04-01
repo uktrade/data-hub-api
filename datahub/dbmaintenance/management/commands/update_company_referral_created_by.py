@@ -41,6 +41,8 @@ class Command(BaseCommand):
                 'Created by updated to new id.',
             )
 
-        self.stdout.write(self.style.SUCCESS(
-            f'Updated referral created_by for --{referral}-- to the id: {user}',
-        ))
+        self.stdout.write(
+            self.style.SUCCESS(
+                f'Updated referral created_by for --{referral}-- to the id: {user}',
+            ),
+        )

@@ -33,8 +33,8 @@ def test_large_capital_opportunity_activity(api_client):
         'summary': 'Large Capital Opportunity Activities Added',
         'type': 'OrderedCollectionPage',
         'next': 'http://testserver/v3/activity-stream/investment/large-capital-opportunity'
-                + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
-                + f'&cursor={str(opportunity.id)}',
+        + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
+        + f'&cursor={str(opportunity.id)}',
         'orderedItems': [
             {
                 'id': f'dit:DataHubLargeCapitalOpportunity:{opportunity.id}:Announce',
@@ -49,11 +49,9 @@ def test_large_capital_opportunity_activity(api_client):
                     'name': opportunity.name,
                     'attributedTo': [
                         {
-                            'id':
-                            f'dit:DataHubAdviser:{opportunity.lead_dit_relationship_manager.pk}',
+                            'id': f'dit:DataHubAdviser:{opportunity.lead_dit_relationship_manager.pk}',
                             'type': ['Person', 'dit:Adviser'],
-                            'dit:emailAddress':
-                            opportunity.lead_dit_relationship_manager.contact_email
+                            'dit:emailAddress': opportunity.lead_dit_relationship_manager.contact_email
                             or opportunity.adviser.email,
                             'name': opportunity.lead_dit_relationship_manager.name,
                         },
@@ -90,8 +88,8 @@ def test_complete_large_capital_opportunity_activity(api_client):
         'summary': 'Large Capital Opportunity Activities Added',
         'type': 'OrderedCollectionPage',
         'next': 'http://testserver/v3/activity-stream/investment/large-capital-opportunity'
-                + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
-                + f'&cursor={str(opportunity.id)}',
+        + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
+        + f'&cursor={str(opportunity.id)}',
         'orderedItems': [
             {
                 'id': f'dit:DataHubLargeCapitalOpportunity:{opportunity.id}:Announce',
@@ -111,8 +109,7 @@ def test_complete_large_capital_opportunity_activity(api_client):
                                 f'Adviser:{opportunity.lead_dit_relationship_manager.pk}'
                             ),
                             'type': ['Person', 'dit:Adviser'],
-                            'dit:emailAddress':
-                            opportunity.lead_dit_relationship_manager.contact_email
+                            'dit:emailAddress': opportunity.lead_dit_relationship_manager.contact_email
                             or opportunity.adviser.email,
                             'name': opportunity.lead_dit_relationship_manager.name,
                         },
@@ -158,10 +155,8 @@ def test_complete_large_capital_opportunity_activity(api_client):
                     'dit:requiredChecksConducted': {
                         'name': opportunity.required_checks_conducted.name,
                     },
-                    'dit:requiredChecksConductedId':
-                    opportunity.required_checks_conducted_id,
-                    'dit:requiredChecksConductedOn':
-                    opportunity.required_checks_conducted_on.strftime(
+                    'dit:requiredChecksConductedId': opportunity.required_checks_conducted_id,
+                    'dit:requiredChecksConductedOn': opportunity.required_checks_conducted_on.strftime(
                         '%Y-%m-%d',
                     ),
                     'dit:requiredChecksConductedBy': [
@@ -169,8 +164,7 @@ def test_complete_large_capital_opportunity_activity(api_client):
                             'id': 'dit:DataHubAdviser:'
                             f'{opportunity.required_checks_conducted_by.pk}',
                             'type': ['Person', 'dit:Adviser'],
-                            'dit:emailAddress':
-                            opportunity.required_checks_conducted_by.contact_email
+                            'dit:emailAddress': opportunity.required_checks_conducted_by.contact_email
                             or opportunity.required_checks_conducted_by.email,
                             'name': opportunity.required_checks_conducted_by.name,
                             'dit:team': {

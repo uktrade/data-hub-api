@@ -26,7 +26,8 @@ class TestIProjectTeamMemberListSerializer:
         project = InvestmentProjectFactory()
 
         team_members = InvestmentProjectTeamMemberFactory.create_batch(
-            2, investment_project=project,
+            2,
+            investment_project=project,
         )
 
         child_serializer = IProjectTeamMemberSerializer()
@@ -40,7 +41,9 @@ class TestIProjectTeamMemberListSerializer:
         project = InvestmentProjectFactory()
 
         team_members = InvestmentProjectTeamMemberFactory.create_batch(
-            2, investment_project=project, role='old role',
+            2,
+            investment_project=project,
+            role='old role',
         )
         adviser = AdviserFactory()
 
@@ -74,7 +77,9 @@ class TestIProjectTeamMemberListSerializer:
         project = InvestmentProjectFactory()
 
         team_members = InvestmentProjectTeamMemberFactory.create_batch(
-            2, investment_project=project, role='old role',
+            2,
+            investment_project=project,
+            role='old role',
         )
 
         new_team_member_data = [
@@ -164,9 +169,12 @@ class TestIProjectSerializer:
         }
         serializer = IProjectSerializer(project, data=project_data, partial=True)
         assert serializer.is_valid()
-        assert str(
-            serializer.validated_data['country_investment_originates_from'],
-        ) == constants.Country.argentina.value.name
+        assert (
+            str(
+                serializer.validated_data['country_investment_originates_from'],
+            )
+            == constants.Country.argentina.value.name
+        )
 
     def test_uk_company_address_fields(self):
         """Tests address fields are sent with UK company nested object."""
@@ -177,5 +185,7 @@ class TestIProjectSerializer:
         assert serializer.data['uk_company']['address_1'] == project.uk_company.address_1
         assert serializer.data['uk_company']['address_2'] == project.uk_company.address_2
         assert serializer.data['uk_company']['address_town'] == project.uk_company.address_town
-        assert serializer.data['uk_company']['address_postcode'] == \
-            project.uk_company.address_postcode
+        assert (
+            serializer.data['uk_company']['address_postcode']
+            == project.uk_company.address_postcode
+        )

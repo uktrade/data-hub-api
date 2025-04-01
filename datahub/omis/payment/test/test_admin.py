@@ -163,13 +163,11 @@ class TestRefundAdmin(AdminTestMixin):
                     ],
                 },
             ),
-
             # invalid order status
             (
                 {'order': lambda *_: OrderWithOpenQuoteFactory()},
                 {'order': ['This order has not been paid for.']},
             ),
-
             # requested on < order.paid_on
             (
                 {
@@ -185,7 +183,6 @@ class TestRefundAdmin(AdminTestMixin):
                     ],
                 },
             ),
-
             # level1 approved on < order.paid_on
             (
                 {
@@ -201,7 +198,6 @@ class TestRefundAdmin(AdminTestMixin):
                     ],
                 },
             ),
-
             # level2 approved on < order.paid_on
             (
                 {
@@ -217,7 +213,6 @@ class TestRefundAdmin(AdminTestMixin):
                     ],
                 },
             ),
-
             # same level1 and level2 approver
             (
                 {
@@ -228,7 +223,6 @@ class TestRefundAdmin(AdminTestMixin):
                     'level1_approved_by': ['Approvers level1 and level2 have to be different.'],
                 },
             ),
-
             # net_amount + vat_amount > order.total_cost
             (
                 {
@@ -245,6 +239,7 @@ class TestRefundAdmin(AdminTestMixin):
     )
     def test_validation_error(self, data_delta, errors):
         """Test validation errors."""
+
         def resolve(value, order, data):
             if callable(value):
                 return value(order, data)
@@ -365,8 +360,7 @@ class TestRefundAdmin(AdminTestMixin):
         assert not form.is_valid()
 
         assert form.errors == {
-            required_field: ['This field is required.']
-            for required_field in required_fields
+            required_field: ['This field is required.'] for required_field in required_fields
         }
 
     @pytest.mark.parametrize(

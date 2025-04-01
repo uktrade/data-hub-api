@@ -9,4 +9,4 @@ class UKRegionalSettingsAdmin(admin.ModelAdmin):
 
     fields = ('uk_region', 'manager_emails')
     list_display = ('uk_region', 'manager_emails')
-    search_fields = ('uk_region__name', )
+    search_fields = ('uk_region__name',)

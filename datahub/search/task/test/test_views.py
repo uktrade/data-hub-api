@@ -212,8 +212,7 @@ class TestTaskSearch(APITestMixin):
         deep_get,
         opensearch_with_collector,
     ):
-        """Tests edge case where no filter returned from raw_query.
-        """
+        """Tests edge case where no filter returned from raw_query."""
         deep_get.return_value = None
 
         current_adviser = AdviserFactory()
@@ -239,8 +238,7 @@ class TestTaskSearch(APITestMixin):
         deep_get,
         opensearch_with_collector,
     ):
-        """Test edge case where no filter_index found in raw_query filter.
-        """
+        """Test edge case where no filter_index found in raw_query filter."""
         not_created_by_adviser = AdviserFactory()
         deep_get.return_value = [{}]
         TaskFactory(
@@ -481,11 +479,14 @@ class TestTaskInvestmentProjectSearch(APITestMixin):
         current_adviser.id = self.user.id
 
         status_tasks = TaskFactory.create_batch(
-            3, status='Active', created_by=current_adviser,
+            3,
+            status='Active',
+            created_by=current_adviser,
         )
 
         status_tasks_completed = TaskFactory.create_batch(
-            3, status='Complete',
+            3,
+            status='Complete',
             created_by=current_adviser,
         )
 

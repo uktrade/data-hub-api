@@ -34,6 +34,7 @@ def to_many_field(wrapped_func):
             fac = MyFactory()  # creates an object with my_m2m_field == [obj1, obj2]
 
     """
+
     @factory.post_generation
     @wraps(wrapped_func)
     def wrapping_func(self, create, extracted, **kwargs):

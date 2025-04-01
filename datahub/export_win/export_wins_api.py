@@ -12,28 +12,23 @@ logger = getLogger(__name__)
 
 
 class ExportWinsAPIError(Exception):
-    """Base exception class for Export Wins API related errors.
-    """
+    """Base exception class for Export Wins API related errors."""
 
 
 class ExportWinsAPIHTTPError(ExportWinsAPIError):
-    """Exception for all HTTP errors.
-    """
+    """Exception for all HTTP errors."""
 
 
 class ExportWinsAPITimeoutError(ExportWinsAPIError):
-    """Exception for when a timeout was encountered when connecting to Export Wins API.
-    """
+    """Exception for when a timeout was encountered when connecting to Export Wins API."""
 
 
 class ExportWinsAPIConnectionError(ExportWinsAPIError):
-    """Exception for when an error was encountered when connecting to Export Wins API.
-    """
+    """Exception for when an error was encountered when connecting to Export Wins API."""
 
 
 def _fetch_page(api_client, source_url, max_retries=5, retry_delay=2):
-    """Requests a page from given relative source_url.
-    """
+    """Requests a page from given relative source_url."""
     for attempt in range(max_retries):
         try:
             page = api_client.request('GET', source_url).json()
@@ -90,8 +85,7 @@ def get_legacy_export_wins_dataset(start_url):
         raise ExportWinsAPITimeoutError(error_message) from exc
     except HTTPError as exc:
         error_message = (
-            'The Export Wins API returned an error status: '
-            f'{exc.response.status_code}',
+            f'The Export Wins API returned an error status: {exc.response.status_code}',
         )
         raise ExportWinsAPIHTTPError(error_message) from exc
 

@@ -7,7 +7,6 @@ from datahub.metadata.utils import get_country_by_country_name
 
 @pytest.mark.django_db
 class TestUtils:
-
     def test_get_country_by_country_name(self):
         country = CountryFactory(name='test country', iso_alpha2_code='ZZZZ')
 
@@ -20,7 +19,10 @@ class TestUtils:
             get_country_by_country_name(name='dont find me', default_iso='---')
 
         assert country.id == get_country_by_country_name(name='test country').id
-        assert country.id == get_country_by_country_name(
-            name='no country with this name',
-            default_iso='ZZZZ',
-        ).id
+        assert (
+            country.id
+            == get_country_by_country_name(
+                name='no country with this name',
+                default_iso='ZZZZ',
+            ).id
+        )

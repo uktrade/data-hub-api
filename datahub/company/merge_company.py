@@ -112,7 +112,10 @@ MERGE_CONFIGURATION = [
     MergeConfiguration(InvestmentProject, INVESTMENT_PROJECT_COMPANY_FIELDS, Company),
     MergeConfiguration(LargeCapitalInvestorProfile, ('investor_company',), Company),
     MergeConfiguration(
-        LargeCapitalOpportunity, ('promoters',), Company, large_capital_opportunity_updater,
+        LargeCapitalOpportunity,
+        ('promoters',),
+        Company,
+        large_capital_opportunity_updater,
     ),
     MergeConfiguration(LegacyExportWinsToDataHubCompany, ('company',), Company),
     MergeConfiguration(Order, ('company',), Company),
@@ -124,7 +127,10 @@ MERGE_CONFIGURATION = [
     MergeConfiguration(PipelineItem, ('company',), Company, pipeline_item_updater),
     MergeConfiguration(Objective, ('company',), Company),
     MergeConfiguration(
-        OneListCoreTeamMember, ('company',), Company, one_list_core_team_member_updater,
+        OneListCoreTeamMember,
+        ('company',),
+        Company,
+        one_list_core_team_member_updater,
     ),
 ]
 
@@ -174,7 +180,8 @@ def merge_companies(source_company: Company, target_company: Company, user):
         results[CompanyActivity] = {
             'company': results[Interaction]['company']
             + results[InvestmentProject]['investor_company']
-            + results[CompanyReferral]['company'] + results[Order]['company'],
+            + results[CompanyReferral]['company']
+            + results[Order]['company'],
         }
 
         source_company.mark_as_transferred(
@@ -187,7 +194,6 @@ def merge_companies(source_company: Company, target_company: Company, user):
 
 
 def rollback_merge_companies(former_source_company: Company):
-    """Rolls back a company merge of what was the "source_company" passed to merge_companies.
-    """
+    """Rolls back a company merge of what was the "source_company" passed to merge_companies."""
     rollback_version = _get_rollback_version(former_source_company, 'Company merged')
     rollback_version.revision.revert()

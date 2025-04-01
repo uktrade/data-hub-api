@@ -2,8 +2,7 @@ from datahub.activity_stream.serializers import ActivitySerializer
 
 
 class OMISOrderAddedSerializer(ActivitySerializer):
-    """OMIS Order added serializer for activity stream.
-    """
+    """OMIS Order added serializer for activity stream."""
 
     def to_representation(self, instance):
         """Serialize the OMIS order as per activity stream spec:

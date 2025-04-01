@@ -23,7 +23,7 @@ class Command(CSVBaseCommand):
             action='store_true',
             default=False,
             help='If True it does not check if the regions match the old_uk_region_locations '
-                 'column.',
+            'column.',
         )
 
     def _process_row(self, row, simulate=False, ignore_old_regions=False, **options):
@@ -35,8 +35,10 @@ class Command(CSVBaseCommand):
 
         current_regions = investment_project.uk_region_locations.all()
         current_region_ids = set(region.pk for region in current_regions)
-        if (investment_project.allow_blank_possible_uk_regions == allow_blank_possible_uk_regions
-                and current_region_ids == set(uk_region_locations)):
+        if (
+            investment_project.allow_blank_possible_uk_regions == allow_blank_possible_uk_regions
+            and current_region_ids == set(uk_region_locations)
+        ):
             return
 
         if not ignore_old_regions:

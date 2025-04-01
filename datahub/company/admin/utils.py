@@ -7,8 +7,7 @@ from datahub.metadata.models import Country
 
 
 def format_company_diff(dh_company, dnb_company):
-    """Format the Datahub and D&B companies for templates.
-    """
+    """Format the Datahub and D&B companies for templates."""
 
     def get_field(name):
         return dh_company._meta.get_field(name)
@@ -137,7 +136,6 @@ class AdminError(Exception):
     """
 
     def __init__(self, messages, redirect_url):
-        """Initialise the AdminError.
-        """
+        """Initialise the AdminError."""
         self.messages = messages
         self.redirect_url = redirect_url

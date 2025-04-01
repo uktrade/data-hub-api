@@ -98,16 +98,19 @@ def test_adviser_report_generation():
     ]
 
     report = AllAdvisersReport()
-    assert list(report.rows()) == [{
-        'id': adviser.pk,
-        'email': adviser.email,
-        'name': adviser.name,
-        'contact_email': adviser.contact_email,
-        'is_active': adviser.is_active,
-        'dit_team__name': adviser.dit_team.name if adviser.dit_team else None,
-        'is_team_active': adviser.dit_team.disabled_on is None if adviser.dit_team else None,
-        'dit_team__role__name': adviser.dit_team.role.name if adviser.dit_team else None,
-    } for adviser in advisers]
+    assert list(report.rows()) == [
+        {
+            'id': adviser.pk,
+            'email': adviser.email,
+            'name': adviser.name,
+            'contact_email': adviser.contact_email,
+            'is_active': adviser.is_active,
+            'dit_team__name': adviser.dit_team.name if adviser.dit_team else None,
+            'is_team_active': adviser.dit_team.disabled_on is None if adviser.dit_team else None,
+            'dit_team__role__name': adviser.dit_team.role.name if adviser.dit_team else None,
+        }
+        for adviser in advisers
+    ]
 
 
 def test_one_list_report_generation():
@@ -140,15 +143,17 @@ def test_one_list_report_generation():
     )
 
     report = OneListReport()
-    assert list(report.rows()) == [{
-        'name': company.name,
-        'one_list_tier__name': company.one_list_tier.name,
-        'sector__segment': company.sector.segment,
-        'primary_contact_name': company.one_list_account_owner.name,
-        'one_list_account_owner__telephone_number':
-            company.one_list_account_owner.telephone_number,
-        'one_list_account_owner__contact_email': company.one_list_account_owner.contact_email,
-        'address_country__name': company.address_country.name,
-        'address_town': company.address_town,
-        'url': f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["company"]}/{company.id}',
-    } for company in companies]
+    assert list(report.rows()) == [
+        {
+            'name': company.name,
+            'one_list_tier__name': company.one_list_tier.name,
+            'sector__segment': company.sector.segment,
+            'primary_contact_name': company.one_list_account_owner.name,
+            'one_list_account_owner__telephone_number': company.one_list_account_owner.telephone_number,
+            'one_list_account_owner__contact_email': company.one_list_account_owner.contact_email,
+            'address_country__name': company.address_country.name,
+            'address_town': company.address_town,
+            'url': f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["company"]}/{company.id}',
+        }
+        for company in companies
+    ]

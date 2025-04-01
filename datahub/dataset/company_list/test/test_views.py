@@ -21,8 +21,7 @@ def get_expected_data_from_pipeline_item(item):
         'contact_ids': [str(contact.id) for contact in item.contacts.all()] or None,
         'created_on': format_date_or_datetime(item.created_on),
         'expected_win_date': (
-            format_date_or_datetime(item.expected_win_date)
-            if item.expected_win_date else None
+            format_date_or_datetime(item.expected_win_date) if item.expected_win_date else None
         ),
         'id': str(item.id),
         'likelihood_to_win': item.likelihood_to_win,
@@ -36,14 +35,14 @@ def get_expected_data_from_pipeline_item(item):
 
 @pytest.mark.django_db
 class TestPipelineItemDatasetViewSet(BaseDatasetViewTest):
-    """Tests for PipelineItemsDatasetView.
-    """
+    """Tests for PipelineItemsDatasetView."""
 
     view_url = reverse('api-v4:dataset:pipeline-items-dataset')
     factory = PipelineItemFactory
 
     @pytest.mark.parametrize(
-        'item_factory', [
+        'item_factory',
+        [
             PipelineItemFactory,
             ArchivedPipelineItemFactory,
         ],

@@ -14,7 +14,6 @@ from datahub.documents.utils import format_content_type
 
 
 class SharePointDocumentSerializer(serializers.ModelSerializer):
-
     created_by = NestedRelatedField(Advisor, extra_fields=['name', 'email'], read_only=True)
     modified_by = NestedRelatedField(Advisor, extra_fields=['name', 'email'], read_only=True)
 
@@ -86,10 +85,12 @@ class GenericDocumentRetrieveSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         """Convert model instance to built-in Python (JSON friendly) data types."""
         representation = super().to_representation(instance)
-        representation.update({
-            'document_type': format_content_type(instance.document_type),
-            'related_object_type': format_content_type(instance.related_object_type),
-        })
+        representation.update(
+            {
+                'document_type': format_content_type(instance.document_type),
+                'related_object_type': format_content_type(instance.related_object_type),
+            },
+        )
         return representation
 
 
@@ -139,7 +140,7 @@ class GenericDocumentCreateSerializer(serializers.Serializer):
             related_object = related_model.objects.get(id=data['related_object_id'])
         except related_model.DoesNotExist:
             raise serializers.ValidationError(
-                f"Related object with id {data['related_object_id']} does not exist.",
+                f'Related object with id {data["related_object_id"]} does not exist.',
             )
         data['related_object'] = related_object
         return data

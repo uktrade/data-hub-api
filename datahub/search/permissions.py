@@ -9,8 +9,7 @@ class SearchPermissions(BasePermission):
     is_export = False
 
     def has_permission(self, request, view):
-        """Return `True` if permission is granted `False` otherwise.
-        """
+        """Return `True` if permission is granted `False` otherwise."""
         if not (request.user and request.user.is_authenticated):
             return False
 

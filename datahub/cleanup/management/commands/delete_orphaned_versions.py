@@ -65,12 +65,16 @@ def _get_orphaned_versions_query(model):
         'object_id',
     )
 
-    version_ids_to_delete = Version.objects.get_for_model(
-        model,
-    ).values(
-        'object_id',
-    ).difference(
-        all_model_ids,
+    version_ids_to_delete = (
+        Version.objects.get_for_model(
+            model,
+        )
+        .values(
+            'object_id',
+        )
+        .difference(
+            all_model_ids,
+        )
     )
 
     return Version.objects.get_for_model(model).filter(

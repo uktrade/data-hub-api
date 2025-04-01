@@ -126,7 +126,8 @@ class TestLargeCapitalOpportunityListView(APITestMixin):
         assert response_data == {'investment_projects__id': ['Enter a valid UUID.']}
 
     def test_large_capital_opportunity_list_view_search_by_investment_project(
-        self, get_opportunity_for_search,
+        self,
+        get_opportunity_for_search,
     ):
         """Test searching large capital opportunity by investment project pk."""
         large_capital_opportunity = get_opportunity_for_search
@@ -134,8 +135,7 @@ class TestLargeCapitalOpportunityListView(APITestMixin):
         response = self.api_client.get(
             url,
             data={
-                'investment_projects__id':
-                    large_capital_opportunity.investment_projects.first().pk,
+                'investment_projects__id': large_capital_opportunity.investment_projects.first().pk,
             },
         )
         assert response.status_code == status.HTTP_200_OK
@@ -231,32 +231,23 @@ class TestUpdateLargeCapitalOpportunityView(APITestMixin):
             set(region['id'] for region in response_data['uk_region_locations'])
             == expected_uk_region_locations
         )
-        assert (
-            response_data['required_checks_conducted']['id']
-            == str(RequiredChecksConductedConstant.cleared.value.id)
+        assert response_data['required_checks_conducted']['id'] == str(
+            RequiredChecksConductedConstant.cleared.value.id,
         )
-        assert (
-            response_data['lead_dit_relationship_manager']['id']
-            == str(lead_dit_relationship_manager.pk)
+        assert response_data['lead_dit_relationship_manager']['id'] == str(
+            lead_dit_relationship_manager.pk,
         )
-        assert (
-            set(asset['id'] for asset in response_data['asset_classes'])
-            == {
-                str(AssetClassInterestConstant.biofuel.value.id),
-                str(AssetClassInterestConstant.biomass.value.id),
-            }
-        )
+        assert set(asset['id'] for asset in response_data['asset_classes']) == {
+            str(AssetClassInterestConstant.biofuel.value.id),
+            str(AssetClassInterestConstant.biomass.value.id),
+        }
         assert response_data['opportunity_value'] == '5'
-        assert (
-            set(
-                construction_risk['id']
-                for construction_risk in response_data['construction_risks']
-            )
-            == {
-                str(ConstructionRiskConstant.greenfield.value.id),
-                str(ConstructionRiskConstant.brownfield.value.id),
-            }
-        )
+        assert set(
+            construction_risk['id'] for construction_risk in response_data['construction_risks']
+        ) == {
+            str(ConstructionRiskConstant.greenfield.value.id),
+            str(ConstructionRiskConstant.brownfield.value.id),
+        }
 
     @freeze_time('2019-05-01')
     def test_patch_large_capital_opportunity_all_requirements_fields(self):
@@ -287,21 +278,14 @@ class TestUpdateLargeCapitalOpportunityView(APITestMixin):
         assert response_data['incomplete_requirements_fields'] == []
         assert response_data['total_investment_sought'] == '10'
         assert response_data['current_investment_secured'] == '1'
-        assert (
-            response_data['investment_types'][0]['id']
-            == str(direct_investment_equity_id)
+        assert response_data['investment_types'][0]['id'] == str(direct_investment_equity_id)
+        assert response_data['estimated_return_rate']['id'] == str(
+            ReturnRateConstant.up_to_five_percent.value.id,
         )
-        assert (
-            response_data['estimated_return_rate']['id']
-            == str(ReturnRateConstant.up_to_five_percent.value.id)
-        )
-        assert (
-            set(time_horizon['id'] for time_horizon in response_data['time_horizons'])
-            == {
-                str(TimeHorizonConstant.up_to_five_years.value.id),
-                str(TimeHorizonConstant.five_to_nine_years.value.id),
-            }
-        )
+        assert set(time_horizon['id'] for time_horizon in response_data['time_horizons']) == {
+            str(TimeHorizonConstant.up_to_five_years.value.id),
+            str(TimeHorizonConstant.five_to_nine_years.value.id),
+        }
 
 
 class TestRetrieveLargeCapitalOpportunityView(APITestMixin):

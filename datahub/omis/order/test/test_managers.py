@@ -12,11 +12,11 @@ class TestOrderManager:
     """Tests for the Order Manager."""
 
     @pytest.mark.parametrize(
-        'include_reopened', [False, True],
+        'include_reopened',
+        [False, True],
     )
     def test_publicly_accessible(self, include_reopened):
-        """Test that `publicly_accessible()` only returns the publicly accessible orders.
-        """
+        """Test that `publicly_accessible()` only returns the publicly accessible orders."""
         # set up db
         for order_status_choice in OrderStatus.choices:
             order_status = order_status_choice[0]

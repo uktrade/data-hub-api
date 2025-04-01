@@ -93,9 +93,12 @@ def test_simulate(s3_stubber, caplog, investment_projects_and_csv_content):
     call_command('delete_investment_project', bucket, object_key, simulate=True)
 
     # In the test, two investment projects should be deleted
-    assert caplog.text.count(
-        f'{records_to_be_deleted} records deleted for investment project: ',
-    ) == 2
+    assert (
+        caplog.text.count(
+            f'{records_to_be_deleted} records deleted for investment project: ',
+        )
+        == 2
+    )
     assert 'InvestmentProject matching query does not exist' in caplog.text
 
     for investment_project in investment_projects:

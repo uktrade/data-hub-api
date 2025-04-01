@@ -53,7 +53,9 @@ def test_identification_task_schedules_ingestion_task(marketing_object_key, capl
     with (
         mock.patch('datahub.ingest.tasks.job_scheduler') as mock_scheduler,
         mock.patch.object(
-            S3ObjectProcessor, 'get_most_recent_object_key', return_value=marketing_object_key,
+            S3ObjectProcessor,
+            'get_most_recent_object_key',
+            return_value=marketing_object_key,
         ),
         mock.patch.object(S3ObjectProcessor, 'has_object_been_ingested', return_value=False),
         caplog.at_level(logging.INFO),
@@ -77,7 +79,9 @@ def test_identification_task_schedules_ingestion_task(marketing_object_key, capl
 
 @mock_aws
 def test_ingestion_task_success(
-    marketing_object_key, s3_object_processor, caplog,
+    marketing_object_key,
+    s3_object_processor,
+    caplog,
 ):
     records = [eyb_lead_marketing_record_faker()]
     object_definition = (marketing_object_key, compressed_json_faker(records))
@@ -93,7 +97,9 @@ def test_ingestion_task_success(
 
 @mock_aws
 def test_ingestion_task_does_not_update_existing(
-    marketing_object_key, s3_object_processor, caplog,
+    marketing_object_key,
+    s3_object_processor,
+    caplog,
 ):
     hashed_uuid = generate_hashed_uuid()
     source = 'Web'
@@ -104,10 +110,12 @@ def test_ingestion_task_does_not_update_existing(
     assert EYBLead.objects.count() == 1
 
     records = [
-        eyb_lead_marketing_record_faker({
-            'hashed_uuid': hashed_uuid,
-            'utm_source': 'Advert',
-        }),
+        eyb_lead_marketing_record_faker(
+            {
+                'hashed_uuid': hashed_uuid,
+                'utm_source': 'Advert',
+            },
+        ),
     ]
     object_definition = (marketing_object_key, compressed_json_faker(records))
     upload_objects_to_s3(s3_object_processor, [object_definition])
@@ -121,7 +129,6 @@ def test_ingestion_task_does_not_update_existing(
 
 @mock_aws
 class TestEYBMarketingIngestionTask:
-
     @pytest.fixture
     def ingestion_task(self, marketing_object_key):
         return EYBMarketingIngestionTask(
@@ -136,8 +143,7 @@ class TestEYBMarketingIngestionTask:
 
     def test_get_record_from_line(self, ingestion_task):
         deserialized_line = eyb_lead_marketing_record_faker()
-        assert ingestion_task._get_record_from_line(deserialized_line) == \
-            deserialized_line
+        assert ingestion_task._get_record_from_line(deserialized_line) == deserialized_line
 
     def test_should_process_record_returns_true_when_new(self, ingestion_task):
         hashed_uuid = generate_hashed_uuid()

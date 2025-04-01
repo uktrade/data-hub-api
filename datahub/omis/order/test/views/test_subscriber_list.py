@@ -41,8 +41,7 @@ class TestGetSubscriberList(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
 
     def test_empty(self):
-        """Test that calling GET returns [] if no-one is subscribed.
-        """
+        """Test that calling GET returns [] if no-one is subscribed."""
         order = OrderFactory()
 
         url = reverse(
@@ -55,8 +54,7 @@ class TestGetSubscriberList(APITestMixin):
         assert response.json() == []
 
     def test_non_empty(self):
-        """Test that calling GET returns the list of advisers subscribed to the order.
-        """
+        """Test that calling GET returns the list of advisers subscribed to the order."""
         advisers = AdviserFactory.create_batch(3)
         order = OrderFactory()
         for adviser in advisers[:2]:
@@ -130,8 +128,7 @@ class TestChangeSubscriberList(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
 
     def test_add_to_empty_list(self):
-        """Test that calling PUT with new advisers adds them to the subscriber list.
-        """
+        """Test that calling PUT with new advisers adds them to the subscriber list."""
         advisers = AdviserFactory.create_batch(2)
         order = OrderFactory()
 
@@ -149,7 +146,8 @@ class TestChangeSubscriberList(APITestMixin):
         assert {adv['id'] for adv in response.json()} == {str(adv.id) for adv in advisers}
 
     @pytest.mark.parametrize(
-        'allowed_status', [
+        'allowed_status',
+        [
             OrderStatus.DRAFT,
             OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
             OrderStatus.QUOTE_ACCEPTED,
@@ -166,8 +164,7 @@ class TestChangeSubscriberList(APITestMixin):
         previous_advisers = AdviserFactory.create_batch(2)
         order = OrderFactory(status=allowed_status)
         subscriptions = [
-            OrderSubscriberFactory(order=order, adviser=adviser)
-            for adviser in previous_advisers
+            OrderSubscriberFactory(order=order, adviser=adviser) for adviser in previous_advisers
         ]
 
         final_advisers = [
@@ -191,7 +188,8 @@ class TestChangeSubscriberList(APITestMixin):
         assert order.subscribers.filter(id=subscriptions[1].id).exists()
 
     @pytest.mark.parametrize(
-        'allowed_status', [
+        'allowed_status',
+        [
             OrderStatus.DRAFT,
             OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
             OrderStatus.QUOTE_ACCEPTED,
@@ -199,8 +197,7 @@ class TestChangeSubscriberList(APITestMixin):
         ],
     )
     def test_remove_all(self, allowed_status):
-        """Test that calling PUT with an empty list, removes all the subscribers.
-        """
+        """Test that calling PUT with an empty list, removes all the subscribers."""
         advisers = AdviserFactory.create_batch(2)
         order = OrderFactory(status=allowed_status)
         for adviser in advisers:
@@ -216,8 +213,7 @@ class TestChangeSubscriberList(APITestMixin):
         assert response.json() == []
 
     def test_invalid_adviser(self):
-        """Test that calling PUT with an invalid adviser returns 400.
-        """
+        """Test that calling PUT with an invalid adviser returns 400."""
         advisers = AdviserFactory.create_batch(2)
         order = OrderFactory()
 
@@ -227,19 +223,24 @@ class TestChangeSubscriberList(APITestMixin):
         )
 
         data = [{'id': adviser.id} for adviser in advisers]
-        data.append({
-            'id': '00000000-0000-0000-0000-000000000000',
-        })
+        data.append(
+            {
+                'id': '00000000-0000-0000-0000-000000000000',
+            },
+        )
 
         response = self.api_client.put(url, data)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == [
-            {}, {}, {'id': ['00000000-0000-0000-0000-000000000000 is not a valid adviser']},
+            {},
+            {},
+            {'id': ['00000000-0000-0000-0000-000000000000 is not a valid adviser']},
         ]
 
     @pytest.mark.parametrize(
-        'disallowed_status', [
+        'disallowed_status',
+        [
             OrderStatus.COMPLETE,
             OrderStatus.CANCELLED,
         ],
@@ -263,7 +264,6 @@ class TestChangeSubscriberList(APITestMixin):
         assert response.status_code == status.HTTP_409_CONFLICT
         assert response.json() == {
             'detail': (
-                'The action cannot be performed '
-                f'in the current status {disallowed_status.label}.'
+                f'The action cannot be performed in the current status {disallowed_status.label}.'
             ),
         }

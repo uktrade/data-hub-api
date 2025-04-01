@@ -71,13 +71,15 @@ class BaseObjectIdentificationTask:
             return
 
         if self.long_queue_checker.is_job_queued(
-            ingestion_task_function, latest_object_key,
+            ingestion_task_function,
+            latest_object_key,
         ):
             logger.info(f'{latest_object_key} has already been queued for ingestion')
             return
 
         if self.long_queue_checker.is_job_running(
-            ingestion_task_function, latest_object_key,
+            ingestion_task_function,
+            latest_object_key,
         ):
             logger.info(f'{latest_object_key} is currently being ingested')
             return
@@ -214,10 +216,12 @@ class BaseObjectIngestionTask:
             else:
                 self.updated_ids.append(str(instance.id))
         else:
-            self.errors.append({
-                'record': record,
-                'errors': serializer.errors,
-            })
+            self.errors.append(
+                {
+                    'record': record,
+                    'errors': serializer.errors,
+                }
+            )
         ```
         """
         raise NotImplementedError(

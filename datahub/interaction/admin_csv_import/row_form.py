@@ -340,10 +340,7 @@ class InteractionCSVRowForm(forms.Form):
         if mapped_field in self.fields:
             self.add_error(mapped_field, errors)
         else:
-            mapped_errors = [
-                join_truthy_strings(field, error, sep=': ')
-                for error in errors
-            ]
+            mapped_errors = [join_truthy_strings(field, error, sep=': ') for error in errors]
             self.add_error(None, mapped_errors)
 
     def _populate_adviser(self, data, adviser_field, team_field):

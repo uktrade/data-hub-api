@@ -99,7 +99,8 @@ def get_investment_projects_to_refresh_gva_values():
     ).filter(
         Q(
             sector__isnull=False,
-        ) | Q(
+        )
+        | Q(
             business_activities__in=[
                 InvestmentBusinessActivityConstant.retail.value.id,
                 InvestmentBusinessActivityConstant.sales.value.id,

@@ -156,82 +156,89 @@ class SearchInteractionPolicyFeedbackExportAPIView(
 ):
     """Filtered interaction policy feedback search export view."""
 
-    queryset = DBInteraction.objects.select_related(
-        'company',
-        'company__global_headquarters',
-        'company__sector',
-    ).prefetch_related(
-        Prefetch('contacts', queryset=Contact.objects.order_by('pk')),
-        'policy_areas',
-        'policy_issue_types',
-        Prefetch(
-            'dit_participants',
-            queryset=(
-                InteractionDITParticipant.objects.order_by('pk').select_related('adviser', 'team')
+    queryset = (
+        DBInteraction.objects.select_related(
+            'company',
+            'company__global_headquarters',
+            'company__sector',
+        )
+        .prefetch_related(
+            Prefetch('contacts', queryset=Contact.objects.order_by('pk')),
+            'policy_areas',
+            'policy_issue_types',
+            Prefetch(
+                'dit_participants',
+                queryset=(
+                    InteractionDITParticipant.objects.order_by('pk').select_related(
+                        'adviser',
+                        'team',
+                    )
+                ),
             ),
-        ),
-    ).annotate(
-        company_link=get_front_end_url_expression('company', 'company__pk'),
-        company_sector_name=get_sector_name_subquery('company__sector'),
-        company_sector_cluster=Sector.objects.filter(
-            parent_id__isnull=True,
-            tree_id=OuterRef('company__sector__tree_id'),
-        ).values('sector_cluster__name'),
-        contact_names=get_string_agg_subquery(
-            DBInteraction,
-            get_full_name_expression(
-                person_field_name='contacts',
-                bracketed_field_name='job_title',
+        )
+        .annotate(
+            company_link=get_front_end_url_expression('company', 'company__pk'),
+            company_sector_name=get_sector_name_subquery('company__sector'),
+            company_sector_cluster=Sector.objects.filter(
+                parent_id__isnull=True,
+                tree_id=OuterRef('company__sector__tree_id'),
+            ).values('sector_cluster__name'),
+            contact_names=get_string_agg_subquery(
+                DBInteraction,
+                get_full_name_expression(
+                    person_field_name='contacts',
+                    bracketed_field_name='job_title',
+                ),
             ),
-        ),
-        created_by_name=get_full_name_expression(
-            person_field_name='created_by',
-        ),
-        adviser_names=get_string_agg_subquery(
-            DBInteraction,
-            get_bracketed_concat_expression(
-                'dit_participants__adviser__first_name',
-                'dit_participants__adviser__last_name',
-                expression_to_bracket='dit_participants__team__name',
+            created_by_name=get_full_name_expression(
+                person_field_name='created_by',
             ),
-        ),
-        adviser_emails=get_string_agg_subquery(
-            DBInteraction,
-            'dit_participants__adviser__email',
-        ),
-        team_names=get_string_agg_subquery(
-            DBInteraction,
-            Cast('dit_participants__team__name', CharField()),
-        ),
-        team_countries=get_string_agg_subquery(
-            DBInteraction,
-            Cast('dit_participants__team__country__name', CharField()),
-        ),
-        link=get_front_end_url_expression('interaction', 'pk'),
-        kind_name=get_choices_as_case_expression(DBInteraction, 'kind'),
-        policy_issue_type_names=get_string_agg_subquery(
-            DBInteraction,
-            Cast('policy_issue_types__name', CharField()),
-        ),
-        policy_area_names=get_string_agg_subquery(
-            DBInteraction,
-            Cast('policy_areas__name', CharField()),
-            # Some policy areas contain commas, so we use a semicolon to delimit multiple values
-            delimiter='; ',
-        ),
-        service_name=get_service_name_subquery('service'),
-        # Placeholder values
-        tags_prediction=Value('', CharField()),
-        tag_1=Value('', CharField()),
-        probability_score_tag_1=Value('', CharField()),
-        tag_2=Value('', CharField()),
-        probability_score_tag_2=Value('', CharField()),
-        tag_3=Value('', CharField()),
-        probability_score_tag_3=Value('', CharField()),
-        tag_4=Value('', CharField()),
-        probability_score_tag_4=Value('', CharField()),
-        tag_5=Value('', CharField()),
-        probability_score_tag_5=Value('', CharField()),
+            adviser_names=get_string_agg_subquery(
+                DBInteraction,
+                get_bracketed_concat_expression(
+                    'dit_participants__adviser__first_name',
+                    'dit_participants__adviser__last_name',
+                    expression_to_bracket='dit_participants__team__name',
+                ),
+            ),
+            adviser_emails=get_string_agg_subquery(
+                DBInteraction,
+                'dit_participants__adviser__email',
+            ),
+            team_names=get_string_agg_subquery(
+                DBInteraction,
+                Cast('dit_participants__team__name', CharField()),
+            ),
+            team_countries=get_string_agg_subquery(
+                DBInteraction,
+                Cast('dit_participants__team__country__name', CharField()),
+            ),
+            link=get_front_end_url_expression('interaction', 'pk'),
+            kind_name=get_choices_as_case_expression(DBInteraction, 'kind'),
+            policy_issue_type_names=get_string_agg_subquery(
+                DBInteraction,
+                Cast('policy_issue_types__name', CharField()),
+            ),
+            policy_area_names=get_string_agg_subquery(
+                DBInteraction,
+                Cast('policy_areas__name', CharField()),
+                # Some policy areas contain commas, so we use a semicolon to delimit multiple values
+                delimiter='; ',
+            ),
+            service_name=get_service_name_subquery('service'),
+            # Placeholder values
+            tags_prediction=Value('', CharField()),
+            tag_1=Value('', CharField()),
+            probability_score_tag_1=Value('', CharField()),
+            tag_2=Value('', CharField()),
+            probability_score_tag_2=Value('', CharField()),
+            tag_3=Value('', CharField()),
+            probability_score_tag_3=Value('', CharField()),
+            tag_4=Value('', CharField()),
+            probability_score_tag_4=Value('', CharField()),
+            tag_5=Value('', CharField()),
+            probability_score_tag_5=Value('', CharField()),
+        )
     )
 
     field_titles = {

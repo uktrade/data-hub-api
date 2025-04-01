@@ -48,8 +48,7 @@ def mock_notify_gateway(monkeypatch):
 
 @pytest.fixture
 def mock_job_scheduler(monkeypatch):
-    """Mocks the job_scheduler function.
-    """
+    """Mocks the job_scheduler function."""
     mock_job_scheduler = mock.Mock()
     monkeypatch.setattr(
         'datahub.reminder.tasks.job_scheduler',
@@ -60,8 +59,7 @@ def mock_job_scheduler(monkeypatch):
 
 @pytest.fixture
 def mock_notify_adviser_by_rq_email(monkeypatch):
-    """Mocks the notify_adviser_by_rq_email function.
-    """
+    """Mocks the notify_adviser_by_rq_email function."""
     mock_notify_adviser_by_rq_email = mock.Mock()
     monkeypatch.setattr(
         'datahub.reminder.tasks.notify_adviser_by_rq_email',
@@ -72,8 +70,7 @@ def mock_notify_adviser_by_rq_email(monkeypatch):
 
 @pytest.fixture
 def mock_logger(monkeypatch):
-    """Returns a mock logger client instance.
-    """
+    """Returns a mock logger client instance."""
     mock_logger = mock.Mock()
     monkeypatch.setattr(
         'datahub.reminder.tasks.logger',
@@ -412,8 +409,7 @@ class TestEmailFunctions:
     def test_update_no_recent_export_interaction_reminder_email_status(
         self,
     ):
-        """Test it updates reminder data with the connected email notification information.
-        """
+        """Test it updates reminder data with the connected email notification information."""
         reminder_number = 3
         notification_id = str(uuid4())
         reminders = NoRecentExportInteractionReminderFactory.create_batch(reminder_number)

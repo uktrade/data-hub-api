@@ -78,8 +78,7 @@ class TestUpdateEmailDeliveryStatusTask:
         self,
         mock_export_win_tasks_notify_gateway,
     ):
-        """Test email notification id being saved into customer response model.
-        """
+        """Test email notification id being saved into customer response model."""
         notification_id = uuid.uuid4()
         mock_export_win_tasks_notify_gateway.send_email_notification = mock.Mock(
             return_value={'id': notification_id},
@@ -171,8 +170,7 @@ class TestUpdateEmailDeliveryStatusTask:
         lock_acquired,
         call_count,
     ):
-        """Test that the task doesn't run if it cannot acquire the advisory_lock.
-        """
+        """Test that the task doesn't run if it cannot acquire the advisory_lock."""
         mock_advisory_lock = mock.MagicMock()
         mock_advisory_lock.return_value.__enter__.return_value = lock_acquired
         monkeypatch.setattr(
@@ -191,8 +189,7 @@ class TestUpdateEmailDeliveryStatusTask:
         self,
         mock_export_win_tasks_notify_gateway,
     ):
-        """Test email delivery status being updated into customer response token model.
-        """
+        """Test email delivery status being updated into customer response token model."""
         customer_response = CustomerResponseFactory()
         mock_export_win_tasks_notify_gateway.get_notification_by_id = mock.Mock(
             return_value={'status': 'delivered'},
@@ -220,10 +217,7 @@ class TestUpdateEmailDeliveryStatusTask:
         customer_response_token_too_old.refresh_from_db()
         customer_response_token_to_update.refresh_from_db()
 
-        assert (
-            customer_response_token_too_old.email_delivery_status
-            == EmailDeliveryStatus.UNKNOWN
-        )
+        assert customer_response_token_too_old.email_delivery_status == EmailDeliveryStatus.UNKNOWN
         assert (
             customer_response_token_to_update.email_delivery_status
             == EmailDeliveryStatus.DELIVERED
@@ -247,8 +241,7 @@ class TestUpdateEmailDeliveryStatusTask:
         lock_acquired,
         call_count,
     ):
-        """Test that the task doesn't run if it cannot acquire the advisory_lock.
-        """
+        """Test that the task doesn't run if it cannot acquire the advisory_lock."""
         mock_advisory_lock = mock.MagicMock()
         mock_advisory_lock.return_value.__enter__.return_value = lock_acquired
         monkeypatch.setattr(
@@ -267,8 +260,7 @@ class TestUpdateEmailDeliveryStatusTask:
         self,
         mock_export_win_tasks_notify_gateway,
     ):
-        """Test email delivery status being updated into customer response model.
-        """
+        """Test email delivery status being updated into customer response model."""
         mock_export_win_tasks_notify_gateway.get_notification_by_id = mock.Mock(
             return_value={'status': 'delivered'},
         )
@@ -316,8 +308,7 @@ class TestAutoResendClientEmailFromUnconfirmedWinTask:
     def test_auto_resend_client_email_when_less_than_max_token_issued_threshold(
         self,
     ):
-        """Test auto resend email to client with less than max token issued threshold.
-        """
+        """Test auto resend email to client with less than max token issued threshold."""
         contact = ContactFactory()
         win = WinFactory(company_contacts=[contact])
         customer_response = CustomerResponseFactory(win=win)
@@ -337,13 +328,10 @@ class TestAutoResendClientEmailFromUnconfirmedWinTask:
         auto_resend_client_email_from_unconfirmed_win()
         customer_response.refresh_from_db()
 
-        assert (
-            customer_response.tokens.count() < EMAIL_MAX_TOKEN_ISSUED_WITHIN_RESPONSE_THRESHOLD
-        )
+        assert customer_response.tokens.count() < EMAIL_MAX_TOKEN_ISSUED_WITHIN_RESPONSE_THRESHOLD
 
     def test_auto_resend_client_email_when_less_than_win_email_response_threshold(self):
-        """Test auto resend email to client with less than win maturity days threshold.
-        """
+        """Test auto resend email to client with less than win maturity days threshold."""
         contact = ContactFactory()
         win = WinFactory(company_contacts=[contact])
         customer_response = CustomerResponseFactory(win=win)
@@ -377,18 +365,12 @@ class TestAutoResendClientEmailFromUnconfirmedWinTask:
         auto_resend_client_email_from_unconfirmed_win()
         customer_response.refresh_from_db()
 
-        assert (
-            win_email_response_threshold > set_time_zone_to_none(token_25_days.created_on))
-        assert (
-            win_email_response_threshold > set_time_zone_to_none(token_21_days.created_on))
-        assert (
-            win_email_response_threshold > set_time_zone_to_none(token_14_days.created_on))
-        assert (
-            win_email_response_threshold > set_time_zone_to_none(token_7_days.created_on))
-        assert (
-            win_email_response_threshold < set_time_zone_to_none(token_5_days.created_on))
-        assert (
-            win_email_response_threshold < set_time_zone_to_none(token_3_days.created_on))
+        assert win_email_response_threshold > set_time_zone_to_none(token_25_days.created_on)
+        assert win_email_response_threshold > set_time_zone_to_none(token_21_days.created_on)
+        assert win_email_response_threshold > set_time_zone_to_none(token_14_days.created_on)
+        assert win_email_response_threshold > set_time_zone_to_none(token_7_days.created_on)
+        assert win_email_response_threshold < set_time_zone_to_none(token_5_days.created_on)
+        assert win_email_response_threshold < set_time_zone_to_none(token_3_days.created_on)
 
     def test_auto_resend_client_email_using_notify_export_win_email_by_rq_email(
         self,
@@ -551,8 +533,7 @@ def test_get_all_fields_for_client_email_receipt_as_adviser_success():
 @pytest.mark.django_db
 @freeze_time('2023-12-11')
 def test_create_token_for_contact_without_existing_unexpired_token():
-    """Testing the create token for contact where no existing unexpired token.
-    """
+    """Testing the create token for contact where no existing unexpired token."""
     mock_customer_response = CustomerResponseFactory()
     mock_contact = ContactFactory()
     new_token = create_token_for_contact(mock_contact, mock_customer_response)
@@ -570,8 +551,7 @@ def test_create_token_for_contact_without_existing_unexpired_token():
 @pytest.mark.django_db
 @freeze_time('2023-12-14')
 def test_create_token_for_contact_as_adviser_without_existing_unexpired_token():
-    """Testing the create token for contact as adviser where no existing unexpired token.
-    """
+    """Testing the create token for contact as adviser where no existing unexpired token."""
     mock_customer_response = CustomerResponseFactory()
     mock_adviser = AdviserFactory()
     new_token = create_token_for_contact(None, mock_customer_response, mock_adviser)
@@ -589,8 +569,7 @@ def test_create_token_for_contact_as_adviser_without_existing_unexpired_token():
 @pytest.mark.django_db
 @freeze_time('2023-12-11')
 def test_create_token_for_contact_with_existing_unexpired_token():
-    """Testing the creation token for contact where there is existing unexpired token.
-    """
+    """Testing the creation token for contact where there is existing unexpired token."""
     mock_customer_response = CustomerResponseFactory()
     mock_contact = ContactFactory()
     with freeze_time('2023-12-10'):
@@ -612,8 +591,7 @@ def test_create_token_for_contact_with_existing_unexpired_token():
 @pytest.mark.django_db
 @freeze_time('2023-12-14')
 def test_create_token_for_contact_as_adviser_with_existing_unexpired_token():
-    """Testing the creation token for contact as adviser where there is existing unexpired token.
-    """
+    """Testing the creation token for contact as adviser where there is existing unexpired token."""
     mock_customer_response = CustomerResponseFactory()
     mock_adviser = AdviserFactory()
     with freeze_time('2023-12-10'):

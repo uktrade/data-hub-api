@@ -66,60 +66,66 @@ def interactions(opensearch_with_collector):
     with freeze_time('2017-01-01 13:00:00'):
         company_1 = CompanyFactory(name='ABC Trading Ltd')
         company_2 = CompanyFactory(name='Little Puddle Ltd')
-        data.extend([
-            CompanyInteractionFactory(
-                subject='Exports meeting',
-                date=dateutil_parse('2017-10-30T00:00:00Z'),
-                company=company_1,
-                contacts=[
-                    ContactFactory(company=company_1, first_name='Lee', last_name='Danger'),
-                    ContactFactory(company=company_1, first_name='Francis', last_name='Brady'),
-                    ContactFactory(company=company_1, first_name='Zanger Za', last_name='Qa'),
-                ],
-                dit_participants__adviser__first_name='Angela',
-                dit_participants__adviser__last_name='Lawson',
-            ),
-            CompanyInteractionFactory(
-                subject='a coffee',
-                date=dateutil_parse('2017-04-05T00:00:00Z'),
-                company=company_2,
-                contacts=[
-                    ContactFactory(company=company_1, first_name='Try', last_name='Slanger'),
-                ],
-                dit_participants__adviser__first_name='Zed',
-                dit_participants__adviser__last_name='Zeddy',
-            ),
-            CompanyInteractionFactory(
-                subject='Email about exhibition',
-                date=dateutil_parse('2016-09-02T00:00:00Z'),
-                company=company_2,
-                contacts=[
-                    ContactFactory(company=company_1, first_name='Caroline', last_name='Green'),
-                ],
-                dit_participants__adviser__first_name='Prime',
-                dit_participants__adviser__last_name='Zeddy',
-            ),
-            CompanyInteractionFactory(
-                subject='talking about cats',
-                date=dateutil_parse('2018-02-01T00:00:00Z'),
-                company=company_2,
-                contacts=[
-                    ContactFactory(company=company_1, first_name='Full', last_name='Bridge'),
-                ],
-                dit_participants__adviser__first_name='Low',
-                dit_participants__adviser__last_name='Tremon',
-            ),
-            CompanyInteractionFactory(
-                subject='Event at HQ',
-                date=dateutil_parse('2018-01-01T00:00:00Z'),
-                company=company_2,
-                contacts=[
-                    ContactFactory(company=company_1, first_name='Diane', last_name='Pree'),
-                ],
-                dit_participants__adviser__first_name='Trevor',
-                dit_participants__adviser__last_name='Saleman',
-            ),
-        ])
+        data.extend(
+            [
+                CompanyInteractionFactory(
+                    subject='Exports meeting',
+                    date=dateutil_parse('2017-10-30T00:00:00Z'),
+                    company=company_1,
+                    contacts=[
+                        ContactFactory(company=company_1, first_name='Lee', last_name='Danger'),
+                        ContactFactory(company=company_1, first_name='Francis', last_name='Brady'),
+                        ContactFactory(company=company_1, first_name='Zanger Za', last_name='Qa'),
+                    ],
+                    dit_participants__adviser__first_name='Angela',
+                    dit_participants__adviser__last_name='Lawson',
+                ),
+                CompanyInteractionFactory(
+                    subject='a coffee',
+                    date=dateutil_parse('2017-04-05T00:00:00Z'),
+                    company=company_2,
+                    contacts=[
+                        ContactFactory(company=company_1, first_name='Try', last_name='Slanger'),
+                    ],
+                    dit_participants__adviser__first_name='Zed',
+                    dit_participants__adviser__last_name='Zeddy',
+                ),
+                CompanyInteractionFactory(
+                    subject='Email about exhibition',
+                    date=dateutil_parse('2016-09-02T00:00:00Z'),
+                    company=company_2,
+                    contacts=[
+                        ContactFactory(
+                            company=company_1,
+                            first_name='Caroline',
+                            last_name='Green',
+                        ),
+                    ],
+                    dit_participants__adviser__first_name='Prime',
+                    dit_participants__adviser__last_name='Zeddy',
+                ),
+                CompanyInteractionFactory(
+                    subject='talking about cats',
+                    date=dateutil_parse('2018-02-01T00:00:00Z'),
+                    company=company_2,
+                    contacts=[
+                        ContactFactory(company=company_1, first_name='Full', last_name='Bridge'),
+                    ],
+                    dit_participants__adviser__first_name='Low',
+                    dit_participants__adviser__last_name='Tremon',
+                ),
+                CompanyInteractionFactory(
+                    subject='Event at HQ',
+                    date=dateutil_parse('2018-01-01T00:00:00Z'),
+                    company=company_2,
+                    contacts=[
+                        ContactFactory(company=company_1, first_name='Diane', last_name='Pree'),
+                    ],
+                    dit_participants__adviser__first_name='Trevor',
+                    dit_participants__adviser__last_name='Saleman',
+                ),
+            ],
+        )
 
     opensearch_with_collector.flush_and_refresh()
 
@@ -138,8 +144,7 @@ class TestInteractionEntitySearchView(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_get_all(self, interactions):
-        """Tests that all interactions are returned with an empty POST body.
-        """
+        """Tests that all interactions are returned with an empty POST body."""
         url = reverse('api-v3:search:interaction')
 
         response = self.api_client.post(url, {})
@@ -297,78 +302,88 @@ class TestInteractionEntitySearchView(APITestMixin):
                 key=lambda dit_participant: dit_participant['adviser']['id'],
             )
 
-        assert results == [{
-            'id': str(interaction.pk),
-            'kind': interaction.kind,
-            'date': interaction.date.isoformat(),
-            'company': {
-                'id': str(interaction.company.pk),
-                'name': interaction.company.name,
-                'trading_names': interaction.company.trading_names,
-            },
-            'companies': [{
-                'id': str(company.pk),
-                'name': company.name,
-                'trading_names': company.trading_names,
-            } for company in sorted(interaction.companies.all(), key=attrgetter('id'))],
-            'company_sector': {
-                'id': str(interaction.company.sector.pk),
-                'name': interaction.company.sector.name,
-                'ancestors': [{
-                    'id': str(ancestor.pk),
-                } for ancestor in interaction.company.sector.get_ancestors()],
-            },
-            'company_one_list_group_tier': {
-                'id': interaction.company.get_one_list_group_tier().pk,
-                'name': interaction.company.get_one_list_group_tier().name,
-            } if interaction.company.get_one_list_group_tier() else None,
-            'contacts': [
-                {
-                    'id': str(contact.pk),
-                    'first_name': contact.first_name,
-                    'name': contact.name,
-                    'last_name': contact.last_name,
+        assert results == [
+            {
+                'id': str(interaction.pk),
+                'kind': interaction.kind,
+                'date': interaction.date.isoformat(),
+                'company': {
+                    'id': str(interaction.company.pk),
+                    'name': interaction.company.name,
+                    'trading_names': interaction.company.trading_names,
+                },
+                'companies': [
+                    {
+                        'id': str(company.pk),
+                        'name': company.name,
+                        'trading_names': company.trading_names,
+                    }
+                    for company in sorted(interaction.companies.all(), key=attrgetter('id'))
+                ],
+                'company_sector': {
+                    'id': str(interaction.company.sector.pk),
+                    'name': interaction.company.sector.name,
+                    'ancestors': [
+                        {
+                            'id': str(ancestor.pk),
+                        }
+                        for ancestor in interaction.company.sector.get_ancestors()
+                    ],
+                },
+                'company_one_list_group_tier': {
+                    'id': interaction.company.get_one_list_group_tier().pk,
+                    'name': interaction.company.get_one_list_group_tier().name,
                 }
-                for contact in sorted(interaction.contacts.all(), key=attrgetter('id'))
-            ],
-            'is_event': None,
-            'event': None,
-            'service': {
-                'id': str(interaction.service.pk),
-                'name': interaction.service.name,
+                if interaction.company.get_one_list_group_tier()
+                else None,
+                'contacts': [
+                    {
+                        'id': str(contact.pk),
+                        'first_name': contact.first_name,
+                        'name': contact.name,
+                        'last_name': contact.last_name,
+                    }
+                    for contact in sorted(interaction.contacts.all(), key=attrgetter('id'))
+                ],
+                'is_event': None,
+                'event': None,
+                'service': {
+                    'id': str(interaction.service.pk),
+                    'name': interaction.service.name,
+                },
+                'subject': interaction.subject,
+                'dit_participants': [
+                    {
+                        'adviser': {
+                            'id': str(dit_participant.adviser.pk),
+                            'first_name': dit_participant.adviser.first_name,
+                            'name': dit_participant.adviser.name,
+                            'last_name': dit_participant.adviser.last_name,
+                        },
+                        'team': {
+                            'id': str(dit_participant.team.pk),
+                            'name': dit_participant.team.name,
+                        },
+                    }
+                    for dit_participant in interaction.dit_participants.order_by('adviser__pk')
+                ],
+                'notes': interaction.notes,
+                'communication_channel': {
+                    'id': str(interaction.communication_channel.pk),
+                    'name': interaction.communication_channel.name,
+                },
+                'investment_project': None,
+                'investment_project_sector': None,
+                'policy_areas': [],
+                'policy_issue_types': [],
+                'service_delivery_status': None,
+                'grant_amount_offered': None,
+                'net_company_receipt': None,
+                'was_policy_feedback_provided': interaction.was_policy_feedback_provided,
+                'created_on': interaction.created_on.isoformat(),
+                'modified_on': interaction.modified_on.isoformat(),
             },
-            'subject': interaction.subject,
-            'dit_participants': [
-                {
-                    'adviser': {
-                        'id': str(dit_participant.adviser.pk),
-                        'first_name': dit_participant.adviser.first_name,
-                        'name': dit_participant.adviser.name,
-                        'last_name': dit_participant.adviser.last_name,
-                    },
-                    'team': {
-                        'id': str(dit_participant.team.pk),
-                        'name': dit_participant.team.name,
-                    },
-                }
-                for dit_participant in interaction.dit_participants.order_by('adviser__pk')
-            ],
-            'notes': interaction.notes,
-            'communication_channel': {
-                'id': str(interaction.communication_channel.pk),
-                'name': interaction.communication_channel.name,
-            },
-            'investment_project': None,
-            'investment_project_sector': None,
-            'policy_areas': [],
-            'policy_issue_types': [],
-            'service_delivery_status': None,
-            'grant_amount_offered': None,
-            'net_company_receipt': None,
-            'was_policy_feedback_provided': interaction.was_policy_feedback_provided,
-            'created_on': interaction.created_on.isoformat(),
-            'modified_on': interaction.modified_on.isoformat(),
-        }]
+        ]
 
     def test_filter_by_kind(self, opensearch_with_collector):
         """Tests filtering interaction by kind."""
@@ -426,7 +441,6 @@ class TestInteractionEntitySearchView(APITestMixin):
             ('his', 'whiskers and tabby'),
             ('ers', 'whiskers and tabby'),
             ('1a', '1a'),
-
             # trading names
             ('maine coon egyptian mau', 'whiskers and tabby'),
             ('maine', 'whiskers and tabby'),
@@ -434,7 +448,6 @@ class TestInteractionEntitySearchView(APITestMixin):
             ('ine oon', 'whiskers and tabby'),
             ('ine mau', 'whiskers and tabby'),
             ('3a', '1a'),
-
             # non-matches
             ('whi lorem', None),
             ('wh', None),
@@ -445,7 +458,10 @@ class TestInteractionEntitySearchView(APITestMixin):
         ],
     )
     def test_filter_by_company_name(
-        self, opensearch_with_collector, name_term, matched_company_name,
+        self,
+        opensearch_with_collector,
+        name_term,
+        matched_company_name,
     ):
         """Tests filtering interaction by company name."""
         matching_company1 = CompanyFactory(
@@ -490,8 +506,7 @@ class TestInteractionEntitySearchView(APITestMixin):
         self,
         opensearch_with_collector,
     ):
-        """Test that we can filter by one list tier group.
-        """
+        """Test that we can filter by one list tier group."""
         one_list_tier = OneListTier.objects.all().order_by('?')[0]
         company_1 = CompanyFactory(
             name='Global HQ Ltd',
@@ -536,8 +551,7 @@ class TestInteractionEntitySearchView(APITestMixin):
         self,
         opensearch_with_collector,
     ):
-        """Test that we can filter by multiple one list tier groups.
-        """
+        """Test that we can filter by multiple one list tier groups."""
         one_list_tiers = list(OneListTier.objects.all().order_by('?')[0:2])
         company_1 = CompanyFactory(
             name='Global HQ Ltd',
@@ -602,10 +616,7 @@ class TestInteractionEntitySearchView(APITestMixin):
         response_data = response.json()
         results = response_data['results']
         assert response_data['count'] == 3
-        assert all(
-            (not result['created_on'] is None) == created_on_exists
-            for result in results
-        )
+        assert all((not result['created_on'] is None) == created_on_exists for result in results)
 
     @pytest.mark.parametrize('dit_participant_field', ['adviser', 'team'])
     def test_filter_by_dit_participant(self, opensearch_with_collector, dit_participant_field):
@@ -621,8 +632,10 @@ class TestInteractionEntitySearchView(APITestMixin):
 
         url = reverse('api-v3:search:interaction')
         request_data = {
-            f'dit_participants__{dit_participant_field}':
-                getattr(dit_participant, dit_participant_field).id,
+            f'dit_participants__{dit_participant_field}': getattr(
+                dit_participant,
+                dit_participant_field,
+            ).id,
         }
         response = self.api_client.post(url, request_data)
         assert response.status_code == status.HTTP_200_OK
@@ -715,11 +728,7 @@ class TestInteractionEntitySearchView(APITestMixin):
         expected_ids = {str(interaction.pk) for interaction in expected_interactions}
 
         assert response_data['count'] == 5
-        assert Counter(
-            value['id']
-            for result in results
-            for value in result[field]
-        ) == {
+        assert Counter(value['id'] for result in results for value in result[field]) == {
             str(expected_field_value.pk): 5,
             # two interactions had both values
             str(other_field_value.pk): 2,
@@ -778,7 +787,8 @@ class TestInteractionEntitySearchView(APITestMixin):
 
         response_data = response.json()
         expected_interactions = (
-            interactions_with_policy_feedback if was_policy_feedback_provided
+            interactions_with_policy_feedback
+            if was_policy_feedback_provided
             else interactions_without_policy_feedback
         )
         assert response_data['count'] == len(expected_interactions)
@@ -834,10 +844,10 @@ class TestInteractionEntitySearchView(APITestMixin):
         [0, 1, 2],
     )
     def test_sector_descends_filter_for_company_interaction(
-            self,
-            hierarchical_sectors,
-            opensearch_with_collector,
-            sector_level,
+        self,
+        hierarchical_sectors,
+        opensearch_with_collector,
+        sector_level,
     ):
         """Test the sector_descends filter with company interactions."""
         num_sectors = len(hierarchical_sectors)
@@ -854,9 +864,11 @@ class TestInteractionEntitySearchView(APITestMixin):
 
         other_companies = CompanyFactory.create_batch(
             3,
-            sector=factory.LazyFunction(lambda: random_obj_for_queryset(
-                Sector.objects.exclude(pk__in=sectors_ids),
-            )),
+            sector=factory.LazyFunction(
+                lambda: random_obj_for_queryset(
+                    Sector.objects.exclude(pk__in=sectors_ids),
+                ),
+            ),
         )
         CompanyInteractionFactory.create_batch(
             3,
@@ -884,10 +896,10 @@ class TestInteractionEntitySearchView(APITestMixin):
         [0, 1, 2],
     )
     def test_sector_descends_filter_for_investment_project_interaction(
-            self,
-            hierarchical_sectors,
-            opensearch_with_collector,
-            sector_level,
+        self,
+        hierarchical_sectors,
+        opensearch_with_collector,
+        sector_level,
     ):
         """Test the sector_descends filter with investment project interactions."""
         num_sectors = len(hierarchical_sectors)
@@ -904,9 +916,11 @@ class TestInteractionEntitySearchView(APITestMixin):
 
         other_projects = ActiveInvestmentProjectFactory.create_batch(
             3,
-            sector=factory.LazyFunction(lambda: random_obj_for_queryset(
-                Sector.objects.exclude(pk__in=sectors_ids),
-            )),
+            sector=factory.LazyFunction(
+                lambda: random_obj_for_queryset(
+                    Sector.objects.exclude(pk__in=sectors_ids),
+                ),
+            ),
         )
         InvestmentProjectInteractionFactory.create_batch(
             3,
@@ -1029,7 +1043,8 @@ class TestInteractionExportView(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert parse_header(response.get('Content-Type')) == ('text/csv', {'charset': 'utf-8'})
         assert parse_header(response.get('Content-Disposition')) == (
-            'attachment', {'filename': 'Data Hub - Interactions - 2018-01-01-11-12-13.csv'},
+            'attachment',
+            {'filename': 'Data Hub - Interactions - 2018-01-01-11-12-13.csv'},
         )
         sorted_interactions = Interaction.objects.order_by(
             orm_ordering,
@@ -1046,11 +1061,10 @@ class TestInteractionExportView(APITestMixin):
                 'Service': get_attr_or_none(interaction, 'service.name'),
                 'Subject': interaction.subject,
                 'Link': f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["interaction"]}'
-                        f'/{interaction.pk}',
+                f'/{interaction.pk}',
                 'Company': get_attr_or_none(interaction, 'company.name'),
-                'Company link':
-                    f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["company"]}'
-                    f'/{interaction.company.pk}',
+                'Company link': f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["company"]}'
+                f'/{interaction.company.pk}',
                 'Company country': get_attr_or_none(
                     interaction,
                     'company.address_country.name',
@@ -1060,8 +1074,10 @@ class TestInteractionExportView(APITestMixin):
                 'Contacts': _format_expected_contacts(interaction),
                 'Advisers': _format_expected_advisers(interaction),
                 'Event': get_attr_or_none(interaction, 'event.name'),
-                'Communication channel':
-                    get_attr_or_none(interaction, 'communication_channel.name'),
+                'Communication channel': get_attr_or_none(
+                    interaction,
+                    'communication_channel.name',
+                ),
                 'Service delivery status': get_attr_or_none(
                     interaction,
                     'service_delivery_status.name',
@@ -1100,8 +1116,7 @@ class TestInteractionExportView(APITestMixin):
         request_sortby,
         orm_ordering,
     ):
-        """Test export of interaction policy feedback.
-        """
+        """Test export of interaction policy feedback."""
         # Faker generates job titles containing commas which complicates comparisons,
         # so all contact job titles are explicitly set
         company = SubsidiaryFactory()
@@ -1161,7 +1176,8 @@ class TestInteractionExportView(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert parse_header(response.get('Content-Type')) == ('text/csv', {'charset': 'utf-8'})
         assert parse_header(response.get('Content-Disposition')) == (
-            'attachment', {'filename': 'Data Hub - Interactions - 2018-01-01-11-12-13.csv'},
+            'attachment',
+            {'filename': 'Data Hub - Interactions - 2018-01-01-11-12-13.csv'},
         )
         sorted_interactions = Interaction.objects.order_by(
             orm_ordering,
@@ -1179,7 +1195,7 @@ class TestInteractionExportView(APITestMixin):
                 'Created date': interaction.created_on,
                 'Modified date': interaction.modified_on,
                 'Link': f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["interaction"]}'
-                        f'/{interaction.pk}',
+                f'/{interaction.pk}',
                 'Service': get_attr_or_none(interaction, 'service.name'),
                 'Subject': interaction.subject,
                 'Company': get_attr_or_none(interaction, 'company.name'),
@@ -1210,8 +1226,10 @@ class TestInteractionExportView(APITestMixin):
                 'team_names': _format_expected_team_names(interaction),
                 'team_countries': _format_expected_team_countries(interaction),
                 'kind_name': interaction.get_kind_display(),
-                'Communication channel':
-                    get_attr_or_none(interaction, 'communication_channel.name'),
+                'Communication channel': get_attr_or_none(
+                    interaction,
+                    'communication_channel.name',
+                ),
                 'was_policy_feedback_provided': interaction.was_policy_feedback_provided,
                 'Policy issue types': join_attr_values(
                     interaction.policy_issue_types.order_by('name'),
@@ -1234,7 +1252,6 @@ class TestInteractionExportView(APITestMixin):
                 'probability_score_tag_4': '',
                 'tag_5': '',
                 'probability_score_tag_5': '',
-
                 'Contacts': _format_expected_contacts(interaction),
                 'Event': get_attr_or_none(interaction, 'event.name'),
                 'Service delivery status': get_attr_or_none(
@@ -1311,18 +1328,24 @@ class TestInteractionBasicSearch(APITestMixin):
                     'id': str(company.pk),
                     'name': company.name,
                     'trading_names': company.trading_names,
-                } for company in sorted(interaction.companies.all(), key=attrgetter('id'))
+                }
+                for company in sorted(interaction.companies.all(), key=attrgetter('id'))
             ],
             'company_one_list_group_tier': {
                 'id': interaction.company.get_one_list_group_tier().pk,
                 'name': interaction.company.get_one_list_group_tier().name,
-            } if interaction.company.get_one_list_group_tier() else None,
+            }
+            if interaction.company.get_one_list_group_tier()
+            else None,
             'company_sector': {
                 'id': str(interaction.company.sector.pk),
                 'name': interaction.company.sector.name,
-                'ancestors': [{
-                    'id': str(ancestor.pk),
-                } for ancestor in interaction.company.sector.get_ancestors()],
+                'ancestors': [
+                    {
+                        'id': str(ancestor.pk),
+                    }
+                    for ancestor in interaction.company.sector.get_ancestors()
+                ],
             },
             'contacts': [
                 {
@@ -1378,9 +1401,7 @@ def _format_expected_contacts(interaction):
         get_full_name_expression(bracketed_field_name='job_title'),
     )
 
-    return ', '.join(
-        _format_expected_contact_name(contact) for contact in queryset
-    )
+    return ', '.join(_format_expected_contact_name(contact) for contact in queryset)
 
 
 def _format_expected_contact_name(contact):

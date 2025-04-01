@@ -16,7 +16,6 @@ def test_run(s3_stubber):
 
     investment_projects = [
         # investment project in CSV doesn't exist so row should fail
-
         # sector should get updated
         InvestmentProjectFactory(sector_id=sectors[0].id),
         # sector should get updated

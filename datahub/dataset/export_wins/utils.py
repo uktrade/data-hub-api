@@ -14,7 +14,7 @@ def create_columns_with_index(data, key, new_key, max_items=5):
             value = data[key][i]
         else:
             value = None
-        data[f'{new_key}_{i+1}_display'] = value
+        data[f'{new_key}_{i + 1}_display'] = value
 
     if key in data:
         del data[key]

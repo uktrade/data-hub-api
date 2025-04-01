@@ -14,6 +14,7 @@ from datahub.metadata.models import TradeAgreement
 
 def confirm_action(title, action_message):
     """Decorator that adds confirmation step before modifying selected objects."""
+
     def decorator(func):
         @functools.wraps(func)
         def wrapper(self, request, queryset):

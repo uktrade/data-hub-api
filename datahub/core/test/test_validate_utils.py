@@ -57,7 +57,9 @@ class TestDataCombiner:
             },
         )
         monkeypatch.setattr(
-            validate_utils, '_get_model_field_info', Mock(return_value=mock_field_info),
+            validate_utils,
+            '_get_model_field_info',
+            Mock(return_value=mock_field_info),
         )
         data_combiner = DataCombiner(instance, None, model=model)
         assert data_combiner.is_field_to_many('field1')
@@ -72,7 +74,9 @@ class TestDataCombiner:
             },
         )
         monkeypatch.setattr(
-            validate_utils, '_get_model_field_info', Mock(return_value=mock_field_info),
+            validate_utils,
+            '_get_model_field_info',
+            Mock(return_value=mock_field_info),
         )
         data_combiner = DataCombiner(instance, None, model=model)
         assert not data_combiner.is_field_to_many('field1')
@@ -83,7 +87,9 @@ class TestDataCombiner:
         model = Mock()
         mock_field_info = Mock(relations={})
         monkeypatch.setattr(
-            validate_utils, '_get_model_field_info', Mock(return_value=mock_field_info),
+            validate_utils,
+            '_get_model_field_info',
+            Mock(return_value=mock_field_info),
         )
         data_combiner = DataCombiner(instance, None, model=model)
         assert not data_combiner.is_field_to_many('field1')
@@ -144,7 +150,9 @@ class TestDataCombiner:
             relations={'field1': Mock(to_many=False)},
         )
         monkeypatch.setattr(
-            validate_utils, '_get_model_field_info', Mock(return_value=mock_field_info),
+            validate_utils,
+            '_get_model_field_info',
+            Mock(return_value=mock_field_info),
         )
         data_combiner = DataCombiner(instance, None, model=model)
         assert data_combiner.get_value_auto('field1') == str(subinstance.id)
@@ -159,7 +167,9 @@ class TestDataCombiner:
             relations={'field1': Mock(to_many=True)},
         )
         monkeypatch.setattr(
-            validate_utils, '_get_model_field_info', Mock(return_value=mock_field_info),
+            validate_utils,
+            '_get_model_field_info',
+            Mock(return_value=mock_field_info),
         )
         data_combiner = DataCombiner(instance, None, model=model)
         assert data_combiner.get_value_auto('field1') == [123]
@@ -171,7 +181,9 @@ class TestDataCombiner:
         model = Mock()
         mock_field_info = Mock(relations={})
         monkeypatch.setattr(
-            validate_utils, '_get_model_field_info', Mock(return_value=mock_field_info),
+            validate_utils,
+            '_get_model_field_info',
+            Mock(return_value=mock_field_info),
         )
         data_combiner = DataCombiner(instance, None, model=model)
         assert data_combiner.get_value_auto('field1') == 123

@@ -87,8 +87,12 @@ class S3ObjectProcessor:
     def get_last_ingestion_datetime(self) -> datetime | None:
         """Get last ingestion datetime of an object with the same prefix (directory)."""
         try:
-            return IngestedObject.objects.filter(
-                object_key__icontains=self.prefix,
-            ).latest('object_created').object_created
+            return (
+                IngestedObject.objects.filter(
+                    object_key__icontains=self.prefix,
+                )
+                .latest('object_created')
+                .object_created
+            )
         except IngestedObject.DoesNotExist:
             return None

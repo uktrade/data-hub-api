@@ -12,8 +12,7 @@ logger = getLogger(__name__)
 
 
 class CompanyAddressResolver:
-    """Command for resolving company address postcode and areas.
-    """
+    """Command for resolving company address postcode and areas."""
 
     def __init__(
         self,
@@ -44,8 +43,7 @@ class CompanyAddressResolver:
         result = Company.objects.filter(
             Q(
                 Q(
-                    Q(address_area_id__isnull=True)
-                    & Q(address_country=self.country_id),
+                    Q(address_area_id__isnull=True) & Q(address_country=self.country_id),
                 )
                 | Q(
                     Q(registered_address_area_id__isnull=True)
@@ -53,8 +51,7 @@ class CompanyAddressResolver:
                 ),
             )
             & Q(
-                Q(archived=False)
-                & Q(duns_number__isnull=False),
+                Q(archived=False) & Q(duns_number__isnull=False),
             ),
         )
         return result
@@ -86,8 +83,7 @@ class CompanyAddressResolver:
         return False
 
     def fix_postcodes_and_areas(self):
-        """Does update on the postcode address table.
-        """
+        """Does update on the postcode address table."""
         for company in self.get_companies_with_no_areas():
             if self.fix_address_postcode(company):
                 area_code = self.get_area_code(company.address_postcode)
@@ -97,8 +93,7 @@ class CompanyAddressResolver:
                 self.update_registered_address_area(area_code, company)
 
     def run(self):
-        """Run the query and output the results as an info message to the log file.
-        """
+        """Run the query and output the results as an info message to the log file."""
         with reversion.create_revision():
             self.fix_postcodes_and_areas()
             reversion.set_comment(self.revision_comment)

@@ -47,8 +47,7 @@ def perform_virus_scan(document_pk: str, download_url: str):
     """
     if not settings.AV_V2_SERVICE_URL:
         raise VirusScanException(
-            f'Cannot scan document with ID {document_pk}; AV V2 service '
-            f'URL not configured',
+            f'Cannot scan document with ID {document_pk}; AV V2 service URL not configured',
         )
 
     logger.info(f'Virus scanning of Document with ID {document_pk} started.')
@@ -70,8 +69,7 @@ def perform_virus_scan(document_pk: str, download_url: str):
     document.mark_as_scanned(is_file_clean, result.get('reason') or '')
 
     logger.info(
-        f'Virus scanning of Document with ID {document_pk} '
-        f'completed (av_clean={is_file_clean}).',
+        f'Virus scanning of Document with ID {document_pk} completed (av_clean={is_file_clean}).',
     )
 
 

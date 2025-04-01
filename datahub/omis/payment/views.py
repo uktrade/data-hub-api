@@ -24,8 +24,7 @@ class BasePaymentViewSet(BaseNestedOrderViewSet):
     pagination_class = None
 
     def get_queryset(self):
-        """:returns: the queryset with payments related to the order.
-        """
+        """:returns: the queryset with payments related to the order."""
         return super().get_queryset().filter(order=self.get_order())
 
 
@@ -49,7 +48,7 @@ class PublicPaymentViewSet(BasePaymentViewSet):
     """ViewSet for Hawk authenticated public facing API."""
 
     authentication_classes = (PaaSIPAuthentication, HawkAuthentication)
-    permission_classes = (HawkScopePermission, )
+    permission_classes = (HawkScopePermission,)
     required_hawk_scope = HawkScope.public_omis
 
     order_lookup_field = 'public_token'
@@ -86,8 +85,7 @@ class PublicPaymentGatewaySessionViewSet(BaseNestedOrderViewSet):
     serializer_class = PaymentGatewaySessionSerializer
 
     def get_queryset(self):
-        """:returns: the queryset with session gateway payments for the order.
-        """
+        """:returns: the queryset with session gateway payments for the order."""
         return super().get_queryset().filter(order=self.get_order())
 
     def get_object(self):

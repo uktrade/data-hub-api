@@ -112,18 +112,14 @@ class TestNestedRelatedField:
         nested_instance = Mock(id=nested_pk, pk=nested_pk, field1='field1_value')
         nested_field = NestedRelatedField(
             Mock(),
-            extra_fields=(
-                'field1',
-            ),
+            extra_fields=('field1',),
         )
 
         instance_pk = uuid4()
         instance = Mock(id=instance_pk, pk=instance_pk, nested_instance=nested_instance)
         field = NestedRelatedField(
             Mock(),
-            extra_fields=(
-                ('nested_instance', nested_field),
-            ),
+            extra_fields=(('nested_instance', nested_field),),
         )
         assert field.to_representation(instance) == {
             'id': str(instance.id),
@@ -139,18 +135,14 @@ class TestNestedRelatedField:
         """
         nested_field = NestedRelatedField(
             Mock(),
-            extra_fields=(
-                'field1',
-            ),
+            extra_fields=('field1',),
         )
 
         instance_pk = uuid4()
         instance = Mock(id=instance_pk, pk=instance_pk, nested_instance=None)
         field = NestedRelatedField(
             Mock(),
-            extra_fields=(
-                ('nested_instance', nested_field),
-            ),
+            extra_fields=(('nested_instance', nested_field),),
         )
         assert field.to_representation(instance) == {
             'id': str(instance.id),
@@ -165,7 +157,7 @@ class TestNestedRelatedField:
         instance.name = 'instance name'
         model.objects.all.return_value = [instance] * 2
         field = NestedRelatedField(model)
-        assert (list(field.get_choices().items()) == [(str(instance.id), str(instance))] * 2)
+        assert list(field.get_choices().items()) == [(str(instance.id), str(instance))] * 2
 
     def test_to_choices_limit(self):
         """Tests that model choices are limited and returned."""
@@ -175,13 +167,16 @@ class TestNestedRelatedField:
         instance.name = 'instance name'
         model.objects.all.return_value = [instance] * 2
         field = NestedRelatedField(model)
-        assert list(field.get_choices(1).items()) == [(
-            str(instance.id),
-            str(instance),
-        )]
+        assert list(field.get_choices(1).items()) == [
+            (
+                str(instance.id),
+                str(instance),
+            ),
+        ]
 
         @pytest.mark.parametrize(
-            ('input_website', 'expected_website'), [
+            ('input_website', 'expected_website'),
+            [
                 ('www.google.com', 'http://www.google.com'),
                 ('http://www.google.com', 'http://www.google.com'),
                 ('https://www.google.com', 'https://www.google.com'),
@@ -193,7 +188,8 @@ class TestNestedRelatedField:
             assert RelaxedURLField().run_validation(input_website) == expected_website
 
         @pytest.mark.parametrize(
-            ('input_website', 'expected_website'), [
+            ('input_website', 'expected_website'),
+            [
                 ('www.google.com', 'http://www.google.com'),
                 ('http://www.google.com', 'http://www.google.com'),
                 ('https://www.google.com', 'https://www.google.com'),
@@ -260,7 +256,6 @@ class TestAddressSerializer(APITestMixin):
                     'secondary_address': None,
                 },
             ),
-
             # minimal primary address
             (
                 {
@@ -286,7 +281,6 @@ class TestAddressSerializer(APITestMixin):
                     'secondary_address': None,
                 },
             ),
-
             # primary and secondary address
             (
                 {
@@ -335,7 +329,6 @@ class TestAddressSerializer(APITestMixin):
                     },
                 },
             ),
-
             # secondary address = None
             (
                 {
@@ -365,7 +358,6 @@ class TestAddressSerializer(APITestMixin):
                     'secondary_address': None,
                 },
             ),
-
             # secondary address: all fields reset
             (
                 {
@@ -423,7 +415,6 @@ class TestAddressSerializer(APITestMixin):
                     'primary_address': ['This field is required.'],
                 },
             ),
-
             # primary address: can't be None
             (
                 {
@@ -433,7 +424,6 @@ class TestAddressSerializer(APITestMixin):
                     'primary_address': ['This field may not be null.'],
                 },
             ),
-
             # primary address: can't be {}
             (
                 {
@@ -447,7 +437,6 @@ class TestAddressSerializer(APITestMixin):
                     },
                 },
             ),
-
             # primary address: line_1, town and country required when only one passed in
             (
                 {
@@ -462,7 +451,6 @@ class TestAddressSerializer(APITestMixin):
                     },
                 },
             ),
-
             # primary address: line_1, town and country required when optional field passed in
             (
                 {
@@ -478,7 +466,6 @@ class TestAddressSerializer(APITestMixin):
                     },
                 },
             ),
-
             # county can't be None
             (
                 {
@@ -497,7 +484,6 @@ class TestAddressSerializer(APITestMixin):
                     },
                 },
             ),
-
             # line_1 too long
             (
                 {
@@ -513,7 +499,6 @@ class TestAddressSerializer(APITestMixin):
                     },
                 },
             ),
-
             # secondary address: line_1, town and country required when only one passed in
             (
                 {
@@ -533,7 +518,6 @@ class TestAddressSerializer(APITestMixin):
                     },
                 },
             ),
-
             # secondary address: line_1, town and country required when optional one passed in
             (
                 {
@@ -578,7 +562,6 @@ class TestAddressSerializer(APITestMixin):
                     'primary_address_area': None,
                     'primary_address_area_id': None,
                     'primary_address_country_id': Country.united_kingdom.value.id,
-
                     'secondary_address_1': '',
                     'secondary_address_2': '',
                     'secondary_address_town': '',
@@ -608,7 +591,6 @@ class TestAddressSerializer(APITestMixin):
                     'secondary_address': None,
                 },
             ),
-
             # primary address: reset non-required fields
             (
                 {
@@ -619,7 +601,6 @@ class TestAddressSerializer(APITestMixin):
                     'primary_address_postcode': 'SE10 9NN',
                     'primary_address_area_id': None,
                     'primary_address_country_id': Country.united_kingdom.value.id,
-
                     'secondary_address_1': '',
                     'secondary_address_2': '',
                     'secondary_address_town': '',
@@ -651,7 +632,6 @@ class TestAddressSerializer(APITestMixin):
                     'secondary_address': None,
                 },
             ),
-
             # secondary address: update line_1
             (
                 {
@@ -662,7 +642,6 @@ class TestAddressSerializer(APITestMixin):
                     'primary_address_postcode': 'SE10 9NN',
                     'primary_address_area_id': None,
                     'primary_address_country_id': Country.united_kingdom.value.id,
-
                     'secondary_address_1': '1',
                     'secondary_address_2': 'Hello st.',
                     'secondary_address_town': 'Muckamore',
@@ -703,7 +682,6 @@ class TestAddressSerializer(APITestMixin):
                     },
                 },
             ),
-
             # secondary address: set to None
             (
                 {
@@ -714,7 +692,6 @@ class TestAddressSerializer(APITestMixin):
                     'primary_address_postcode': 'SE10 9NN',
                     'primary_address_country_id': Country.united_kingdom.value.id,
                     'primary_address_area_id': None,
-
                     'secondary_address_1': '1',
                     'secondary_address_2': 'Hello st.',
                     'secondary_address_town': 'Muckamore',
@@ -742,7 +719,6 @@ class TestAddressSerializer(APITestMixin):
                     'secondary_address': None,
                 },
             ),
-
             # secondary address: reset non-required fields
             (
                 {
@@ -753,7 +729,6 @@ class TestAddressSerializer(APITestMixin):
                     'primary_address_postcode': 'SE10 9NN',
                     'primary_address_area_id': None,
                     'primary_address_country_id': Country.united_kingdom.value.id,
-
                     'secondary_address_1': '1',
                     'secondary_address_2': 'Hello st.',
                     'secondary_address_town': 'Muckamore',
@@ -796,7 +771,6 @@ class TestAddressSerializer(APITestMixin):
                     },
                 },
             ),
-
             # secondary address: reset all fields
             (
                 {
@@ -807,7 +781,6 @@ class TestAddressSerializer(APITestMixin):
                     'primary_address_postcode': 'SE10 9NN',
                     'primary_address_area_id': None,
                     'primary_address_country_id': Country.united_kingdom.value.id,
-
                     'secondary_address_1': '1',
                     'secondary_address_2': 'Hello st.',
                     'secondary_address_town': 'Muckamore',
@@ -865,7 +838,6 @@ class TestAddressSerializer(APITestMixin):
                     'primary_address_county': 'Greenwich',
                     'primary_address_postcode': 'SE10 9NN',
                     'primary_address_country_id': Country.united_kingdom.value.id,
-
                     'secondary_address_1': '',
                     'secondary_address_2': '',
                     'secondary_address_town': '',
@@ -880,7 +852,6 @@ class TestAddressSerializer(APITestMixin):
                     'primary_address': ['This field may not be null.'],
                 },
             ),
-
             # primary address: line_1 required
             (
                 {
@@ -890,7 +861,6 @@ class TestAddressSerializer(APITestMixin):
                     'primary_address_county': 'Greenwich',
                     'primary_address_postcode': 'SE10 9NN',
                     'primary_address_country_id': Country.united_kingdom.value.id,
-
                     'secondary_address_1': '',
                     'secondary_address_2': '',
                     'secondary_address_town': '',
@@ -912,7 +882,6 @@ class TestAddressSerializer(APITestMixin):
                     },
                 },
             ),
-
             # county can't be None
             (
                 {
@@ -922,7 +891,6 @@ class TestAddressSerializer(APITestMixin):
                     'primary_address_county': 'Greenwich',
                     'primary_address_postcode': 'SE10 9NN',
                     'primary_address_country_id': Country.united_kingdom.value.id,
-
                     'secondary_address_1': '',
                     'secondary_address_2': '',
                     'secondary_address_town': '',
@@ -941,7 +909,6 @@ class TestAddressSerializer(APITestMixin):
                     },
                 },
             ),
-
             # line_1 too long
             (
                 {
@@ -951,7 +918,6 @@ class TestAddressSerializer(APITestMixin):
                     'primary_address_county': 'Greenwich',
                     'primary_address_postcode': 'SE10 9NN',
                     'primary_address_country_id': Country.united_kingdom.value.id,
-
                     'secondary_address_1': '',
                     'secondary_address_2': '',
                     'secondary_address_town': '',
@@ -970,7 +936,6 @@ class TestAddressSerializer(APITestMixin):
                     },
                 },
             ),
-
             # secondary address: line_1, town and country required when only one passed in
             (
                 {
@@ -980,7 +945,6 @@ class TestAddressSerializer(APITestMixin):
                     'primary_address_county': 'Greenwich',
                     'primary_address_postcode': 'SE10 9NN',
                     'primary_address_country_id': Country.united_kingdom.value.id,
-
                     'secondary_address_1': '',
                     'secondary_address_2': '',
                     'secondary_address_town': '',
@@ -1000,7 +964,6 @@ class TestAddressSerializer(APITestMixin):
                     },
                 },
             ),
-
             # secondary address: line_1, town and country required when optional one passed in
             (
                 {
@@ -1010,7 +973,6 @@ class TestAddressSerializer(APITestMixin):
                     'primary_address_county': 'Greenwich',
                     'primary_address_postcode': 'SE10 9NN',
                     'primary_address_country_id': Country.united_kingdom.value.id,
-
                     'secondary_address_1': '',
                     'secondary_address_2': '',
                     'secondary_address_town': '',
@@ -1031,7 +993,6 @@ class TestAddressSerializer(APITestMixin):
                     },
                 },
             ),
-
             # secondary address: line_1, town and country required when blank values passed in
             (
                 {
@@ -1041,7 +1002,6 @@ class TestAddressSerializer(APITestMixin):
                     'primary_address_county': 'Greenwich',
                     'primary_address_postcode': 'SE10 9NN',
                     'primary_address_country_id': Country.united_kingdom.value.id,
-
                     'secondary_address_1': '1',
                     'secondary_address_2': 'Hello st.',
                     'secondary_address_town': 'Muckamore',
@@ -1086,7 +1046,6 @@ class TestAddressSerializer(APITestMixin):
                     'primary_address_postcode': 'SE10 9NN',
                     'primary_address_area': None,
                     'primary_address_country_id': Country.united_kingdom.value.id,
-
                     'secondary_address_1': '',
                     'secondary_address_2': '',
                     'secondary_address_town': '',
@@ -1111,7 +1070,6 @@ class TestAddressSerializer(APITestMixin):
                     'secondary_address': None,
                 },
             ),
-
             # primary and secondary address
             (
                 {
@@ -1122,7 +1080,6 @@ class TestAddressSerializer(APITestMixin):
                     'primary_address_postcode': 'SE10 9NN',
                     'primary_address_area': None,
                     'primary_address_country_id': Country.united_kingdom.value.id,
-
                     'secondary_address_1': '1',
                     'secondary_address_2': 'Hello st.',
                     'secondary_address_town': 'Muckamore',
@@ -1158,7 +1115,6 @@ class TestAddressSerializer(APITestMixin):
                     },
                 },
             ),
-
             # some fields as None instead of ''
             (
                 {
@@ -1169,7 +1125,6 @@ class TestAddressSerializer(APITestMixin):
                     'primary_address_postcode': '',
                     'primary_address_area': None,
                     'primary_address_country_id': Country.united_kingdom.value.id,
-
                     'secondary_address_1': '1',
                     'secondary_address_2': None,
                     'secondary_address_town': 'Muckamore',

@@ -14,8 +14,7 @@ def schedule_send_email_notification(
     *args,
     **kwargs,
 ):
-    """Task to schedule send_email_notification with RQ.
-    """
+    """Task to schedule send_email_notification with RQ."""
     job = job_scheduler(
         queue_name=LONG_RUNNING_QUEUE,
         function=send_email_notification,

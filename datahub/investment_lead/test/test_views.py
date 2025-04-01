@@ -48,8 +48,7 @@ class TestEYBLeadListAPI(APITestMixin):
         response = api_client.get(EYB_LEAD_COLLECTION_URL)
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data['results']) == 1
-        assert_retrieved_eyb_lead_data(
-            eyb_lead_instance_from_db, response.data['results'][0])
+        assert_retrieved_eyb_lead_data(eyb_lead_instance_from_db, response.data['results'][0])
 
     def test_list_no_eyb_leads(self, test_user_with_view_permissions):
         """Tests that an empty list is returned if there are no EYB leads."""
@@ -61,7 +60,8 @@ class TestEYBLeadListAPI(APITestMixin):
         assert response.data['results'] == []
 
     def test_list_leads_with_missing_triage_or_user_component(
-        self, test_user_with_view_permissions,
+        self,
+        test_user_with_view_permissions,
     ):
         """Tests the list view only return leads with both triage and user hashed UUIDs."""
         lead_with_both = EYBLeadFactory()
@@ -226,9 +226,12 @@ class TestEYBLeadListAPI(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 5
 
-        response = api_client.get(EYB_LEAD_COLLECTION_URL, data={
-            'sector': [level_zero_sector.pk, other_level_zero_sector.pk],
-        })
+        response = api_client.get(
+            EYB_LEAD_COLLECTION_URL,
+            data={
+                'sector': [level_zero_sector.pk, other_level_zero_sector.pk],
+            },
+        )
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 4
         sector_ids_in_results = set([lead['sector']['id'] for lead in response.data['results']])
@@ -251,7 +254,8 @@ class TestEYBLeadListAPI(APITestMixin):
         assert response.data['count'] == 1
 
         response = api_client.get(
-            EYB_LEAD_COLLECTION_URL, data={'sector': str(non_existent_sector_uuid)},
+            EYB_LEAD_COLLECTION_URL,
+            data={'sector': str(non_existent_sector_uuid)},
         )
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 0
@@ -316,7 +320,8 @@ class TestEYBLeadListAPI(APITestMixin):
         assert response.data['count'] == 3
 
         response = api_client.get(
-            EYB_LEAD_COLLECTION_URL, data={'value': ['high', 'low', 'unknown']},
+            EYB_LEAD_COLLECTION_URL,
+            data={'value': ['high', 'low', 'unknown']},
         )
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 3
@@ -375,9 +380,12 @@ class TestEYBLeadListAPI(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 5
 
-        response = api_client.get(EYB_LEAD_COLLECTION_URL, data={
-            'country': [france_country.pk, greece_country.pk],
-        })
+        response = api_client.get(
+            EYB_LEAD_COLLECTION_URL,
+            data={
+                'country': [france_country.pk, greece_country.pk],
+            },
+        )
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 2
         country_ids_in_results = set(
@@ -400,7 +408,8 @@ class TestEYBLeadListAPI(APITestMixin):
         assert response.data['count'] == 1
 
         response = api_client.get(
-            EYB_LEAD_COLLECTION_URL, data={'country': str(non_existing_country_uuid)},
+            EYB_LEAD_COLLECTION_URL,
+            data={'country': str(non_existing_country_uuid)},
         )
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 0
@@ -481,9 +490,12 @@ class TestEYBLeadListAPI(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 5
 
-        response = api_client.get(EYB_LEAD_COLLECTION_URL, data={
-            'overseas_region': [first_region.pk, second_region.pk],
-        })
+        response = api_client.get(
+            EYB_LEAD_COLLECTION_URL,
+            data={
+                'overseas_region': [first_region.pk, second_region.pk],
+            },
+        )
         assert response.status_code == status.HTTP_200_OK
         assert response.data['count'] == 4
         country_ids_in_results = set(

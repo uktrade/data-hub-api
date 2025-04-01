@@ -49,9 +49,11 @@ class TestServiceAnswers(APITestMixin):
             'communication_channel': communication_channel.pk,
             'subject': 'whatever',
             'date': date.today().isoformat(),
-            'dit_participants': [{
-                'adviser': adviser.pk,
-            }],
+            'dit_participants': [
+                {
+                    'adviser': adviser.pk,
+                },
+            ],
             'company': contact.company.pk,
             'contacts': [contact.pk],
             'was_policy_feedback_provided': False,
@@ -184,13 +186,14 @@ class TestServiceAnswers(APITestMixin):
             'communication_channel': communication_channel.pk,
             'subject': 'whatever',
             'date': date.today().isoformat(),
-            'dit_participants': [{
-                'adviser': adviser.pk,
-            }],
+            'dit_participants': [
+                {
+                    'adviser': adviser.pk,
+                },
+            ],
             'company': contact.company.pk,
             'contacts': [contact.pk],
             'was_policy_feedback_provided': False,
-
             'service': service,
             **resolve_data(extra_data),
         }
@@ -207,8 +210,7 @@ class TestServiceAnswers(APITestMixin):
         [
             pytest.param(
                 {
-                    'service_id':
-                        ServiceConstant.providing_investment_advice_and_information.value.id,
+                    'service_id': ServiceConstant.providing_investment_advice_and_information.value.id,
                     'service_answers': {
                         ServiceQuestionID.piai_what_did_you_give_advice_about.value: {
                             ServiceAnswerOptionID.piai_banking_and_funding.value: {},
@@ -216,8 +218,7 @@ class TestServiceAnswers(APITestMixin):
                     },
                 },
                 {
-                    'service':
-                        ServiceConstant.providing_investment_advice_and_information.value.id,
+                    'service': ServiceConstant.providing_investment_advice_and_information.value.id,
                     'service_answers': {
                         ServiceQuestionID.piai_what_did_you_give_advice_about.value: {
                             ServiceAnswerOptionID.piai_dit_or_government_services.value: {},
@@ -228,8 +229,7 @@ class TestServiceAnswers(APITestMixin):
             ),
             pytest.param(
                 {
-                    'service_id':
-                        ServiceConstant.providing_investment_advice_and_information.value.id,
+                    'service_id': ServiceConstant.providing_investment_advice_and_information.value.id,
                     'service_answers': {
                         ServiceQuestionID.piai_what_did_you_give_advice_about.value: {
                             ServiceAnswerOptionID.piai_banking_and_funding.value: {},
@@ -237,8 +237,7 @@ class TestServiceAnswers(APITestMixin):
                     },
                 },
                 {
-                    'service':
-                        ServiceConstant.making_export_introductions.value.id,
+                    'service': ServiceConstant.making_export_introductions.value.id,
                     'service_answers': {
                         ServiceQuestionID.making_export_introductions.value: {
                             ServiceAnswerOptionID.making_export_introductions_customers.value: {},
@@ -268,8 +267,7 @@ class TestServiceAnswers(APITestMixin):
         [
             pytest.param(
                 {
-                    'service_id':
-                        ServiceConstant.providing_investment_advice_and_information.value.id,
+                    'service_id': ServiceConstant.providing_investment_advice_and_information.value.id,
                     'service_answers': {
                         ServiceQuestionID.piai_what_did_you_give_advice_about.value: {
                             ServiceAnswerOptionID.piai_banking_and_funding.value: {},
@@ -277,8 +275,7 @@ class TestServiceAnswers(APITestMixin):
                     },
                 },
                 {
-                    'service':
-                        ServiceConstant.account_management.value.id,
+                    'service': ServiceConstant.account_management.value.id,
                     'service_answers': {
                         ServiceQuestionID.piai_what_did_you_give_advice_about.value: {
                             ServiceAnswerOptionID.piai_banking_and_funding.value: {},
@@ -294,8 +291,7 @@ class TestServiceAnswers(APITestMixin):
             ),
             pytest.param(
                 {
-                    'service_id':
-                        ServiceConstant.providing_investment_advice_and_information.value.id,
+                    'service_id': ServiceConstant.providing_investment_advice_and_information.value.id,
                     'service_answers': {
                         ServiceQuestionID.piai_what_did_you_give_advice_about.value: {
                             ServiceAnswerOptionID.piai_banking_and_funding.value: {},
@@ -303,8 +299,7 @@ class TestServiceAnswers(APITestMixin):
                     },
                 },
                 {
-                    'service':
-                        ServiceConstant.making_export_introductions.value.id,
+                    'service': ServiceConstant.making_export_introductions.value.id,
                     'service_answers': {
                         ServiceQuestionID.piai_what_did_you_give_advice_about.value: {
                             ServiceAnswerOptionID.piai_banking_and_funding.value: {},
@@ -323,8 +318,7 @@ class TestServiceAnswers(APITestMixin):
             ),
             pytest.param(
                 {
-                    'service_id':
-                        ServiceConstant.providing_investment_advice_and_information.value.id,
+                    'service_id': ServiceConstant.providing_investment_advice_and_information.value.id,
                     'service_answers': {
                         ServiceQuestionID.piai_what_did_you_give_advice_about.value: {
                             ServiceAnswerOptionID.piai_banking_and_funding.value: {},
@@ -332,8 +326,7 @@ class TestServiceAnswers(APITestMixin):
                     },
                 },
                 {
-                    'service':
-                        ServiceConstant.providing_investment_advice_and_information.value.id,
+                    'service': ServiceConstant.providing_investment_advice_and_information.value.id,
                     'service_answers': {
                         ServiceQuestionID.piai_what_did_you_give_advice_about.value: {},
                     },
@@ -347,8 +340,7 @@ class TestServiceAnswers(APITestMixin):
             ),
             pytest.param(
                 {
-                    'service_id':
-                        ServiceConstant.providing_investment_advice_and_information.value.id,
+                    'service_id': ServiceConstant.providing_investment_advice_and_information.value.id,
                     'service_answers': {
                         ServiceQuestionID.piai_what_did_you_give_advice_about.value: {
                             ServiceAnswerOptionID.piai_dit_or_government_services.value: {},
@@ -356,8 +348,7 @@ class TestServiceAnswers(APITestMixin):
                     },
                 },
                 {
-                    'service':
-                        ServiceConstant.providing_investment_advice_and_information.value.id,
+                    'service': ServiceConstant.providing_investment_advice_and_information.value.id,
                     'service_answers': {
                         ServiceQuestionID.piai_what_did_you_give_advice_about.value: {
                             ServiceAnswerOptionID.making_export_introductions_customers.value: {},
@@ -373,8 +364,7 @@ class TestServiceAnswers(APITestMixin):
             ),
             pytest.param(
                 {
-                    'service_id':
-                        ServiceConstant.providing_investment_advice_and_information.value.id,
+                    'service_id': ServiceConstant.providing_investment_advice_and_information.value.id,
                     'service_answers': {
                         ServiceQuestionID.piai_what_did_you_give_advice_about.value: {
                             ServiceAnswerOptionID.piai_banking_and_funding.value: {},
@@ -382,8 +372,7 @@ class TestServiceAnswers(APITestMixin):
                     },
                 },
                 {
-                    'service':
-                        ServiceConstant.making_export_introductions.value.id,
+                    'service': ServiceConstant.making_export_introductions.value.id,
                     'service_answers': {},
                 },
                 {'service_answers': ['This field is required.']},

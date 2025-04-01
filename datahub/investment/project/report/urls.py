@@ -1,4 +1,5 @@
 """Investment project report view URL config."""
+
 from django.contrib.admin import site
 from django.urls import path
 

@@ -271,7 +271,9 @@ class TestSearchExportCountryHistory(APITestMixin):
         ],
     )
     def test_filtering_by_country_returns_matching_interactions(
-        self, opensearch_with_collector, factory,
+        self,
+        opensearch_with_collector,
+        factory,
     ):
         """Test that filtering by country includes matching interactions."""
         obj = factory()

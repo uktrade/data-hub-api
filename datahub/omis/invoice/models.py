@@ -56,7 +56,8 @@ class Invoice(BaseModel):
     payment_due_date = models.DateField()
 
     contact_email = models.EmailField(
-        max_length=MAX_LENGTH, blank=True,
+        max_length=MAX_LENGTH,
+        blank=True,
         help_text='Email address of the contact at the time of invoice creation.',
     )
 
@@ -68,21 +69,27 @@ class Invoice(BaseModel):
     vat_verified = models.BooleanField(null=True)
 
     net_cost = models.PositiveIntegerField(
-        default=0, help_text='Net value in pence.',
+        default=0,
+        help_text='Net value in pence.',
     )
     subtotal_cost = models.PositiveIntegerField(
-        default=0, help_text='Net cost - any discount in pence.',
+        default=0,
+        help_text='Net cost - any discount in pence.',
     )
     vat_cost = models.PositiveIntegerField(
-        default=0, help_text='VAT amount of subtotal in pence.',
+        default=0,
+        help_text='VAT amount of subtotal in pence.',
     )
     total_cost = models.PositiveIntegerField(
-        default=0, help_text='Subtotal + VAT cost in pence.',
+        default=0,
+        help_text='Subtotal + VAT cost in pence.',
     )
 
     # legacy fields, only meant to be used in readonly mode as reference
     billing_contact_name = models.CharField(
-        max_length=MAX_LENGTH, blank=True, editable=False,
+        max_length=MAX_LENGTH,
+        blank=True,
+        editable=False,
         help_text='Legacy field. Billing contact name.',
     )
 

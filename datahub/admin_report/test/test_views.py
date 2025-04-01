@@ -94,8 +94,12 @@ class TestReportAdmin(AdminTestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert parse_header(response.get('Content-Type')) == ('text/csv', {'charset': 'utf-8'})
         assert parse_header(response.get('Content-Disposition')) == (
-            'attachment', {'filename': 'Test report - 2018-01-01-11-12-13.csv'},
+            'attachment',
+            {'filename': 'Test report - 2018-01-01-11-12-13.csv'},
         )
-        assert response.getvalue().decode('utf-8-sig') == f"""Test ID,Name\r
+        assert (
+            response.getvalue().decode('utf-8-sig')
+            == f"""Test ID,Name\r
 {str(obj.pk)},{obj.name}\r
 """
+        )

@@ -400,11 +400,17 @@ class InstanceMock:
 
     @property
     def _meta(self):
-        return type('Meta', (),
-                    {'fields': [],
-                     'exclude': [],
-                     'concrete_fields': [],
-                     'private_fields': [], 'many_to_many': []})
+        return type(
+            'Meta',
+            (),
+            {
+                'fields': [],
+                'exclude': [],
+                'concrete_fields': [],
+                'private_fields': [],
+                'many_to_many': [],
+            },
+        )
 
 
 @pytest.mark.django_db
@@ -424,7 +430,6 @@ class TestCustomerResponseInlineForm:
 
 @pytest.mark.django_db
 class TestWinAdminSearchResults:
-
     def test_admin_search_no_filters(self):
         win1 = WinFactory()
         contacts = ContactFactory.create_batch(4)

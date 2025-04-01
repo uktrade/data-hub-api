@@ -117,7 +117,6 @@ class HQTeamRegionOrPostFactory(factory.django.DjangoModelFactory):
 
 
 class HVOProgrammesFactory(factory.django.DjangoModelFactory):
-
     class Meta:
         model = 'export_win.HVOProgrammes'
 
@@ -175,26 +174,22 @@ class WinFactory(factory.django.DjangoModelFactory):
 
     @to_many_field
     def associated_programme(self):  # noqa: D102
-        """Add support for setting `associated_programme`.
-        """
+        """Add support for setting `associated_programme`."""
         return []
 
     @to_many_field
     def type_of_support(self):  # noqa: D102
-        """Add support for setting `type_of_support`.
-        """
+        """Add support for setting `type_of_support`."""
         return []
 
     @to_many_field
     def company_contacts(self):  # noqa: D102
-        """Add support for setting `company_contacts`.
-        """
+        """Add support for setting `company_contacts`."""
         return []
 
     @to_many_field
     def team_members(self):  # noqa: D102
-        """Add support for setting `team_members`.
-        """
+        """Add support for setting `team_members`."""
         return []
 
     class Meta:
@@ -265,7 +260,9 @@ class CustomerResponseTokenFactory(factory.django.DjangoModelFactory):
     customer_response = factory.SubFactory(CustomerResponseFactory)
     email_notification_id = factory.Faker('uuid4')  # Adjust based on your requirements
     email_delivery_status = factory.Faker(
-        'random_element', elements=[choice[0] for choice in EmailDeliveryStatus.choices])
+        'random_element',
+        elements=[choice[0] for choice in EmailDeliveryStatus.choices],
+    )
     company_contact = factory.SubFactory(ContactFactory)
 
     class Meta:

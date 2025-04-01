@@ -972,9 +972,9 @@ def test_mappings(model_label, config):
     """Test that `MAPPING` includes all the data necessary for covering all the cases.
     This is to avoid missing tests when new the configurations for delete_old_records are changed.
     """
-    assert (
-        model_label in MAPPING
-    ), f'No test cases for deleting old records for model {model_label} specified in MAPPING'
+    assert model_label in MAPPING, (
+        f'No test cases for deleting old records for model {model_label} specified in MAPPING'
+    )
 
     if config.relation_filter_mapping:
         mapping = MAPPING[model_label]
@@ -982,9 +982,9 @@ def test_mappings(model_label, config):
         related_models_in_mapping = {
             relation['factory']._meta.get_model_class() for relation in mapping['relations']
         }
-        assert (
-            related_models_in_config <= related_models_in_mapping
-        ), f'Missing test cases for relation filters for model {model_label} detected'
+        assert related_models_in_config <= related_models_in_mapping, (
+            f'Missing test cases for relation filters for model {model_label} detected'
+        )
 
 
 @pytest.mark.parametrize(('model_label', 'config'), delete_old_records.Command.CONFIGS.items())

@@ -23,13 +23,15 @@ def is_user_feature_flag_active(code, user):
         'is_active': True,
     }
 
-    return any([
-        *[
-            feature_group.features.filter(**params).exists()
-            for feature_group in user.feature_groups.filter(is_active=True)
+    return any(
+        [
+            *[
+                feature_group.features.filter(**params).exists()
+                for feature_group in user.feature_groups.filter(is_active=True)
+            ],
+            user.features.filter(**params).exists(),
         ],
-        user.features.filter(**params).exists(),
-    ])
+    )
 
 
 def is_user_feature_flag_group_active(code, user):
@@ -46,6 +48,7 @@ def feature_flagged_view(code):
     This returns a 404 is a specified feature flag is not active. Otherwise, the view is called
     normally.
     """
+
     def decorator(view_func):
         @wraps(view_func)
         def wrapped_view(*args, **kwargs):

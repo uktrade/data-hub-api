@@ -45,18 +45,15 @@ class HawkAuth(AuthBase):
 
 
 class TokenAuth(AuthBase):
-    """Token authentication class.
-    """
+    """Token authentication class."""
 
     def __init__(self, token, token_keyword='Token'):
-        """Initialise the class with the token.
-        """
+        """Initialise the class with the token."""
         self.token = token
         self.token_keyword = token_keyword
 
     def __call__(self, request):
-        """Inject the Authorization header in to the request.
-        """
+        """Inject the Authorization header in to the request."""
         request.headers['Authorization'] = f'{self.token_keyword} {self.token}'
         return request
 
@@ -142,8 +139,5 @@ def get_zipkin_headers(request):
         'x-b3-traceid',
         'x-b3-spanid',
     ]
-    headers = {
-        key: request.headers.get(key)
-        for key in keys if key in request.headers
-    }
+    headers = {key: request.headers.get(key) for key in keys if key in request.headers}
     return headers

@@ -27,7 +27,6 @@ class TestEmptyModelSoftDeleteCoreViewSet(SoftDeleteCoreViewSet):
 
 class TestSoftDeleteViaArchiveMixin(APITestMixin):
     def test_destroy_with_non_archivable_model_deletes_object(self):
-
         empty_model = EmptyModel.objects.create()
         id = empty_model.id
 

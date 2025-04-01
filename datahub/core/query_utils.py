@@ -160,15 +160,20 @@ def get_aggregate_subquery(model, expression, join_field_name='pk'):
 
     # For an explanation of the operations here, see
     # https://docs.djangoproject.com/en/3.0/ref/models/expressions/#using-aggregates-within-a-subquery-expression
-    queryset = model.objects.filter(
-        **{join_field_name: OuterRef('pk')},
-    ).order_by(
-    ).values(
-        join_field_name,
-    ).annotate(
-        _annotated_value=expression,
-    ).values(
-        '_annotated_value',
+    queryset = (
+        model.objects.filter(
+            **{join_field_name: OuterRef('pk')},
+        )
+        .order_by()
+        .values(
+            join_field_name,
+        )
+        .annotate(
+            _annotated_value=expression,
+        )
+        .values(
+            '_annotated_value',
+        )
     )
 
     return Subquery(queryset)
@@ -190,15 +195,20 @@ def get_top_related_expression_subquery(related_field, expression, ordering, out
         )
     """
     wrapped_expression = F(expression) if isinstance(expression, str) else expression
-    queryset = related_field.model.objects.annotate(
-        _annotated_value=wrapped_expression,
-    ).filter(
-        **{related_field.name: OuterRef(outer_field)},
-    ).order_by(
-        *ordering,
-    ).values(
-        '_annotated_value',
-    )[:1]
+    queryset = (
+        related_field.model.objects.annotate(
+            _annotated_value=wrapped_expression,
+        )
+        .filter(
+            **{related_field.name: OuterRef(outer_field)},
+        )
+        .order_by(
+            *ordering,
+        )
+        .values(
+            '_annotated_value',
+        )[:1]
+    )
 
     return Subquery(queryset)
 
@@ -297,9 +307,7 @@ def get_bracketed_concat_expression(*expressions, expression_to_bracket=None):
             ),
         )
     """
-    parts = [
-        NullIf(field, Value('', output_field=CharField())) for field in expressions
-    ]
+    parts = [NullIf(field, Value('', output_field=CharField())) for field in expressions]
 
     if expression_to_bracket:
         bracketed_expression = PreferNullConcat(

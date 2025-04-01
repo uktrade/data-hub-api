@@ -7,8 +7,7 @@ from django.core.management.base import CommandError
 
 @pytest.fixture
 def mock_get_company_updates(monkeypatch):
-    """Test fixture to mock get_company_updates scheduler task.
-    """
+    """Test fixture to mock get_company_updates scheduler task."""
     mocked_get_company_updates = mock.Mock()
     monkeypatch.setattr(
         'datahub.dnb_api.management.commands.update_companies_from_dnb_service'

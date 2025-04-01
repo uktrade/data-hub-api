@@ -301,13 +301,17 @@ def test_can_get_propositions_with_custom_formatting(propositions):
     """Check if we can see custom formatted propositions in the report."""
 
     def proposition_formatter(propositions):
-        return [{
-            'deadline': dateutil_parse(proposition['deadline']).strftime('%Y-%m-%d'),
-            'status': proposition['status'],
-            'modified_on': dateutil_parse(proposition['modified_on']).isoformat()
-            if proposition['status'] != PropositionStatus.ONGOING else '',
-            'adviser_id': str(proposition['adviser_id']),
-        } for proposition in propositions]
+        return [
+            {
+                'deadline': dateutil_parse(proposition['deadline']).strftime('%Y-%m-%d'),
+                'status': proposition['status'],
+                'modified_on': dateutil_parse(proposition['modified_on']).isoformat()
+                if proposition['status'] != PropositionStatus.ONGOING
+                else '',
+                'adviser_id': str(proposition['adviser_id']),
+            }
+            for proposition in propositions
+        ]
 
     spi_report = SPIReport(proposition_formatter=proposition_formatter)
     rows = list(spi_report.rows())

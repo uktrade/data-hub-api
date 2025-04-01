@@ -24,32 +24,25 @@ pytestmark = pytest.mark.django_db
 
 
 class TestCompanyBusinessTypePostMigrate:
-    """Tests for the `company_business_type_post_migrate` signal receiver.
-    """
+    """Tests for the `company_business_type_post_migrate` signal receiver."""
 
     def test_db_in_sync(self):
-        """Test that business types have been correctly loaded.
-        """
-        loaded_business_types = {
-            (obj.id, obj.name) for obj in BusinessType.objects.all()
-        }
+        """Test that business types have been correctly loaded."""
+        loaded_business_types = {(obj.id, obj.name) for obj in BusinessType.objects.all()}
         expected_business_types = {
-            (UUID(obj.value.id), obj.value.name)
-            for obj in BusinessTypeConstant
+            (UUID(obj.value.id), obj.value.name) for obj in BusinessTypeConstant
         }
         assert loaded_business_types == expected_business_types
 
     @mock.patch('datahub.company.signals.load_constants_to_database')
     def test_only_called_once(self, mocked_load_constants_to_database):
-        """Test that load_constants_to_database is only called once.
-        """
+        """Test that load_constants_to_database is only called once."""
         emit_post_migrate_signal(verbosity=1, interactive=False, db=DEFAULT_DB_ALIAS)
         mocked_load_constants_to_database.assert_called_once()
 
 
 class TestExportCountryHistoryCustomSignals:
-    """Test the custom signals are triggered when export country is created, updated and deleted.
-    """
+    """Test the custom signals are triggered when export country is created, updated and deleted."""
 
     def test_company_export_country_history_create(self):
         """Test that creating new CompanyExportCountry record

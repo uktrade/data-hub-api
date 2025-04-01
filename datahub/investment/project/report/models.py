@@ -32,9 +32,7 @@ class SPIReport(BaseModel):
 
     class Meta:
         verbose_name = 'SPI report'
-        default_permissions = (
-            'view',
-        )
+        default_permissions = ('view',)
 
     def get_absolute_url(self):
         """Generate pre-signed download URL."""

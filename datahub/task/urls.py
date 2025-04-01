@@ -34,5 +34,4 @@ urls_v4 = [
         get_tasks_companies_and_projects,
         name='companies-and-projects',
     ),
-
 ]

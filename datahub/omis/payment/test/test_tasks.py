@@ -34,13 +34,11 @@ class TestRefreshPendingPaymentGatewaySessions:
         data = (
             # shouldn't be included because modified_on == 59 mins ago
             ('2017-04-18 19:01', PaymentGatewaySessionStatus.STARTED),
-
             # shouldn't be included because status != 'ongoing'
             ('2017-04-18 18:59', PaymentGatewaySessionStatus.SUCCESS),
             ('2017-04-18 18:59', PaymentGatewaySessionStatus.FAILED),
             ('2017-04-18 18:59', PaymentGatewaySessionStatus.CANCELLED),
             ('2017-04-18 18:59', PaymentGatewaySessionStatus.ERROR),
-
             # should be included because modified_on >= 60 mins ago
             ('2017-04-18 19:00', PaymentGatewaySessionStatus.CREATED),
             ('2017-04-18 18:59', PaymentGatewaySessionStatus.STARTED),
@@ -74,7 +72,11 @@ class TestRefreshPendingPaymentGatewaySessions:
         assert mock_schedule_refresh_payment_gateway_session.call_count == 3
 
     def test_job_scheduler_schedule_refresh_payment_gateway_session(
-            self, caplog, monkeypatch, requests_mock):
+        self,
+        caplog,
+        monkeypatch,
+        requests_mock,
+    ):
         self.mock_sessions(requests_mock)
         caplog.set_level(logging.INFO)
 
@@ -84,8 +86,7 @@ class TestRefreshPendingPaymentGatewaySessions:
 
         # check result
         assert any(
-            'schedule_refresh_payment_gateway_session'
-            in message for message in caplog.messages
+            'schedule_refresh_payment_gateway_session' in message for message in caplog.messages
         )
         # assert mock_payment_tasks_job_scheduler.call_count == 3
 

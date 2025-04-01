@@ -7,10 +7,7 @@ def get_all_recipients(message):
     :returns: a list of all recipient emails
     """
     return sorted(
-        {
-            email.strip()
-            for name, email in (*message.to, *message.cc)
-        },
+        {email.strip() for name, email in (*message.to, *message.cc)},
     )
 
 

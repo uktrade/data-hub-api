@@ -38,8 +38,7 @@ class BaseSelectPrimaryModelForm(forms.Form):
         super().__init__(*args, **kwargs)
 
     def clean(self):
-        """Checks that the selection made is allowed.
-        """
+        """Checks that the selection made is allowed."""
         cleaned_data = super().clean()
         index = cleaned_data.get('selected_model')
 
@@ -53,7 +52,10 @@ class BaseSelectPrimaryModelForm(forms.Form):
             raise ValidationError(self.INVALID_TARGET_MODEL_MSG)
 
         is_source_valid, disallowed_objects = is_model_a_valid_merge_source(
-            source_model, self._allowed_relations_for_merging, self._model)
+            source_model,
+            self._allowed_relations_for_merging,
+            self._model,
+        )
         if not is_source_valid:
             error_msg = f'{self.INVALID_SOURCE_MODEL_MSG}: Invalid object: {disallowed_objects}'
             logger.error(error_msg)
@@ -217,7 +219,10 @@ def _build_option_context(source, target, dict):
     merge_results, _ = get_planned_changes(target, merge_configuration)
     merge_entries = transform_merge_results_to_merge_entry_summaries(merge_results)
     is_source_valid, invalid_objects = is_model_a_valid_merge_source(
-        source, allowed_relations_for_merging, model)
+        source,
+        allowed_relations_for_merging,
+        model,
+    )
     is_target_valid = is_model_a_valid_merge_target(target)
 
     return {

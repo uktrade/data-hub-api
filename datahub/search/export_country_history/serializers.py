@@ -20,9 +20,7 @@ class SearchExportCountryHistorySerializer(EntitySearchQuerySerializer):
 
     DEFAULT_ORDERING = SearchOrdering('date', SortDirection.desc)
 
-    SORT_BY_FIELDS = (
-        'date',
-    )
+    SORT_BY_FIELDS = ('date',)
 
     country = SingleOrListField(child=StringUUIDField(), required=False)
     company = SingleOrListField(child=StringUUIDField(), required=False)

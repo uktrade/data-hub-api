@@ -24,8 +24,7 @@ def test_link_company_with_dnb_success(
     dnb_response_uk,
     base_company_dict,
 ):
-    """Test the link_company_with_dnb utility.
-    """
+    """Test the link_company_with_dnb utility."""
     requests_mock.post(
         DNB_V2_SEARCH_URL,
         json=dnb_response_uk,

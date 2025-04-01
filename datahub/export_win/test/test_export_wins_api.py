@@ -25,17 +25,16 @@ from datahub.export_win.export_wins_api import (
 def mock_sleep(monkeypatch):
     def sleep(seconds):
         pass
+
     monkeypatch.setattr(time, 'sleep', sleep)
 
 
 class TestExportWinsDatasetApi(APITestMixin):
-    """Tests functionality to obtain export wins datasets.
-    """
+    """Tests functionality to obtain export wins datasets."""
 
     @override_settings(EXPORT_WINS_SERVICE_BASE_URL=None)
     def test_export_wins_api_missing_settings_error(self):
-        """Test when environment variables are not set an exception is thrown.
-        """
+        """Test when environment variables are not set an exception is thrown."""
         with pytest.raises(ImproperlyConfigured):
             next(get_legacy_export_wins_dataset('/data-hub-wins'))
 
@@ -109,8 +108,7 @@ class TestExportWinsDatasetApi(APITestMixin):
         self,
         requests_mock,
     ):
-        """Check GET call will be made.
-        """
+        """Check GET call will be made."""
         dynamic_response = HawkMockJSONResponse(
             api_id=settings.EXPORT_WINS_HAWK_ID,
             api_key=settings.EXPORT_WINS_HAWK_KEY,
@@ -133,8 +131,7 @@ class TestExportWinsDatasetApi(APITestMixin):
         requests_mock,
         mock_sleep,
     ):
-        """Check GET call will be retried.
-        """
+        """Check GET call will be retried."""
         dynamic_response = HawkMockJSONResponse(
             api_id=settings.EXPORT_WINS_HAWK_ID,
             api_key=settings.EXPORT_WINS_HAWK_KEY,
@@ -168,8 +165,7 @@ class TestExportWinsDatasetApi(APITestMixin):
         requests_mock,
         mock_sleep,
     ):
-        """Check GET call will be aborted.
-        """
+        """Check GET call will be aborted."""
         dynamic_response = HawkMockJSONResponse(
             api_id=settings.EXPORT_WINS_HAWK_ID,
             api_key=settings.EXPORT_WINS_HAWK_KEY,

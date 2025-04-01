@@ -269,8 +269,7 @@ class TestAcceptOrder(APITestMixin):
         assert response.status_code == status.HTTP_409_CONFLICT
         assert response.json() == {
             'detail': (
-                'The action cannot be performed '
-                f'in the current status {disallowed_status.label}.'
+                f'The action cannot be performed in the current status {disallowed_status.label}.'
             ),
         }
 

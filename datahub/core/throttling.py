@@ -16,8 +16,7 @@ class PathRateThrottle(SimpleRateThrottle):
     """
 
     def get_cache_key(self, request, view):
-        """:returns: cache key constructed from the request path
-        """
+        """:returns: cache key constructed from the request path"""
         # we hash the path to have a deterministic length (64 chars)
         ident_hash = hashlib.sha256(request.path.lower().encode('utf-8'))
 

@@ -81,8 +81,7 @@ def test_run(s3_stubber, caplog):
 
 
 def test_overwrite(s3_stubber, caplog):
-    """Test that the command updates all specified records (ignoring ones with errors).
-    """
+    """Test that the command updates all specified records (ignoring ones with errors)."""
     caplog.set_level('ERROR')
     global_hq = CompanyFactory(
         headquarter_type_id=HeadquarterType.ghq.value.id,

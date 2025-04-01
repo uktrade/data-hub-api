@@ -59,14 +59,15 @@ class BaseSearchModel(Document):
     @classmethod
     def get_write_index(cls):
         """Gets the index currently referenced by the write alias."""
-        indices, = get_indices_for_aliases(cls.get_write_alias())
+        (indices,) = get_indices_for_aliases(cls.get_write_alias())
         return _get_write_index(indices)
 
     @classmethod
     def get_read_and_write_indices(cls):
         """Gets the indices currently referenced by the read and write aliases."""
         read_indices, write_indices = get_indices_for_aliases(
-            cls.get_read_alias(), cls.get_write_alias(),
+            cls.get_read_alias(),
+            cls.get_write_alias(),
         )
         return read_indices, _get_write_index(write_indices)
 
@@ -92,7 +93,7 @@ class BaseSearchModel(Document):
                 f'index {current_write_index}. It may be a legacy index.',
             )
             return ''
-        return current_write_index[len(prefix):]
+        return current_write_index[len(prefix) :]
 
     @classmethod
     def get_target_index_name(cls):
@@ -156,9 +157,7 @@ class BaseSearchModel(Document):
     @classmethod
     def db_object_to_dict(cls, db_object):
         """Converts a DB model object to a dictionary suitable for OpenSearch."""
-        mapped_values = (
-            (col, fn, getattr(db_object, col)) for col, fn in cls.MAPPINGS.items()
-        )
+        mapped_values = ((col, fn, getattr(db_object, col)) for col, fn in cls.MAPPINGS.items())
         fields = get_model_non_mapped_field_names(cls)
 
         result = {

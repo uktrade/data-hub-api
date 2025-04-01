@@ -4,7 +4,6 @@ from datahub.company_activity.models.stova_event import StovaEvent
 
 
 class StovaEventSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = StovaEvent
         fields = [

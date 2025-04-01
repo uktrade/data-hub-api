@@ -10,6 +10,7 @@ def enforce_request_content_type(content_type):
     This should be used on rest framework view functions/methods which have
     `request` as the first argument
     """
+
     def _enforce_request_content_type(f):
         def wrapper(request, *args, **kwargs):
             content_type = request.content_type or ''
@@ -21,5 +22,7 @@ def enforce_request_content_type(content_type):
                     status=status.HTTP_406_NOT_ACCEPTABLE,
                 )
             return f(request, *args, **kwargs)
+
         return wrapper
+
     return _enforce_request_content_type

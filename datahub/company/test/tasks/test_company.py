@@ -20,15 +20,13 @@ from datahub.omis.order.test.factories import OrderFactory
 
 @pytest.fixture
 def automatic_company_archive_feature_flag():
-    """Creates the automatic company archive feature flag.
-    """
+    """Creates the automatic company archive feature flag."""
     return FeatureFlagFactory(code=AUTOMATIC_COMPANY_ARCHIVE_FEATURE_FLAG)
 
 
 @pytest.mark.django_db
 class TestAutomaticCompanyArchive:
-    """Tests for the automatic_company_archive task.
-    """
+    """Tests for the automatic_company_archive task."""
 
     def test_no_feature_flag(
         self,
@@ -260,8 +258,7 @@ class TestAutomaticCompanyArchive:
         self,
         automatic_company_archive_feature_flag,
     ):
-        """Test that a company with OMIS orders is not archived.
-        """
+        """Test that a company with OMIS orders is not archived."""
         gt_3m_ago = timezone.now() - relativedelta(months=3, days=1)
         with freeze_time(gt_3m_ago):
             company = CompanyFactory()
@@ -299,8 +296,7 @@ class TestAutomaticCompanyArchive:
         self,
         automatic_company_archive_feature_flag,
     ):
-        """Test that a company with investor profile is not archived.
-        """
+        """Test that a company with investor profile is not archived."""
         gt_3m_ago = timezone.now() - relativedelta(months=3, days=1)
         with freeze_time(gt_3m_ago):
             companies = CompanyFactory.create_batch(2)

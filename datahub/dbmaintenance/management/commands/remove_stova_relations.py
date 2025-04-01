@@ -39,8 +39,7 @@ class Command(BaseCommand):
         parser.add_argument('batch_size', type=int, nargs='?', default=5000)
 
     def handle(self, *args, **options):
-        """Process the CSV file and logs some additional logging to help with the company duns update.
-        """
+        """Process the CSV file and logs some additional logging to help with the company duns update."""
         is_simulation = options['simulate']
         batch_size = options['batch_size']
         logger.info(f'Simulation is: {is_simulation}')

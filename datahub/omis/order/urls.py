@@ -14,10 +14,12 @@ internal_frontend_urls = [
     path('order', OrderViewSet.as_view({'post': 'create'}), name='list'),
     path(
         'order/<uuid:pk>',
-        OrderViewSet.as_view({
-            'get': 'retrieve',
-            'patch': 'partial_update',
-        }),
+        OrderViewSet.as_view(
+            {
+                'get': 'retrieve',
+                'patch': 'partial_update',
+            },
+        ),
         name='detail',
     ),
     path(
@@ -30,13 +32,11 @@ internal_frontend_urls = [
         OrderViewSet.as_action_view('cancel'),
         name='cancel',
     ),
-
     path(
         'order/<uuid:order_pk>/subscriber-list',
         SubscriberListView.as_view(),
         name='subscriber-list',
     ),
-
     path(
         'order/<uuid:order_pk>/assignee',
         AssigneeView.as_view(),

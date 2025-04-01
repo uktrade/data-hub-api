@@ -12,12 +12,10 @@ from datahub.company_activity.tests.factories import GreatExportEnquiryFactory
 
 @pytest.mark.django_db
 class TestCompanyActivityGreatTasks:
-    """Tests for the schedule_sync_data_to_company_activity task for great export enquiry.
-    """
+    """Tests for the schedule_sync_data_to_company_activity task for great export enquiry."""
 
     def test_great_export_enquiry_are_copied_to_company_activity(self):
-        """Test that great export enquiry are added to the CompanyActivity model.
-        """
+        """Test that great export enquiry are added to the CompanyActivity model."""
         great_export_enquiry = GreatExportEnquiryFactory()
         GreatExportEnquiryFactory.create_batch(3)
 
@@ -41,8 +39,7 @@ class TestCompanyActivityGreatTasks:
 
     @mock.patch('datahub.company_activity.models.CompanyActivity.objects.bulk_create')
     def test_great_export_enquiry_are_bulk_created_in_batches(self, mocked_bulk_create, caplog):
-        """Test that great export enquiries are bulk created in batches.
-        """
+        """Test that great export enquiries are bulk created in batches."""
         caplog.set_level('INFO')
         batch_size = 5
 

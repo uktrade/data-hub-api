@@ -86,8 +86,7 @@ def unrelated_objects():
 
 
 def company_with_interactions_and_contacts_factory():
-    """Factory for a company with interactions (and hence contacts, as interactions have contacts).
-    """
+    """Factory for a company with interactions (and hence contacts, as interactions have contacts)."""
     company = CompanyFactory()
     CompanyInteractionFactory.create_batch(3, company=company)
     return company
@@ -207,10 +206,7 @@ class TestDuplicateCompanyMerger:
                 {
                     **base_expected_results,
                     CompanyActivity: {'company': 1},
-                    InvestmentProject: {
-                        field: 1 for field in INVESTMENT_PROJECT_COMPANY_FIELDS
-                    },
-
+                    InvestmentProject: {field: 1 for field in INVESTMENT_PROJECT_COMPANY_FIELDS},
                 },
                 True,
             ),
@@ -221,7 +217,6 @@ class TestDuplicateCompanyMerger:
                     CompanyActivity: {'company': 3},
                     Contact: {'company': 3},
                     Order: {'company': 3},
-
                 },
                 True,
             ),
@@ -264,10 +259,10 @@ class TestDuplicateCompanyMerger:
     @pytest.mark.parametrize('num_related_objects', [0, 1, 3])
     @pytest.mark.usefixtures('unrelated_objects')
     def test_merge_interactions_contacts_succeeds(
-            self,
-            factory_relation_kwarg,
-            creates_contacts,
-            num_related_objects,
+        self,
+        factory_relation_kwarg,
+        creates_contacts,
+        num_related_objects,
     ):
         """Tests that perform_merge() moves contacts and interactions to the target company,
         and marks the source company as archived and transferred.
@@ -387,14 +382,8 @@ class TestDuplicateCompanyMerger:
             # each interaction has a contact, that's why 4 contacts should be moved
             CompanyActivity: company,
             InvestmentProject: {
-                **{
-                    field: 1
-                    for field in fields
-                },
-                **{
-                    field: 0
-                    for field in other_fields
-                },
+                **{field: 1 for field in fields},
+                **{field: 0 for field in other_fields},
             },
         }
 
@@ -584,8 +573,7 @@ class TestDuplicateCompanyMerger:
             merge_companies(source_company, target_company, user)
 
     def test_rollback(self):
-        """Test that rollback_merge_companies() rolls back a merge of companies.
-        """
+        """Test that rollback_merge_companies() rolls back a merge of companies."""
         with reversion.create_revision():
             source_company = _company_factory(2, 2, 2, 2, 2, 2)
             target_company = _company_factory(3, 3, 3, 3, 3, 3)
@@ -607,8 +595,10 @@ class TestDuplicateCompanyMerger:
         assert source_company.transferred_to == target_company
 
         assert target_company.interactions.count() == 5
-        assert target_company.contacts.count() == \
-            source_company_num_contacts + target_company_num_contacts
+        assert (
+            target_company.contacts.count()
+            == source_company_num_contacts + target_company_num_contacts
+        )
         assert target_company.orders.count() == 5
         assert target_company.referrals.count() == 5
         assert target_company.company_list_items.count() == 5
@@ -635,8 +625,9 @@ class TestDuplicateCompanyMerger:
 
     def test_related_fields_are_versioned(self):
         for relation in ALLOWED_RELATIONS_FOR_MERGING:
-            assert reversion.is_registered(relation.model), \
+            assert reversion.is_registered(relation.model), (
                 f'{relation.model} is not registered with reversion'
+            )
 
     def test_one_list_core_team_member_merges_successfully(self):
         """Test merge is successful.
@@ -655,25 +646,33 @@ class TestDuplicateCompanyMerger:
         OneListCoreTeamMemberFactory(adviser=adviser, company=target_company)
 
         # Target has only the 1 OneListCoreTeamMember
-        assert OneListCoreTeamMember.objects.filter(
-            company=target_company,
-        ).count() == 1
+        assert (
+            OneListCoreTeamMember.objects.filter(
+                company=target_company,
+            ).count()
+            == 1
+        )
 
         merge_companies(source_company, target_company, adviser)
 
         # Merge successful and target has 2 advisers.
-        assert OneListCoreTeamMember.objects.filter(
-            company=target_company,
-        ).count() == 2
+        assert (
+            OneListCoreTeamMember.objects.filter(
+                company=target_company,
+            ).count()
+            == 2
+        )
         # Merge successful and target does not have duplicate advisers.
-        assert OneListCoreTeamMember.objects.filter(
-            company=target_company,
-            adviser=adviser,
-        ).count() == 1
+        assert (
+            OneListCoreTeamMember.objects.filter(
+                company=target_company,
+                adviser=adviser,
+            ).count()
+            == 1
+        )
 
     def test_company_export_merges_successfully(self):
-        """Test company merge successfully merges company `CompanyExport`s.
-        """
+        """Test company merge successfully merges company `CompanyExport`s."""
         adviser = AdviserFactory()
         source_company = CompanyFactory()
         target_company = CompanyFactory()
@@ -687,13 +686,15 @@ class TestDuplicateCompanyMerger:
         merge_companies(source_company, target_company, adviser)
 
         # Merge successful and target now has 2 company exports
-        assert CompanyExport.objects.filter(
-            company=target_company,
-        ).count() == 2
+        assert (
+            CompanyExport.objects.filter(
+                company=target_company,
+            ).count()
+            == 2
+        )
 
     def test_company_objective_merges_successfully(self):
-        """Test company merge successfully merges company `Objective`s.
-        """
+        """Test company merge successfully merges company `Objective`s."""
         adviser = AdviserFactory()
         source_company = CompanyFactory()
         target_company = CompanyFactory()
@@ -705,20 +706,25 @@ class TestDuplicateCompanyMerger:
         ObjectiveFactory(company=target_company)
 
         # Target has only 1 export before merge
-        assert Objective.objects.filter(
-            company=target_company,
-        ).count() == 1
+        assert (
+            Objective.objects.filter(
+                company=target_company,
+            ).count()
+            == 1
+        )
 
         merge_companies(source_company, target_company, adviser)
 
         # Merge successful and target now has 2 objectives.
-        assert Objective.objects.filter(
-            company=target_company,
-        ).count() == 2
+        assert (
+            Objective.objects.filter(
+                company=target_company,
+            ).count()
+            == 2
+        )
 
     def test_company_eyb_lead_merges_successfully(self):
-        """Test company merge successfully merges company `EYBLead`s.
-        """
+        """Test company merge successfully merges company `EYBLead`s."""
         adviser = AdviserFactory()
         source_company = CompanyFactory()
         target_company = CompanyFactory()
@@ -727,19 +733,24 @@ class TestDuplicateCompanyMerger:
         EYBLeadFactory(company=target_company)
 
         # Target has only 1 export before merge
-        assert EYBLead.objects.filter(
-            company=target_company,
-        ).count() == 1
+        assert (
+            EYBLead.objects.filter(
+                company=target_company,
+            ).count()
+            == 1
+        )
 
         merge_companies(source_company, target_company, adviser)
 
-        assert EYBLead.objects.filter(
-            company=target_company,
-        ).count() == 2
+        assert (
+            EYBLead.objects.filter(
+                company=target_company,
+            ).count()
+            == 2
+        )
 
     def test_company_large_capital_investor_profile_merges_successfully(self):
-        """Test company merge successfully merges company `LargeCapitalInvestorProfile`s.
-        """
+        """Test company merge successfully merges company `LargeCapitalInvestorProfile`s."""
         adviser = AdviserFactory()
         source_company = CompanyFactory()
         target_company = CompanyFactory()
@@ -748,19 +759,24 @@ class TestDuplicateCompanyMerger:
         CompleteLargeCapitalInvestorProfileFactory(investor_company=target_company)
 
         # Target has only 1 export before merge
-        assert LargeCapitalInvestorProfile.objects.filter(
-            investor_company=target_company,
-        ).count() == 1
+        assert (
+            LargeCapitalInvestorProfile.objects.filter(
+                investor_company=target_company,
+            ).count()
+            == 1
+        )
 
         merge_companies(source_company, target_company, adviser)
 
-        assert LargeCapitalInvestorProfile.objects.filter(
-            investor_company=target_company,
-        ).count() == 2
+        assert (
+            LargeCapitalInvestorProfile.objects.filter(
+                investor_company=target_company,
+            ).count()
+            == 2
+        )
 
     def test_company_large_capital_opportunity_merges_successfully(self):
-        """Test company merge successfully merges company `LargeCapitalOpportunity`s.
-        """
+        """Test company merge successfully merges company `LargeCapitalOpportunity`s."""
         adviser = AdviserFactory()
         source_company = CompanyFactory()
         target_company = CompanyFactory()
@@ -771,19 +787,24 @@ class TestDuplicateCompanyMerger:
         # Shared one, should not be merged.
         LargeCapitalOpportunityFactory(promoters=[target_company, source_company])
 
-        assert LargeCapitalOpportunity.objects.filter(
-            promoters=target_company,
-        ).count() == 2
+        assert (
+            LargeCapitalOpportunity.objects.filter(
+                promoters=target_company,
+            ).count()
+            == 2
+        )
 
         merge_companies(source_company, target_company, adviser)
 
-        assert LargeCapitalOpportunity.objects.filter(
-            promoters=target_company,
-        ).count() == 3
+        assert (
+            LargeCapitalOpportunity.objects.filter(
+                promoters=target_company,
+            ).count()
+            == 3
+        )
 
     def test_company_new_export_interaction_reminder_merges_successfully(self):
-        """Test company merge successfully merges company `NewExportInteractionReminder`s.
-        """
+        """Test company merge successfully merges company `NewExportInteractionReminder`s."""
         adviser = AdviserFactory()
         source_company = CompanyFactory()
         target_company = CompanyFactory()
@@ -792,19 +813,24 @@ class TestDuplicateCompanyMerger:
         NewExportInteractionReminderFactory(company=target_company)
 
         # Target has only 1 export before merge
-        assert NewExportInteractionReminder.objects.filter(
-            company=target_company,
-        ).count() == 1
+        assert (
+            NewExportInteractionReminder.objects.filter(
+                company=target_company,
+            ).count()
+            == 1
+        )
 
         merge_companies(source_company, target_company, adviser)
 
-        assert NewExportInteractionReminder.objects.filter(
-            company=target_company,
-        ).count() == 2
+        assert (
+            NewExportInteractionReminder.objects.filter(
+                company=target_company,
+            ).count()
+            == 2
+        )
 
     def test_company_no_recent_export_interaction_reminder_merges_successfully(self):
-        """Test company merge successfully merges company `NoRecentExportInteractionReminder`s.
-        """
+        """Test company merge successfully merges company `NoRecentExportInteractionReminder`s."""
         adviser = AdviserFactory()
         source_company = CompanyFactory()
         target_company = CompanyFactory()
@@ -813,19 +839,24 @@ class TestDuplicateCompanyMerger:
         NoRecentExportInteractionReminderFactory(company=target_company)
 
         # Target has only 1 export before merge
-        assert NoRecentExportInteractionReminder.objects.filter(
-            company=target_company,
-        ).count() == 1
+        assert (
+            NoRecentExportInteractionReminder.objects.filter(
+                company=target_company,
+            ).count()
+            == 1
+        )
 
         merge_companies(source_company, target_company, adviser)
 
-        assert NoRecentExportInteractionReminder.objects.filter(
-            company=target_company,
-        ).count() == 2
+        assert (
+            NoRecentExportInteractionReminder.objects.filter(
+                company=target_company,
+            ).count()
+            == 2
+        )
 
     def test_company_task_merges_successfully(self):
-        """Test company merge successfully merges company `Task`s.
-        """
+        """Test company merge successfully merges company `Task`s."""
         adviser = AdviserFactory()
         source_company = CompanyFactory()
         target_company = CompanyFactory()
@@ -834,19 +865,24 @@ class TestDuplicateCompanyMerger:
         TaskFactory(company=target_company)
 
         # Target has only 1 export before merge
-        assert Task.objects.filter(
-            company=target_company,
-        ).count() == 1
+        assert (
+            Task.objects.filter(
+                company=target_company,
+            ).count()
+            == 1
+        )
 
         merge_companies(source_company, target_company, adviser)
 
-        assert Task.objects.filter(
-            company=target_company,
-        ).count() == 2
+        assert (
+            Task.objects.filter(
+                company=target_company,
+            ).count()
+            == 2
+        )
 
     def test_company_legacy_export_wins_merges_successfully(self):
-        """Test company merge successfully merges company `LegacyExportWinsToDataHubCompany`s.
-        """
+        """Test company merge successfully merges company `LegacyExportWinsToDataHubCompany`s."""
         adviser = AdviserFactory()
         source_company = CompanyFactory()
         target_company = CompanyFactory()
@@ -855,15 +891,21 @@ class TestDuplicateCompanyMerger:
         LegacyExportWinsToDataHubCompanyFactory(company=target_company)
 
         # Target has only 1 export before merge
-        assert LegacyExportWinsToDataHubCompany.objects.filter(
-            company=target_company,
-        ).count() == 1
+        assert (
+            LegacyExportWinsToDataHubCompany.objects.filter(
+                company=target_company,
+            ).count()
+            == 1
+        )
 
         merge_companies(source_company, target_company, adviser)
 
-        assert LegacyExportWinsToDataHubCompany.objects.filter(
-            company=target_company,
-        ).count() == 2
+        assert (
+            LegacyExportWinsToDataHubCompany.objects.filter(
+                company=target_company,
+            ).count()
+            == 2
+        )
 
     def test_company_with_merges_can_merge_to_non_merged_company(self):
         adviser = AdviserFactory()
@@ -880,9 +922,12 @@ class TestDuplicateCompanyMerger:
         assert source_company_b.archived
         assert source_company_b.transferred_to.id == source_company_c.id
 
-        assert source_company_c.transferred_from.filter(
-            id=source_company_a.id,
-        ).exists() is True
+        assert (
+            source_company_c.transferred_from.filter(
+                id=source_company_a.id,
+            ).exists()
+            is True
+        )
         assert (
             source_company_c.transferred_from.filter(
                 id=source_company_b.id,
@@ -975,53 +1020,81 @@ class TestDuplicateCompanyMerger:
 
         merge_companies(source_company_merged, target_company, adviser)
 
-        assert OneListCoreTeamMember.objects.filter(
-            company=target_company,
-        ).count() == 2
+        assert (
+            OneListCoreTeamMember.objects.filter(
+                company=target_company,
+            ).count()
+            == 2
+        )
 
-        assert CompanyExport.objects.filter(
-            company=target_company,
-        ).count() == 2
+        assert (
+            CompanyExport.objects.filter(
+                company=target_company,
+            ).count()
+            == 2
+        )
 
-        assert Objective.objects.filter(
-            company=target_company,
-        ).count() == 2
+        assert (
+            Objective.objects.filter(
+                company=target_company,
+            ).count()
+            == 2
+        )
 
-        assert EYBLead.objects.filter(
-            company=target_company,
-        ).count() == 2
+        assert (
+            EYBLead.objects.filter(
+                company=target_company,
+            ).count()
+            == 2
+        )
 
-        assert LargeCapitalInvestorProfile.objects.filter(
-            investor_company=target_company,
-        ).count() == 2
+        assert (
+            LargeCapitalInvestorProfile.objects.filter(
+                investor_company=target_company,
+            ).count()
+            == 2
+        )
 
-        assert LargeCapitalOpportunity.objects.filter(
-            promoters=target_company,
-        ).count() == 3
+        assert (
+            LargeCapitalOpportunity.objects.filter(
+                promoters=target_company,
+            ).count()
+            == 3
+        )
 
-        assert NewExportInteractionReminder.objects.filter(
-            company=target_company,
-        ).count() == 2
+        assert (
+            NewExportInteractionReminder.objects.filter(
+                company=target_company,
+            ).count()
+            == 2
+        )
 
-        assert NoRecentExportInteractionReminder.objects.filter(
-            company=target_company,
-        ).count() == 2
+        assert (
+            NoRecentExportInteractionReminder.objects.filter(
+                company=target_company,
+            ).count()
+            == 2
+        )
 
-        assert Task.objects.filter(
-            company=target_company,
-        ).count() == 2
+        assert (
+            Task.objects.filter(
+                company=target_company,
+            ).count()
+            == 2
+        )
 
-        assert LegacyExportWinsToDataHubCompany.objects.filter(
-            company=target_company,
-        ).count() == 2
+        assert (
+            LegacyExportWinsToDataHubCompany.objects.filter(
+                company=target_company,
+            ).count()
+            == 2
+        )
 
 
 @pytest.mark.django_db
 class TestCompanyMerge:
-
     def test_merge_logs_source_and_target_relations(self, caplog):
-        """Tests before we merge companies that the counts of each models relations are logged.
-        """
+        """Tests before we merge companies that the counts of each models relations are logged."""
         adviser = AdviserFactory()
         source_company = CompanyFactory()
         target_company = CompanyFactory()
@@ -1054,12 +1127,12 @@ class TestCompanyMerge:
 
 
 def _company_factory(
-        num_interactions=0,
-        num_contacts=0,
-        num_orders=0,
-        num_referrals=0,
-        num_company_list_items=0,
-        num_pipeline_items=0,
+    num_interactions=0,
+    num_contacts=0,
+    num_orders=0,
+    num_referrals=0,
+    num_company_list_items=0,
+    num_pipeline_items=0,
 ):
     """Factory for a company that has companies, interactions and OMIS orders."""
     company = CompanyFactory()

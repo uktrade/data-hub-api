@@ -121,8 +121,7 @@ class CompanyListItemViewSet(CoreViewSet):
     queryset = get_company_list_item_queryset()
 
     def initial(self, request, *args, **kwargs):
-        """Raise an Http404 if user's company list specified in the URL path does not exist.
-        """
+        """Raise an Http404 if user's company list specified in the URL path does not exist."""
         super().initial(request, *args, **kwargs)
 
         if not CompanyList.objects.filter(
@@ -138,8 +137,7 @@ class CompanyListItemViewSet(CoreViewSet):
 
 
 class CompanyListItemAPIView(APIView):
-    """A view for adding a company to a selected list of companies that belongs to a user.
-    """
+    """A view for adding a company to a selected list of companies that belongs to a user."""
 
     permission_classes = (CompanyListItemAPIPermissions,)
     # Note: A query set is required for CompanyListItemPermissions
@@ -204,7 +202,7 @@ class PipelineItemViewSet(ArchivableViewSetMixin, CoreViewSet, DestroyModelMixin
         OrderingFilter,
     )
     filterset_fields = ('status', 'company_id', 'archived')
-    ordering = ('-created_on')
+    ordering = '-created_on'
     ordering_fields = ('created_on', 'modified_on', 'name')
     queryset = get_pipeline_item_queryset()
 

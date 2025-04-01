@@ -5,8 +5,9 @@ from datahub.task.models import Task
 
 
 class EmailTemplate(ABC):
-    UTM_URL_BASE = '?utm_source=individual&utm_medium=email_notify' +\
-                   '&utm_campaign={0}&utm_content=task'
+    UTM_URL_BASE = (
+        '?utm_source=individual&utm_medium=email_notify' + '&utm_campaign={0}&utm_content=task'
+    )
     UTM_CAMPAIGN = None
 
     @abstractmethod
@@ -25,9 +26,7 @@ class EmailTemplate(ABC):
 
     @property
     def company_name(self):
-        return (
-            f'Company name: {self.task.get_company().name }' if self.task.get_company() else None
-        )
+        return f'Company name: {self.task.get_company().name}' if self.task.get_company() else None
 
     @property
     def investment_project(self):

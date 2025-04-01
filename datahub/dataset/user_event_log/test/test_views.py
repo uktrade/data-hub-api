@@ -25,8 +25,7 @@ def get_expected_data_from_user_log(event):
 
 @pytest.mark.django_db
 class TestUserEventsViewSet:
-    """Tests for the user event logs dataset endpoint.
-    """
+    """Tests for the user event logs dataset endpoint."""
 
     factory = AdviserFactory
     view_url = reverse('api-v4:dataset:user-events-dataset')

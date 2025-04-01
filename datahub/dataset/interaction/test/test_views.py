@@ -23,8 +23,7 @@ def get_expected_data_from_interaction(interaction):
     """Returns expected API response dictionary for an interaction."""
     return {
         'adviser_ids': [
-            str(x.adviser_id)
-            for x in interaction.dit_participants.all().order_by('pk')
+            str(x.adviser_id) for x in interaction.dit_participants.all().order_by('pk')
         ],
         'communication_channel__name': get_attr_or_none(
             interaction,
@@ -40,11 +39,7 @@ def get_expected_data_from_interaction(interaction):
         'created_by_id': str(interaction.created_by_id),
         'created_on': format_date_or_datetime(interaction.created_on),
         'date': format_date_or_datetime(interaction.date),
-        'event_id': (
-            str(interaction.event_id)
-            if interaction.event_id is not None
-            else None
-        ),
+        'event_id': (str(interaction.event_id) if interaction.event_id is not None else None),
         'grant_amount_offered': (
             float(interaction.grant_amount_offered)
             if interaction.grant_amount_offered is not None
@@ -67,16 +62,19 @@ def get_expected_data_from_interaction(interaction):
         'notes': interaction.notes,
         'policy_area_names': (
             [x.name for x in interaction.policy_areas.all()]
-            if interaction.policy_areas.exists() else None
+            if interaction.policy_areas.exists()
+            else None
         ),
         'policy_feedback_notes': interaction.policy_feedback_notes,
         'policy_issue_type_names': (
             [x.name for x in interaction.policy_issue_types.all()]
-            if interaction.policy_areas.exists() else None
+            if interaction.policy_areas.exists()
+            else None
         ),
         'related_trade_agreement_names': (
             [x.name for x in interaction.related_trade_agreements.all()]
-            if interaction.related_trade_agreements.exists() else None
+            if interaction.related_trade_agreements.exists()
+            else None
         ),
         'sector': get_attr_or_none(interaction, 'company.sector.name'),
         'service_delivery_status__name': get_attr_or_none(
@@ -89,7 +87,8 @@ def get_expected_data_from_interaction(interaction):
         'were_countries_discussed': interaction.were_countries_discussed,
         'export_barrier_type_names': (
             [x.name for x in interaction.export_barrier_types.all()]
-            if interaction.export_barrier_types.exists() else None
+            if interaction.export_barrier_types.exists()
+            else None
         ),
         'export_barrier_notes': interaction.export_barrier_notes,
     }
@@ -97,14 +96,14 @@ def get_expected_data_from_interaction(interaction):
 
 @pytest.mark.django_db
 class TestInteractionsDatasetViewSet(BaseDatasetViewTest):
-    """Tests for InteractionsDatasetView.
-    """
+    """Tests for InteractionsDatasetView."""
 
     view_url = reverse('api-v4:dataset:interactions-dataset')
     factory = CompanyInteractionFactoryWithRelatedTradeAgreements
 
     @pytest.mark.parametrize(
-        'interaction_factory', [
+        'interaction_factory',
+        [
             CompanyExportInteractionFactory,
             CompanyInteractionFactory,
             CompanyInteractionFactoryWithPolicyFeedback,

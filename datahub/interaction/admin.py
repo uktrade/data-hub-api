@@ -53,9 +53,7 @@ class InteractionAdmin(BaseModelAdminMixin, VersionAdmin):
     """Interaction admin."""
 
     autocomplete_fields = ('contacts', 'companies')
-    inlines = (
-        InteractionDITParticipantInline,
-    )
+    inlines = (InteractionDITParticipantInline,)
     search_fields = (
         '=pk',
         'subject',
@@ -69,9 +67,7 @@ class InteractionAdmin(BaseModelAdminMixin, VersionAdmin):
         'get_contact_names',
         'investment_project',
     )
-    list_filter = (
-        'kind',
-    )
+    list_filter = ('kind',)
     raw_id_fields = (
         'company',
         'event',
@@ -119,8 +115,7 @@ class InteractionAdmin(BaseModelAdminMixin, VersionAdmin):
         description='source',
     )
     def pretty_source(self, obj):
-        """Return the source field formatted with indentation.
-        """
+        """Return the source field formatted with indentation."""
         return format_json_as_html(obj.source)
 
     @admin.display(

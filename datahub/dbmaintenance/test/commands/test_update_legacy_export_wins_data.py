@@ -41,7 +41,8 @@ def test_run(s3_stubber, caplog):
         company_name,
         lead_officer_name,
         lead_officer_email_address,
-        user_name, user_email,
+        user_name,
+        user_email,
         line_manager_name,
         customer_name,
         customer_job_title,
@@ -56,12 +57,15 @@ def test_run(s3_stubber, caplog):
         line_manager_names,
         customer_names,
         customer_job_titles,
-        customer_email_addresses, strict=False,
+        customer_email_addresses,
+        strict=False,
     ):
-        csv_contents.append(f'{uuid},"{company_name}",{lead_officer_name},'
-                            f'{lead_officer_email_address},{user_name},'
-                            f'{user_email},{line_manager_name},{customer_name},'
-                            f'"{customer_job_title}",{customer_email_address}')
+        csv_contents.append(
+            f'{uuid},"{company_name}",{lead_officer_name},'
+            f'{lead_officer_email_address},{user_name},'
+            f'{user_email},{line_manager_name},{customer_name},'
+            f'"{customer_job_title}",{customer_email_address}',
+        )
 
     csv_content = '\n'.join(csv_contents)
 
@@ -83,7 +87,8 @@ def test_run(s3_stubber, caplog):
         company_name,
         lead_officer_name,
         lead_officer_email_address,
-        user_name, user_email,
+        user_name,
+        user_email,
         line_manager_name,
         customer_name,
         customer_job_title,
@@ -98,7 +103,8 @@ def test_run(s3_stubber, caplog):
         line_manager_names,
         customer_names,
         customer_job_titles,
-        customer_email_addresses, strict=False,
+        customer_email_addresses,
+        strict=False,
     ):
         win = Win.objects.get(id=uuid)
         assert win.company_name == company_name
@@ -149,7 +155,8 @@ def test_simulate(s3_stubber, caplog):
         company_name,
         lead_officer_name,
         lead_officer_email_address,
-        user_name, user_email,
+        user_name,
+        user_email,
         line_manager_name,
         customer_name,
         customer_job_title,
@@ -164,12 +171,15 @@ def test_simulate(s3_stubber, caplog):
         line_manager_names,
         customer_names,
         customer_job_titles,
-        customer_email_addresses, strict=False,
+        customer_email_addresses,
+        strict=False,
     ):
-        csv_contents.append(f'{uuid},"{company_name}",{lead_officer_name},'
-                            f'{lead_officer_email_address},{user_name},'
-                            f'{user_email},{line_manager_name},{customer_name},'
-                            f'"{customer_job_title}",{customer_email_address}')
+        csv_contents.append(
+            f'{uuid},"{company_name}",{lead_officer_name},'
+            f'{lead_officer_email_address},{user_name},'
+            f'{user_email},{line_manager_name},{customer_name},'
+            f'"{customer_job_title}",{customer_email_address}',
+        )
 
     csv_content = '\n'.join(csv_contents)
 
@@ -191,7 +201,8 @@ def test_simulate(s3_stubber, caplog):
         company_name,
         lead_officer_name,
         lead_officer_email_address,
-        user_name, user_email,
+        user_name,
+        user_email,
         line_manager_name,
         customer_name,
         customer_job_title,
@@ -206,7 +217,8 @@ def test_simulate(s3_stubber, caplog):
         line_manager_names,
         customer_names,
         customer_job_titles,
-        customer_email_addresses, strict=False,
+        customer_email_addresses,
+        strict=False,
     ):
         win = Win.objects.get(id=uuid)
         assert win.company_name != company_name

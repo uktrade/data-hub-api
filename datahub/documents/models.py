@@ -33,13 +33,16 @@ class Document(BaseModel, ArchivableModel):
     path = models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH)
 
     uploaded_on = models.DateTimeField(
-        null=True, blank=True,
+        null=True,
+        blank=True,
     )
     scan_initiated_on = models.DateTimeField(
-        null=True, blank=True,
+        null=True,
+        blank=True,
     )
     scanned_on = models.DateTimeField(
-        null=True, blank=True,
+        null=True,
+        blank=True,
     )
 
     av_clean = models.BooleanField(null=True, db_index=True)
@@ -52,9 +55,7 @@ class Document(BaseModel, ArchivableModel):
     )
 
     class Meta:
-        unique_together = (
-            ('bucket_id', 'path'),
-        )
+        unique_together = (('bucket_id', 'path'),)
 
     @property
     def name(self):
@@ -248,12 +249,14 @@ class GenericDocument(BaseModel, ArchivableModel):
 
     class Meta:
         indexes = [
-            models.Index(fields=[
-                'document_type',
-                'document_object_id',
-                'related_object_type',
-                'related_object_id',
-            ]),
+            models.Index(
+                fields=[
+                    'document_type',
+                    'document_object_id',
+                    'related_object_type',
+                    'related_object_id',
+                ],
+            ),
         ]
 
     def __str__(self):

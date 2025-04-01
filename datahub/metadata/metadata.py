@@ -62,11 +62,14 @@ registry.register(
     model=models.Service,
     queryset=models.Service.objects.prefetch_related(
         'interaction_questions__answer_options',
-    ).select_related(
+    )
+    .select_related(
         'parent',
-    ).filter(
+    )
+    .filter(
         children__isnull=True,
-    ).order_by(
+    )
+    .order_by(
         'order',
     ),
     serializer=ServiceSerializer,

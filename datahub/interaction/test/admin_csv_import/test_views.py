@@ -52,8 +52,7 @@ class TestInteractionAdminChangeList(AdminTestMixin):
     """Tests for the contact admin change list."""
 
     def test_load_import_link_exists(self):
-        """Test that there is a link to import interactions on the interaction change list page.
-        """
+        """Test that there is a link to import interactions on the interaction change list page."""
         response = self.client.get(interaction_change_list_url)
         assert response.status_code == status.HTTP_200_OK
 
@@ -178,8 +177,7 @@ class TestImportInteractionsSelectFileView(AdminTestMixin):
     """Tests for the import interaction select file form."""
 
     def test_displays_page_if_with_correct_permissions(self):
-        """Test that the view returns displays the form if the user has the correct permissions.
-        """
+        """Test that the view returns displays the form if the user has the correct permissions."""
         response = self.client.get(import_interactions_url)
 
         assert response.status_code == status.HTTP_200_OK
@@ -424,9 +422,7 @@ class TestImportInteractionsSaveView(AdminTestMixin):
         assert expected_contact_emails == actual_contact_emails
 
         # Check that created_by is set correctly
-        assert all([
-            interaction.created_by == self.user for interaction in created_interactions
-        ])
+        assert all([interaction.created_by == self.user for interaction in created_interactions])
 
     def test_saves_results(self):
         """Test that counts by matching status are saved in the cache."""

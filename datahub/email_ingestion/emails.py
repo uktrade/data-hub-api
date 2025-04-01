@@ -71,8 +71,7 @@ def delete_message(token, message_id):
 
 
 def process_ingestion_emails():
-    """Gets all new mail documents in the bucket and process each message.
-    """
+    """Gets all new mail documents in the bucket and process each message."""
     processor = InteractionPlainEmailProcessor()
 
     token = get_access_token(

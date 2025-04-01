@@ -88,7 +88,6 @@ class TestPublicGetInvoice(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == {
             'created_on': format_date_or_datetime(invoice.created_on),
-
             'invoice_number': invoice.invoice_number,
             'invoice_company_name': invoice.invoice_company_name,
             'invoice_address_1': invoice.invoice_address_1,
@@ -102,7 +101,6 @@ class TestPublicGetInvoice(APITestMixin):
             },
             'invoice_vat_number': invoice.invoice_vat_number,
             'payment_due_date': invoice.payment_due_date.isoformat(),
-
             'billing_contact_name': invoice.billing_contact_name,
             'billing_company_name': invoice.billing_company_name,
             'billing_address_1': invoice.billing_address_1,
@@ -115,7 +113,6 @@ class TestPublicGetInvoice(APITestMixin):
                 'name': invoice.billing_address_country.name,
             },
             'po_number': invoice.po_number,
-
             'vat_status': invoice.vat_status,
             'vat_number': invoice.vat_number,
             'vat_verified': invoice.vat_verified,

@@ -50,8 +50,7 @@ EXCEPTION_NOTIFY_MESSAGES = {
 
 
 def _flatten_serializer_errors_to_list(serializer_errors):
-    """Flatten DRF Serializer validation errors to a list with one field per item.
-    """
+    """Flatten DRF Serializer validation errors to a list with one field per item."""
     field_errors = []
     for field_name, details in serializer_errors.items():
         details_string = ','.join([str(detail) for detail in details])
@@ -70,11 +69,7 @@ def _get_meeting_subject(sender, contacts, secondary_advisers):
     """Construct and return a meeting subject given a sender, contacts and secondary
     advisers (if present).
     """
-    adviser_names = [
-        adviser.name
-        for adviser in (sender, *secondary_advisers)
-        if adviser.name
-    ]
+    adviser_names = [adviser.name for adviser in (sender, *secondary_advisers) if adviser.name]
     if not adviser_names:
         adviser_names = ['DIT']
     contact_names = [contact.name for contact in contacts if contact.name]
@@ -91,7 +86,6 @@ def _get_meeting_subject(sender, contacts, secondary_advisers):
 
 
 class BaseInteractionEmailProcessor:
-
     def _notify_meeting_ingest_failure(self, message, errors):
         try:
             sender_email = message.from_[0][1]
@@ -174,8 +168,7 @@ class CalendarInteractionEmailProcessor(BaseInteractionEmailProcessor, EmailProc
 
     @transaction.atomic
     def save_serializer_as_interaction(self, serializer, interaction_data):
-        """Create the interaction model instance from the validated serializer.
-        """
+        """Create the interaction model instance from the validated serializer."""
         # Provide an overridden value for source - so that we save the meeting
         # data properly
         interaction = serializer.save(
@@ -247,8 +240,7 @@ class InteractionPlainEmailProcessor(BaseInteractionEmailProcessor, EmailProcess
 
     @transaction.atomic
     def save_serializer_as_interaction(self, serializer, interaction_data):
-        """Create the interaction model instance from the validated serializer.
-        """
+        """Create the interaction model instance from the validated serializer."""
         # Provide an overridden value for source - so that we save the meeting
         # data properly
         interaction = serializer.save(

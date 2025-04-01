@@ -57,8 +57,7 @@ def test_activity_investment_dict():
 
     assert result['id'] == str(investment.id)
     assert result['created_by']['id'] == str(investment.created_by_id)
-    assert result['investment_type']['id'] == str(
-        investment.investment_type_id)
+    assert result['investment_type']['id'] == str(investment.investment_type_id)
     assert result['estimated_land_date'] == investment.estimated_land_date
     assert result['eyb_leads'] == []
 
@@ -95,8 +94,7 @@ def test_activity_investment_with_eyb_leads_dict():
 
     assert result['id'] == str(investment.id)
     assert result['created_by']['id'] == str(investment.created_by_id)
-    assert result['investment_type']['id'] == str(
-        investment.investment_type_id)
+    assert result['investment_type']['id'] == str(investment.investment_type_id)
     assert result['estimated_land_date'] == investment.estimated_land_date
     assert_eyb_lead_in_result_list(eyb_leads_is_high_value, result['eyb_leads'])
     assert_eyb_lead_in_result_list(eyb_leads_is_not_high_value, result['eyb_leads'])

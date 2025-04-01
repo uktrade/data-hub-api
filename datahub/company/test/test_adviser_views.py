@@ -221,7 +221,7 @@ class TestAdviser(APITestMixin):
             ),
             (
                 # nothing odd should happen with special characters
-                r"%_`~:'()[]{}?*+-|^$\\.&~# \t\n\r\v\f",  # noqa: P103
+                r"%_`~:'()[]{}?*+-|^$\\.&~# \t\n\r\v\f",
                 [],
             ),
             (

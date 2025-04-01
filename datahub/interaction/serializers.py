@@ -188,7 +188,9 @@ class BaseInteractionSerializer(serializers.ModelSerializer):
         allow_empty=False,
     )
     communication_channel = NestedRelatedField(
-        CommunicationChannel, required=False, allow_null=True,
+        CommunicationChannel,
+        required=False,
+        allow_null=True,
     )
     is_event = serializers.BooleanField(required=False, allow_null=True)
     event = NestedRelatedField(
@@ -209,7 +211,9 @@ class BaseInteractionSerializer(serializers.ModelSerializer):
     service = NestedRelatedField(Service, required=False, allow_null=True)
     service_answers = serializers.JSONField(required=False)
     service_delivery_status = NestedRelatedField(
-        ServiceDeliveryStatus, required=False, allow_null=True,
+        ServiceDeliveryStatus,
+        required=False,
+        allow_null=True,
     )
     export_barrier_types = NestedRelatedField(
         ExportBarrierType,
@@ -365,10 +369,7 @@ class BaseInteractionSerializer(serializers.ModelSerializer):
             export_country.country: export_country
             for export_country in interaction.export_countries.all()
         }
-        new_country_mapping = {
-            item['country']: item
-            for item in validated_export_countries
-        }
+        new_country_mapping = {item['country']: item for item in validated_export_countries}
 
         for new_country, export_data in new_country_mapping.items():
             status = export_data['status']
@@ -402,7 +403,10 @@ class InteractionSerializer(BaseInteractionSerializer):
     """Interaction Serializer for V3 endpoint."""
 
     related_trade_agreements = NestedRelatedField(
-        'metadata.TradeAgreement', many=True, required=False, allow_empty=True,
+        'metadata.TradeAgreement',
+        many=True,
+        required=False,
+        allow_empty=True,
     )
 
     class Meta:
@@ -605,7 +609,10 @@ class InteractionSerializerV4(BaseInteractionSerializer):
     """Interaction Serializer for V4 Endpoint."""
 
     related_trade_agreements = NestedRelatedField(
-        'metadata.TradeAgreement', many=True, required=True, allow_empty=True,
+        'metadata.TradeAgreement',
+        many=True,
+        required=True,
+        allow_empty=True,
     )
 
     class Meta:
@@ -742,10 +749,11 @@ class InteractionSerializerV4(BaseInteractionSerializer):
                         OperatorRule('has_related_trade_agreements', bool),
                         InRule(
                             'theme',
-                            [Interaction.Theme.EXPORT,
-                             Interaction.Theme.TRADE_AGREEMENT,
-                             Interaction.Theme.OTHER,
-                             ],
+                            [
+                                Interaction.Theme.EXPORT,
+                                Interaction.Theme.TRADE_AGREEMENT,
+                                Interaction.Theme.OTHER,
+                            ],
                         ),
                     ),
                 ),

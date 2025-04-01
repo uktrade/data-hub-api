@@ -69,8 +69,7 @@ class PaymentGatewaySessionQuerySet(models.QuerySet):
     """Custom Payment Gateway Session QuerySet."""
 
     def ongoing(self):
-        """:returns: only non-finished sessions
-        """
+        """:returns: only non-finished sessions"""
         return self.filter(
             status__in=[
                 PaymentGatewaySessionStatus.CREATED,

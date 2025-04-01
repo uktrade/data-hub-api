@@ -1,4 +1,5 @@
 """Search views."""
+
 import uuid
 from collections import namedtuple
 from enum import Enum, auto
@@ -43,8 +44,7 @@ class SearchStubSchema(AutoSchema):
     """
 
     def get_operation(self, path, path_regex, path_prefix, method, registry):
-        """Supress showing the response in the form of the request body.
-        """
+        """Supress showing the response in the form of the request body."""
         operation = super().get_operation(
             path=path,
             path_regex=path_regex,
@@ -228,9 +228,7 @@ class SearchAPIView(APIView):
             ancestor_uuids = set(ancestors.values_list('id', flat=True))
             # Remove ancestors from sector list, leaving only the youngest descendants
             filter_data['sector_descends'] = [
-                sector_id
-                for sector_id in sector_ids
-                if uuid.UUID(sector_id) not in ancestor_uuids
+                sector_id for sector_id in sector_ids if uuid.UUID(sector_id) not in ancestor_uuids
             ]
 
         entities = self.get_entities()

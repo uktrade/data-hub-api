@@ -214,7 +214,8 @@ class UKRegion(Enum):
     wales = Constant('Wales', '8d4cd12a-6095-e211-a939-e4115bead28a')
     west_midlands = Constant('West Midlands', '854cd12a-6095-e211-a939-e4115bead28a')
     yorkshire_and_the_humber = Constant(
-        'Yorkshire and The Humber', '834cd12a-6095-e211-a939-e4115bead28a',
+        'Yorkshire and The Humber',
+        '834cd12a-6095-e211-a939-e4115bead28a',
     )
 
 
@@ -288,7 +289,8 @@ class Team(Enum):
     healthcare_uk = Constant('Healthcare UK', '3ff47a07-002c-e311-a78e-e4115bead28a')
     tees_valley_lep = Constant('Tees Valley LEP', 'a889ef76-8925-e511-b6bc-e4115bead28a')
     td_events_healthcare = Constant(
-        'TD - Events - Healthcare', 'daf924aa-9698-e211-a939-e4115bead28a',
+        'TD - Events - Healthcare',
+        'daf924aa-9698-e211-a939-e4115bead28a',
     )
     food_from_britain = Constant('Food From Britain', '8cf924aa-9698-e211-a939-e4115bead28a')
     crm = Constant('crm', 'a7f924aa-9698-e211-a939-e4115bead28a')
@@ -325,16 +327,24 @@ class InvestmentProjectStage(Enum):
     """Investment project stage constants."""
 
     prospect = OrderedConstant(
-        'Prospect', '8a320cc9-ae2e-443e-9d26-2f36452c2ced', 200.0,
+        'Prospect',
+        '8a320cc9-ae2e-443e-9d26-2f36452c2ced',
+        200.0,
     )
     assign_pm = OrderedConstant(
-        'Assign PM', 'c9864359-fb1a-4646-a4c1-97d10189fc03', 300.0,
+        'Assign PM',
+        'c9864359-fb1a-4646-a4c1-97d10189fc03',
+        300.0,
     )
     active = OrderedConstant(
-        'Active', '7606cc19-20da-4b74-aba1-2cec0d753ad8', 400.0,
+        'Active',
+        '7606cc19-20da-4b74-aba1-2cec0d753ad8',
+        400.0,
     )
     verify_win = OrderedConstant(
-        'Verify win', '49b8f6f3-0c50-4150-a965-2c974f3149e3', 500.0,
+        'Verify win',
+        '49b8f6f3-0c50-4150-a965-2c974f3149e3',
+        500.0,
     )
     won = OrderedConstant('Won', '945ea6d1-eee3-4f5b-9144-84a75b71b8e6', 600.0)
 
@@ -362,35 +372,44 @@ class ReferralSourceActivity(Enum):
     """Referral source activity constants."""
 
     cold_call = Constant(
-        'Cold call', '0c4f8e74-d34f-4aca-b764-a44cdc2d0087',
+        'Cold call',
+        '0c4f8e74-d34f-4aca-b764-a44cdc2d0087',
     )
     direct_enquiry = Constant(
-        'Direct enquiry', '7d98f3a6-3e3f-40ac-a6f3-3f0c251ec1d2',
+        'Direct enquiry',
+        '7d98f3a6-3e3f-40ac-a6f3-3f0c251ec1d2',
     )
     event = Constant(
-        'Event', '3816a95b-6a76-4ad0-8ae9-b0d7e7d2b79c',
+        'Event',
+        '3816a95b-6a76-4ad0-8ae9-b0d7e7d2b79c',
     )
     marketing = Constant(
-        'Marketing', '0acf0e68-e09e-4e5d-92b6-e72e5a5c7ea4',
+        'Marketing',
+        '0acf0e68-e09e-4e5d-92b6-e72e5a5c7ea4',
     )
     multiplier = Constant(
-        'Multiplier', 'e95cddb3-9407-4c8a-b5a6-2616117b0aae',
+        'Multiplier',
+        'e95cddb3-9407-4c8a-b5a6-2616117b0aae',
     )
     none = Constant(
-        'None', 'aba8f653-264f-48d8-950e-07f9c418c7b0',
+        'None',
+        'aba8f653-264f-48d8-950e-07f9c418c7b0',
     )
     other = Constant(
-        'Other', '318e6e9e-2a0e-4e4b-a495-c48aeee4b996',
+        'Other',
+        '318e6e9e-2a0e-4e4b-a495-c48aeee4b996',
     )
     relationship_management_activity = Constant(
         'Relationship management activity',
         '668e999c-a669-4d9b-bfbf-6275ceed86da',
     )
     personal_reference = Constant(
-        'Personal reference', 'c03c4043-18b4-4463-a36b-a1af1b35f95d',
+        'Personal reference',
+        'c03c4043-18b4-4463-a36b-a1af1b35f95d',
     )
     website = Constant(
-        'Website', '812b2f62-fe62-4cc8-b69c-58f3e2ebac17',
+        'Website',
+        '812b2f62-fe62-4cc8-b69c-58f3e2ebac17',
     )
 
 
@@ -419,7 +438,8 @@ class FDIValue(Enum):
     """Investment FDI value constants."""
 
     higher = Constant(
-        'Higher', '38e36c77-61ad-4186-a7a8-ac6a1a1104c6',
+        'Higher',
+        '38e36c77-61ad-4186-a7a8-ac6a1a1104c6',
     )
 
 
@@ -427,7 +447,9 @@ class SalaryRange(Enum):
     """Average salary constants."""
 
     below_25000 = OrderedConstant(
-        'Below £25,000', '2943bf3d-32dd-43be-8ad4-969b006dee7b', 100.0,
+        'Below £25,000',
+        '2943bf3d-32dd-43be-8ad4-969b006dee7b',
+        100.0,
     )
 
 
@@ -435,7 +457,8 @@ class InvestmentStrategicDriver(Enum):
     """Investment strategic driver constants."""
 
     access_to_market = Constant(
-        'Access to market', '382aa6d1-a362-4166-a09d-f579d9f3be75',
+        'Access to market',
+        '382aa6d1-a362-4166-a09d-f579d9f3be75',
     )
 
 
@@ -500,15 +523,18 @@ class ExportBarrierType(Enum):
     """Interaction export barrier type constant."""
 
     capacity = Constant(
-        'Capacity', 'd0c8fe10-dd29-4e39-a422-80dd111199e7',
+        'Capacity',
+        'd0c8fe10-dd29-4e39-a422-80dd111199e7',
     )
 
     finance = Constant(
-        'Finance', '758c4132-a07b-4e4d-a43d-f2f630113023',
+        'Finance',
+        '758c4132-a07b-4e4d-a43d-f2f630113023',
     )
 
     other = Constant(
-        'Other', '8ef83315-2b0f-4d5e-98da-a16f8b2217a6',
+        'Other',
+        '8ef83315-2b0f-4d5e-98da-a16f8b2217a6',
     )
 
 

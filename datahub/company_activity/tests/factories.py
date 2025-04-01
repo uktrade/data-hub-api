@@ -64,8 +64,7 @@ class CompanyActivityReferralFactory(CompanyActivityBaseFactory):
 
 
 class CompanyActivityInvestmentProjectFactory(CompanyActivityBaseFactory):
-    """CompanyActivity factory with an investment project.
-    """
+    """CompanyActivity factory with an investment project."""
 
     activity_source = CompanyActivity.ActivitySource.investment
     investment = factory.SubFactory(InvestmentProjectFactory)
@@ -84,8 +83,7 @@ class CompanyActivityInvestmentProjectFactory(CompanyActivityBaseFactory):
 
 
 class CompanyActivityOmisOrderFactory(CompanyActivityBaseFactory):
-    """CompanyActivity factory with an omis order.
-    """
+    """CompanyActivity factory with an omis order."""
 
     activity_source = CompanyActivity.ActivitySource.order
     order = factory.SubFactory(OrderFactory)
@@ -104,8 +102,7 @@ class CompanyActivityOmisOrderFactory(CompanyActivityBaseFactory):
 
 
 class CompanyActivityIngestedFileFactory(factory.django.DjangoModelFactory):
-    """CompanyActivity ingested file factory.
-    """
+    """CompanyActivity ingested file factory."""
 
     filepath = 'data-flow/exports/ExportGreatContactFormData/20240920T000000.jsonl.gz'
     file_created = now()
@@ -115,8 +112,7 @@ class CompanyActivityIngestedFileFactory(factory.django.DjangoModelFactory):
 
 
 class GreatExportEnquiryFactory(factory.django.DjangoModelFactory):
-    """Ingested Great Export Enquiry data factory.
-    """
+    """Ingested Great Export Enquiry data factory."""
 
     form_id = factory.Faker('pyint', min_value=0, max_value=999999)
     url = 'http://www.lewis.com/'
@@ -177,8 +173,7 @@ class GreatExportEnquiryFactory(factory.django.DjangoModelFactory):
 
 
 class CompanyActivityGreatExportEnquiryFactory(CompanyActivityBaseFactory):
-    """CompanyActivity factory with an great export enquiry.
-    """
+    """CompanyActivity factory with an great export enquiry."""
 
     activity_source = CompanyActivity.ActivitySource.great_export_enquiry
     great_export_enquiry = factory.SubFactory(GreatExportEnquiryFactory)
@@ -197,8 +192,7 @@ class CompanyActivityGreatExportEnquiryFactory(CompanyActivityBaseFactory):
 
 
 class CompanyActivityEYBLeadFactory(CompanyActivityBaseFactory):
-    """CompanyActivity factory with an EYB lead.
-    """
+    """CompanyActivity factory with an EYB lead."""
 
     activity_source = CompanyActivity.ActivitySource.eyb_lead
     eyb_lead = factory.SubFactory(EYBLeadFactory)
@@ -260,8 +254,7 @@ class StovaEventFactory(factory.django.DjangoModelFactory):
 
 
 class StovaAttendeeFactory(factory.django.DjangoModelFactory):
-    """Ingested Stova Attendee data factory.
-    """
+    """Ingested Stova Attendee data factory."""
 
     stova_event_id = factory.Faker('pyint', min_value=0, max_value=999999999)
     stova_attendee_id = factory.Faker('pyint', min_value=0, max_value=999999999)

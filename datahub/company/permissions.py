@@ -10,6 +10,8 @@ class IsAccountManagerOnCompany(BasePermission):
     """
 
     def has_object_permission(self, request, view, obj):
-        return request.user.has_perms([
-            f'company.{CompanyPermission.change_company}',
-        ]) and (obj.one_list_account_owner == request.user)
+        return request.user.has_perms(
+            [
+                f'company.{CompanyPermission.change_company}',
+            ],
+        ) and (obj.one_list_account_owner == request.user)

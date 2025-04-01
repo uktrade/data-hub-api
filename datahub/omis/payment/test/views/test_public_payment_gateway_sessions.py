@@ -162,11 +162,13 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
         existing_data = PaymentGatewaySessionFactory.create_batch(
             3,
             order=order,
-            status=factory.Iterator([
-                PaymentGatewaySessionStatus.CREATED,
-                PaymentGatewaySessionStatus.STARTED,
-                PaymentGatewaySessionStatus.FAILED,
-            ]),
+            status=factory.Iterator(
+                [
+                    PaymentGatewaySessionStatus.CREATED,
+                    PaymentGatewaySessionStatus.STARTED,
+                    PaymentGatewaySessionStatus.FAILED,
+                ],
+            ),
         )
 
         # mock GOV.UK requests used to:
@@ -335,7 +337,8 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
         assert PaymentGatewaySession.objects.count() == 0
 
     @pytest.mark.parametrize(
-        'disallowed_status', [
+        'disallowed_status',
+        [
             OrderStatus.PAID,
             OrderStatus.COMPLETE,
         ],
@@ -355,8 +358,7 @@ class TestPublicCreatePaymentGatewaySession(APITestMixin):
         assert response.status_code == status.HTTP_409_CONFLICT
         assert response.json() == {
             'detail': (
-                'The action cannot be performed '
-                f'in the current status {disallowed_status.label}.'
+                f'The action cannot be performed in the current status {disallowed_status.label}.'
             ),
         }
 
@@ -583,7 +585,8 @@ class TestPublicGetPaymentGatewaySession(APITestMixin):
         assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
 
     @pytest.mark.parametrize(
-        'order_status', [
+        'order_status',
+        [
             OrderStatus.QUOTE_ACCEPTED,
             OrderStatus.PAID,
             OrderStatus.COMPLETE,

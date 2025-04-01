@@ -134,8 +134,7 @@ class TestAddCompanyReferral(APITestMixin):
         ],
     )
     def test_permission_checking(self, permission_codenames, expected_status, api_client):
-        """Test that the expected status is returned depending on the permissions the user has.
-        """
+        """Test that the expected status is returned depending on the permissions the user has."""
         user = create_test_user(permission_codenames=permission_codenames)
         api_client = self.create_api_client(user=user)
 
@@ -186,7 +185,6 @@ class TestAddCompanyReferral(APITestMixin):
                     # The value of these fields shouldn't be allowed to be an empty string
                     'notes': '',
                     'subject': '',
-
                     # Provide values for other required fields (so we don't get errors for them)
                     'company': {
                         'id': CompanyFactory,
@@ -359,8 +357,7 @@ class TestGetCompanyReferral(APITestMixin):
         ],
     )
     def test_permission_checking(self, permission_codenames, expected_status, api_client):
-        """Test that the expected status is returned depending on the permissions the user has.
-        """
+        """Test that the expected status is returned depending on the permissions the user has."""
         referral = CompanyReferralFactory()
         user = create_test_user(permission_codenames=permission_codenames)
 
@@ -410,7 +407,9 @@ class TestGetCompanyReferral(APITestMixin):
             'interaction': {
                 'id': str(referral.interaction.pk),
                 'subject': referral.interaction.subject,
-            } if referral.interaction else None,
+            }
+            if referral.interaction
+            else None,
             'notes': referral.notes,
             'recipient': format_expected_adviser(referral.recipient),
             'status': referral.status,

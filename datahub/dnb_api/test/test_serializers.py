@@ -27,8 +27,7 @@ override_functions = (
 
 
 def test_dnb_company_serializer_partial_save(db):
-    """Test DNBCompanySerializer.partial_save() method.
-    """
+    """Test DNBCompanySerializer.partial_save() method."""
     dh_company = CompanyFactory()
     original_company = Company.objects.get(id=dh_company.id)
     serializer = DNBCompanySerializer(
@@ -45,8 +44,7 @@ def test_dnb_company_serializer_partial_save(db):
 
 
 def test_dnb_change_request_serializer(db):
-    """Test that dnb change requests serialize correctly.
-    """
+    """Test that dnb change requests serialize correctly."""
     change_request = ChangeRequestSerializer(data={'turnover_gbp': 200})
     change_request.is_valid()
 

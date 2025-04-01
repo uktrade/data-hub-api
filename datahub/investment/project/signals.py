@@ -143,6 +143,9 @@ def update_project_site_address_fields_when_company_address_changes(sender, **kw
                 investment_project.address_postcode = instance.address_postcode
                 investment_project.save(
                     update_fields=[
-                        'address_1', 'address_2', 'address_town', 'address_postcode',
+                        'address_1',
+                        'address_2',
+                        'address_town',
+                        'address_postcode',
                     ],
                 )

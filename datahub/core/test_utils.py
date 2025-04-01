@@ -327,7 +327,8 @@ class MockQuerySet:
     def get(self, **kwargs):
         """Gets an item matching the given kwargs."""
         matches = [
-            item for item in self._results
+            item
+            for item in self._results
             if all(getattr(item, attr) == val for attr, val in kwargs.items())
         ]
 
@@ -340,8 +341,7 @@ class MockQuerySet:
         return matches[0]
 
     def order_by(self, *fields):
-        """Mock order_by note: no actual ordering takes place.
-        """
+        """Mock order_by note: no actual ordering takes place."""
         return self.values_list(self, *fields)
 
     def filter(self, pk__in=()):
@@ -369,9 +369,7 @@ class MockQuerySet:
         return self._clone(value_list_fields=fields, value_list_flat=flat)
 
     def _clone(self, objects=None, **kwargs):
-        clone_args = (
-            objects if objects is not None else self._objects,
-        )
+        clone_args = (objects if objects is not None else self._objects,)
         clone_kwargs = {
             'value_list_fields': self._value_list_fields,
             'value_list_flat': self._value_list_flat,
@@ -416,9 +414,7 @@ def format_csv_data(rows):
     Expects an iterable of dictionaries with arbitrary objects as values, and outputs a list of
     dictionaries with strings as values.
     """
-    return [
-        {key: str(transform_csv_value(val)) for key, val in row.items()} for row in rows
-    ]
+    return [{key: str(transform_csv_value(val)) for key, val in row.items()} for row in rows]
 
 
 def construct_mock(**props):
@@ -455,8 +451,7 @@ def resolve_data(data, value_resolver=identity):
     """
     if isinstance(data, Mapping):
         return {
-            key: resolve_data(value, value_resolver=value_resolver)
-            for key, value in data.items()
+            key: resolve_data(value, value_resolver=value_resolver) for key, value in data.items()
         }
 
     if isinstance(data, Sequence) and not isinstance(data, (str, bytes)):
@@ -541,10 +536,9 @@ class HawkMockJSONResponse:
             self._response = {}
 
     def __call__(self, request, context):
-        """Mock the server authorization response for validating the response content.
-        """
+        """Mock the server authorization response for validating the response content."""
         response = json.dumps(self._response)
-        credentials = (lambda key: self.credentials)
+        credentials = lambda key: self.credentials
         receiver = mohawk.Receiver(
             credentials,
             request.headers['Authorization'],

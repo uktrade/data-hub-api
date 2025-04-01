@@ -15,8 +15,7 @@ logger = getLogger(__name__)
 
 
 def sync_all_models():
-    """Task that starts sub-tasks to sync all models to OpenSearch.
-    """
+    """Task that starts sub-tasks to sync all models to OpenSearch."""
     for search_app in get_search_apps():
         schedule_model_sync((search_app.name,))
 
@@ -34,8 +33,7 @@ def schedule_model_sync(search_app: tuple):
 
 
 def sync_model(search_app_name):
-    """Task that syncs a single model to OpenSearch.
-    """
+    """Task that syncs a single model to OpenSearch."""
     search_app = get_search_app(search_app_name)
     sync_app(search_app)
 
@@ -50,6 +48,7 @@ def sync_object_task(search_app_name, pk):
     This task is named sync_object_task to avoid a conflict with sync_object.
     """
     from datahub.search.sync_object import sync_object
+
     logger.info(f"Running sync_object_task search_app_name '{search_app_name}' pk '{str(pk)}'")
     search_app = get_search_app(search_app_name)
     sync_object(search_app, pk)
@@ -111,8 +110,7 @@ def sync_related_objects_task(
 
 
 def complete_model_migration(search_app_name, new_mapping_hash):
-    """Completes a migration by performing a full resync, updating aliases and removing old indices.
-    """
+    """Completes a migration by performing a full resync, updating aliases and removing old indices."""
     search_app = get_search_app(search_app_name)
     if search_app.search_model.get_target_mapping_hash() != new_mapping_hash:
         warning_message = f"""Unexpected target mapping hash. This indicates that the task was \

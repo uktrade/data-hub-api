@@ -69,8 +69,7 @@ class CompanyListItem(BaseModel):
 
 @reversion.register_base_model()
 class PipelineItem(ArchivableModel, BaseModel):
-    """Model holding pipeline list items.
-    """
+    """Model holding pipeline list items."""
 
     class Status(models.TextChoices):
         LEADS = ('leads', 'Leads')
@@ -110,21 +109,28 @@ class PipelineItem(ArchivableModel, BaseModel):
         help_text='Preferred company contacts',
     )
     sector = models.ForeignKey(
-        metadata_models.Sector, blank=True, null=True,
+        metadata_models.Sector,
+        blank=True,
+        null=True,
         on_delete=models.SET_NULL,
         help_text='Sector in which the proposal is being worked on',
     )
     potential_value = models.DecimalField(
-        blank=True, null=True, max_digits=19, decimal_places=0,
+        blank=True,
+        null=True,
+        max_digits=19,
+        decimal_places=0,
         help_text='Potential value (£) of the proposal',
     )
     likelihood_to_win = models.IntegerField(
-        blank=True, null=True,
+        blank=True,
+        null=True,
         choices=LikelihoodToWin.choices,
         help_text='How likely the user thinks this proposal will result in success',
     )
     expected_win_date = models.DateField(
-        blank=True, null=True,
+        blank=True,
+        null=True,
         help_text='Approximate expected date for this proposal to succeed',
     )
 

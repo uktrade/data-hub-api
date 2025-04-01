@@ -40,14 +40,11 @@ class CompanyActivity(models.Model):
     activity_source = models.CharField(
         max_length=MAX_LENGTH,
         choices=ActivitySource.choices,
-        help_text=(
-            'The type of company activity, such as an interaction, event, referral etc.'
-        ),
+        help_text=('The type of company activity, such as an interaction, event, referral etc.'),
     )
     date = models.DateTimeField(
         help_text=(
-            'A date field copied from the activity_source model, '
-            'so it can be sorted in the API.'
+            'A date field copied from the activity_source model, so it can be sorted in the API.'
         ),
     )
 

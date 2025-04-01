@@ -56,8 +56,7 @@ class TestGetOrderAssignees(APITestMixin):
         assert response.json() == []
 
     def test_non_empty(self):
-        """Test that calling GET returns the list of advisers assigned to the order.
-        """
+        """Test that calling GET returns the list of advisers assigned to the order."""
         advisers = AdviserFactory.create_batch(3)
         order = OrderFactory(assignees=[])
         for i, adviser in enumerate(advisers[:2]):
@@ -192,12 +191,20 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
         adviser3 = AdviserFactory()
 
         assignee1 = OrderAssigneeFactory(
-            order=order, adviser=adviser1, estimated_time=100, is_lead=True,
-            created_by=created_by, modified_by=created_by,
+            order=order,
+            adviser=adviser1,
+            estimated_time=100,
+            is_lead=True,
+            created_by=created_by,
+            modified_by=created_by,
         )
         assignee2 = OrderAssigneeFactory(
-            order=order, adviser=adviser2, estimated_time=250, is_lead=False,
-            created_by=created_by, modified_by=created_by,
+            order=order,
+            adviser=adviser2,
+            estimated_time=250,
+            is_lead=False,
+            created_by=created_by,
+            modified_by=created_by,
         )
 
         url = reverse(
@@ -386,8 +393,10 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
         adviser2 = AdviserFactory()
 
         assignee1 = OrderAssigneeFactory(
-            order=order, adviser=adviser1,
-            created_by=created_by, modified_by=created_by,
+            order=order,
+            adviser=adviser1,
+            created_by=created_by,
+            modified_by=created_by,
         )
         OrderAssigneeFactory(order=order, adviser=adviser2)
 
@@ -513,8 +522,7 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
         assert assignee1.is_lead
 
     def test_400_if_readonly_fields_changed(self):
-        """Test that the `actual_time` field cannot be set when the order is in draft.
-        """
+        """Test that the `actual_time` field cannot be set when the order is in draft."""
         order = OrderFactory(assignees=[])
         OrderAssigneeFactory(order=order, estimated_time=100, is_lead=True)
         assignee2 = OrderAssigneeFactory(order=order, estimated_time=250, is_lead=False)
@@ -620,7 +628,8 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
         assert response.json() == {'non_field_errors': ['Only one lead allowed.']}
 
     @pytest.mark.parametrize(
-        'disallowed_status', [
+        'disallowed_status',
+        [
             OrderStatus.COMPLETE,
             OrderStatus.CANCELLED,
         ],
@@ -637,16 +646,17 @@ class TestChangeAssigneesWhenOrderInDraft(APITestMixin):
         )
         response = self.api_client.patch(
             url,
-            [{
-                'adviser': {'id': AdviserFactory().id},
-            }],
+            [
+                {
+                    'adviser': {'id': AdviserFactory().id},
+                },
+            ],
         )
 
         assert response.status_code == status.HTTP_409_CONFLICT
         assert response.json() == {
             'detail': (
-                'The action cannot be performed '
-                f'in the current status {disallowed_status.label}.'
+                f'The action cannot be performed in the current status {disallowed_status.label}.'
             ),
         }
 
@@ -835,8 +845,7 @@ class TestChangeAssigneesWhenOrderInPaid(APITestMixin):
         ],
     )
     def test_400_if_readonly_fields_changed(self, data):
-        """Test that estimated_time and is_lead cannot be set at this stage.
-        """
+        """Test that estimated_time and is_lead cannot be set at this stage."""
         order = OrderPaidFactory(assignees=[])
         assignee = OrderAssigneeFactory(order=order)
 
@@ -913,7 +922,8 @@ class TestChangeAssigneesWhenOrderInOtherAllowedStatuses(APITestMixin):
     """
 
     @pytest.mark.parametrize(
-        'order_status', [
+        'order_status',
+        [
             OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
             OrderStatus.QUOTE_ACCEPTED,
         ],
@@ -964,7 +974,8 @@ class TestChangeAssigneesWhenOrderInOtherAllowedStatuses(APITestMixin):
         assert str(new_adviser.id) in [item['adviser']['id'] for item in response.json()]
 
     @pytest.mark.parametrize(
-        'order_status', [
+        'order_status',
+        [
             OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
             OrderStatus.QUOTE_ACCEPTED,
         ],
@@ -1019,13 +1030,15 @@ class TestChangeAssigneesWhenOrderInOtherAllowedStatuses(APITestMixin):
         }
 
     @pytest.mark.parametrize(
-        'order_status', [
+        'order_status',
+        [
             OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
             OrderStatus.QUOTE_ACCEPTED,
         ],
     )
     @pytest.mark.parametrize(
-        'data', [
+        'data',
+        [
             {'estimated_time': 100},
             {'actual_time': 100},
             {'is_lead': True},
@@ -1062,13 +1075,15 @@ class TestChangeAssigneesWhenOrderInOtherAllowedStatuses(APITestMixin):
         ]
 
     @pytest.mark.parametrize(
-        'order_status', [
+        'order_status',
+        [
             OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
             OrderStatus.QUOTE_ACCEPTED,
         ],
     )
     @pytest.mark.parametrize(
-        'data', [
+        'data',
+        [
             {'estimated_time': 100},
             {'actual_time': 100},
             {'is_lead': True},

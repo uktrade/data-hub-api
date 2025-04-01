@@ -28,6 +28,8 @@ def remove_export_country_history_from_opensearch(instance):
 receivers = (
     SignalReceiver(post_save, DBCompanyExportCountryHistory, export_country_history_sync_search),
     SignalReceiver(
-        post_delete, DBCompanyExportCountryHistory, remove_export_country_history_from_opensearch,
+        post_delete,
+        DBCompanyExportCountryHistory,
+        remove_export_country_history_from_opensearch,
     ),
 )

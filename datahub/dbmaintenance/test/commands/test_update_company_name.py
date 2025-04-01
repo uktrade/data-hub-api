@@ -52,7 +52,11 @@ def test_run(s3_stubber, caplog):
     assert len(caplog.records) == 1
 
     assert [company.name for company in companies] == [
-        'xyz100', 'xyz102', 'ghi', 'xyz104', 'xyz105',
+        'xyz100',
+        'xyz102',
+        'ghi',
+        'xyz104',
+        'xyz105',
     ]
 
 

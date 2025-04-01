@@ -34,9 +34,13 @@ class Command(CSVBaseCommand):
 
         if self._should_update(company, overwrite=overwrite):
             global_hq_id = parse_uuid(row['global_hq_id'])
-            global_hq = {
-                'id': global_hq_id,
-            } if global_hq_id is not None else None
+            global_hq = (
+                {
+                    'id': global_hq_id,
+                }
+                if global_hq_id is not None
+                else None
+            )
 
             data = {
                 'global_headquarters': global_hq,

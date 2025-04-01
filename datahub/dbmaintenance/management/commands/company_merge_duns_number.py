@@ -9,8 +9,7 @@ logger = getLogger(__name__)
 
 
 class Command(CSVBaseCommand):
-    """Command to company merges.
-    """
+    """Command to company merges."""
 
     help = """
     Merging company with duns number.  This consumes a two-column CSV file from S3 which is a
@@ -42,21 +41,24 @@ class Command(CSVBaseCommand):
             self.additional_logging['target_companies_archived'].append(str(target_company.id))
         if source_company.global_headquarters:
             self.additional_logging['source_company_global_headquarters'].append(
-                str(source_company.id))
+                str(source_company.id),
+            )
         merge_companies(source_company, target_company, None)
 
     def handle(self, *args, **options):
-        """Process the CSV file and logs some additional logging to help with companies merging.
-        """
+        """Process the CSV file and logs some additional logging to help with companies merging."""
         super().handle(*args, **options)
         logger.info(
             'List of Source Companies with Subsidiaries: '
-            f'{self.additional_logging["companies_with_subsidiaries"]}')
+            f'{self.additional_logging["companies_with_subsidiaries"]}',
+        )
         logger.info(
             'List of Target Companies Archived: '
-            f'{self.additional_logging["target_companies_archived"]}')
+            f'{self.additional_logging["target_companies_archived"]}',
+        )
         logger.info(
             'List of Source Compnies with Global Headqaurters: '
-            f'{self.additional_logging["source_company_global_headquarters"]}')
+            f'{self.additional_logging["source_company_global_headquarters"]}',
+        )
 
         self.additional_logging.clear()

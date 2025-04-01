@@ -20,10 +20,8 @@ def trasform_govuk_payment_to_omis_payment_data(govuk_payment):
         'amount': govuk_payment['amount'],
         'method': PaymentMethod.CARD,
         'transaction_reference': govuk_payment['reference'],
-
         # unfortunately GOV.UK Pay doesn't tell us when the payment actually happened
         'received_on': dateutil_parse(govuk_payment['created_date']).date(),
-
         # card details
         'cardholder_name': card_details['cardholder_name'],
         'card_brand': card_details['card_brand'],

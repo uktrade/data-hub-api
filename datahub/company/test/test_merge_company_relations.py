@@ -54,10 +54,12 @@ class TestDuplicateCompanyMerger:
             if relation.field.name in self_related_field_names:
                 continue
 
-            assert relation.remote_field in ALLOWED_RELATIONS_FOR_MERGING, [(
-                'Required relationship missing from company merge. \n'
-                f'Field: {relation.field.name} \n'
-                f'Model: {relation.model} \n'
-                f'Related Name: {relation.related_name} \n'
-                f'Related Model: {relation.related_model} \n'
-            )]
+            assert relation.remote_field in ALLOWED_RELATIONS_FOR_MERGING, [
+                (
+                    'Required relationship missing from company merge. \n'
+                    f'Field: {relation.field.name} \n'
+                    f'Model: {relation.model} \n'
+                    f'Related Name: {relation.related_name} \n'
+                    f'Related Model: {relation.related_model} \n'
+                ),
+            ]

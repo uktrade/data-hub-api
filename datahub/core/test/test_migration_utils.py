@@ -35,13 +35,13 @@ class TestLoadYamlInMigration:
                 'datahub.core.test.support.book': Book,
                 'datahub.core.test.support.person': Person,
             }[model_name]
+
         apps.get_model.side_effect = _get_model_mocked
 
         return apps
 
     def test_loading(self, migration_apps):
-        """Test that loading a yaml file updates the existing data.
-        """
+        """Test that loading a yaml file updates the existing data."""
         yaml_content = """
 # person with pk=1, last_name should change
 - model: datahub.core.test.support.person

@@ -105,7 +105,11 @@ class Command(CSVBaseCommand):
         return Advisor.objects.get(pk=pk)
 
     def _update_company(
-        self, company, new_one_list_tier_id, new_one_list_account_owner_id, simulate,
+        self,
+        company,
+        new_one_list_tier_id,
+        new_one_list_account_owner_id,
+        simulate,
     ):
         """Update `company` with the new values.
 
@@ -136,9 +140,7 @@ class Command(CSVBaseCommand):
         :param one_list_account_owner_id: new Advisor value
         :return: True if `company` needs updating
         """
-        return (
-            company.one_list_tier_id != one_list_tier_id
-        ) or (
+        return (company.one_list_tier_id != one_list_tier_id) or (
             company.one_list_account_owner_id != one_list_account_owner_id
         )
 

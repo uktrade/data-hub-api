@@ -111,9 +111,9 @@ class TestContactAdminPermissions(AdminTestMixin):
         ],
     )
     def test_permission_denied_if_staff_and_without_change_permission(
-            self,
-            route_name,
-            method,
+        self,
+        route_name,
+        method,
     ):
         """Test that the view returns a 403 response if the staff user does not have the
         change company permission.

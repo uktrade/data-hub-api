@@ -32,8 +32,8 @@ def test_company_referral_activity(api_client):
         'summary': 'Company Referral Activities',
         'type': 'OrderedCollectionPage',
         'next': 'http://testserver/v3/activity-stream/company-referral'
-                + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
-                + f'&cursor={str(company_referral.id)}',
+        + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
+        + f'&cursor={str(company_referral.id)}',
         'orderedItems': [
             {
                 'id': f'dit:DataHubCompanyReferral:{company_referral.id}:Announce',
@@ -57,9 +57,8 @@ def test_company_referral_activity(api_client):
                         {
                             'id': f'dit:DataHubAdviser:{company_referral.created_by.pk}',
                             'type': ['Person', 'dit:Adviser'],
-                            'dit:emailAddress':
-                                company_referral.created_by.contact_email
-                                or company_referral.created_by.email,
+                            'dit:emailAddress': company_referral.created_by.contact_email
+                            or company_referral.created_by.email,
                             'name': company_referral.created_by.name,
                             'dit:team': {
                                 'id': f'dit:DataHubTeam:{company_referral.created_by.dit_team.pk}',
@@ -71,9 +70,8 @@ def test_company_referral_activity(api_client):
                         {
                             'id': f'dit:DataHubAdviser:{company_referral.recipient.pk}',
                             'type': ['Person', 'dit:Adviser'],
-                            'dit:emailAddress':
-                                company_referral.recipient.contact_email
-                                or company_referral.recipient.email,
+                            'dit:emailAddress': company_referral.recipient.contact_email
+                            or company_referral.recipient.email,
                             'name': company_referral.recipient.name,
                             'dit:team': {
                                 'id': f'dit:DataHubTeam:{company_referral.recipient.dit_team.pk}',
@@ -115,8 +113,8 @@ def test_closed_company_referral_activity(api_client):
         'summary': 'Company Referral Activities',
         'type': 'OrderedCollectionPage',
         'next': 'http://testserver/v3/activity-stream/company-referral'
-                + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
-                + f'&cursor={str(company_referral.id)}',
+        + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
+        + f'&cursor={str(company_referral.id)}',
         'orderedItems': [
             {
                 'id': f'dit:DataHubCompanyReferral:{company_referral.id}:Announce',
@@ -140,9 +138,8 @@ def test_closed_company_referral_activity(api_client):
                         {
                             'id': f'dit:DataHubAdviser:{company_referral.created_by.pk}',
                             'type': ['Person', 'dit:Adviser'],
-                            'dit:emailAddress':
-                                company_referral.created_by.contact_email
-                                or company_referral.created_by.email,
+                            'dit:emailAddress': company_referral.created_by.contact_email
+                            or company_referral.created_by.email,
                             'name': company_referral.created_by.name,
                             'dit:team': {
                                 'id': f'dit:DataHubTeam:{company_referral.created_by.dit_team.pk}',
@@ -154,9 +151,8 @@ def test_closed_company_referral_activity(api_client):
                         {
                             'id': f'dit:DataHubAdviser:{company_referral.recipient.pk}',
                             'type': ['Person', 'dit:Adviser'],
-                            'dit:emailAddress':
-                                company_referral.recipient.contact_email
-                                or company_referral.recipient.email,
+                            'dit:emailAddress': company_referral.recipient.contact_email
+                            or company_referral.recipient.email,
                             'name': company_referral.recipient.name,
                             'dit:team': {
                                 'id': f'dit:DataHubTeam:{company_referral.recipient.dit_team.pk}',
@@ -198,8 +194,8 @@ def test_complete_company_referral_activity(api_client):
         'summary': 'Company Referral Activities',
         'type': 'OrderedCollectionPage',
         'next': 'http://testserver/v3/activity-stream/company-referral'
-                + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
-                + f'&cursor={str(company_referral.id)}',
+        + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
+        + f'&cursor={str(company_referral.id)}',
         'orderedItems': [
             {
                 'id': f'dit:DataHubCompanyReferral:{company_referral.id}:Announce',
@@ -224,9 +220,8 @@ def test_complete_company_referral_activity(api_client):
                         {
                             'id': f'dit:DataHubAdviser:{company_referral.created_by.pk}',
                             'type': ['Person', 'dit:Adviser'],
-                            'dit:emailAddress':
-                                company_referral.created_by.contact_email
-                                or company_referral.created_by.email,
+                            'dit:emailAddress': company_referral.created_by.contact_email
+                            or company_referral.created_by.email,
                             'name': company_referral.created_by.name,
                             'dit:team': {
                                 'id': f'dit:DataHubTeam:{company_referral.created_by.dit_team.pk}',
@@ -238,9 +233,8 @@ def test_complete_company_referral_activity(api_client):
                         {
                             'id': f'dit:DataHubAdviser:{company_referral.recipient.pk}',
                             'type': ['Person', 'dit:Adviser'],
-                            'dit:emailAddress':
-                                company_referral.recipient.contact_email
-                                or company_referral.recipient.email,
+                            'dit:emailAddress': company_referral.recipient.contact_email
+                            or company_referral.recipient.email,
                             'name': company_referral.recipient.name,
                             'dit:team': {
                                 'id': f'dit:DataHubTeam:{company_referral.recipient.dit_team.pk}',
@@ -252,13 +246,11 @@ def test_complete_company_referral_activity(api_client):
                         {
                             'id': f'dit:DataHubAdviser:{company_referral.completed_by.pk}',
                             'type': ['Person', 'dit:Adviser'],
-                            'dit:emailAddress':
-                                company_referral.completed_by.contact_email
-                                or company_referral.completed_by.email,
+                            'dit:emailAddress': company_referral.completed_by.contact_email
+                            or company_referral.completed_by.email,
                             'name': company_referral.completed_by.name,
                             'dit:team': {
-                                'id':
-                                    f'dit:DataHubTeam:{company_referral.completed_by.dit_team.pk}',
+                                'id': f'dit:DataHubTeam:{company_referral.completed_by.dit_team.pk}',
                                 'type': ['Group', 'dit:Team'],
                                 'name': company_referral.completed_by.dit_team.name,
                             },
@@ -298,8 +290,8 @@ def test_company_referral_activity_without_team_and_contact(api_client):
         'summary': 'Company Referral Activities',
         'type': 'OrderedCollectionPage',
         'next': 'http://testserver/v3/activity-stream/company-referral'
-                + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
-                + f'&cursor={str(company_referral.id)}',
+        + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
+        + f'&cursor={str(company_referral.id)}',
         'orderedItems': [
             {
                 'id': f'dit:DataHubCompanyReferral:{company_referral.id}:Announce',
@@ -323,9 +315,8 @@ def test_company_referral_activity_without_team_and_contact(api_client):
                         {
                             'id': f'dit:DataHubAdviser:{company_referral.created_by.pk}',
                             'type': ['Person', 'dit:Adviser'],
-                            'dit:emailAddress':
-                                company_referral.created_by.contact_email
-                                or company_referral.created_by.email,
+                            'dit:emailAddress': company_referral.created_by.contact_email
+                            or company_referral.created_by.email,
                             'name': company_referral.created_by.name,
                             'dit:team': {
                                 'id': f'dit:DataHubTeam:{company_referral.created_by.dit_team.pk}',
@@ -337,9 +328,8 @@ def test_company_referral_activity_without_team_and_contact(api_client):
                         {
                             'id': f'dit:DataHubAdviser:{company_referral.recipient.pk}',
                             'type': ['Person', 'dit:Adviser'],
-                            'dit:emailAddress':
-                                company_referral.recipient.contact_email
-                                or company_referral.recipient.email,
+                            'dit:emailAddress': company_referral.recipient.contact_email
+                            or company_referral.recipient.email,
                             'name': company_referral.recipient.name,
                             'dit:DataHubCompanyReferral:role': 'recipient',
                         },
@@ -353,8 +343,7 @@ def test_company_referral_activity_without_team_and_contact(api_client):
 
 @pytest.mark.django_db
 def test_company_referrals_ordering(api_client):
-    """Test that the company referrals are ordered by ('modified_on', 'pk').
-    """
+    """Test that the company referrals are ordered by ('modified_on', 'pk')."""
     company_referrals = []
 
     with freeze_time() as frozen_datetime:
@@ -373,7 +362,6 @@ def test_company_referrals_ordering(api_client):
         for obj in sorted(company_referrals, key=lambda obj: (obj.modified_on, obj.pk))
     ]
     response_company_referral_ids = [
-        item['object']['id']
-        for item in response.json()['orderedItems']
+        item['object']['id'] for item in response.json()['orderedItems']
     ]
     assert sorted_company_referral_ids == response_company_referral_ids

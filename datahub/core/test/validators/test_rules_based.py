@@ -230,9 +230,7 @@ class TestRulesBasedValidator:
         ('rules', 'errors'),
         [
             (
-                (
-                    _make_stub_validation_rule([FieldAndError('field1', 'error')]),
-                ),
+                (_make_stub_validation_rule([FieldAndError('field1', 'error')]),),
                 {'field1': ['test error']},
             ),
             (
@@ -262,7 +260,8 @@ class TestRulesBasedValidator:
         """Test that validation fails when any rule fails."""
         instance = Mock()
         serializer = Mock(
-            instance=instance, error_messages={
+            instance=instance,
+            error_messages={
                 'error': 'test error',
                 'error2': 'test error 2',
             },

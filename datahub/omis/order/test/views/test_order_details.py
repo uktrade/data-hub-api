@@ -200,8 +200,7 @@ class TestAddOrder(APITestMixin):
         assert not response.json()['billing_address_country']
 
     def test_fails_if_contact_not_from_company(self):
-        """Test that if the contact does not work at the company specified, the validation fails.
-        """
+        """Test that if the contact does not work at the company specified, the validation fails."""
         company = CompanyFactory()
         contact = ContactFactory()  # doesn't work at `company`
         country = Country.france.value
@@ -412,7 +411,8 @@ class TestGeneralChangeOrder(APITestMixin):
 
         url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
         response = self.api_client.patch(
-            url, {'description': 'Updated description'},
+            url,
+            {'description': 'Updated description'},
         )
 
         order.refresh_from_db()
@@ -420,8 +420,7 @@ class TestGeneralChangeOrder(APITestMixin):
         assert not response.json()['uk_region']
 
     def test_fails_if_contact_not_from_company(self):
-        """Test that if the contact does not work at the company specified, the validation fails.
-        """
+        """Test that if the contact does not work at the company specified, the validation fails."""
         order = OrderFactory()
         other_contact = ContactFactory()  # doesn't work at `order.company`
 
@@ -554,8 +553,10 @@ class TestGeneralChangeOrder(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert response.json()['status'] == OrderStatus.DRAFT
         assert response.json()['product_info'] != 'Updated product info'
-        assert response.json()['permission_to_approach_contacts'] != \
-            'Updated permission to approach contacts'
+        assert (
+            response.json()['permission_to_approach_contacts']
+            != 'Updated permission to approach contacts'
+        )
         assert response.json()['contact_email'] != 'updated-email@email.com'
         assert response.json()['contact_phone'] != '1234'
         assert response.json()['discount_value'] != 99999
@@ -818,16 +819,13 @@ class TestChangeOrderInQuoteStatuses(APITestMixin):
             'vat_number': '987654321',
             'vat_verified': False,
             'po_number': 'New po number',
-
             'contact': new_contact.pk,
         }
 
         url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
         response = self.api_client.patch(url, data)
         assert response.status_code == status.HTTP_200_OK
-        assert {
-            k: v for k, v in response.json().items() if k in data
-        } == {
+        assert {k: v for k, v in response.json().items() if k in data} == {
             **data,
             'billing_address_country': {
                 'id': Country.france.value.id,
@@ -851,7 +849,6 @@ class TestChangeOrderInQuoteStatuses(APITestMixin):
         [
             ('company', lambda o: CompanyFactory().pk),
             ('primary_market', Country.greece.value.id),
-
             (
                 'service_types',
                 lambda o: [ServiceType.objects.filter(disabled_on__isnull=True).first().id],
@@ -892,7 +889,6 @@ class TestChangeOrderInQuoteStatuses(APITestMixin):
             {
                 'company': order.company.pk,
                 'primary_market': order.primary_market.pk,
-
                 'service_types': order.service_types.values_list('id', flat=True),
                 'uk_region': order.uk_region.pk,
                 'sector': order.sector.pk,
@@ -999,10 +995,7 @@ class TestChangeOrderInQuoteStatuses(APITestMixin):
         )
         old_invoice = order.invoice
 
-        data = {
-            field: value(order) if callable(value) else value
-            for field, value in data.items()
-        }
+        data = {field: value(order) if callable(value) else value for field, value in data.items()}
         url = reverse('api-v3:omis:order:detail', kwargs={'pk': order.pk})
         response = self.api_client.patch(url, data)
         assert response.status_code == status.HTTP_200_OK
@@ -1036,7 +1029,6 @@ class TestChangeOrderInPaid(APITestMixin):
         [
             ('company', lambda o: CompanyFactory().pk),
             ('primary_market', Country.greece.value.id),
-
             (
                 'service_types',
                 lambda o: [ServiceType.objects.filter(disabled_on__isnull=True).first().id],
@@ -1048,7 +1040,6 @@ class TestChangeOrderInPaid(APITestMixin):
             ('contacts_not_to_approach', 'lorem ipsum'),
             ('description', 'lorem ipsum'),
             ('delivery_date', '2017-04-20'),
-
             ('billing_address_1', 'New billing address 1'),
             ('billing_address_2', 'New billing address 2'),
             ('billing_address_town', 'New billing town'),
@@ -1082,7 +1073,6 @@ class TestChangeOrderInPaid(APITestMixin):
             {
                 'company': order.company.pk,
                 'primary_market': order.primary_market.pk,
-
                 'service_types': order.service_types.values_list('id', flat=True),
                 'uk_region': order.uk_region.pk,
                 'sector': order.sector.pk,
@@ -1091,7 +1081,6 @@ class TestChangeOrderInPaid(APITestMixin):
                 'contacts_not_to_approach': order.contacts_not_to_approach,
                 'description': order.description,
                 'delivery_date': order.delivery_date.isoformat(),
-
                 'billing_address_1': order.billing_address_1,
                 'billing_address_2': order.billing_address_2,
                 'billing_address_town': order.billing_address_town,
@@ -1122,7 +1111,6 @@ class TestChangeOrderInEndStatuses(APITestMixin):
         [
             ('company', lambda o: CompanyFactory().pk),
             ('primary_market', Country.greece.value.id),
-
             (
                 'service_types',
                 lambda o: [ServiceType.objects.filter(disabled_on__isnull=True).first().id],
@@ -1134,7 +1122,6 @@ class TestChangeOrderInEndStatuses(APITestMixin):
             ('contacts_not_to_approach', 'lorem ipsum'),
             ('description', 'lorem ipsum'),
             ('delivery_date', '2017-04-20'),
-
             ('billing_address_1', 'New billing address 1'),
             ('billing_address_2', 'New billing address 2'),
             ('billing_address_town', 'New billing town'),
@@ -1145,7 +1132,6 @@ class TestChangeOrderInEndStatuses(APITestMixin):
             ('vat_number', '987654321'),
             ('vat_verified', False),
             ('po_number', 'New po number'),
-
             ('contact', lambda o: ContactFactory(company=o.company).pk),
         ],
     )
@@ -1177,7 +1163,6 @@ class TestChangeOrderInEndStatuses(APITestMixin):
             {
                 'company': order.company.pk,
                 'primary_market': order.primary_market.pk,
-
                 'service_types': order.service_types.values_list('id', flat=True),
                 'uk_region': order.uk_region.pk,
                 'sector': order.sector.pk,
@@ -1186,7 +1171,6 @@ class TestChangeOrderInEndStatuses(APITestMixin):
                 'contacts_not_to_approach': order.contacts_not_to_approach,
                 'description': order.description,
                 'delivery_date': order.delivery_date.isoformat(),
-
                 'billing_address_1': order.billing_address_1,
                 'billing_address_2': order.billing_address_2,
                 'billing_address_town': order.billing_address_town,
@@ -1197,7 +1181,6 @@ class TestChangeOrderInEndStatuses(APITestMixin):
                 'vat_number': order.vat_number,
                 'vat_verified': order.vat_verified,
                 'po_number': order.po_number,
-
                 'contact': order.contact.pk,
             },
         )
@@ -1245,8 +1228,7 @@ class TestMarkOrderAsComplete(APITestMixin):
         ],
     )
     def test_409_if_order_not_in_allowed_status(self, disallowed_status):
-        """Test that if the order is in a disallowed status, the order cannot be marked as complete.
-        """
+        """Test that if the order is in a disallowed status, the order cannot be marked as complete."""
         order = OrderPaidFactory(status=disallowed_status, assignees=[])
         OrderAssigneeCompleteFactory(order=order)
 
@@ -1328,8 +1310,7 @@ class TestCancelOrder(APITestMixin):
         ],
     )
     def test_409_if_order_not_in_allowed_status(self, disallowed_status):
-        """Test that if the order is in a disallowed status, the order cannot be cancelled.
-        """
+        """Test that if the order is in a disallowed status, the order cannot be cancelled."""
         reason = CancellationReason.objects.order_by('?').first()
         order = OrderFactory(status=disallowed_status)
 
@@ -1356,15 +1337,16 @@ class TestCancelOrder(APITestMixin):
             ),
             (
                 {'cancellation_reason': {'id': '2f68875c-35a5-4c3d-8160-9ddc104260c2'}},
-                {'cancellation_reason': [
-                    'Invalid pk "2f68875c-35a5-4c3d-8160-9ddc104260c2" - object does not exist.',
-                ]},
+                {
+                    'cancellation_reason': [
+                        'Invalid pk "2f68875c-35a5-4c3d-8160-9ddc104260c2" - object does not exist.',
+                    ],
+                },
             ),
         ],
     )
     def test_validation_errors(self, data, errors):
-        """Test that if cancellation_reason is invalid, the endpoint returns 400.
-        """
+        """Test that if cancellation_reason is invalid, the endpoint returns 400."""
         order = OrderFactory(status=OrderStatus.DRAFT)
 
         url = reverse('api-v3:omis:order:cancel', kwargs={'pk': order.pk})
@@ -1425,7 +1407,8 @@ class TestViewOrderDetails(APITestMixin):
                 {
                     'id': str(service_type.pk),
                     'name': service_type.name,
-                } for service_type in order.service_types.all()
+                }
+                for service_type in order.service_types.all()
             ],
             'description': order.description,
             'contacts_not_to_approach': order.contacts_not_to_approach,

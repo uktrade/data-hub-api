@@ -56,22 +56,19 @@ class DuplicateTracker:
         self.item_keys = set()
 
     def add_item(self, cleaned_data):
-        """Add the cleaned data of a InteractionCSVRowForm to the collection of rows seen so far.
-        """
+        """Add the cleaned data of a InteractionCSVRowForm to the collection of rows seen so far."""
         key = _cleaned_data_to_key(cleaned_data)
         if key:
             self.item_keys.add(key)
 
     def has_item(self, cleaned_data):
-        """Check if a InteractionCSVRowForm is a duplicate of a previously-added row.
-        """
+        """Check if a InteractionCSVRowForm is a duplicate of a previously-added row."""
         key = _cleaned_data_to_key(cleaned_data)
         return key and key in self.item_keys
 
 
 def _cleaned_data_to_key(cleaned_data):
-    """Return a tuple representing a unique key for the cleaned data of an InteractionCSVRowForm.
-    """
+    """Return a tuple representing a unique key for the cleaned data of an InteractionCSVRowForm."""
     # As an optimisation we could just track the pk for model instances,
     # but that is omitted for simplicity
     key = tuple(cleaned_data.get(field) for field in DUPLICATE_FIELD_MAPPING)
