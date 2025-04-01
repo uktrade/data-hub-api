@@ -23,9 +23,7 @@ class AuditLog:
     @staticmethod
     def get_version_pairs(versions: list[Version]) -> list[tuple[Version, Version]]:
         """Get pairs of consecutive versions to compare changes."""
-        return [
-            (versions[n], versions[n + 1]) for n in range(len(versions) - 1)
-        ]
+        return [(versions[n], versions[n + 1]) for n in range(len(versions) - 1)]
 
     @staticmethod
     def _get_user_representation(user: Optional[User]) -> Optional[dict[str, str]]:
@@ -60,7 +58,9 @@ class AuditLog:
                 'timestamp': v_new.revision.date_created,
                 'comment': v_new.revision.get_comment() or '',
                 'changes': diff_versions(
-                    model_meta_data, v_old.field_dict, v_new.field_dict,
+                    model_meta_data,
+                    v_old.field_dict,
+                    v_new.field_dict,
                 ),
             }
 
@@ -124,7 +124,7 @@ class VersionQuerySetProxy:
                 raise TypeError('Slicing with step not supported')
 
             stop = item.stop + 1 if item.stop is not None else None
-            return self.queryset[item.start:stop]
+            return self.queryset[item.start : stop]
 
         return self.queryset[item]
 

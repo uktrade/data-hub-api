@@ -37,10 +37,7 @@ def test_delete_documents(opensearch_bulk, mock_opensearch_client):
     call_kwargs['actions'] = list(call_kwargs['actions'])  # from generator to list
     assert call_args == (mock_opensearch_client.return_value,)
     assert call_kwargs == {
-        'actions': [
-            {'_op_type': 'delete', '_index': index, **doc}
-            for doc in docs
-        ],
+        'actions': [{'_op_type': 'delete', '_index': index, **doc} for doc in docs],
         'chunk_size': BULK_CHUNK_SIZE,
         'request_timeout': BULK_DELETION_TIMEOUT_SECS,
         'max_chunk_bytes': settings.OPENSEARCH_BULK_MAX_CHUNK_BYTES,
@@ -66,17 +63,14 @@ def test_delete_documents_with_errors(opensearch_bulk, mock_opensearch_client):
         delete_documents(index, docs)
 
     assert excinfo.value.args == (
-        (
-            "Errors during an OpenSearch bulk deletion operation: [{'delete': {'status': 500}}]"
-        ),
+        ("Errors during an OpenSearch bulk deletion operation: [{'delete': {'status': 500}}]"),
     )
 
 
 @pytest.mark.django_db
 @pytest.mark.usefixtures('synchronous_thread_pool')
 def test_collector(monkeypatch, opensearch_with_signals):
-    """Test that the collector collects and deletes all the django objects deleted.
-    """
+    """Test that the collector collects and deletes all the django objects deleted."""
     obj = SimpleModel.objects.create()
     sync_object(SimpleModelSearchApp, str(obj.pk))
     opensearch_with_signals.indices.refresh()

@@ -124,8 +124,7 @@ class AdviserAdmin(ExportWinsAdminMixin, VersionAdmin, UserAdmin):
             path(
                 'add-from-sso/',
                 self.admin_site.admin_view(add_sso_user_admin.add_view),
-                name=f'{model_opts.app_label}_'
-                     f'{model_opts.model_name}_add-from-sso',
+                name=f'{model_opts.app_label}_{model_opts.model_name}_add-from-sso',
             ),
             *super().get_urls(),
         ]
@@ -142,9 +141,12 @@ class AddAdviserFromSSOAdmin(AdviserAdmin):
 
     add_form_template = 'admin/company/advisor/add_from_sso.html'
     add_fieldsets = (
-        (None, {
-            'classes': ('wide',),
-            'fields': ('search_email',),
-        }),
+        (
+            None,
+            {
+                'classes': ('wide',),
+                'fields': ('search_email',),
+            },
+        ),
     )
     add_form = AddAdviserFromSSOForm

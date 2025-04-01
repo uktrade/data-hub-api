@@ -174,7 +174,7 @@ class TestSearchOrder(APITestMixin):
                 ['efgh'],
             ),
             (  # filter by completed_on_before and completed_on_after
-               # note that both dates are inclusive
+                # note that both dates are inclusive
                 {
                     'completed_on_before': '2018-06-01',
                     'completed_on_after': '2018-05-01',
@@ -354,9 +354,7 @@ class TestSearchOrder(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert len(response.json()['results']) == len(results)
-        assert [
-            item['reference'] for item in response.json()['results']
-        ] == results
+        assert [item['reference'] for item in response.json()['results']] == results
 
     @pytest.mark.parametrize(
         ('post_data', 'expected_total_subtotal_cost'),
@@ -452,7 +450,10 @@ class TestSearchOrder(APITestMixin):
         [0, 1, 2],
     )
     def test_sector_descends_filter(
-        self, hierarchical_sectors, opensearch_with_collector, sector_level,
+        self,
+        hierarchical_sectors,
+        opensearch_with_collector,
+        sector_level,
     ):
         """Test the sector_descends filter."""
         num_sectors = len(hierarchical_sectors)
@@ -464,9 +465,11 @@ class TestSearchOrder(APITestMixin):
         )
         OrderFactory.create_batch(
             3,
-            sector=factory.LazyFunction(lambda: random_obj_for_queryset(
-                Sector.objects.exclude(pk__in=sectors_ids),
-            )),
+            sector=factory.LazyFunction(
+                lambda: random_obj_for_queryset(
+                    Sector.objects.exclude(pk__in=sectors_ids),
+                ),
+            ),
         )
 
         opensearch_with_collector.flush_and_refresh()
@@ -524,7 +527,8 @@ class TestOrderExportView(APITestMixin):
     """Tests the OMIS order export view."""
 
     @pytest.mark.parametrize(
-        'permissions', [
+        'permissions',
+        [
             (),
             (f'order.{OrderPermission.view}',),
             (f'order.{OrderPermission.export}',),
@@ -603,7 +607,8 @@ class TestOrderExportView(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         assert parse_header(response.get('Content-Type')) == ('text/csv', {'charset': 'utf-8'})
         assert parse_header(response.get('Content-Disposition')) == (
-            'attachment', {'filename': 'Data Hub - Orders - 2018-01-01-11-12-13.csv'},
+            'attachment',
+            {'filename': 'Data Hub - Orders - 2018-01-01-11-12-13.csv'},
         )
 
         sorted_orders = Order.objects.order_by(orm_ordering, 'pk')
@@ -611,8 +616,7 @@ class TestOrderExportView(APITestMixin):
 
         assert reader.fieldnames == list(SearchOrderExportAPIView.field_titles.values())
         sorted_orders_and_refunds = (
-            (order, order.refunds.filter(status=RefundStatus.APPROVED))
-            for order in sorted_orders
+            (order, order.refunds.filter(status=RefundStatus.APPROVED)) for order in sorted_orders
         )
 
         expected_row_data = [
@@ -621,24 +625,24 @@ class TestOrderExportView(APITestMixin):
                 'Net price': Decimal(order.subtotal_cost) / 100,
                 'Net refund': Decimal(
                     sum(refund.net_amount for refund in refunds),
-                ) / 100 if refunds else None,
+                )
+                / 100
+                if refunds
+                else None,
                 'Status': order.get_status_display(),
                 'Link': order.get_datahub_frontend_url(),
                 'Sector': order.sector.name,
                 'Market': order.primary_market.name,
                 'UK region': order.uk_region.name,
                 'Company': order.company.name,
-                'Company country':
-                    order.company.address_country.name,
+                'Company country': order.company.address_country.name,
                 'Company UK region': get_attr_or_none(order, 'company.uk_region.name'),
-                'Company link':
-                    f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["company"]}'
-                    f'/{order.company.pk}',
+                'Company link': f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["company"]}'
+                f'/{order.company.pk}',
                 'Contact': order.contact.name,
                 'Contact job title': order.contact.job_title,
-                'Contact link':
-                    f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["contact"]}'
-                    f'/{order.contact.pk}',
+                'Contact link': f'{settings.DATAHUB_FRONTEND_URL_PREFIXES["contact"]}'
+                f'/{order.contact.pk}',
                 'Lead adviser': get_attr_or_none(order.get_lead_assignee(), 'adviser.name'),
                 'Created by team': get_attr_or_none(order, 'created_by.dit_team.name'),
                 'Date created': order.created_on,
@@ -712,8 +716,5 @@ class TestGlobalSearch(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert len(response.json()['results']) == len(expected_results)
-        actual_results = sorted(
-            item['reference']
-            for item in response.json()['results']
-        )
+        actual_results = sorted(item['reference'] for item in response.json()['results'])
         assert actual_results == expected_results

@@ -1,4 +1,5 @@
 """Investment serialisers for views."""
+
 from collections import Counter
 from functools import partial
 
@@ -157,9 +158,7 @@ SPI_FIELDS = (
     'stage_log',
 )
 
-EYB_FIELDS = (
-    'eyb_leads',
-)
+EYB_FIELDS = ('eyb_leads',)
 
 ALL_FIELDS = (
     CORE_FIELDS + VALUE_FIELDS + REQUIREMENTS_FIELDS + TEAM_FIELDS + SPI_FIELDS + EYB_FIELDS

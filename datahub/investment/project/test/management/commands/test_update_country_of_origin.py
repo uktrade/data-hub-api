@@ -58,12 +58,12 @@ class TestUpdateCountryOfOriginCommand:
             assert versions.count() == 0
 
         assert any(
-            'schedule_update_country_of_origin_for_investment_projects'
-            in message for message in caplog.messages
+            'schedule_update_country_of_origin_for_investment_projects' in message
+            for message in caplog.messages
         )
         assert any(
-            'Task update_country_of_origin_for_investment_projects completed'
-            in message for message in caplog.messages
+            'Task update_country_of_origin_for_investment_projects completed' in message
+            for message in caplog.messages
         )
 
     def _run_command(self):

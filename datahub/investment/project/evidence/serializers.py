@@ -34,7 +34,8 @@ class EvidenceDocumentSerializer(serializers.ModelSerializer):
             'status',
         )
         read_only_fields = (
-            'url', 'created_on',
+            'url',
+            'created_on',
         )
         extra_kwargs = {
             'comment': {'default': ''},

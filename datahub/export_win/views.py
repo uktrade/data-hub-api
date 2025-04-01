@@ -55,6 +55,7 @@ def log_bad_request(view_method):
                     },
                 )
             raise
+
     return wrapper
 
 
@@ -92,29 +93,33 @@ class WinViewSet(CoreViewSet):
     """Views for Export wins."""
 
     serializer_class = WinSerializer
-    queryset = Win.objects.select_related(
-        'customer_location',
-        'type',
-        'country',
-        'goods_vs_services',
-        'sector',
-        'hvc',
-        'hvo_programme',
-        'lead_officer',
-        'line_manager',
-        'team_type',
-        'hq_team',
-        'business_potential',
-        'export_experience',
-        'customer_response',
-    ).prefetch_related(
-        'type_of_support',
-        'associated_programme',
-        'team_members',
-        'advisers',
-    ).annotate(
-        first_sent=Min('customer_response__tokens__created_on'),
-        last_sent=Max('customer_response__tokens__created_on'),
+    queryset = (
+        Win.objects.select_related(
+            'customer_location',
+            'type',
+            'country',
+            'goods_vs_services',
+            'sector',
+            'hvc',
+            'hvo_programme',
+            'lead_officer',
+            'line_manager',
+            'team_type',
+            'hq_team',
+            'business_potential',
+            'export_experience',
+            'customer_response',
+        )
+        .prefetch_related(
+            'type_of_support',
+            'associated_programme',
+            'team_members',
+            'advisers',
+        )
+        .annotate(
+            first_sent=Min('customer_response__tokens__created_on'),
+            last_sent=Max('customer_response__tokens__created_on'),
+        )
     )
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_class = ConfirmedFilterSet
@@ -161,10 +166,13 @@ class WinViewSet(CoreViewSet):
         """Confirmed wins should be retrievable to all, otherwise revert to default rules."""
         queryset = super().get_queryset().exclude(is_anonymous_win=True)
         win = get_object_or_404(queryset, pk=kwargs['pk'])
-        if not hasattr(
-            win,
-            'customer_response',
-        ) or win.customer_response.agree_with_win is not True:
+        if (
+            not hasattr(
+                win,
+                'customer_response',
+            )
+            or win.customer_response.agree_with_win is not True
+        ):
             queryset = self.get_queryset()
             win = get_object_or_404(queryset, pk=kwargs['pk'])
         serializer = self.get_serializer(win)
@@ -184,8 +192,7 @@ class WinViewSet(CoreViewSet):
 
     @action(methods=['post'], detail=True, schema=StubSchema())
     def resend_export_win(self, request, *args, **kwargs):
-        """Resend email manually via ITA dashboard.
-        """
+        """Resend email manually via ITA dashboard."""
         win = self.get_object()
         contact = win.company_contacts.first()
         customer_response = win.customer_response

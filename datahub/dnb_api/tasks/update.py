@@ -89,7 +89,6 @@ def _get_company_updates(last_updated_after, fields_to_update):
     update_descriptor = f'rq:get_company_updates:{start_time}'
 
     while True:
-
         response = get_company_update_page(last_updated_after, next_page)
         dnb_company_updates = response.get('results', [])
 
@@ -146,7 +145,6 @@ def get_company_updates(last_updated_after=None, fields_to_update=None):
     Data Hub.
     """
     with advisory_lock('get_company_updates', wait=False) as acquired:
-
         if not acquired:
             logger.info('Another instance of this task is already running.')
             return

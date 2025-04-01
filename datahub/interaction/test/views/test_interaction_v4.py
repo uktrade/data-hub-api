@@ -146,7 +146,8 @@ class TestAddInteraction(APITestMixin):
             'net_company_receipt': None,
             'policy_feedback_notes': request_data.get('policy_feedback_notes', ''),
             'was_policy_feedback_provided': request_data.get(
-                'was_policy_feedback_provided', False,
+                'was_policy_feedback_provided',
+                False,
             ),
             'communication_channel': {
                 'id': str(communication_channel.pk),
@@ -173,10 +174,12 @@ class TestAddInteraction(APITestMixin):
                 'id': str(company.pk),
                 'name': company.name,
             },
-            'companies': [{
-                'id': str(company.pk),
-                'name': company.name,
-            }],
+            'companies': [
+                {
+                    'id': str(company.pk),
+                    'name': company.name,
+                },
+            ],
             'contacts': [
                 {
                     'id': str(contact.pk),
@@ -218,10 +221,12 @@ class TestAddInteraction(APITestMixin):
             'company_referral': None,
             'large_capital_opportunity': request_data.get('large_capital_opportunity'),
             'has_related_trade_agreements': request_data.get(
-                'has_related_trade_agreements', False,
+                'has_related_trade_agreements',
+                False,
             ),
             'related_trade_agreements': request_data.get(
-                'related_trade_agreements', [],
+                'related_trade_agreements',
+                [],
             ),
             'helped_remove_export_barrier': request_data.get('helped_remove_export_barrier'),
             'export_barrier_types': [],
@@ -351,7 +356,9 @@ class TestAddInteraction(APITestMixin):
         ],
     )
     def test_add_new_interaction(
-        self, extra_data, permissions,
+        self,
+        extra_data,
+        permissions,
     ):
         """Test add a new interaction."""
         adviser = create_test_user(
@@ -396,7 +403,8 @@ class TestAddInteraction(APITestMixin):
             'net_company_receipt': None,
             'policy_feedback_notes': request_data.get('policy_feedback_notes', ''),
             'was_policy_feedback_provided': request_data.get(
-                'was_policy_feedback_provided', False,
+                'was_policy_feedback_provided',
+                False,
             ),
             'communication_channel': {
                 'id': str(communication_channel.pk),
@@ -423,10 +431,12 @@ class TestAddInteraction(APITestMixin):
                 'id': str(company.pk),
                 'name': company.name,
             },
-            'companies': [{
-                'id': str(company.pk),
-                'name': company.name,
-            }],
+            'companies': [
+                {
+                    'id': str(company.pk),
+                    'name': company.name,
+                },
+            ],
             'contacts': [
                 {
                     'id': str(contact.pk),
@@ -468,10 +478,12 @@ class TestAddInteraction(APITestMixin):
             'company_referral': None,
             'large_capital_opportunity': None,
             'has_related_trade_agreements': request_data.get(
-                'has_related_trade_agreements', False,
+                'has_related_trade_agreements',
+                False,
             ),
             'related_trade_agreements': request_data.get(
-                'related_trade_agreements', [],
+                'related_trade_agreements',
+                [],
             ),
             'helped_remove_export_barrier': False,
             'export_barrier_types': [],
@@ -665,7 +677,8 @@ class TestAddInteraction(APITestMixin):
                         {'adviser': AdviserFactory},
                     ],
                     'communication_channel': partial(
-                        random_obj_for_model, CommunicationChannel,
+                        random_obj_for_model,
+                        CommunicationChannel,
                     ),
                     'was_policy_feedback_provided': False,
                     'has_related_trade_agreements': False,
@@ -1625,11 +1638,10 @@ class TestAddInteraction(APITestMixin):
                     ],
                 },
                 {
-                    'export_barrier_types':
-                        [
-                            'This field is only valid when an interaction'
-                            ' helped remove an export barrier',
-                        ],
+                    'export_barrier_types': [
+                        'This field is only valid when an interaction'
+                        ' helped remove an export barrier',
+                    ],
                 },
             ),
             (
@@ -1663,8 +1675,7 @@ class TestAddInteraction(APITestMixin):
                     'export_barrier_notes': [
                         'This field is only valid when an interaction'
                         ' helped remove an export barrier',
-                        'This field is only valid when the'
-                        ' export barrier type is \"Other\"',
+                        'This field is only valid when the export barrier type is "Other"',
                     ],
                 },
             ),
@@ -1712,8 +1723,7 @@ class TestAddInteraction(APITestMixin):
 
     @freeze_time('2017-04-18 13:25:30.986208')
     def test_restricted_user_can_add_associated_investment_project_interaction(self):
-        """Test that a restricted user can add an interaction for an associated investment project.
-        """
+        """Test that a restricted user can add an interaction for an associated investment project."""
         project_creator = AdviserFactory()
         project = InvestmentProjectFactory(created_by=project_creator)
         requester = create_test_user(
@@ -1796,8 +1806,7 @@ class TestAddInteraction(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
             'investment_project': [
-                "You don't have permission to add an interaction for this "
-                'investment project.',
+                "You don't have permission to add an interaction for this investment project.",
             ],
         }
 
@@ -1842,7 +1851,8 @@ class TestAddInteraction(APITestMixin):
         when the interaction without existing export country set.
         """
         adviser = create_test_user(
-            permission_codenames=permissions, dit_team=TeamFactory(),
+            permission_codenames=permissions,
+            dit_team=TeamFactory(),
         )
         company = CompanyFactory()
         contact = ContactFactory(company=company)
@@ -1979,10 +1989,12 @@ class TestGetInteraction(APITestMixin):
                 'id': str(interaction.company.pk),
                 'name': interaction.company.name,
             },
-            'companies': [{
-                'id': str(interaction.company.pk),
-                'name': interaction.company.name,
-            }],
+            'companies': [
+                {
+                    'id': str(interaction.company.pk),
+                    'name': interaction.company.name,
+                },
+            ],
             'contacts': [
                 {
                     'id': str(contact.pk),
@@ -2002,7 +2014,9 @@ class TestGetInteraction(APITestMixin):
             'company_export': {
                 'id': str(interaction.company_export.pk),
                 'title': interaction.company_export.title,
-            } if interaction.company_export else None,
+            }
+            if interaction.company_export
+            else None,
             'investment_project': {
                 'id': str(interaction.investment_project.pk),
                 'name': interaction.investment_project.name,
@@ -2116,10 +2130,12 @@ class TestGetInteraction(APITestMixin):
                 'id': str(interaction.company.pk),
                 'name': interaction.company.name,
             },
-            'companies': [{
-                'id': str(interaction.company.pk),
-                'name': interaction.company.name,
-            }],
+            'companies': [
+                {
+                    'id': str(interaction.company.pk),
+                    'name': interaction.company.name,
+                },
+            ],
             'contacts': [
                 {
                     'id': str(contact.pk),
@@ -2260,8 +2276,7 @@ class TestUpdateInteraction(APITestMixin):
     def test_restricted_user_cannot_update_non_associated_investment_project_interaction(
         self,
     ):
-        """Test that a restricted user cannot update a non-associated investment project interaction.
-        """
+        """Test that a restricted user cannot update a non-associated investment project interaction."""
         interaction = InvestmentProjectInteractionFactory(
             subject='I am a subject',
         )
@@ -2283,8 +2298,7 @@ class TestUpdateInteraction(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_restricted_user_can_update_associated_investment_project_interaction(self):
-        """Test that a restricted user can update an interaction for an associated investment project.
-        """
+        """Test that a restricted user can update an interaction for an associated investment project."""
         project_creator = AdviserFactory()
         project = InvestmentProjectFactory(created_by=project_creator)
         interaction = CompanyInteractionFactory(
@@ -2384,7 +2398,10 @@ class TestUpdateInteraction(APITestMixin):
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_CHANGE_PERMISSIONS)
     @freeze_time('2017-04-18 13:25:30.986208')
     def test_draft_update_enforces_required_fields(
-        self, permissions, data, error_response,
+        self,
+        permissions,
+        data,
+        error_response,
     ):
         """Test that changing a draft to completed will enforce service and
         communication_channel to be set.
@@ -2411,7 +2428,8 @@ class TestUpdateInteraction(APITestMixin):
         when the interaction with existing export country.
         """
         adviser = create_test_user(
-            permission_codenames=permissions, dit_team=TeamFactory(),
+            permission_codenames=permissions,
+            dit_team=TeamFactory(),
         )
         interaction = ExportCountriesInteractionFactory()
         export_countries = interaction.export_countries.all()
@@ -2461,9 +2479,7 @@ class TestUpdateInteraction(APITestMixin):
         requester = create_test_user(permission_codenames=permissions)
         interaction = ExportCountriesInteractionFactory()
 
-        assert (
-            len(Interaction.objects.get(pk=interaction.pk).export_countries.all()) == 1
-        )
+        assert len(Interaction.objects.get(pk=interaction.pk).export_countries.all()) == 1
         api_client = self.create_api_client(user=requester)
         url = reverse('api-v4:interaction:item', kwargs={'pk': interaction.pk})
         data = {
@@ -2478,13 +2494,15 @@ class TestUpdateInteraction(APITestMixin):
     @freeze_time('2017-04-18 13:25:30.986208')
     @pytest.mark.parametrize('permissions', NON_RESTRICTED_ADD_PERMISSIONS)
     def test_add_interaction_with_company_export_country_check_history(
-        self, permissions,
+        self,
+        permissions,
     ):
         """Test add a new interaction with export country
         check to make sure it is not tracked in company export country history.
         """
         adviser = create_test_user(
-            permission_codenames=permissions, dit_team=TeamFactory(),
+            permission_codenames=permissions,
+            dit_team=TeamFactory(),
         )
         company = CompanyFactory()
         contact = ContactFactory(company=company)
@@ -2560,9 +2578,7 @@ class TestListInteractions(APITestMixin):
         response_data = response.json()
         assert response_data['count'] == 6
         actual_ids = {i['id'] for i in response_data['results']}
-        expected_ids = {
-            str(i.id) for i in chain(project_interactions, company_interactions)
-        }
+        expected_ids = {str(i.id) for i in chain(project_interactions, company_interactions)}
         assert actual_ids == expected_ids
 
     def test_restricted_user_can_only_list_associated_interactions(self):
@@ -2610,11 +2626,9 @@ class TestListInteractions(APITestMixin):
 
         opportunity = LargeCapitalOpportunityFactory()
         CompanyInteractionFactory.create_batch(3)
-        opportunity_interactions = (
-            LargeCapitalOpportunityInteractionFactory.create_batch(
-                3,
-                large_capital_opportunity=opportunity,
-            )
+        opportunity_interactions = LargeCapitalOpportunityInteractionFactory.create_batch(
+            3,
+            large_capital_opportunity=opportunity,
         )
         url = reverse('api-v4:interaction:collection')
         response = api_client.get(
@@ -2649,7 +2663,8 @@ class TestListInteractions(APITestMixin):
         CompanyInteractionFactory.create_batch(3, contacts=[contact])
         CompanyInteractionFactory.create_batch(3, company=company)
         export_interactions = CompanyExportInteractionFactory.create_batch(
-            2, company_export=export,
+            2,
+            company_export=export,
         )
 
         url = reverse('api-v4:interaction:collection')

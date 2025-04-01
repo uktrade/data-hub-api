@@ -60,8 +60,7 @@ class ContactAdmin(BaseModelAdminMixin, VersionAdmin):
             path(
                 'merge/step-1-select-other-contact',
                 self.admin_site.admin_view(partial(merge_select_other_contact, self)),
-                name=f'{model_meta.app_label}_'
-                f'{model_meta.model_name}_merge-select-other-contact',
+                name=f'{model_meta.app_label}_{model_meta.model_name}_merge-select-other-contact',
             ),
             path(
                 'merge/step-2-select-primary-contact/',
@@ -72,7 +71,7 @@ class ContactAdmin(BaseModelAdminMixin, VersionAdmin):
             path(
                 'merge/step-3-confirm/',
                 self.admin_site.admin_view(partial(confirm_merge_contacts, self)),
-                name=f'{model_meta.app_label}_' f'{model_meta.model_name}_merge-confirm',
+                name=f'{model_meta.app_label}_{model_meta.model_name}_merge-confirm',
             ),
             *super().get_urls(),
         ]

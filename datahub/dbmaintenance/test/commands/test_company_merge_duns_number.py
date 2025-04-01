@@ -10,8 +10,7 @@ pytestmark = pytest.mark.django_db
 
 
 def test_merge_id_duns_number(s3_stubber):
-    """Test that the command merge id and duns number.
-    """
+    """Test that the command merge id and duns number."""
     with reversion.create_revision():
         company_1 = CompanyFactory(duns_number='123456789')
         company_2 = CompanyFactory(duns_number='223456789')

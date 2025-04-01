@@ -49,10 +49,7 @@ def _export_countries_list(export_countries):
 
 
 def _companies_list(companies):
-    return [
-        dict_utils.company_dict(company)
-        for company in companies.all()
-    ]
+    return [dict_utils.company_dict(company) for company in companies.all()]
 
 
 class _DITParticipant(InnerDoc):

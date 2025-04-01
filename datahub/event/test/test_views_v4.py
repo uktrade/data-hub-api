@@ -41,69 +41,75 @@ class TestGetEventView(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
 
         response_data = _get_canonical_response_data(response)
-        expected_response_data = _canonicalise_response_data({
-            'id': response_data['id'],
-            'name': event.name,
-            'event_type': {
-                'id': str(event.event_type.id),
-                'name': str(event.event_type.name),
-            },
-            'start_date': event.start_date.isoformat(),
-            'end_date': event.end_date.isoformat(),
-            'location_type': {
-                'id': str(event.location_type.id),
-                'name': event.location_type.name,
-            },
-            'notes': event.notes,
-            'address_1': event.address_1,
-            'address_2': event.address_2,
-            'address_town': event.address_town,
-            'address_county': event.address_county,
-            'address_postcode': event.address_postcode,
-            'address_country': {
-                'id': str(event.address_country.id),
-                'name': event.address_country.name,
-            },
-            'archived_documents_url_path': event.archived_documents_url_path,
-            'disabled_on': format_date_or_datetime(event.disabled_on),
-            'uk_region': {
-                'id': UKRegion.east_of_england.value.id,
-                'name': UKRegion.east_of_england.value.name,
-            },
-            'organiser': {
-                'id': str(event.organiser.pk),
-                'first_name': event.organiser.first_name,
-                'last_name': event.organiser.last_name,
-                'name': event.organiser.name,
-            },
-            'lead_team': {
-                'id': str(event.lead_team.id),
-                'name': event.lead_team.name,
-            },
-            'teams': [
-                {
-                    'id': Team.healthcare_uk.value.id,
-                    'name': Team.healthcare_uk.value.name,
+        expected_response_data = _canonicalise_response_data(
+            {
+                'id': response_data['id'],
+                'name': event.name,
+                'event_type': {
+                    'id': str(event.event_type.id),
+                    'name': str(event.event_type.name),
                 },
-                {
-                    'id': Team.crm.value.id,
-                    'name': Team.crm.value.name,
+                'start_date': event.start_date.isoformat(),
+                'end_date': event.end_date.isoformat(),
+                'location_type': {
+                    'id': str(event.location_type.id),
+                    'name': event.location_type.name,
                 },
-            ],
-            'has_related_trade_agreements': True,
-            'related_trade_agreements': [{
-                'id': TradeAgreement.uk_japan.value.id,
-                'name': TradeAgreement.uk_japan.value.name,
-            }],
-            'related_programmes': [{
-                'id': Programme.great_branded.value.id,
-                'name': Programme.great_branded.value.name,
-            }],
-            'service': {
-                'id': Service.inbound_referral.value.id,
-                'name': Service.inbound_referral.value.name,
+                'notes': event.notes,
+                'address_1': event.address_1,
+                'address_2': event.address_2,
+                'address_town': event.address_town,
+                'address_county': event.address_county,
+                'address_postcode': event.address_postcode,
+                'address_country': {
+                    'id': str(event.address_country.id),
+                    'name': event.address_country.name,
+                },
+                'archived_documents_url_path': event.archived_documents_url_path,
+                'disabled_on': format_date_or_datetime(event.disabled_on),
+                'uk_region': {
+                    'id': UKRegion.east_of_england.value.id,
+                    'name': UKRegion.east_of_england.value.name,
+                },
+                'organiser': {
+                    'id': str(event.organiser.pk),
+                    'first_name': event.organiser.first_name,
+                    'last_name': event.organiser.last_name,
+                    'name': event.organiser.name,
+                },
+                'lead_team': {
+                    'id': str(event.lead_team.id),
+                    'name': event.lead_team.name,
+                },
+                'teams': [
+                    {
+                        'id': Team.healthcare_uk.value.id,
+                        'name': Team.healthcare_uk.value.name,
+                    },
+                    {
+                        'id': Team.crm.value.id,
+                        'name': Team.crm.value.name,
+                    },
+                ],
+                'has_related_trade_agreements': True,
+                'related_trade_agreements': [
+                    {
+                        'id': TradeAgreement.uk_japan.value.id,
+                        'name': TradeAgreement.uk_japan.value.name,
+                    },
+                ],
+                'related_programmes': [
+                    {
+                        'id': Programme.great_branded.value.id,
+                        'name': Programme.great_branded.value.name,
+                    },
+                ],
+                'service': {
+                    'id': Service.inbound_referral.value.id,
+                    'name': Service.inbound_referral.value.name,
+                },
             },
-        })
+        )
 
         assert response_data == expected_response_data
 
@@ -191,15 +197,19 @@ class TestCreateEventView(APITestMixin):
                 'id': str(team.pk),
                 'name': team.name,
             },
-            'teams': [{
-                'id': str(team.pk),
-                'name': team.name,
-            }],
+            'teams': [
+                {
+                    'id': str(team.pk),
+                    'name': team.name,
+                },
+            ],
             'has_related_trade_agreements': True,
-            'related_trade_agreements': [{
-                'id': TradeAgreement.uk_japan.value.id,
-                'name': TradeAgreement.uk_japan.value.name,
-            }],
+            'related_trade_agreements': [
+                {
+                    'id': TradeAgreement.uk_japan.value.id,
+                    'name': TradeAgreement.uk_japan.value.name,
+                },
+            ],
             'related_programmes': [],
             'service': {
                 'id': Service.inbound_referral.value.id,
@@ -289,14 +299,18 @@ class TestCreateEventView(APITestMixin):
                 },
             ],
             'has_related_trade_agreements': True,
-            'related_trade_agreements': [{
-                'id': TradeAgreement.uk_japan.value.id,
-                'name': TradeAgreement.uk_japan.value.name,
-            }],
-            'related_programmes': [{
-                'id': Programme.great_branded.value.id,
-                'name': Programme.great_branded.value.name,
-            }],
+            'related_trade_agreements': [
+                {
+                    'id': TradeAgreement.uk_japan.value.id,
+                    'name': TradeAgreement.uk_japan.value.name,
+                },
+            ],
+            'related_programmes': [
+                {
+                    'id': Programme.great_branded.value.id,
+                    'name': Programme.great_branded.value.name,
+                },
+            ],
             'service': {
                 'id': Service.inbound_referral.value.id,
                 'name': Service.inbound_referral.value.name,
@@ -386,8 +400,7 @@ class TestCreateEventView(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response_data == {
             'related_trade_agreements': [
-                "'Related trade agreements' is inconsistent"
-                " with 'Has related trade agreements?'",
+                "'Related trade agreements' is inconsistent with 'Has related trade agreements?'",
             ],
         }
 
@@ -418,8 +431,7 @@ class TestCreateEventView(APITestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response_data == {
             'related_trade_agreements': [
-                "'Related trade agreements' is inconsistent"
-                " with 'Has related trade agreements?'",
+                "'Related trade agreements' is inconsistent with 'Has related trade agreements?'",
             ],
         }
 
@@ -676,14 +688,18 @@ class TestUpdateEventView(APITestMixin):
                 },
             ],
             'has_related_trade_agreements': True,
-            'related_trade_agreements': [{
-                'id': TradeAgreement.uk_japan.value.id,
-                'name': TradeAgreement.uk_japan.value.name,
-            }],
-            'related_programmes': [{
-                'id': Programme.great_challenge_fund.value.id,
-                'name': Programme.great_challenge_fund.value.name,
-            }],
+            'related_trade_agreements': [
+                {
+                    'id': TradeAgreement.uk_japan.value.id,
+                    'name': TradeAgreement.uk_japan.value.name,
+                },
+            ],
+            'related_programmes': [
+                {
+                    'id': Programme.great_challenge_fund.value.id,
+                    'name': Programme.great_challenge_fund.value.name,
+                },
+            ],
             'service': {
                 'id': Service.account_management.value.id,
                 'name': Service.account_management.value.name,
@@ -754,8 +770,7 @@ class TestUpdateEventView(APITestMixin):
 
 
 class TestEventVersioning(APITestMixin):
-    """Tests for versions created when interacting with the event endpoints.
-    """
+    """Tests for versions created when interacting with the event endpoints."""
 
     def test_add_creates_a_new_version(self):
         """Test that creating an event creates a new version."""

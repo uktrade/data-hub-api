@@ -43,11 +43,13 @@ def test_configure_connection(connections, settings):
 
     opensearch_client.configure_connection()
 
-    connections.configure.assert_called_with(default={
-        'hosts': [settings.OPENSEARCH_URL],
-        'verify_certs': settings.OPENSEARCH_VERIFY_CERTS,
-        'pool_maxsize': settings.OPENSEARCH_POOL_MAXSIZE,
-    })
+    connections.configure.assert_called_with(
+        default={
+            'hosts': [settings.OPENSEARCH_URL],
+            'verify_certs': settings.OPENSEARCH_VERIFY_CERTS,
+            'pool_maxsize': settings.OPENSEARCH_POOL_MAXSIZE,
+        },
+    )
 
 
 def test_creates_index(monkeypatch, mock_connection_for_create_index):
@@ -108,10 +110,12 @@ def test_creates_index(monkeypatch, mock_connection_for_create_index):
                             'type': 'stemmer',
                         },
                         'english_stop': {
-                            'stopwords': '_english_', 'type': 'stop',
+                            'stopwords': '_english_',
+                            'type': 'stop',
                         },
                         'english_stemmer': {
-                            'language': 'english', 'type': 'stemmer',
+                            'language': 'english',
+                            'type': 'stemmer',
                         },
                     },
                 },
@@ -208,39 +212,35 @@ def test_alias_exists(mock_opensearch_client, expected):
         [
             (
                 (),
-                (
-                    ('test-alias', ('index1', 'index2')),
-                ),
+                (('test-alias', ('index1', 'index2')),),
                 {
-                    'actions': [{
-                        'remove': {
-                            'alias': 'test-alias',
-                            'indices': ['index1', 'index2'],
+                    'actions': [
+                        {
+                            'remove': {
+                                'alias': 'test-alias',
+                                'indices': ['index1', 'index2'],
+                            },
                         },
-                    }],
+                    ],
                 },
             ),
             (
-                (
-                    ('test-alias', ('index1', 'index2')),
-                ),
+                (('test-alias', ('index1', 'index2')),),
                 (),
                 {
-                    'actions': [{
-                        'add': {
-                            'alias': 'test-alias',
-                            'indices': ['index1', 'index2'],
+                    'actions': [
+                        {
+                            'add': {
+                                'alias': 'test-alias',
+                                'indices': ['index1', 'index2'],
+                            },
                         },
-                    }],
+                    ],
                 },
             ),
             (
-                (
-                    ('test-alias', ('index1', 'index2')),
-                ),
-                (
-                    ('test-alias-2', ('index3', 'index4')),
-                ),
+                (('test-alias', ('index1', 'index2')),),
+                (('test-alias-2', ('index3', 'index4')),),
                 {
                     'actions': [
                         {

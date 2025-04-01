@@ -14,7 +14,6 @@ def test_run(s3_stubber):
     """Test that the command updates the relevant records ignoring ones with errors."""
     investment_projects = [
         # investment project in CSV doesn't exist so row should fail
-
         # created_on should get updated
         InvestmentProjectFactory(),
         # should be ignored
@@ -50,7 +49,13 @@ def test_run(s3_stubber):
         investment_project.refresh_from_db()
 
     assert investment_projects[0].created_on == datetime(
-        2015, 9, 29, 11, 3, 20, tzinfo=timezone.utc,
+        2015,
+        9,
+        29,
+        11,
+        3,
+        20,
+        tzinfo=timezone.utc,
     )
     assert investment_projects[1].created_on == created_on_dates[1]
     assert investment_projects[2].created_on == created_on_dates[2]

@@ -39,10 +39,9 @@ def get_leads_to_process():
 
 
 def raise_exception_for_eyb_lead_without_company(eyb_lead: EYBLead):
-    """Check for required attributes on EYB Lead to ensure there is a company.
-    """
+    """Check for required attributes on EYB Lead to ensure there is a company."""
     if not eyb_lead.company:
-        raise AttributeError('The ''company'' attribute is not set for the ''EYBLead'' object.')
+        raise AttributeError('The company attribute is not set for the EYBLead object.')
 
 
 def find_match_by_duns_number(duns_number):
@@ -66,8 +65,7 @@ def find_match_by_duns_number(duns_number):
 
 
 def add_new_company_from_eyb_lead(eyb_lead: EYBLead):
-    """Add new company from EYB lead and link it.
-    """
+    """Add new company from EYB lead and link it."""
     # Create company record
     company = Company()
 
@@ -113,8 +111,7 @@ def match_or_create_company_for_eyb_lead(eyb_lead):
 
 
 def email_matches_contact_on_eyb_lead_company(eyb_lead: EYBLead):
-    """Check whether a contact exists with the EYB lead email address on the EYB Lead company.
-    """
+    """Check whether a contact exists with the EYB lead email address on the EYB Lead company."""
     raise_exception_for_eyb_lead_without_company(eyb_lead)
 
     count = Contact.objects.filter(

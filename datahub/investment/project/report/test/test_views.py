@@ -38,9 +38,7 @@ class TestGetSPIReport(AdminTestMixin):
         user = create_test_user(
             is_staff=True,
             password=self.PASSWORD,
-            permission_codenames=(
-                SPIReportPermission.view,
-            ),
+            permission_codenames=(SPIReportPermission.view,),
         )
         client = self.create_client(user=user)
         response = client.get(url)
@@ -77,9 +75,7 @@ class TestGetSPIReport(AdminTestMixin):
         user = create_test_user(
             is_staff=True,
             password=self.PASSWORD,
-            permission_codenames=(
-                SPIReportPermission.view,
-            ),
+            permission_codenames=(SPIReportPermission.view,),
         )
         client = self.create_client(user=user)
         response = client.get(url)

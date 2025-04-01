@@ -146,8 +146,7 @@ class TestMergeWithAnotherCompanyViewPost(AdminTestMixin):
         [
             (
                 SAME_CONTACT,
-                'The two contacts to merge cannot be the same. Please select a different '
-                'contact.',
+                'The two contacts to merge cannot be the same. Please select a different contact.',
             ),
             (
                 '1234',

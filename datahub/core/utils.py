@@ -69,8 +69,7 @@ def join_truthy_strings(*args, sep=' '):
 
 
 def upper_snake_case_to_sentence_case(strings, glue=' '):
-    """Formats string or strings from UPPER_SNAKE_CASE to Sentence case.
-    """
+    """Formats string or strings from UPPER_SNAKE_CASE to Sentence case."""
     if isinstance(strings, str):
         strings = [strings]
     return glue.join(list(map(lambda string: string.replace('_', ' ').capitalize(), strings)))
@@ -99,9 +98,9 @@ def format_currency(value, symbol='£'):
             value = round(value / 1000, 2)
 
     # Only use decimals when pence are included (£75.50 not £75.00)
-    if (isinstance(value, float) and round(abs(value) % 1, 2) != 0.0):
+    if isinstance(value, float) and round(abs(value) % 1, 2) != 0.0:
         # Don't use two decimals with multiplier if it would result in trailing 0.
-        if (multiplier != '' and round(abs(value * 10) % 1, 1) == 0.0):
+        if multiplier != '' and round(abs(value * 10) % 1, 1) == 0.0:
             formatter = ',.1f'
         else:
             formatter = ',.2f'
@@ -118,11 +117,11 @@ def format_currency_range(values, separator=' to ', symbol='£'):
 
 
 def format_currency_range_string(
-        string,
-        separator='-',
-        more_or_less=True,
-        smart_more_or_less=True,
-        symbol='£',
+    string,
+    separator='-',
+    more_or_less=True,
+    smart_more_or_less=True,
+    symbol='£',
 ):
     """Formats a range of ammounts according to Gov UK style guide.
     Note only numbers in specific formats are formatted, it doesn't detect number values within

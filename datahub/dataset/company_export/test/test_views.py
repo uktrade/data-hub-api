@@ -17,8 +17,7 @@ def get_expected_data_from_company_export(export):
         'archived': export.archived,
         'archived_by_id': export.archived_by_id,
         'archived_on': (
-            format_date_or_datetime(export.archived_on)
-            if export.archived_on else None
+            format_date_or_datetime(export.archived_on) if export.archived_on else None
         ),
         'archived_reason': export.archived_reason,
         'company_id': str(export.company_id),
@@ -30,7 +29,8 @@ def get_expected_data_from_company_export(export):
         'modified_by_id': export.modified_by_id,
         'estimated_win_date': (
             format_date_or_datetime(export.estimated_win_date)
-            if export.estimated_win_date else None
+            if export.estimated_win_date
+            else None
         ),
         'id': str(export.id),
         'title': export.title,
@@ -49,14 +49,14 @@ def get_expected_data_from_company_export(export):
 
 @pytest.mark.django_db
 class TestCompanyExportDatasetViewSet(BaseDatasetViewTest):
-    """Tests for CompanyExportDatasetView.
-    """
+    """Tests for CompanyExportDatasetView."""
 
     view_url = reverse('api-v4:dataset:company-export-dataset')
     factory = ExportFactory
 
     @pytest.mark.parametrize(
-        'item_factory', [
+        'item_factory',
+        [
             ExportFactory,
         ],
     )

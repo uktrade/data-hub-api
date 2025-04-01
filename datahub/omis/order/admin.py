@@ -145,43 +145,45 @@ class OrderAdmin(BaseModelAdminMixin, ViewAndChangeOnlyAdmin):
         if not order.cancelled_on and not order.cancelled_by and not order.cancellation_reason:
             return ''
         description = self._get_description_for_timed_event(
-            order.cancelled_on, order.cancelled_by,
+            order.cancelled_on,
+            order.cancelled_by,
         )
 
         return f'{description} because "{order.cancellation_reason}"'
 
     def public_facing_url(self, order):
-        """:returns: read-only and clickable URL to the public facing OMIS page
-        """
+        """:returns: read-only and clickable URL to the public facing OMIS page"""
         url = order.get_public_facing_url()
         return format_html('<a href="{href}">{text}<a>', href=url, text=url)
 
     def discount(self, order):
-        """:returns: details of any discount applied
-        """
+        """:returns: details of any discount applied"""
         if not order.discount_value and not order.discount_label:
             return ''
         return f'{order.discount_value} pence - {order.discount_label}'
 
     def uk_advisers(self, order):
-        """:returns: descriptive list of advisers subscribed to the order
-        """
+        """:returns: descriptive list of advisers subscribed to the order"""
         return format_html_join(
-            '', '<p>{0}</p>',
+            '',
+            '<p>{0}</p>',
             ((sub.adviser.name,) for sub in order.subscribers.all()),
         )
 
     def post_advisers(self, order):
-        """:returns: descriptive list of advisers assigned to the order
-        """
+        """:returns: descriptive list of advisers assigned to the order"""
         return format_html_join(
-            '', '<p>{0} {1}- estimated time {2} mins - actual time {3} mins</p>',
-            ((
-                assignee.adviser.name,
-                '(lead) ' if assignee.is_lead else '',
-                assignee.estimated_time or mark_safe('<i>unknown</i>'),
-                assignee.actual_time or mark_safe('<i>unknown</i>'),
-            ) for assignee in order.assignees.all()),
+            '',
+            '<p>{0} {1}- estimated time {2} mins - actual time {3} mins</p>',
+            (
+                (
+                    assignee.adviser.name,
+                    '(lead) ' if assignee.is_lead else '',
+                    assignee.estimated_time or mark_safe('<i>unknown</i>'),
+                    assignee.actual_time or mark_safe('<i>unknown</i>'),
+                )
+                for assignee in order.assignees.all()
+            ),
         )
 
     def get_urls(self):
@@ -191,13 +193,15 @@ class OrderAdmin(BaseModelAdminMixin, ViewAndChangeOnlyAdmin):
         def wrap(view):
             def wrapper(*args, **kwargs):
                 return self.admin_site.admin_view(view)(*args, **kwargs)
+
             wrapper.model_admin = self
             return update_wrapper(wrapper, view)
 
         info = self.model._meta.app_label, self.model._meta.model_name
         return [
             path(
-                '<path:object_id>/cancel/', wrap(self.cancel_order_view),
+                '<path:object_id>/cancel/',
+                wrap(self.cancel_order_view),
                 name='%s_%s_cancel' % info,
             ),
         ] + urls
@@ -205,7 +209,7 @@ class OrderAdmin(BaseModelAdminMixin, ViewAndChangeOnlyAdmin):
     @csrf_protect_m
     def cancel_order_view(self, request, object_id, extra_context=None):
         """Admin view for cancelling an order."""
-        if (IS_POPUP_VAR in request.POST or IS_POPUP_VAR in request.GET):
+        if IS_POPUP_VAR in request.POST or IS_POPUP_VAR in request.GET:
             raise SuspiciousOperation('Action not allowed in popup')
 
         with transaction.atomic(using=router.db_for_write(self.model)):

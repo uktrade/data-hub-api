@@ -93,7 +93,9 @@ def get_expected_data_from_project(project, won_date=None):
         'actual_land_date': format_date_or_datetime(project.actual_land_date),
         'actual_uk_region_names': (
             [region.name for region in project.actual_uk_regions.order_by('name')]
-        ) if project.actual_uk_regions.exists() else None,
+        )
+        if project.actual_uk_regions.exists()
+        else None,
         'address_1': project.address_1,
         'address_2': project.address_2,
         'address_town': project.address_town,
@@ -105,16 +107,20 @@ def get_expected_data_from_project(project, won_date=None):
         'average_salary__name': get_attr_or_none(project, 'average_salary.name'),
         'business_activity_names': (
             [activity.name for activity in project.business_activities.order_by('name')]
-        ) if project.business_activities.exists() else None,
+        )
+        if project.business_activities.exists()
+        else None,
         'client_contact_ids': [str(contact.id) for contact in client_contacts],
-        'client_contact_names': [f'{contact.first_name} {contact.last_name}'
-                                 for contact in client_contacts],
+        'client_contact_names': [
+            f'{contact.first_name} {contact.last_name}' for contact in client_contacts
+        ],
         'client_contact_emails': [contact.email for contact in client_contacts],
         'client_relationship_manager_id': str_or_none(project.client_relationship_manager_id),
         'client_requirements': project.client_requirements,
         'competing_countries': (
             [country.name for country in project.competitor_countries.order_by('name')]
-            if project.competitor_countries.exists() else [None]
+            if project.competitor_countries.exists()
+            else [None]
         ),
         'country_investment_originates_from_id': str_or_none(
             project.country_investment_originates_from_id,
@@ -127,17 +133,16 @@ def get_expected_data_from_project(project, won_date=None):
         'created_on': format_date_or_datetime(project.created_on),
         'delivery_partner_names': (
             [partner.name for partner in project.delivery_partners.order_by('name')]
-
-        ) if project.delivery_partners.exists() else None,
+        )
+        if project.delivery_partners.exists()
+        else None,
         'description': project.description,
         'estimated_land_date': format_date_or_datetime(project.estimated_land_date),
         'export_revenue': project.export_revenue,
         'fdi_type__name': get_attr_or_none(project, 'fdi_type.name'),
         'fdi_value__name': get_attr_or_none(project, 'fdi_value.name'),
         'foreign_equity_investment': (
-            float(project.foreign_equity_investment)
-            if project.foreign_equity_investment
-            else None
+            float(project.foreign_equity_investment) if project.foreign_equity_investment else None
         ),
         'government_assistance': project.government_assistance,
         'gross_value_added': project.gross_value_added,
@@ -165,7 +170,8 @@ def get_expected_data_from_project(project, won_date=None):
         'number_safeguarded_jobs': project.number_safeguarded_jobs,
         'other_business_activity': project.other_business_activity,
         'project_arrived_in_triage_on': format_date_or_datetime(
-            project.project_arrived_in_triage_on),
+            project.project_arrived_in_triage_on,
+        ),
         'project_assurance_adviser_id': str_or_none(project.project_assurance_adviser_id),
         'project_first_moved_to_won': won_date,
         'project_manager_id': str_or_none(project.project_manager_id),
@@ -186,33 +192,39 @@ def get_expected_data_from_project(project, won_date=None):
         ),
         'sector_name': get_attr_or_none(project, 'sector.name'),
         'specific_programme_names': (
-            [specific_programme.name for specific_programme in
-             project.specific_programmes.order_by('name')]
-        )if project.specific_programmes.exists() else None,
+            [
+                specific_programme.name
+                for specific_programme in project.specific_programmes.order_by('name')
+            ]
+        )
+        if project.specific_programmes.exists()
+        else None,
         'stage__name': get_attr_or_none(project, 'stage.name'),
         'status': project.status,
         'strategic_driver_names': (
             [driver.name for driver in project.strategic_drivers.order_by('name')]
-        ) if project.strategic_drivers.exists() else None,
+        )
+        if project.strategic_drivers.exists()
+        else None,
         'team_member_ids': (
-            [
-                str(team_member.adviser_id)
-                for team_member in project.team_members.order_by('id')
-            ]
-        ) if project.team_members.exists() else [None],
+            [str(team_member.adviser_id) for team_member in project.team_members.order_by('id')]
+        )
+        if project.team_members.exists()
+        else [None],
         'total_investment': float(project.total_investment) if project.total_investment else None,
         'uk_company_id': str_or_none(project.uk_company_id),
         'uk_company_sector': get_attr_or_none(project, 'uk_company.sector.name'),
         'uk_region_location_names': (
             [region.name for region in project.uk_region_locations.order_by('name')]
-        ) if project.uk_region_locations.exists() else None,
+        )
+        if project.uk_region_locations.exists()
+        else None,
     }
 
 
 @pytest.mark.django_db
 class TestInvestmentProjectsDatasetViewSet(BaseDatasetViewTest):
-    """Tests for InvestmentProjectsDatasetView.
-    """
+    """Tests for InvestmentProjectsDatasetView."""
 
     view_url = reverse('api-v4:dataset:investment-projects-dataset')
     factory = InvestmentProjectFactory
@@ -289,8 +301,10 @@ class TestInvestmentProjectsDatasetViewSet(BaseDatasetViewTest):
         assert response.status_code == status.HTTP_200_OK
         response_results = response.json()['results']
         assert len(response_results) == 4
-        expected_project_list = sorted([project_3, project_4],
-                                       key=lambda item: item.pk) + [project_1, project_2]
+        expected_project_list = sorted([project_3, project_4], key=lambda item: item.pk) + [
+            project_1,
+            project_2,
+        ]
         for index, project in enumerate(expected_project_list):
             assert str(project.id) == response_results[index]['id']
 

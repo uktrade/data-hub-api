@@ -50,8 +50,9 @@ def assert_ingested_eyb_triage_data(instance: EYBLead, data: dict):
     assert_datetimes(instance.triage_created, data.get('created'))
     assert_datetimes(instance.triage_modified, data.get('modified'))
 
-    level_zero_segment, level_one_segment, level_two_segment = \
+    level_zero_segment, level_one_segment, level_two_segment = (
         Sector.get_segments_from_sector_instance(instance.sector)
+    )
     assert level_zero_segment == data.get('sector')
     assert level_one_segment == data.get('sectorSub', None)
     assert level_two_segment == data.get('sectorSubSub', None)
@@ -151,9 +152,7 @@ def assert_retrieved_eyb_lead_data(instance: EYBLead, data: dict):
     assert instance.agree_terms == data['agree_terms']
     assert instance.agree_info_email == data['agree_info_email']
     assert instance.landing_timeframe == data['landing_timeframe']
-    assert [
-        str(ip.id) for ip in instance.investment_projects.all()
-    ] == [
+    assert [str(ip.id) for ip in instance.investment_projects.all()] == [
         data_ip['id'] for data_ip in data['investment_projects']
     ]
 

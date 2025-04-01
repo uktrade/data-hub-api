@@ -10,20 +10,17 @@ from datahub.interaction import MAILBOX_INGESTION_FEATURE_FLAG_NAME
 
 @pytest.fixture
 def mailbox_ingestion_feature_flag():
-    """Creates the email ingestion feature flag.
-    """
+    """Creates the email ingestion feature flag."""
     return FeatureFlagFactory(code=MAILBOX_INGESTION_FEATURE_FLAG_NAME)
 
 
 @pytest.mark.django_db
 @pytest.mark.usefixtures('mailbox_ingestion_feature_flag')
 class TestIngestEmails:
-    """Test ingest_emails RQ task.
-    """
+    """Test ingest_emails RQ task."""
 
     def test_ingest_emails_lock_acquired(self, monkeypatch):
-        """Test that our emails are processed when the lock is acquired.
-        """
+        """Test that our emails are processed when the lock is acquired."""
         process_emails_patch = mock.Mock()
         monkeypatch.setattr(
             'datahub.email_ingestion.emails.process_ingestion_emails',
@@ -33,8 +30,7 @@ class TestIngestEmails:
         assert process_emails_patch.call_count == 1
 
     def test_ingest_emails_lock_not_acquired(self, monkeypatch):
-        """Test that our emails are not processed when the lock cannot be acquired successfully.
-        """
+        """Test that our emails are not processed when the lock cannot be acquired successfully."""
         process_emails_patch = mock.Mock()
         monkeypatch.setattr(
             'datahub.email_ingestion.emails.process_ingestion_emails',
@@ -48,8 +44,7 @@ class TestIngestEmails:
         assert process_emails_patch.called is False
 
     def test_ingest_feature_flag_inactive(self, monkeypatch):
-        """Test that our emails are not processed when the feature flag is not active.
-        """
+        """Test that our emails are not processed when the feature flag is not active."""
         process_emails_patch = mock.Mock()
         # ensure that the process_ingestion_emails method is a mock so we can interrogate later
         monkeypatch.setattr(

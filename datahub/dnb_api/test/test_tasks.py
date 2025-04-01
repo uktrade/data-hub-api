@@ -53,8 +53,7 @@ def test_sync_company_with_dnb_all_fields(
     base_company_dict,
     update_descriptor,
 ):
-    """Test the sync_company_with_dnb task when all fields should be synced.
-    """
+    """Test the sync_company_with_dnb task when all fields should be synced."""
     requests_mock.post(
         DNB_V2_SEARCH_URL,
         json=dnb_response_uk,
@@ -118,8 +117,7 @@ def test_sync_company_with_dnb_partial_fields(
     dnb_response_uk,
     base_company_dict,
 ):
-    """Test the sync_company_with_dnb task when only a subset of fields should be synced.
-    """
+    """Test the sync_company_with_dnb task when only a subset of fields should be synced."""
     requests_mock.post(
         DNB_V2_SEARCH_URL,
         json=dnb_response_uk,
@@ -188,8 +186,7 @@ def test_sync_company_with_dnb_partial_fields(
     ],
 )
 def test_sync_company_with_dnb_bubbles_up_errors(monkeypatch, error):
-    """Test the sync_company_with_dnb task retries server errors.
-    """
+    """Test the sync_company_with_dnb task retries server errors."""
     company = CompanyFactory(duns_number='123456789')
 
     # Set up a DNBServiceError with the parametrized status code
@@ -238,8 +235,7 @@ class TestGetCompanyUpdates:
         ],
     )
     def test_errors(self, monkeypatch, error):
-        """Test the schedule_get_company_updates task retries server errors.
-        """
+        """Test the schedule_get_company_updates task retries server errors."""
         mocked_get_company_update_page = mock.Mock(side_effect=error)
         monkeypatch.setattr(
             'datahub.dnb_api.tasks.update.get_company_update_page',
@@ -446,7 +442,7 @@ class TestGetCompanyUpdates:
             },
         )
         expected_message = (
-            'datahub.dnb_api.tasks.update.get_company_updates ' 'updated: 1; failed to update: 0'
+            'datahub.dnb_api.tasks.update.get_company_updates updated: 1; failed to update: 0'
         )
         mocked_send_realtime_message.assert_called_once_with(expected_message)
 
@@ -490,7 +486,7 @@ class TestGetCompanyUpdates:
             },
         )
         expected_message = (
-            'datahub.dnb_api.tasks.update.get_company_updates ' 'updated: 1; failed to update: 0'
+            'datahub.dnb_api.tasks.update.get_company_updates updated: 1; failed to update: 0'
         )
         mocked_send_realtime_message.assert_called_once_with(expected_message)
 
@@ -539,15 +535,14 @@ class TestGetCompanyUpdates:
             },
         )
         expected_message = (
-            'datahub.dnb_api.tasks.update.get_company_updates ' 'updated: 1; failed to update: 1'
+            'datahub.dnb_api.tasks.update.get_company_updates updated: 1; failed to update: 1'
         )
         mocked_send_realtime_message.assert_called_once_with(expected_message)
 
 
 @freeze_time('2019-01-01 11:12:13')
 def test_update_company_from_dnb_data(dnb_response_uk, base_company_dict):
-    """Test the update_company_from_dnb_data command when all DNB fields are updated.
-    """
+    """Test the update_company_from_dnb_data command when all DNB fields are updated."""
     company = CompanyFactory(duns_number='123456789')
     original_company = Company.objects.get(id=company.id)
     update_descriptor = 'foobar'
@@ -598,8 +593,7 @@ def test_update_company_from_dnb_data(dnb_response_uk, base_company_dict):
 
 @freeze_time('2019-01-01 11:12:13')
 def test_update_company_from_dnb_data_partial_fields(dnb_response_uk, base_company_dict):
-    """Test the update_company_from_dnb_data command when a subset of DNB fields are updated.
-    """
+    """Test the update_company_from_dnb_data command when a subset of DNB fields are updated."""
     company = CompanyFactory(duns_number='123456789')
     original_company = Company.objects.get(id=company.id)
 
@@ -653,8 +647,7 @@ def test_update_company_from_dnb_data_partial_fields(dnb_response_uk, base_compa
 
 @freeze_time('2019-01-01 11:12:13')
 def test_update_company_from_dnb_data_does_not_exist(dnb_response_uk, caplog):
-    """Test the update_company_from_dnb_data command when the company does not exist in Data Hub.
-    """
+    """Test the update_company_from_dnb_data command when the company does not exist in Data Hub."""
     with pytest.raises(Company.DoesNotExist):
         update_company_from_dnb_data(dnb_response_uk['results'][0])
     assert 'Company matching duns_number was not found' in caplog.text
@@ -688,8 +681,7 @@ def test_sync_outdated_companies_with_dnb_all_fields(
     existing_company_dnb_modified_on,
     caplog,
 ):
-    """Test the sync_outdated_companies_with_dnb task when all fields should be synced.
-    """
+    """Test the sync_outdated_companies_with_dnb task when all fields should be synced."""
     caplog.set_level('INFO')
     if callable(existing_company_dnb_modified_on):
         existing_company_dnb_modified_on = existing_company_dnb_modified_on()
@@ -759,8 +751,7 @@ def test_sync_outdated_companies_with_dnb_partial_fields(
     existing_company_dnb_modified_on,
     caplog,
 ):
-    """Test the sync_outdated_companies_with_dnb task when only a subset of fields should be synced.
-    """
+    """Test the sync_outdated_companies_with_dnb task when only a subset of fields should be synced."""
     caplog.set_level('INFO')
     if callable(existing_company_dnb_modified_on):
         existing_company_dnb_modified_on = existing_company_dnb_modified_on()
@@ -934,8 +925,7 @@ def test_sync_outdated_companies_nothing_to_update(
 
 @freeze_time('2019-01-01 11:12:13')
 def test_sync_outdated_companies_simulation(caplog):
-    """Test that using simulation mode does not modify companies and logs correctly.
-    """
+    """Test that using simulation mode does not modify companies and logs correctly."""
     caplog.set_level('INFO')
     company = CompanyFactory(
         duns_number='123456789',
@@ -997,8 +987,7 @@ def test_record_audit_succeeds_when_ttl_expires(monkeypatch):
         now,
     )
     send_realtime_message_mock.assert_called_with(
-        f'datahub.dnb_api.tasks.update.get_company_updates updated: {3}; '
-        f'failed to update: {0}',
+        f'datahub.dnb_api.tasks.update.get_company_updates updated: {3}; failed to update: {0}',
     )
 
 

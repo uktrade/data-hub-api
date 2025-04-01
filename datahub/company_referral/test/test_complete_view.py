@@ -133,7 +133,6 @@ class TestCompleteCompanyReferral(APITestMixin):
                     # These fields shouldn't be allowed to be blank
                     'kind': '',
                     'subject': '',
-
                     # Provide values for other required fields (so we don't get errors for them)
                     'was_policy_feedback_provided': False,
                     'date': '2020-01-01',
@@ -155,7 +154,6 @@ class TestCompleteCompanyReferral(APITestMixin):
                     # These fields shouldn't be allowed to be empty
                     'contacts': [],
                     'dit_participants': [],
-
                     # Provide values for other required fields (so we don't get errors for them)
                     'kind': Interaction.Kind.INTERACTION,
                     'subject': 'Test subject',
@@ -175,7 +173,6 @@ class TestCompleteCompanyReferral(APITestMixin):
                     # These fields shouldn't be allowed to be blank for interactions
                     'communication_channel': None,
                     'service': None,
-
                     # Fill in the standard fields to test interaction validation
                     'kind': Interaction.Kind.INTERACTION,
                     'subject': 'test subject',
@@ -199,7 +196,6 @@ class TestCompleteCompanyReferral(APITestMixin):
                     # These fields shouldn't be allowed to be blank for service deliveries
                     'is_event': None,
                     'service': None,
-
                     # Fill in the standard fields to test interaction validation
                     'kind': Interaction.Kind.SERVICE_DELIVERY,
                     'subject': 'test subject',
@@ -415,7 +411,6 @@ class TestCompleteCompanyReferral(APITestMixin):
             'id': referral.interaction_id,
             'modified_by_id': self.user.pk,
             'modified_on': FROZEN_DATETIME,
-
             # Fields specified in the request body
             'communication_channel_id': resolved_request_data.get('communication_channel'),
             'date': datetime(2020, 2, 3, tzinfo=timezone.utc),
@@ -438,8 +433,6 @@ class TestCompleteCompanyReferral(APITestMixin):
             'were_countries_discussed': None,
             'helped_remove_export_barrier': None,
             'export_barrier_notes': '',
-
-
             # Other fields
             'archived': False,
             'archived_by_id': None,
@@ -448,7 +441,6 @@ class TestCompleteCompanyReferral(APITestMixin):
             'archived_reason': None,
             'large_capital_opportunity_id': None,
             'has_related_trade_agreements': None,
-
             # TODO: a legacy field, remove once interaction.company field is removed
             'company_id': referral.company_id,
         }

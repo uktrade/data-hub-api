@@ -2,8 +2,7 @@ from django.apps import AppConfig
 
 
 class TaskConfig(AppConfig):
-    """Django App Config for the Task app.
-    """
+    """Django App Config for the Task app."""
 
     name = 'datahub.task'
 

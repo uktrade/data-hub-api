@@ -5,8 +5,7 @@ from datahub.user.company_list.models import CompanyListItem
 
 
 class WithListAutocompleteFilter(AutocompleteFilter):
-    """Autocomplete function that prepends any companies from the current users' list to the results.
-    """
+    """Autocomplete function that prepends any companies from the current users' list to the results."""
 
     def filter(self, queryset, value):
         """Filters the queryset."""

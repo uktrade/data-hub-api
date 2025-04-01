@@ -21,7 +21,8 @@ class Command(CSVBaseCommand):
         if investment_project.actual_uk_regions.all():
             logger.warning(
                 'Not updating project with existing actual UK regions: %s, %s',
-                investment_project.project_code, investment_project,
+                investment_project.project_code,
+                investment_project,
             )
             return
 

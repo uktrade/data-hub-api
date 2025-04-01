@@ -27,7 +27,6 @@ pytestmark = pytest.mark.django_db
 
 
 class TestGetS3Client:
-
     @override_settings(S3_LOCAL_ENDPOINT_URL=None)
     def test_get_s3_client_returns_boto3_instance(self):
         with mock.patch('datahub.ingest.boto3.boto3.client') as patched_s3_client:
@@ -39,13 +38,14 @@ class TestGetS3Client:
         with mock.patch('datahub.ingest.boto3.boto3.client') as patched_s3_client:
             get_s3_client(TEST_AWS_REGION)
             patched_s3_client.assert_called_with(
-                's3', TEST_AWS_REGION, endpoint_url='http://localstack',
+                's3',
+                TEST_AWS_REGION,
+                endpoint_url='http://localstack',
             )
 
 
 @mock_aws
 class TestS3ObjectProcessor:
-
     def test_list_objects_empty_with_no_objects_in_bucket(self, s3_object_processor):
         objects = s3_object_processor.list_objects()
         assert objects == []
@@ -82,13 +82,16 @@ class TestS3ObjectProcessor:
 
     def test_get_object_last_modified_datetime(self, s3_object_processor):
         object_definition = (
-            TEST_OBJECT_KEY, compressed_json_faker([{'test': 'content'}]),
+            TEST_OBJECT_KEY,
+            compressed_json_faker([{'test': 'content'}]),
         )
         last_modified_datetime = datetime(2024, 11, 24, 10, 00, 00, tzinfo=timezone.utc)
         with freeze_time(last_modified_datetime):
             upload_objects_to_s3(s3_object_processor, [object_definition])
-        assert s3_object_processor.get_object_last_modified_datetime(TEST_OBJECT_KEY) \
+        assert (
+            s3_object_processor.get_object_last_modified_datetime(TEST_OBJECT_KEY)
             == last_modified_datetime
+        )
 
     def test_get_object_last_modified_datetime_raises_error(self, s3_object_processor, caplog):
         with pytest.raises(ClientError):
@@ -130,8 +133,10 @@ class TestS3ObjectProcessor:
             object_created=now,
         )
 
-        assert s3_object_processor.get_last_ingestion_datetime() == \
-            most_recently_ingested_object_record.object_created
+        assert (
+            s3_object_processor.get_last_ingestion_datetime()
+            == most_recently_ingested_object_record.object_created
+        )
 
     def test_get_last_ingestion_datetime_with_no_records(self, s3_object_processor):
         assert s3_object_processor.get_last_ingestion_datetime() is None

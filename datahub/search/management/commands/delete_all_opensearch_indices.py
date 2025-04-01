@@ -25,10 +25,12 @@ Are you sure you want to do this?
     Type 'yes' to continue, or 'no' to cancel: """
 
     def add_arguments(self, parser):
-        """Add no-input argument to the command.
-        """
+        """Add no-input argument to the command."""
         parser.add_argument(
-            '--noinput', '--no-input', action='store_false', dest='interactive',
+            '--noinput',
+            '--no-input',
+            action='store_false',
+            dest='interactive',
             help='Tells Django to NOT prompt the user for input of any kind.',
         )
 
@@ -38,7 +40,8 @@ Are you sure you want to do this?
 
         client = get_client()
         index_statistics = client.cat.indices(
-            index=f'{settings.OPENSEARCH_INDEX_PREFIX}-*', format='json',
+            index=f'{settings.OPENSEARCH_INDEX_PREFIX}-*',
+            format='json',
         )
         indices = sorted(item['index'] for item in index_statistics)
 

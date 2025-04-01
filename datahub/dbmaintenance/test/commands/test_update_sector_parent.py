@@ -111,7 +111,9 @@ def test_non_existent_sector(s3_stubber, caplog):
     assert len(caplog.records) == 1
 
     assert [sector.parent.pk for sector in sectors] == [
-        new_parents[0].pk, new_parents[1].pk, old_parents[2].pk,
+        new_parents[0].pk,
+        new_parents[1].pk,
+        old_parents[2].pk,
     ]
 
 
@@ -167,7 +169,9 @@ def test_non_existent_sector_parent(s3_stubber, caplog):
     assert len(caplog.records) == 1
 
     assert [sector.parent.pk for sector in sectors] == [
-        new_parents[0].pk, new_parents[1].pk, old_parents[2].pk,
+        new_parents[0].pk,
+        new_parents[1].pk,
+        old_parents[2].pk,
     ]
 
 
@@ -326,7 +330,9 @@ def test_no_change(s3_stubber, caplog):
     assert len(caplog.records) == 2
 
     assert [sector.parent.pk for sector in sectors] == [
-        new_parents[0].pk, old_parents[1].pk, old_parents[2].pk,
+        new_parents[0].pk,
+        old_parents[1].pk,
+        old_parents[2].pk,
     ]
 
 

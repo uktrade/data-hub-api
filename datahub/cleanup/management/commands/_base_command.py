@@ -46,7 +46,7 @@ class BaseCleanupCommand(BaseCommand):
             '--only-print-queries',
             action='store_true',
             help='Only prints the SQL query and number of matching records. Does not delete '
-                 'records or simulate deletions.',
+            'records or simulate deletions.',
         )
 
     def handle(self, *args, **options):
@@ -101,14 +101,18 @@ class BaseCleanupCommand(BaseCommand):
             for field, filters in relation_filter_mapping.items()
         }
 
-        return get_unreferenced_objects_query(
-            model,
-            excluded_relations=config.excluded_relations,
-            relation_exclusion_filter_mapping=relation_filter_kwargs,
-        ).filter(
-            _join_cleanup_filters(config.filters),
-        ).order_by(
-            f'-{config.filters[0].date_field}',
+        return (
+            get_unreferenced_objects_query(
+                model,
+                excluded_relations=config.excluded_relations,
+                relation_exclusion_filter_mapping=relation_filter_kwargs,
+            )
+            .filter(
+                _join_cleanup_filters(config.filters),
+            )
+            .order_by(
+                f'-{config.filters[0].date_field}',
+            )
         )
 
 
@@ -116,11 +120,15 @@ def _print_query(model, qs, relation=None):
     model_verbose_name = capfirst(model._meta.verbose_name_plural)
 
     logger.info(
-        ''.join((
-            f'{model_verbose_name} to delete',
-            f' (via {model._meta.model_name}.{relation.remote_field.name})' if relation else '',
-            f': {qs.count()}',
-        )),
+        ''.join(
+            (
+                f'{model_verbose_name} to delete',
+                f' (via {model._meta.model_name}.{relation.remote_field.name})'
+                if relation
+                else '',
+                f': {qs.count()}',
+            ),
+        ),
     )
 
     logger.info('SQL:')

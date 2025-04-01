@@ -14,12 +14,10 @@ from datahub.core.utils import reverse_with_query_string
 
 
 class TestUnarchiveCompanyLink(AdminTestMixin):
-    """Tests the 'unarchive' link on the change form.
-    """
+    """Tests the 'unarchive' link on the change form."""
 
     def test_link_exists(self):
-        """Test that the link exists for a user with the change company permission.
-        """
+        """Test that the link exists for a user with the change company permission."""
         company = ArchivedCompanyFactory()
 
         change_route_name = admin_urlname(Company._meta, 'change')
@@ -40,8 +38,7 @@ class TestUnarchiveCompanyLink(AdminTestMixin):
         assert unarchive_url in response.rendered_content
 
     def test_link_does_not_exist_with_only_view_permission(self):
-        """Test that the link does not exist for a user with only the view company permission.
-        """
+        """Test that the link does not exist for a user with only the view company permission."""
         company = ArchivedCompanyFactory()
 
         change_route_name = admin_urlname(Company._meta, 'change')
@@ -71,8 +68,7 @@ class TestUnarchiveCompanyLink(AdminTestMixin):
         ],
     )
     def test_link_does_not_exist_company_not_unarchivable(self, company_creator):
-        """Test that the link does not exist when the company is not unarchivable.
-        """
+        """Test that the link does not exist when the company is not unarchivable."""
         company = company_creator()
 
         change_route_name = admin_urlname(Company._meta, 'change')
@@ -120,8 +116,7 @@ class TestUnarchiveCompanyViewGet(AdminTestMixin):
         expected_status_code,
         expected_archived_value,
     ):
-        """Test the unarchive view when called on companies in different states.
-        """
+        """Test the unarchive view when called on companies in different states."""
         company = company_callable()
         unarchive_route_name = admin_urlname(Company._meta, 'unarchive-company')
         unarchive_query_args = {

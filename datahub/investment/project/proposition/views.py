@@ -143,9 +143,7 @@ class ProjectPropositionDocumentViewSet(BaseEntityDocumentModelViewSet):
         'proposition__investment_project',
     )
 
-    filter_backends = (
-        DjangoFilterBackend,
-    )
+    filter_backends = (DjangoFilterBackend,)
 
     def initial(self, request, *args, **kwargs):
         """Raise an Http404 if there is no project or proposition corresponding to the IDs
@@ -186,9 +184,7 @@ class ProjectPropositionDocumentViewSet(BaseEntityDocumentModelViewSet):
 class PropositionViewSet(CoreViewSet):
     """ViewSet for public facing proposition endpoint (with no nesting)."""
 
-    permission_classes = (
-        PropositionModelPermissions,
-    )
+    permission_classes = (PropositionModelPermissions,)
     serializer_class = PropositionSerializer
     queryset = Proposition.objects.select_related(
         'investment_project',

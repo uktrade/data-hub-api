@@ -22,8 +22,7 @@ class Command(BaseCommand):
     help = 'Fix Canadian Company address postcodes for the purpose of setting address areas'
 
     def handle(self, *args, **options):
-        """Resolves Company address issues for Canada.
-        """
+        """Resolves Company address issues for Canada."""
         company_address_resolver = CompanyAddressResolver(
             country_id=Country.canada.value.id,
             revision_comment='Canada area and postcode fix.',

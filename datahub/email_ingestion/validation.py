@@ -10,12 +10,15 @@ ALL_AUTH_METHODS = ('spf', 'dkim', 'dmarc', 'compauth')
 
 
 def _get_auth_headers(message):
-    """When message passes through multiple servers, the authentication_results becomes an array.
-    """
-    authentication_results = message.authentication_results[0] if isinstance(
-        message.authentication_results,
-        list,
-    ) else message.authentication_results
+    """When message passes through multiple servers, the authentication_results becomes an array."""
+    authentication_results = (
+        message.authentication_results[0]
+        if isinstance(
+            message.authentication_results,
+            list,
+        )
+        else message.authentication_results
+    )
 
     return ' '.join(authentication_results.splitlines())
 
@@ -39,8 +42,7 @@ def _verify_authentication(message, auth_methods):
             expected_auth_pairs.append(f'{auth_method}=pass')
 
         expected_auth_pair_present = any(
-            expected_auth_pair in header_contents
-            for expected_auth_pair in expected_auth_pairs
+            expected_auth_pair in header_contents for expected_auth_pair in expected_auth_pairs
         )
 
         if expected_auth_pair_present:
@@ -54,7 +56,7 @@ def _log_unknown_domain(from_domain, message):
     log_auth_methods = r'|'.join(re.escape(auth_method) for auth_method in ALL_AUTH_METHODS)
     auth_header_contents = _get_auth_headers(message)
     authentication_results = re.findall(
-        fr'((?:{log_auth_methods})=[a-z0-9]+)',
+        rf'((?:{log_auth_methods})=[a-z0-9]+)',
         auth_header_contents,
         flags=re.IGNORECASE,
     )

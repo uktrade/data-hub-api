@@ -31,13 +31,17 @@ def get_expected_data_from_task(task):
         'due_date': format_date_or_datetime(task.due_date),
         'reminder_days': task.reminder_days,
         'email_reminders_enabled': task.email_reminders_enabled,
-        'adviser_ids': [str(adviser.id) for adviser in task.advisers.all().order_by(
-            'first_name',
-            'id',
-        )],
+        'adviser_ids': [
+            str(adviser.id)
+            for adviser in task.advisers.all().order_by(
+                'first_name',
+                'id',
+            )
+        ],
         'reminder_date': task.reminder_date,
         'investment_project_id': str(task.investment_project.id)
-        if task.investment_project else None,
+        if task.investment_project
+        else None,
         'company_id': str(task.company.id) if task.company else None,
         'interaction_id': str(task.interaction.id) if task.interaction else None,
         'status': task.status.value,
@@ -47,8 +51,7 @@ def get_expected_data_from_task(task):
 
 @pytest.mark.django_db
 class TestTasksDatasetViewSet(BaseDatasetViewTest):
-    """Tests for TasksDatasetView.
-    """
+    """Tests for TasksDatasetView."""
 
     view_url = reverse('api-v4:dataset:tasks-dataset')
     factory = TaskFactory
@@ -93,8 +96,7 @@ class TestTasksDatasetViewSet(BaseDatasetViewTest):
         tasks_from_response = results_from_response
         expected_tasks = [
             get_expected_data_from_task(task)
-            for task
-            in [task_one, task_two, task_three, task_four]
+            for task in [task_one, task_two, task_three, task_four]
         ]
         assert tasks_from_response == expected_tasks
 
@@ -128,8 +130,6 @@ class TestTasksDatasetViewSet(BaseDatasetViewTest):
 
         tasks_from_response = results_from_response
         expected_tasks = [
-            get_expected_data_from_task(task)
-            for task
-            in [task_two, task_three, task_four]
+            get_expected_data_from_task(task) for task in [task_two, task_three, task_four]
         ]
         assert tasks_from_response == expected_tasks

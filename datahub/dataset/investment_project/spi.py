@@ -35,15 +35,16 @@ class SPIReportFormatter:
     def filter_fields(self, result):
         """Filter results fields."""
         return {
-            self.required_fields_label_mapping[key]:
-                self.required_fields_value_mapping.get(key, lambda value: value)(value)
+            self.required_fields_label_mapping[key]: self.required_fields_value_mapping.get(
+                key,
+                lambda value: value,
+            )(value)
             for key, value in result.items()
             if key in self.required_fields_label_mapping
         }
 
     def format(self, investment_projects):
-        """Enrich Investment Project record with SPI report data and only include required fields.
-        """
+        """Enrich Investment Project record with SPI report data and only include required fields."""
         for investment_project in investment_projects:
             spi_report_row = self._SPIReport.get_row(investment_project)
             result = self.filter_fields(spi_report_row)
@@ -56,9 +57,9 @@ def proposition_formatter(propositions):
         {
             'deadline': dateutil_parse(proposition['deadline']).strftime('%Y-%m-%d'),
             'status': proposition['status'],
-            'modified_on':
-                dateutil_parse(proposition['modified_on']).isoformat()
-                if proposition['status'] != PropositionStatus.ONGOING else '',
+            'modified_on': dateutil_parse(proposition['modified_on']).isoformat()
+            if proposition['status'] != PropositionStatus.ONGOING
+            else '',
             'adviser_id': proposition['adviser_id'],
         }
         for proposition in propositions

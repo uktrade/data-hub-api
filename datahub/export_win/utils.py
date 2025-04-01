@@ -10,15 +10,19 @@ def calculate_totals_for_export_win(win_instance):
     odi_value = constants.BreakdownType.odi.value
     return {
         'total_export_value': win_instance.breakdowns.filter(
-            type_id=export_type_value.id).aggregate(
+            type_id=export_type_value.id,
+        ).aggregate(
             total_export_value=Sum('value'),
-        )['total_export_value'] or 0,
+        )['total_export_value']
+        or 0,
         'total_non_export_value': win_instance.breakdowns.filter(
-            type_id=non_export_value.id).aggregate(
+            type_id=non_export_value.id,
+        ).aggregate(
             total_non_export_value=Sum('value'),
-        )['total_non_export_value'] or 0,
-        'total_odi_value': win_instance.breakdowns.filter(
-            type_id=odi_value.id).aggregate(
+        )['total_non_export_value']
+        or 0,
+        'total_odi_value': win_instance.breakdowns.filter(type_id=odi_value.id).aggregate(
             total_odi_value=Sum('value'),
-        )['total_odi_value'] or 0,
+        )['total_odi_value']
+        or 0,
     }

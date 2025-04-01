@@ -8,19 +8,25 @@ from datahub.company.views import (
     PublicCompanyViewSet,
 )
 
-company_collection = CompanyViewSet.as_view({
-    'get': 'list',
-    'post': 'create',
-})
+company_collection = CompanyViewSet.as_view(
+    {
+        'get': 'list',
+        'post': 'create',
+    },
+)
 
-company_item = CompanyViewSet.as_view({
-    'get': 'retrieve',
-    'patch': 'partial_update',
-})
+company_item = CompanyViewSet.as_view(
+    {
+        'get': 'retrieve',
+        'patch': 'partial_update',
+    },
+)
 
-company_audit = CompanyAuditViewSet.as_view({
-    'get': 'list',
-})
+company_audit = CompanyAuditViewSet.as_view(
+    {
+        'get': 'list',
+    },
+)
 
 company_archive = CompanyViewSet.as_action_view('archive')
 
@@ -48,17 +54,21 @@ update_export_detail = CompanyViewSet.as_action_view(
     'update_export_detail',
 )
 
-one_list_group_core_team = OneListGroupCoreTeamViewSet.as_view({
-    'get': 'list',
-})
+one_list_group_core_team = OneListGroupCoreTeamViewSet.as_view(
+    {
+        'get': 'list',
+    },
+)
 
 update_one_list_core_team = CompanyViewSet.as_action_view(
     'update_one_list_core_team',
 )
 
-public_company_item = PublicCompanyViewSet.as_view({
-    'get': 'retrieve',
-})
+public_company_item = PublicCompanyViewSet.as_view(
+    {
+        'get': 'retrieve',
+    },
+)
 
 urls = [
     path('company', company_collection, name='collection'),

@@ -18,8 +18,7 @@ class TestDisableSignalsForModel:
         opensearch_with_signals,
         monkeypatch,
     ):
-        """Test that signal receivers are active without the context manager being active.
-        """
+        """Test that signal receivers are active without the context manager being active."""
         callback_mock = Mock()
         monkeypatch.setattr(
             'datahub.search.test.search_support.relatedmodel.signals._dummy_callback',
@@ -81,6 +80,7 @@ class TestDisableSignalsForModel:
         Note that as this test uses another thread, the usual test transaction and clean-up
         logic does not kick in. Hence, cleaning up has to be manually handled.
         """
+
         def _task():
             try:
                 # Ensure a transaction is used
@@ -98,9 +98,7 @@ class TestDisableSignalsForModel:
             callback_mock,
         )
 
-        with disable_search_signal_receivers(SimpleModel), \
-                ThreadPoolExecutor() as executor:
-
+        with disable_search_signal_receivers(SimpleModel), ThreadPoolExecutor() as executor:
             future = executor.submit(_task)
             future.result()
 

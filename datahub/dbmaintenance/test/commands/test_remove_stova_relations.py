@@ -286,8 +286,7 @@ class TestRemoveStovaRelationsCommand:
         assert Interaction.objects.count() == 1
 
     def test_batch_size(self, test_base_stova_attendee):
-        """Test objects are deleted based on their batch_size from the management command.
-        """
+        """Test objects are deleted based on their batch_size from the management command."""
         s3_processor_mock = mock.Mock()
         task = StovaAttendeeIngestionTask('dummy-prefix', s3_processor_mock)
         data = test_base_stova_attendee

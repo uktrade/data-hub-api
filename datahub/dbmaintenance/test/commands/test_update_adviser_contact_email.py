@@ -53,8 +53,11 @@ def test_run(s3_stubber, caplog):
         adviser.refresh_from_db()
 
     expected_emails = [
-        'adviser0@test.com', 'adviser1changed@test.com', 'adviser2@test.com',
-        'adviser3changed@test.com', '',
+        'adviser0@test.com',
+        'adviser1changed@test.com',
+        'adviser2@test.com',
+        'adviser3changed@test.com',
+        '',
     ]
     assert [adviser.contact_email for adviser in advisers] == expected_emails
 
@@ -103,8 +106,11 @@ def test_simulate(s3_stubber, caplog):
         adviser.refresh_from_db()
 
     expected_emails = [
-        'adviser0@test.com', 'adviser1@test.com', 'adviser2@test.com', '', 'adviser4@test.com',
-
+        'adviser0@test.com',
+        'adviser1@test.com',
+        'adviser2@test.com',
+        '',
+        'adviser4@test.com',
     ]
     assert [adviser.contact_email for adviser in advisers] == expected_emails
 

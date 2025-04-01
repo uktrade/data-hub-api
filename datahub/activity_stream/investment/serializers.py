@@ -3,8 +3,7 @@ from datahub.investment.project.models import InvestmentProject
 
 
 class IProjectCreatedSerializer(ActivitySerializer):
-    """Investment Projects added serializer for activity stream.
-    """
+    """Investment Projects added serializer for activity stream."""
 
     class Meta:
         model = InvestmentProject

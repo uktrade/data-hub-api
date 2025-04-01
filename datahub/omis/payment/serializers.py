@@ -20,11 +20,7 @@ class PaymentSerializer(serializers.ModelSerializer):
     """Payment DRF serializer."""
 
     method = serializers.ChoiceField(
-        choices=[
-            method
-            for method in PaymentMethod.choices
-            if method[0] in ('bacs', 'manual')
-        ],
+        choices=[method for method in PaymentMethod.choices if method[0] in ('bacs', 'manual')],
         default=PaymentMethod.BACS,
     )
 

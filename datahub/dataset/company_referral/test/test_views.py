@@ -24,9 +24,7 @@ def get_expected_data_from_company_referral(referral):
         'created_on': format_date_or_datetime(referral.created_on),
         'id': str(referral.id),
         'interaction_id': (
-            str(referral.interaction_id)
-            if referral.interaction_id is not None
-            else None
+            str(referral.interaction_id) if referral.interaction_id is not None else None
         ),
         'notes': referral.notes,
         'recipient_id': str(referral.recipient_id),
@@ -37,14 +35,14 @@ def get_expected_data_from_company_referral(referral):
 
 @pytest.mark.django_db
 class TestCompanyReferralDatasetView(BaseDatasetViewTest):
-    """Tests for CompanyReferralDatasetView.
-    """
+    """Tests for CompanyReferralDatasetView."""
 
     view_url = reverse('api-v4:dataset:company-referrals-dataset')
     factory = CompanyReferralFactory
 
     @pytest.mark.parametrize(
-        'referral_factory', [
+        'referral_factory',
+        [
             CompanyReferralFactory,
             ClosedCompanyReferralFactory,
         ],

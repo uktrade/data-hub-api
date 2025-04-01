@@ -154,8 +154,7 @@ def test_updating_company_name_updates_orders(opensearch_with_signals):
 
 
 def test_updating_contact_name_updates_orders(opensearch_with_signals):
-    """Test that when a contact's name is updated, the contact's orders are synced to OpenSearch.
-    """
+    """Test that when a contact's name is updated, the contact's orders are synced to OpenSearch."""
     order = OrderFactory()
     new_first_name = 'Jamie'
     new_last_name = 'Bloggs'

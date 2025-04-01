@@ -36,8 +36,7 @@ class SearchApp:
 
     @classmethod
     def connect_signals(cls):
-        """Connects all signal handlers so DB models can be synced with OpenSearch on save.
-        """
+        """Connects all signal handlers so DB models can be synced with OpenSearch on save."""
         for receiver in cls.get_signal_receivers():
             receiver.connect()
 
@@ -79,8 +78,7 @@ def get_search_apps_by_name(app_names=None):
     search_apps = get_search_apps()
 
     return [
-        search_app for search_app in search_apps
-        if not app_names or search_app.name in app_names
+        search_app for search_app in search_apps if not app_names or search_app.name in app_names
     ]
 
 

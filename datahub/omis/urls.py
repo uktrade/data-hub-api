@@ -12,7 +12,8 @@ internal_frontend_urls = [
     path(
         '',
         include(
-            (payment_urls.payment_internal_frontend_urls, 'payment'), namespace='payment',
+            (payment_urls.payment_internal_frontend_urls, 'payment'),
+            namespace='payment',
         ),
     ),
 ]

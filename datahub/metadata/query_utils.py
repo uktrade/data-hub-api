@@ -26,13 +26,18 @@ def _get_name_from_mptt_model(model, relation_name=None):
     """
     outer_ref_prefix = f'{relation_name}__' if relation_name is not None else ''
 
-    subquery = model.objects.annotate(
-        name=_StringAgg(F('segment'), Value(model.PATH_SEPARATOR)),
-    ).filter(
-        lft__lte=OuterRef(f'{outer_ref_prefix}lft'),
-        rght__gte=OuterRef(f'{outer_ref_prefix}rght'),
-        tree_id=OuterRef(f'{outer_ref_prefix}tree_id'),
-    ).order_by().values('name')
+    subquery = (
+        model.objects.annotate(
+            name=_StringAgg(F('segment'), Value(model.PATH_SEPARATOR)),
+        )
+        .filter(
+            lft__lte=OuterRef(f'{outer_ref_prefix}lft'),
+            rght__gte=OuterRef(f'{outer_ref_prefix}rght'),
+            tree_id=OuterRef(f'{outer_ref_prefix}tree_id'),
+        )
+        .order_by()
+        .values('name')
+    )
 
     return Subquery(subquery, output_field=CharField())
 

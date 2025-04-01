@@ -46,11 +46,15 @@ def get_unreferenced_objects_query(
     for field in fields:
         related_field = field.field
         exclusion_filters = relation_exclusion_filter_mapping.get(field, Q())
-        subquery = related_field.model.objects.filter(
-            **{related_field.attname: OuterRef('pk')},
-        ).exclude(
-            exclusion_filters,
-        ).only('pk')
+        subquery = (
+            related_field.model.objects.filter(
+                **{related_field.attname: OuterRef('pk')},
+            )
+            .exclude(
+                exclusion_filters,
+            )
+            .only('pk')
+        )
         q &= Q(~Exists(subquery))
 
     return model.objects.filter(q)
@@ -64,7 +68,4 @@ def get_relations_to_delete(model):
     :returns: list of fields of `model` that point to models deleted in cascade
     """
     candidates = get_candidate_relations_to_delete(model._meta)
-    return [
-        field for field in candidates
-        if field.field.remote_field.on_delete == CASCADE
-    ]
+    return [field for field in candidates if field.field.remote_field.on_delete == CASCADE]

@@ -10,31 +10,41 @@ from datahub.investment.project.views import (
     IProjectViewSet,
 )
 
-project_collection = IProjectViewSet.as_view({
-    'get': 'list',
-    'post': 'create',
-})
+project_collection = IProjectViewSet.as_view(
+    {
+        'get': 'list',
+        'post': 'create',
+    },
+)
 
-project_item = IProjectViewSet.as_view({
-    'get': 'retrieve',
-    'patch': 'partial_update',
-})
+project_item = IProjectViewSet.as_view(
+    {
+        'get': 'retrieve',
+        'patch': 'partial_update',
+    },
+)
 
-project_team_member_collection = IProjectTeamMembersViewSet.as_view({
-    'post': 'create',
-    'delete': 'destroy_all',
-    'put': 'replace_all',
-})
+project_team_member_collection = IProjectTeamMembersViewSet.as_view(
+    {
+        'post': 'create',
+        'delete': 'destroy_all',
+        'put': 'replace_all',
+    },
+)
 
-project_team_member_item = IProjectTeamMembersViewSet.as_view({
-    'get': 'retrieve',
-    'patch': 'partial_update',
-    'delete': 'destroy',
-})
+project_team_member_item = IProjectTeamMembersViewSet.as_view(
+    {
+        'get': 'retrieve',
+        'patch': 'partial_update',
+        'delete': 'destroy',
+    },
+)
 
-audit_item = IProjectAuditViewSet.as_view({
-    'get': 'list',
-})
+audit_item = IProjectAuditViewSet.as_view(
+    {
+        'get': 'list',
+    },
+)
 
 archive_item = IProjectViewSet.as_action_view('archive')
 

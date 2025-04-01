@@ -10,10 +10,12 @@ from datahub.omis.payment.views import (
 payment_internal_frontend_urls = [
     path(
         'order/<uuid:order_pk>/payment',
-        PaymentViewSet.as_view({
-            'get': 'list',
-            'post': 'create_list',
-        }),
+        PaymentViewSet.as_view(
+            {
+                'get': 'list',
+                'post': 'create_list',
+            },
+        ),
         name='collection',
     ),
 ]

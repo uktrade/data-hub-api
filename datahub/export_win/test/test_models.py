@@ -44,7 +44,6 @@ class BaseLegacyModelTests:
         assert loaded_model.legacy_id == EXPORT_WINS_LEGACY_ID_START_VALUE
 
     def test_new_model_with_no_legacy_id_is_auto_incremented(self):
-
         model = self.factory()
         model.save()
 
@@ -52,7 +51,6 @@ class BaseLegacyModelTests:
         assert loaded_model.legacy_id == EXPORT_WINS_LEGACY_ID_START_VALUE
 
     def test_new_model_with_no_legacy_id_are_auto_incremented(self):
-
         self.factory.create_batch(3)
 
         loaded_model = self.model_class.objects.all().order_by('legacy_id')
@@ -80,7 +78,6 @@ class BaseLegacyModelTests:
 
 
 class TestWinAdviserModel(BaseLegacyModelTests):
-
     factory = WinAdviserFactory
     model_class = WinAdviser
 
@@ -94,13 +91,11 @@ class TestWinAdviserModel(BaseLegacyModelTests):
 
 
 class TestBreakdownModel(BaseLegacyModelTests):
-
     factory = BreakdownFactory
     model_class = Breakdown
 
 
-class TestWinModel():
-
+class TestWinModel:
     def test_win_save(self, win_factory):
         win = win_factory
         calc_total = calculate_totals_for_export_win(win)
@@ -124,8 +119,10 @@ class TestWinModel():
 
     def test_str_representation_with_created_on(self, win_factory):
         win = win_factory
-        assert str(win) == (f'Export win {win.pk}: {win.adviser} <{win.adviser.email}> - '
-                            f'{win.created_on.strftime("%Y-%m-%d %H:%M:%S")}')
+        assert str(win) == (
+            f'Export win {win.pk}: {win.adviser} <{win.adviser.email}> - '
+            f'{win.created_on.strftime("%Y-%m-%d %H:%M:%S")}'
+        )
 
     def test_str_representation_without_created_on(self):
         win = WinFactory(created_on=None)

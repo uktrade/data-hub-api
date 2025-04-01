@@ -18,8 +18,7 @@ pytestmark = pytest.mark.django_db
 
 @pytest.fixture
 def mock_time(monkeypatch):
-    """Mock time.sleep() and time.perf_counter().
-    """
+    """Mock time.sleep() and time.perf_counter()."""
     # Freeze perf_counter's perception of time at a value of 1.0
     mock_perf_counter = mock.Mock(return_value=1.0)
     monkeypatch.setattr(
@@ -47,12 +46,10 @@ def mock_time(monkeypatch):
 
 @pytest.fixture
 def mock_job_scheduler(monkeypatch):
-    """Mock sync_company_with_dnb.
-    """
+    """Mock sync_company_with_dnb."""
     mocked_job_scheduler = mock.Mock()
     monkeypatch.setattr(
-        'datahub.dbmaintenance.management.commands.update_company_dnb_data.'
-        'job_scheduler',
+        'datahub.dbmaintenance.management.commands.update_company_dnb_data.job_scheduler',
         mocked_job_scheduler,
     )
     return mocked_job_scheduler
@@ -75,8 +72,7 @@ def test_run(
     mock_job_scheduler,
     fields,
 ):
-    """Test that the command updates the specified records (ignoring ones with errors).
-    """
+    """Test that the command updates the specified records (ignoring ones with errors)."""
     mock_sleep = mock_time['mock_sleep']
     caplog.set_level('WARNING')
 
@@ -126,7 +122,8 @@ def test_run(
                 function_args=(
                     company.id,
                     fields,
-                    'command:update_company_dnb_data:2019-01-01T11:12:13+00:00'),
+                    'command:update_company_dnb_data:2019-01-01T11:12:13+00:00',
+                ),
                 retry_intervals=[60, 60, 60],
             )
     mocked_log_to_sentry.assert_called_with(
@@ -148,8 +145,7 @@ def test_simulate(
     caplog,
     mock_job_scheduler,
 ):
-    """Test that the command simulates updates if --simulate is passed in.
-    """
+    """Test that the command simulates updates if --simulate is passed in."""
     caplog.set_level('WARNING')
 
     companies = [

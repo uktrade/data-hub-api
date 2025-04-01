@@ -20,7 +20,11 @@ def test_run(s3_stubber, caplog):
     old_business_activities = [[], [], business_activities[0:2], business_activities[2:3]]
     investment_projects = InvestmentProjectFactory.create_batch(4)
 
-    for project, project_business_activities in zip(investment_projects, old_business_activities, strict=False):
+    for project, project_business_activities in zip(
+        investment_projects,
+        old_business_activities,
+        strict=False,
+    ):
         project.business_activities.set(project_business_activities)
 
     bucket = 'test_bucket'
@@ -68,7 +72,11 @@ def test_simulate(s3_stubber, caplog):
     old_business_activities = [[], [], business_activities[0:2], business_activities[2:3]]
     investment_projects = InvestmentProjectFactory.create_batch(4)
 
-    for project, project_business_activities in zip(investment_projects, old_business_activities, strict=False):
+    for project, project_business_activities in zip(
+        investment_projects,
+        old_business_activities,
+        strict=False,
+    ):
         project.business_activities.set(project_business_activities)
 
     bucket = 'test_bucket'
@@ -105,8 +113,9 @@ def test_simulate(s3_stubber, caplog):
     assert 'InvestmentProject matching query does not exist' in caplog.text
     assert len(caplog.records) == 1
 
-    assert [list(project.business_activities.all())
-            for project in investment_projects] == old_business_activities
+    assert [
+        list(project.business_activities.all()) for project in investment_projects
+    ] == old_business_activities
 
 
 def test_audit_log(s3_stubber):

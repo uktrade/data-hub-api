@@ -31,9 +31,7 @@ def get_base_interaction_queryset():
         Prefetch(
             'dit_participants',
             queryset=(
-                InteractionDITParticipant.objects
-                                         .order_by('pk')
-                                         .select_related('adviser', 'team')
+                InteractionDITParticipant.objects.order_by('pk').select_related('adviser', 'team')
             ),
         ),
     )
@@ -57,9 +55,9 @@ def get_interaction_queryset():
         Prefetch(
             'export_countries',
             queryset=(
-                InteractionExportCountry.objects
-                                        .order_by('country__name')
-                                        .select_related('country')
+                InteractionExportCountry.objects.order_by('country__name').select_related(
+                    'country',
+                )
             ),
         ),
     ).annotate(

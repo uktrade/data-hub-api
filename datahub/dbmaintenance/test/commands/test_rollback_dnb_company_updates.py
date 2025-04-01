@@ -15,8 +15,7 @@ pytestmark = pytest.mark.django_db
 
 
 def test_run(s3_stubber, formatted_dnb_company):
-    """Test that the command successfully rolls back the specified records.
-    """
+    """Test that the command successfully rolls back the specified records."""
     with reversion.create_revision():
         companies = [
             CompanyFactory(duns_number='123456789'),
@@ -77,8 +76,7 @@ def test_run(s3_stubber, formatted_dnb_company):
     'rollback_dnb_company_update',
 )
 def test_simulate(mocked_rollback_dnb_company_update, s3_stubber):
-    """Test that the command simulates rollbacks if --simulate is passed in.
-    """
+    """Test that the command simulates rollbacks if --simulate is passed in."""
     companies = [
         CompanyFactory(duns_number='123456789'),
         CompanyFactory(duns_number='223456789'),

@@ -27,13 +27,10 @@ COMPANY_CATEGORY_TO_BUSINESS_TYPE_MAPPING = {
     'old public company': BusinessTypeConstant.company,
     # Foreign and other irrelevant companies
     'other company type': None,
-    "pri/lbg/nsc (private, limited by guarantee, no share capital, use of 'limited' exemption)":
-        BusinessTypeConstant.private_limited_company,
-    'pri/ltd by guar/nsc (private, limited by guarantee, no share capital)':
-        BusinessTypeConstant.private_limited_company,
+    "pri/lbg/nsc (private, limited by guarantee, no share capital, use of 'limited' exemption)": BusinessTypeConstant.private_limited_company,
+    'pri/ltd by guar/nsc (private, limited by guarantee, no share capital)': BusinessTypeConstant.private_limited_company,
     # Section 30 is the limited exemption
-    'priv ltd sect. 30 (private limited company, section 30 of the companies act)':
-        BusinessTypeConstant.private_limited_company,
+    'priv ltd sect. 30 (private limited company, section 30 of the companies act)': BusinessTypeConstant.private_limited_company,
     'private limited company': BusinessTypeConstant.private_limited_company,
     'private unlimited': BusinessTypeConstant.company,
     'private unlimited company': BusinessTypeConstant.company,

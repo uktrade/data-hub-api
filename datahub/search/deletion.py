@@ -18,10 +18,7 @@ def delete_documents(index, docs):
 
     :raises DataHubError: in case of non 404 errors
     """
-    delete_actions = (
-        _create_delete_action(index, doc['_id'])
-        for doc in docs
-    )
+    delete_actions = (_create_delete_action(index, doc['_id']) for doc in docs)
 
     _, errors = bulk(
         actions=delete_actions,

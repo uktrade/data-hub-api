@@ -31,8 +31,12 @@ class CompanyReferralViewSet(CoreViewSet):
         received referrals, otherwise return original queryset.
         """
         if self.action == 'list':
-            return super().get_queryset().filter(
-                Q(created_by=self.request.user) | Q(recipient=self.request.user),
+            return (
+                super()
+                .get_queryset()
+                .filter(
+                    Q(created_by=self.request.user) | Q(recipient=self.request.user),
+                )
             )
 
         return super().get_queryset()

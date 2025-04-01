@@ -334,8 +334,7 @@ def test_investment_project_synched_only_if_interaction_linked(
 
 
 def test_incomplete_fields_syncs_when_project_changes(opensearch_with_signals):
-    """When project fields change, the incomplete fields should update accordingly.
-    """
+    """When project fields change, the incomplete fields should update accordingly."""
     project = InvestmentProjectFactory(
         stage_id=InvestmentProjectStage.won.value.id,
         likelihood_to_land_id=None,
@@ -435,8 +434,7 @@ def test_incomplete_fields_syncs_when_m2m_changes(
     field,
     get_field_values,
 ):
-    """When an m2m field is updated, the incomplete fields should be updated accordingly.
-    """
+    """When an m2m field is updated, the incomplete fields should be updated accordingly."""
     project = InvestmentProjectFactory(
         stage_id=InvestmentProjectStage.won.value.id,
         client_considering_other_countries=True,

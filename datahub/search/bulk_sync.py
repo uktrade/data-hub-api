@@ -25,8 +25,12 @@ def sync_app(search_app, batch_size=None, post_batch_callback=None):
 
     # We know pk exists but some models don't have modified_on, so handle this.
     try:
-        it = search_app.queryset.order_by('-modified_on').values_list('pk', flat=True).iterator(
-            chunk_size=batch_size,
+        it = (
+            search_app.queryset.order_by('-modified_on')
+            .values_list('pk', flat=True)
+            .iterator(
+                chunk_size=batch_size,
+            )
         )
         has_modified_on = True
     except FieldError:
@@ -46,10 +50,8 @@ def sync_app(search_app, batch_size=None, post_batch_callback=None):
         )
 
         emit_progress = (
-            (num_source_rows_processed + num_actions) // PROGRESS_INTERVAL
-            - num_source_rows_processed // PROGRESS_INTERVAL
-            > 0
-        )
+            num_source_rows_processed + num_actions
+        ) // PROGRESS_INTERVAL - num_source_rows_processed // PROGRESS_INTERVAL > 0
 
         num_source_rows_processed += len(batch)
         num_objects_synced += num_actions
@@ -57,7 +59,7 @@ def sync_app(search_app, batch_size=None, post_batch_callback=None):
         if emit_progress:
             log_message = (
                 f'{model_name} rows processed: {num_source_rows_processed}/{total_rows} '
-                f'{num_source_rows_processed*100//total_rows}%'
+                f'{num_source_rows_processed * 100 // total_rows}%'
             )
 
             if has_modified_on:

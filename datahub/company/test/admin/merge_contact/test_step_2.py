@@ -58,7 +58,8 @@ class TestSelectPrimaryContactViewGet(AdminTestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     @pytest.mark.parametrize(
-        'swap', [True, False],
+        'swap',
+        [True, False],
     )
     @pytest.mark.parametrize(
         ('contact_1_factory', 'contact_2_factory'),
@@ -78,8 +79,7 @@ class TestSelectPrimaryContactViewGet(AdminTestMixin):
         contact_2_factory,
         swap,
     ):
-        """Tests that the radio button to select a contact is disabled if it is archived.
-        """
+        """Tests that the radio button to select a contact is disabled if it is archived."""
         contact_1 = (contact_2_factory if swap else contact_1_factory)()
         contact_2 = (contact_1_factory if swap else contact_2_factory)()
         contact_1_disabled = not swap

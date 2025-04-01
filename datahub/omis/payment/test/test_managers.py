@@ -42,7 +42,9 @@ class TestPaymentManager:
             'received_on': dateutil_parse('2017-01-01').date(),
         }
         payment = Payment.objects.create_from_order(
-            order=order, by=by, attrs=attrs,
+            order=order,
+            by=by,
+            attrs=attrs,
         )
 
         payment.refresh_from_db()
@@ -59,8 +61,7 @@ class TestPaymentGatewaySessionManager:
     """Tests for the Payment Gateway Session Manager."""
 
     def test_create_first_session_from_order(self, requests_mock, monkeypatch):
-        """Test the successful creation of the first payment gateway session for an order.
-        """
+        """Test the successful creation of the first payment gateway session for an order."""
         monkeypatch.setattr(
             'uuid.uuid4',
             mock.Mock(return_value=uuid.UUID('0123abcd-0000-0000-0000-000000000000')),
@@ -140,11 +141,13 @@ class TestPaymentGatewaySessionManager:
         existing_data = PaymentGatewaySessionFactory.create_batch(
             3,
             order=order,
-            status=factory.Iterator([
-                PaymentGatewaySessionStatus.CREATED,
-                PaymentGatewaySessionStatus.STARTED,
-                PaymentGatewaySessionStatus.FAILED,
-            ]),
+            status=factory.Iterator(
+                [
+                    PaymentGatewaySessionStatus.CREATED,
+                    PaymentGatewaySessionStatus.STARTED,
+                    PaymentGatewaySessionStatus.FAILED,
+                ],
+            ),
         )
 
         # mock GOV.UK requests used to:
@@ -220,7 +223,8 @@ class TestPaymentGatewaySessionManager:
         }
 
     @pytest.mark.parametrize(
-        'disallowed_status', [
+        'disallowed_status',
+        [
             OrderStatus.DRAFT,
             OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
             OrderStatus.PAID,
@@ -312,7 +316,9 @@ class TestPaymentGatewaySessionManager:
 
     @pytest.mark.parametrize('govuk_status_code', [400, 401, 422, 500])
     def test_exception_if_govuk_pay_errors_when_creating(
-        self, govuk_status_code, requests_mock,
+        self,
+        govuk_status_code,
+        requests_mock,
     ):
         """Test that if GOV.UK Pay errors whilst creating a new payment, the method raises
         GOVUKPayAPIException.
@@ -339,7 +345,9 @@ class TestPaymentGatewaySessionManager:
 
     @pytest.mark.parametrize('govuk_status_code', [400, 401, 404, 409, 500])
     def test_exception_if_govuk_pay_errors_when_cancelling(
-        self, govuk_status_code, requests_mock,
+        self,
+        govuk_status_code,
+        requests_mock,
     ):
         """Test that if GOV.UK Pay errors whilst cancelling some other ongoing
         sessions/payments, the method raises GOVUKPayAPIException to keep the system consistent.
@@ -396,20 +404,24 @@ class TestPaymentGatewaySessionManager:
         order1_sessions = PaymentGatewaySessionFactory.create_batch(
             3,
             order=order1,
-            status=factory.Iterator([
-                PaymentGatewaySessionStatus.CREATED,
-                PaymentGatewaySessionStatus.SUBMITTED,
-                PaymentGatewaySessionStatus.FAILED,
-            ]),
+            status=factory.Iterator(
+                [
+                    PaymentGatewaySessionStatus.CREATED,
+                    PaymentGatewaySessionStatus.SUBMITTED,
+                    PaymentGatewaySessionStatus.FAILED,
+                ],
+            ),
         )
         order2_sessions = PaymentGatewaySessionFactory.create_batch(
             3,
             order=order2,
-            status=factory.Iterator([
-                PaymentGatewaySessionStatus.STARTED,
-                PaymentGatewaySessionStatus.SUCCESS,
-                PaymentGatewaySessionStatus.CANCELLED,
-            ]),
+            status=factory.Iterator(
+                [
+                    PaymentGatewaySessionStatus.STARTED,
+                    PaymentGatewaySessionStatus.SUCCESS,
+                    PaymentGatewaySessionStatus.CANCELLED,
+                ],
+            ),
         )
 
         # test qs without filters

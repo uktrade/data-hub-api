@@ -482,9 +482,9 @@ class TestDuplicateContactMerger:
     @pytest.mark.parametrize('num_related_objects', [0, 1, 3])
     @pytest.mark.usefixtures('unrelated_objects')
     def test_merge_succeeds(
-            self,
-            factory_relation_kwarg,
-            num_related_objects,
+        self,
+        factory_relation_kwarg,
+        num_related_objects,
     ):
         """Tests that merge_contacts() moves models that are linked to the source contact to the
         target contact and marks the source contact as archived.
@@ -530,12 +530,15 @@ class TestDuplicateContactMerger:
         for obj in source_related_objects:
             obj.refresh_from_db()
 
-        if (len(source_related_objects) > 0 and hasattr(obj, 'contacts')):
-            assert all([*list(obj.contacts.all())][0]
-                       == target_contact for obj in source_related_objects)
-        elif (len(source_related_objects) > 0 and hasattr(obj, 'client_contacts')):
-            assert all([*list(obj.client_contacts.all())][0]
-                       == target_contact for obj in source_related_objects)
+        if len(source_related_objects) > 0 and hasattr(obj, 'contacts'):
+            assert all(
+                [*list(obj.contacts.all())][0] == target_contact for obj in source_related_objects
+            )
+        elif len(source_related_objects) > 0 and hasattr(obj, 'client_contacts'):
+            assert all(
+                [*list(obj.client_contacts.all())][0] == target_contact
+                for obj in source_related_objects
+            )
         else:
             assert all(obj.contact == target_contact for obj in source_related_objects)
             assert all(obj.modified_on == merge_time for obj in source_related_objects)
@@ -588,12 +591,12 @@ class TestDuplicateContactMerger:
 
 
 def _contact_factory(
-        num_interactions=0,
-        num_orders=0,
-        num_referrals=0,
-        num_pipeline_items=0,
-        num_exports=0,
-        num_investment_projects=0,
+    num_interactions=0,
+    num_orders=0,
+    num_referrals=0,
+    num_pipeline_items=0,
+    num_exports=0,
+    num_investment_projects=0,
 ):
     """Factory for a contact that has company referrals, orders,
     company exports, interactions and OMIS orders.

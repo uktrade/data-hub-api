@@ -451,8 +451,7 @@ class PublicCustomerResponseSerializer(ModelSerializer):
         return field.to_representation(token.company_contact)
 
     def update(self, instance, validated_data):
-        """Update the customer response and invalidate token.
-        """
+        """Update the customer response and invalidate token."""
         with transaction.atomic():
             instance = super().update(instance, validated_data)
 
@@ -513,8 +512,7 @@ class PublicCustomerResponseSerializer(ModelSerializer):
 
 
 class DataHubLegacyExportWinSerializer(ModelSerializer):
-    """Legacy read-only serialiser for export win views.
-    """
+    """Legacy read-only serialiser for export win views."""
 
     response = SerializerMethodField(read_only=True)
 
@@ -566,12 +564,14 @@ class DataHubLegacyExportWinSerializer(ModelSerializer):
                 'name': win.lead_officer_name,
                 'email': win.lead_officer_email_address,
             }
-        officer.update({
-            'team': {
-                'type': win.team_type.name,
-                'sub_type': win.hq_team.name,
+        officer.update(
+            {
+                'team': {
+                    'type': win.team_type.name,
+                    'sub_type': win.hq_team.name,
+                },
             },
-        })
+        )
         return officer
 
     def get_adviser(self, win):

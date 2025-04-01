@@ -65,5 +65,6 @@ def refresh_pending_payment_gateway_sessions(age_check=60, refresh_rate=0.5):
 
     for index, session_id in enumerate(session_ids):
         schedule_refresh_payment_gateway_session(
-            session_id=session_id, time_delta=(timedelta(seconds=refresh_rate * index)),
+            session_id=session_id,
+            time_delta=(timedelta(seconds=refresh_rate * index)),
         )

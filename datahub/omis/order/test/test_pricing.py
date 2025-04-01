@@ -69,8 +69,7 @@ class TestCanPricingBeCalculated:
         ],
     )
     def test_cannot_with_incomplete_vat_data(self, fields):
-        """Test that it returns False if the VAT fields are incomplete.
-        """
+        """Test that it returns False if the VAT fields are incomplete."""
         order = Order(**fields)
         assert not can_pricing_be_calculated(order)
 
@@ -129,8 +128,7 @@ class TestCalculatePricing:
     """Tests for the _calculate_pricing function."""
 
     def test_zero_hours(self):
-        """Test that given estimated time = 0, all the calculated values are zero.
-        """
+        """Test that given estimated time = 0, all the calculated values are zero."""
         pricing = _calculate_pricing(
             estimated_time=0,
             hourly_rate=1000,
@@ -205,16 +203,14 @@ class TestCalculateOrderPricing:
     """Tests for the calculate_order_pricing function."""
 
     def test_zero_if_order_incomplete(self):
-        """Test that if an order doesn't have all the VAT fields, the pricing is zero.
-        """
+        """Test that if an order doesn't have all the VAT fields, the pricing is zero."""
         order = Order(vat_status=None)
         pricing = calculate_order_pricing(order)
 
         assert pricing == ZERO_PRICING
 
     def test_zero_with_no_estimated_time(self):
-        """Test that if an order doesn't have any assignees, the pricing is zero.
-        """
+        """Test that if an order doesn't have any assignees, the pricing is zero."""
         order = OrderFactory(assignees=[])
         assert not order.assignees.count()
 

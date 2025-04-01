@@ -182,7 +182,6 @@ class TestInteractionCSVForm:
                 'theme': 'invalid',
                 'kind': 'invalid',
                 'date': 'invalid',
-
                 'adviser_1': 'invalid',
                 'contact_email': 'invalid',
                 'service': 'invalid',
@@ -316,9 +315,7 @@ class TestInteractionCSVForm:
             },
         }
         # `source` has been set (list used rather than a generator for useful failure messages)
-        assert all([
-            interaction.source == expected_source for interaction in created_interactions
-        ])
+        assert all([interaction.source == expected_source for interaction in created_interactions])
 
     def test_save_creates_versions(self):
         """Test that save() creates versions using django-reversion."""
@@ -346,10 +343,12 @@ class TestInteractionCSVForm:
         assert Revision.objects.first().get_comment() == REVISION_COMMENT
 
         # Versions were created (list used rather than a generator for useful failure messages)
-        assert all([
-            Version.objects.get_for_object(interaction).count() == 1
-            for interaction in created_interactions
-        ])
+        assert all(
+            [
+                Version.objects.get_for_object(interaction).count() == 1
+                for interaction in created_interactions
+            ],
+        )
 
     def test_save_rolls_back_on_error(self):
         """Test that save() rolls back if one row can't be saved."""

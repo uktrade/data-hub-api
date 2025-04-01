@@ -64,7 +64,8 @@ class InvestmentProjectEvidenceDocumentAssociationChecker(
 
 
 class IsAssociatedToInvestmentProjectEvidenceDocumentPermission(
-    IsAssociatedToInvestmentProjectPermissionMixin, IsAssociatedToObjectPermission,
+    IsAssociatedToInvestmentProjectPermissionMixin,
+    IsAssociatedToObjectPermission,
 ):
     """Permission class based on InvestmentProjectEvidenceDocumentAssociationChecker."""
 

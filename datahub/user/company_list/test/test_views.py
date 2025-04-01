@@ -645,10 +645,13 @@ class TestCreateOrUpdateCompanyListItemAPIView(APITestMixin):
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert response.content == b''
 
-        assert CompanyListItem.objects.filter(
-            list__in=(other_list, company_list),
-            company=company,
-        ).count() == 2
+        assert (
+            CompanyListItem.objects.filter(
+                list__in=(other_list, company_list),
+                company=company,
+            ).count()
+            == 2
+        )
 
     def test_with_existing_item(self):
         """Test that no error is returned if the specified company is already on the
@@ -866,15 +869,21 @@ class TestCompanyListItemViewSet(APITestMixin):
                             'adviser': {
                                 'id': str(dit_participant.adviser.pk),
                                 'name': dit_participant.adviser.name,
-                            } if dit_participant.adviser else None,
+                            }
+                            if dit_participant.adviser
+                            else None,
                             'team': {
                                 'id': str(dit_participant.team.pk),
                                 'name': dit_participant.team.name,
-                            } if dit_participant.team else None,
+                            }
+                            if dit_participant.team
+                            else None,
                         }
                         for dit_participant in latest_interaction.dit_participants.order_by('pk')
                     ],
-                } if latest_interaction else None,
+                }
+                if latest_interaction
+                else None,
             },
         ]
 
@@ -914,8 +923,7 @@ class TestCompanyListItemViewSet(APITestMixin):
             for result in results
         ]
         expected_interaction_dates = [
-            format_date_or_datetime(date_.date()) if date_ else None
-            for date_ in interaction_dates
+            format_date_or_datetime(date_.date()) if date_ else None for date_ in interaction_dates
         ]
         assert actual_interaction_dates == expected_interaction_dates
 
@@ -977,8 +985,7 @@ class TestDeleteCompanyListItemAPIView(APITestMixin):
         assert not CompanyListItem.objects.filter(list=company_list, company=company).exists()
 
     def test_that_actual_company_is_not_deleted(self):
-        """Test that a company is not removed from database after removing from user's selected list.
-        """
+        """Test that a company is not removed from database after removing from user's selected list."""
         company = CompanyFactory()
         company_list = CompanyListFactory(adviser=self.user)
         CompanyListItemFactory(list=company_list, company=company)

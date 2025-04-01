@@ -19,7 +19,6 @@ logger = logging.getLogger(__name__)
 
 
 def _automatic_company_archive(limit, simulate):
-
     _5y_ago = timezone.now() - relativedelta(years=5)
     _3m_ago = timezone.now() - relativedelta(months=3)
 
@@ -27,23 +26,25 @@ def _automatic_company_archive(limit, simulate):
         company=OuterRef('pk'),
     ).order_by('-date')
 
-    candidate_companies_to_be_archived = list(Company.objects.annotate(
-        latest_interaction_date=Subquery(
-            latest_interaction.values('date')[:1],
+    candidate_companies_to_be_archived = list(
+        Company.objects.annotate(
+            latest_interaction_date=Subquery(
+                latest_interaction.values('date')[:1],
+            ),
+            active_investment_projects=FilteredRelation(
+                'investor_investment_projects',
+                condition=Q(investor_investment_projects__status=InvestmentProject.Status.ONGOING),
+            ),
+        ).filter(
+            Q(latest_interaction_date__date__lt=_5y_ago) | Q(latest_interaction_date__isnull=True),
+            archived=False,
+            orders__isnull=True,
+            investor_profiles__isnull=True,
+            active_investment_projects__isnull=True,
+            created_on__lt=_3m_ago,
+            modified_on__lt=_3m_ago,
         ),
-        active_investment_projects=FilteredRelation(
-            'investor_investment_projects',
-            condition=Q(investor_investment_projects__status=InvestmentProject.Status.ONGOING),
-        ),
-    ).filter(
-        Q(latest_interaction_date__date__lt=_5y_ago) | Q(latest_interaction_date__isnull=True),
-        archived=False,
-        orders__isnull=True,
-        investor_profiles__isnull=True,
-        active_investment_projects__isnull=True,
-        created_on__lt=_3m_ago,
-        modified_on__lt=_3m_ago,
-    ))
+    )
 
     companies_to_be_archived = [
         company
@@ -93,8 +94,7 @@ def schedule_automatic_company_archive(limit=1000, simulate=True):
 
 
 def automatic_company_archive(limit=1000, simulate=True):
-    """Archive inactive companies.
-    """
+    """Archive inactive companies."""
     if not is_feature_flag_active(AUTOMATIC_COMPANY_ARCHIVE_FEATURE_FLAG):
         logger.info(
             f'Feature flag "{AUTOMATIC_COMPANY_ARCHIVE_FEATURE_FLAG}" is not active, exiting.',
@@ -102,7 +102,6 @@ def automatic_company_archive(limit=1000, simulate=True):
         return
 
     with advisory_lock('automatic_company_archive', wait=False) as acquired:
-
         if not acquired:
             logger.info('Another instance of this task is already running.')
             return

@@ -53,16 +53,17 @@ def generate_quote_reference(order):
             letters=get_random_string(length=2, allowed_chars='ACEFHJKMNPRTUVWXY'),
             numbers=get_random_string(length=1, allowed_chars='123456789'),
         )
+
     return generate_reference(model=Quote, gen=gen, prefix=f'{order.reference}/Q-')
 
 
 def generate_quote_content(order, expires_on):
-    """:returns: the content of the quote populated with the given order details.
-    """
+    """:returns: the content of the quote populated with the given order details."""
     company = order.company
     company_address = compose_official_address(company)
     company_address_formatted = ', '.join(
-        field for field in (
+        field
+        for field in (
             company_address.line_1,
             company_address.line_2,
             company_address.county,
@@ -100,29 +101,28 @@ def calculate_quote_expiry_date(order):
     """
     now_date = now().date()
 
-    x_days_before_delivery = (
-        order.delivery_date - timedelta(days=QUOTE_EXPIRY_DAYS_BEFORE_DELIVERY)
+    x_days_before_delivery = order.delivery_date - timedelta(
+        days=QUOTE_EXPIRY_DAYS_BEFORE_DELIVERY,
     )
 
-    y_days_from_now = (
-        now_date + timedelta(days=QUOTE_EXPIRY_DAYS_FROM_NOW)
-    )
+    y_days_from_now = now_date + timedelta(days=QUOTE_EXPIRY_DAYS_FROM_NOW)
 
     expiry_date = min(x_days_before_delivery, y_days_from_now)
 
     if expiry_date < now_date:
-        raise ValidationError({
-            'delivery_date': [
-                'The calculated expiry date for the quote is in the past. '
-                'You might be able to fix this by changing the delivery date.',
-            ],
-        })
+        raise ValidationError(
+            {
+                'delivery_date': [
+                    'The calculated expiry date for the quote is in the past. '
+                    'You might be able to fix this by changing the delivery date.',
+                ],
+            },
+        )
     return expiry_date
 
 
 def get_latest_terms_and_conditions():
-    """:returns: the latest TermsAndConditions object if it exists, None otherwise.
-    """
+    """:returns: the latest TermsAndConditions object if it exists, None otherwise."""
     from datahub.omis.quote.models import TermsAndConditions
 
     return TermsAndConditions.objects.order_by('-created_on').first()

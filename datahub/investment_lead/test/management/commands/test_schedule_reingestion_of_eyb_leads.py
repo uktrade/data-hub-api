@@ -85,11 +85,14 @@ def test_schedule_reingestion_of_eyb_leads(s3_object_processor, caplog):
 
     yesterday = datetime.now(tz=timezone.utc) - timedelta(days=1)
     with freeze_time(yesterday):
-        upload_objects_to_s3(s3_object_processor, [
-            triage_object_definition,
-            user_object_definition,
-            marketing_object_definition,
-        ])
+        upload_objects_to_s3(
+            s3_object_processor,
+            [
+                triage_object_definition,
+                user_object_definition,
+                marketing_object_definition,
+            ],
+        )
 
         EYBLeadFactory(
             triage_hashed_uuid=existing_hashed_uuid,
@@ -126,8 +129,7 @@ def test_schedule_reingestion_of_eyb_leads(s3_object_processor, caplog):
 
 def test_schedule_reingestion_of_eyb_leads_handles_error(caplog):
     with (
-        mock.patch('datahub.ingest.models.IngestedObject.objects')
-        as mock_objects,
+        mock.patch('datahub.ingest.models.IngestedObject.objects') as mock_objects,
         caplog.at_level(logging.ERROR),
     ):
         mock_objects.filter.side_effect = Exception('A mocked filtering error')

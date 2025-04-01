@@ -26,6 +26,8 @@ def remove_task_from_opensearch(instance):
 receivers = (
     SignalReceiver(post_save, DBTask, sync_task_to_opensearch),
     SignalReceiver(
-        post_delete, DBTask, remove_task_from_opensearch,
+        post_delete,
+        DBTask,
+        remove_task_from_opensearch,
     ),
 )

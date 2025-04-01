@@ -109,29 +109,22 @@ def create_customer_response_from_legacy(win, item):
             'other_marketing_source': item.get(
                 'confirmation__other_marketing_source',
                 '',
-            ) or '',
+            )
+            or '',
         },
     }
 
     field_mappings = {
         'confirmation__agree_with_win': 'agree_with_win',
         'confirmation__case_study_willing': 'case_study_willing',
-        'confirmation__company_was_at_risk_of_not_exporting':
-            'company_was_at_risk_of_not_exporting',
-        'confirmation__has_enabled_expansion_into_existing_market':
-            'has_enabled_expansion_into_existing_market',
-        'confirmation__has_enabled_expansion_into_new_market':
-            'has_enabled_expansion_into_new_market',
-        'confirmation__has_explicit_export_plans':
-            'has_explicit_export_plans',
-        'confirmation__has_increased_exports_as_percent_of_turnover':
-            'has_increased_exports_as_percent_of_turnover',
-        'confirmation__interventions_were_prerequisite':
-            'interventions_were_prerequisite',
-        'confirmation__involved_state_enterprise':
-            'involved_state_enterprise',
-        'confirmation__support_improved_speed':
-            'support_improved_speed',
+        'confirmation__company_was_at_risk_of_not_exporting': 'company_was_at_risk_of_not_exporting',
+        'confirmation__has_enabled_expansion_into_existing_market': 'has_enabled_expansion_into_existing_market',
+        'confirmation__has_enabled_expansion_into_new_market': 'has_enabled_expansion_into_new_market',
+        'confirmation__has_explicit_export_plans': 'has_explicit_export_plans',
+        'confirmation__has_increased_exports_as_percent_of_turnover': 'has_increased_exports_as_percent_of_turnover',
+        'confirmation__interventions_were_prerequisite': 'interventions_were_prerequisite',
+        'confirmation__involved_state_enterprise': 'involved_state_enterprise',
+        'confirmation__support_improved_speed': 'support_improved_speed',
     }
 
     customer_response = {}
@@ -217,10 +210,13 @@ def create_export_win_from_legacy(item):
         'migrated_on': lambda item, context: datetime.now(),
         'created_on': lambda item, context: parse(item['created']),
         'audit': lambda item, context: '' if item['audit'] is None else item['audit'],
-        'is_deleted': lambda item, context: False if item.get(
+        'is_deleted': lambda item, context: False
+        if item.get(
             'is_active',
             None,
-        ) is None else (not item['is_active']),
+        )
+        is None
+        else (not item['is_active']),
     }
 
     # fields to be copied over directly
@@ -265,8 +261,7 @@ def create_export_win_from_legacy(item):
 
 def migrate_legacy_win(item):
     customer_response_item = {
-        key: item.pop(key)
-        for key in list(item.keys()) if key.startswith('confirmation_')
+        key: item.pop(key) for key in list(item.keys()) if key.startswith('confirmation_')
     }
 
     win_data = create_export_win_from_legacy(item)
@@ -277,8 +272,7 @@ def migrate_legacy_win(item):
         'type_of_support',
     ]
     many_to_many = {
-        field: win_data.pop(field)
-        for field in many_to_many_fields if field in win_data
+        field: win_data.pop(field) for field in many_to_many_fields if field in win_data
     }
     win_id = win_data.pop('id')
     if win_data['country'] is None:
@@ -311,7 +305,7 @@ def create_breakdown_from_legacy(item):
     try:
         win = Win.objects.all_wins().get(id=item['win__id'])
     except Win.DoesNotExist:
-        logger.warning(f"Legacy Win {item['win__id']} does not exist.")
+        logger.warning(f'Legacy Win {item["win__id"]} does not exist.')
         return None
 
     breakdown_type = BreakdownType.objects.get(export_win_id=item['type'])
@@ -357,7 +351,7 @@ def create_win_adviser_from_legacy(item):
     try:
         win = Win.objects.all_wins().get(id=item['win__id'])
     except Win.DoesNotExist:
-        logger.warning(f"Legacy Win {item['win__id']} does not exist.")
+        logger.warning(f'Legacy Win {item["win__id"]} does not exist.')
         return None
 
     hq_team = HQTeamRegionOrPost.objects.get(export_win_id=item['hq_team'])
@@ -373,13 +367,17 @@ def create_win_adviser_from_legacy(item):
 
     adviser = _get_adviser_by_email_or_name('', item.get('name').strip())
     if adviser:
-        adviser_data.update({
-            'adviser': adviser,
-        })
+        adviser_data.update(
+            {
+                'adviser': adviser,
+            },
+        )
     else:
-        adviser_data.update({
-            'name': item['name'],
-        })
+        adviser_data.update(
+            {
+                'name': item['name'],
+            },
+        )
     return adviser_data
 
 
@@ -417,22 +415,19 @@ def resolve_legacy_field(model, source_field_name, lookup_field=None, annotate=N
             return obj
         except model.DoesNotExist:
             return None
+
     return resolver
 
 
 def resolve_many_to_many(model, source_field_name, max_items):
     def resolver(data, context=None):
         resolvers = [
-            resolve_legacy_field(model, f'{source_field_name}{i}')
-            for i in range(1, max_items + 1)
+            resolve_legacy_field(model, f'{source_field_name}{i}') for i in range(1, max_items + 1)
         ]
-        objs = [
-            obj for obj in (
-                _resolver(data) for _resolver in resolvers
-            ) if obj
-        ]
+        objs = [obj for obj in (_resolver(data) for _resolver in resolvers) if obj]
 
         return objs
+
     return resolver
 
 
@@ -464,12 +459,17 @@ def _get_adviser_by_email_or_name(email, name):
         )
     else:
         return None
-    adviser = Advisor.objects.annotate(
-        email_lowercase=Lower('email'),
-        contact_email_lowercase=Lower('contact_email'),
-    ).filter(
-        filters,
-    ).order_by('-date_joined').first()
+    adviser = (
+        Advisor.objects.annotate(
+            email_lowercase=Lower('email'),
+            contact_email_lowercase=Lower('contact_email'),
+        )
+        .filter(
+            filters,
+        )
+        .order_by('-date_joined')
+        .first()
+    )
     return adviser
 
 
@@ -519,12 +519,16 @@ def resolve_company_contact(data, context=None):
         # In case name is written as "Joe M. Doe"
         first_name = parts[0]
         last_name = parts[-1]
-        contact = Contact.objects.filter(
-            first_name__iexact=first_name,
-            last_name__iexact=last_name,
-            company=context['company'],
-            transferred_to__isnull=True,
-        ).order_by('-created_on').first()
+        contact = (
+            Contact.objects.filter(
+                first_name__iexact=first_name,
+                last_name__iexact=last_name,
+                company=context['company'],
+                transferred_to__isnull=True,
+            )
+            .order_by('-created_on')
+            .first()
+        )
         if contact:
             return {
                 'company_contacts': [contact],
@@ -621,9 +625,13 @@ def migrate_edit_history(soft_deleted=False):
 
 def migrate_legacy_notifications(legacy_notification):
     try:
-        win = Win.objects.all_wins().select_related(
-            'customer_response',
-        ).get(pk=legacy_notification['win_id'])
+        win = (
+            Win.objects.all_wins()
+            .select_related(
+                'customer_response',
+            )
+            .get(pk=legacy_notification['win_id'])
+        )
         customer_response = win.customer_response
 
         if legacy_notification['type'] == 'c':
@@ -644,7 +652,6 @@ def migrate_legacy_notifications(legacy_notification):
     except Win.DoesNotExist:
         logger.warning(f'Legacy Win {legacy_notification["win_id"]} does not exist.')
         pass
-
 
 
 def migrate_notifications(soft_deleted=False):

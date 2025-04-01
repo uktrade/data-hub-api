@@ -64,7 +64,8 @@ class TestSelectPrimaryCompanyViewGet(AdminTestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     @pytest.mark.parametrize(
-        'swap', [True, False],
+        'swap',
+        [True, False],
     )
     @pytest.mark.parametrize(
         ('company_1_factory', 'company_2_factory'),

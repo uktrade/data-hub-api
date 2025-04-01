@@ -23,7 +23,8 @@ class Command(CSVBaseCommand):
 
         with transaction.atomic():
             mapping, created = LegacyExportWinsToDataHubCompany.objects.get_or_create(
-                id=export_win_id, defaults={
+                id=export_win_id,
+                defaults={
                     'company_id': company_id,
                 },
             )

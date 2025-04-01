@@ -46,8 +46,7 @@ class TestAdminChangeLink:
     ],
 )
 def test_verbose_name_for_count(count, expected_result):
-    """Test that verbose_name_for_count() returns the correct verbose name form for various counts.
-    """
+    """Test that verbose_name_for_count() returns the correct verbose name form for various counts."""
     mock_model_meta = Mock(
         verbose_name='singular',
         verbose_name_plural='plural',

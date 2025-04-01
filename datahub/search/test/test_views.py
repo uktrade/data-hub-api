@@ -84,8 +84,7 @@ class TestValidateViewSortByAttributes:
         assert not invalid_fields
 
     def test_sort_by_remapping_keys_are_sort_by_fields(self, search_view):
-        """Validate that the keys of view.es_sort_by_remappings are in serializer.SORT_BY_FIELDS.
-        """
+        """Validate that the keys of view.es_sort_by_remappings are in serializer.SORT_BY_FIELDS."""
         if not hasattr(search_view, 'es_sort_by_remappings'):
             return
 
@@ -357,8 +356,7 @@ class TestBasicSearch(APITestMixin):
         opensearch_with_collector,
         search_support_user,
     ):
-        """Tests that name is more important than other fields in cross field matches.
-        """
+        """Tests that name is more important than other fields in cross field matches."""
         SimpleModel.objects.create(name='Smaxtec Limited', address='')
         SimpleModel.objects.create(name='Newsmax Media (HQ Florida)', address='')
         SimpleModel.objects.create(name='Smooth Notebooks', address='Smaxet House')
@@ -721,9 +719,7 @@ class TestEntitySearch(APITestMixin):
             if interaction.company.sector_id == youngest_descendant_sector_id
         }
 
-        actual_ids = {
-            UUID(interaction['id']) for interaction in response_data['results']
-        }
+        actual_ids = {UUID(interaction['id']) for interaction in response_data['results']}
 
         # Assert that no ancestor sectors' interactions are in the results
         assert response_data['count'] == 1

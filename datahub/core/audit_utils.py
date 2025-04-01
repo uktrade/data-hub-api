@@ -64,15 +64,16 @@ def _make_value_friendly(field, value):
     if field.many_to_many or field.one_to_many:
         return [
             _get_object_name_for_pk(
-                field.related_model, one_value,
-            ) for one_value in value
+                field.related_model,
+                one_value,
+            )
+            for one_value in value
         ]
     return _get_object_name_for_pk(field.related_model, value)
 
 
 def _get_object_name_for_pk(model, pk):
-    """Gets the name for a given object pk or returns the pk if it cannot be found.
-    """
+    """Gets the name for a given object pk or returns the pk if it cannot be found."""
     try:
         result = model.objects.get(pk=pk)
     except (model.DoesNotExist, ValueError, TypeError, ValidationError):

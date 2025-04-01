@@ -24,8 +24,7 @@ class TestUpdateOrderPricingPreSave:
         assert order.vat_cost == 0
 
     def test_pricing_unchanged_if_update_unrelated(self):
-        """Test that if an unrelated field gets updated, the pricing stays the same.
-        """
+        """Test that if an unrelated field gets updated, the pricing stays the same."""
         order = OrderFactory()
         pre_update_pricing = get_pricing_from_order(order)
 

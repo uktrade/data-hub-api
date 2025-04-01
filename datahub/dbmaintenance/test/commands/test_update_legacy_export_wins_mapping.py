@@ -47,9 +47,7 @@ def test_run(s3_stubber, caplog):
     assert mappings.count() == 5
 
     for mapping, uuid, company in zip(mappings, uuids, companies, strict=False):
-        assert (
-            company is None and mapping.company_id is None
-        ) or (
+        assert (company is None and mapping.company_id is None) or (
             mapping.company_id == company.id
         )
         assert mapping.id == uuid

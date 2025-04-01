@@ -1,5 +1,3 @@
-
-
 from datetime import datetime, timedelta
 from logging import getLogger
 
@@ -38,13 +36,15 @@ def auto_resend_client_email_from_unconfirmed_win():
             return
 
         current_date = datetime.utcnow()
-        win_max_days_threshold = \
+        win_max_days_threshold = (
             EMAIL_MAX_DAYS_TO_RESPONSE_THRESHOLD * EMAIL_MAX_WEEKS_AUTO_RESEND_THRESHOLD
+        )
 
         win_maturity_days_threshold = current_date - timedelta(days=win_max_days_threshold + 1)
 
-        win_email_response_threshold = \
-            current_date - timedelta(days=EMAIL_MAX_DAYS_TO_RESPONSE_THRESHOLD - 1)
+        win_email_response_threshold = current_date - timedelta(
+            days=EMAIL_MAX_DAYS_TO_RESPONSE_THRESHOLD - 1,
+        )
 
         customer_responses = (
             CustomerResponse.objects.filter(
@@ -85,12 +85,12 @@ def auto_resend_client_email_from_unconfirmed_win():
 
 
 def create_token_for_contact(contact, customer_response, adviser=None):
-    """Generate new token and set all existing unexpired token to expire.
-    """
+    """Generate new token and set all existing unexpired token to expire."""
     CustomerResponseToken.objects.filter(
         company_contact=contact,
         customer_response=customer_response,
-        expires_on__gte=datetime.utcnow()).update(expires_on=datetime.utcnow())
+        expires_on__gte=datetime.utcnow(),
+    ).update(expires_on=datetime.utcnow())
     expires_on = datetime.utcnow() + timedelta(days=7)
     new_token = CustomerResponseToken.objects.create(
         expires_on=expires_on,
@@ -112,17 +112,21 @@ def get_all_fields_for_client_email_receipt(token, customer_response):
 
     if token.company_contact:
         win_token = token.company_contact
-        details.update({
-            'customer_email': win_token.email,
-            'client_firstname': win_token.first_name,
-        })
+        details.update(
+            {
+                'customer_email': win_token.email,
+                'client_firstname': win_token.first_name,
+            },
+        )
 
     if token.adviser:
         win_token = token.adviser
-        details.update({
-            'customer_email': win_token.contact_email,
-            'client_firstname': win_token.first_name,
-        })
+        details.update(
+            {
+                'customer_email': win_token.contact_email,
+                'client_firstname': win_token.first_name,
+            },
+        )
 
     return details
 
@@ -161,8 +165,9 @@ def get_all_fields_for_lead_officer_email_receipt_no(customer_response):
 
 def get_all_fields_for_lead_officer_email_receipt_yes(customer_response):
     win = customer_response.win
-    total_export_win_value = Breakdown.objects.filter(win=win).aggregate(
-        Sum('value'))['value__sum'] or 0
+    total_export_win_value = (
+        Breakdown.objects.filter(win=win).aggregate(Sum('value'))['value__sum'] or 0
+    )
     details = {
         'lead_officer_email': win.lead_officer.contact_email,
         'country_destination': win.country.name,
@@ -175,14 +180,13 @@ def get_all_fields_for_lead_officer_email_receipt_yes(customer_response):
 
 
 def notify_export_win_email_by_rq_email(
-        email_address,
-        template_identifier,
-        context,
-        update_task,
-        token_id=None,
+    email_address,
+    template_identifier,
+    context,
+    update_task,
+    token_id=None,
 ):
-    """Notify Export win contact, using GOVUK notify and some template context.
-    """
+    """Notify Export win contact, using GOVUK notify and some template context."""
     job = job_scheduler(
         function=send_export_win_email_notification_via_rq,
         function_args=(
@@ -201,12 +205,12 @@ def notify_export_win_email_by_rq_email(
 
 
 def send_export_win_email_notification_via_rq(
-        recipient_email,
-        template_identifier,
-        context=None,
-        update_delivery_status_task=None,
-        object_id=None,
-        notify_service_name=None,
+    recipient_email,
+    template_identifier,
+    context=None,
+    update_delivery_status_task=None,
+    object_id=None,
+    notify_service_name=None,
 ):
     """Email notification function to be scheduled by RQ,
     setting up a second task to update the email delivery status.

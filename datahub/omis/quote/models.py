@@ -17,7 +17,8 @@ class TermsAndConditions(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     created_on = models.DateTimeField(
-        db_index=True, auto_now_add=True,
+        db_index=True,
+        auto_now_add=True,
         help_text='Set automatically.',
     )
     name = models.CharField(
@@ -34,7 +35,7 @@ class TermsAndConditions(models.Model):
 
     class Meta:
         db_table = 'omis-quote_termsandconditions'
-        ordering = ('-created_on', )
+        ordering = ('-created_on',)
         verbose_name_plural = 'terms and conditions'
 
     def __str__(self):
@@ -50,7 +51,8 @@ class Quote(BaseModel):
     content = models.TextField()
     terms_and_conditions = models.ForeignKey(
         TermsAndConditions,
-        null=True, blank=True,
+        null=True,
+        blank=True,
         on_delete=models.PROTECT,
         related_name='+',
     )
@@ -58,7 +60,8 @@ class Quote(BaseModel):
     cancelled_on = models.DateTimeField(null=True, blank=True)
     cancelled_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        null=True, blank=True,
+        null=True,
+        blank=True,
         on_delete=models.SET_NULL,
         related_name='+',
     )
@@ -66,7 +69,8 @@ class Quote(BaseModel):
     accepted_on = models.DateTimeField(null=True, blank=True)
     accepted_by = models.ForeignKey(
         'company.Contact',
-        null=True, blank=True,
+        null=True,
+        blank=True,
         on_delete=models.SET_NULL,
         related_name='+',
     )
@@ -105,13 +109,11 @@ class Quote(BaseModel):
         self.save()
 
     def is_cancelled(self):
-        """:returns: True if this quote is cancelled, False otherwise.
-        """
+        """:returns: True if this quote is cancelled, False otherwise."""
         return self.cancelled_on
 
     def is_accepted(self):
-        """:returns: True if this quote has been accepted, False otherwise.
-        """
+        """:returns: True if this quote has been accepted, False otherwise."""
         return self.accepted_on
 
     def __str__(self):

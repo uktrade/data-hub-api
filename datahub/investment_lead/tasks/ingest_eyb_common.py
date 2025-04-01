@@ -59,7 +59,9 @@ class BaseEYBIngestionTask(BaseObjectIngestionTask):
             else:
                 self.updated_ids.append(str(instance.id))
         else:
-            self.errors.append({
-                'record': record,
-                'errors': serializer.errors,
-            })
+            self.errors.append(
+                {
+                    'record': record,
+                    'errors': serializer.errors,
+                },
+            )

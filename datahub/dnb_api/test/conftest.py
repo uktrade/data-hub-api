@@ -10,8 +10,7 @@ from datahub.interaction.test.factories import CompanyInteractionFactory
 
 @pytest.fixture
 def dnb_response_non_uk():
-    """Fixture for a record as returned by the dnb-service.
-    """
+    """Fixture for a record as returned by the dnb-service."""
     original_registration_description = 'Federal Taxpayer Identification Number (US)'
     return {
         'results': [
@@ -89,15 +88,19 @@ def dnb_company_updates_response_uk(dnb_response_uk):
 
 @pytest.fixture
 def dnb_company_search_datahub_companies():
-    """Creates Data Hub companies for hydrating DNB search results with.
-    """
+    """Creates Data Hub companies for hydrating DNB search results with."""
     # Company with no interactions
     CompanyFactory(duns_number='1234567', id='6083b732-b07a-42d6-ada4-c8082293285b')
     # Company with two interactions
     company = CompanyFactory(duns_number='7654321', id='6083b732-b07a-42d6-ada4-c99999999999')
 
     interaction_date = datetime.datetime(
-        year=2019, month=8, day=1, hour=16, minute=0, tzinfo=datetime.timezone.utc,
+        year=2019,
+        month=8,
+        day=1,
+        hour=16,
+        minute=0,
+        tzinfo=datetime.timezone.utc,
     )
     with freeze_time(interaction_date):
         CompanyInteractionFactory(
@@ -108,7 +111,10 @@ def dnb_company_search_datahub_companies():
         )
 
     older_interaction_date = datetime.datetime(
-        year=2018, month=8, day=1, tzinfo=datetime.timezone.utc,
+        year=2018,
+        month=8,
+        day=1,
+        tzinfo=datetime.timezone.utc,
     )
     with freeze_time(older_interaction_date):
         CompanyInteractionFactory(

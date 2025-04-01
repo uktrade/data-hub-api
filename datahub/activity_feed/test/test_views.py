@@ -15,11 +15,7 @@ def pytest_generate_tests(metafunc):
         perms = ActivityFeedView.ACTIVITY_MODELS_PERMISSIONS_REQUIRED
         insufficient_activity_permissions = [
             pytest.param(
-                [
-                    perm
-                    for perm in perms
-                    if perm != perm_to_exclude
-                ],
+                [perm for perm in perms if perm != perm_to_exclude],
                 id=f'without {perm_to_exclude}',
             )
             for perm_to_exclude in perms
@@ -59,7 +55,6 @@ class TestActivityFeedView(APITestMixin):
             settings.ACTIVITY_STREAM_OUTGOING_URL,
             status_code=response_status_code,
             content=response_content,
-
         )
 
         url = reverse('api-v4:activity-feed:index')

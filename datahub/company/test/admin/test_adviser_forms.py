@@ -67,8 +67,7 @@ class TestAddAdviserFromSSOForm:
         mock_get_user_by_email,
         mock_get_user_by_email_user_id,
     ):
-        """Test that validation fails if there's no matching adviser in Staff SSO.
-        """
+        """Test that validation fails if there's no matching adviser in Staff SSO."""
         mock_get_user_by_email.side_effect = SSOUserDoesNotExistError()
         mock_get_user_by_email_user_id.side_effect = SSOUserDoesNotExistError()
 
@@ -80,8 +79,7 @@ class TestAddAdviserFromSSOForm:
         }
 
     def test_validation_fails_when_there_is_a_request_error(self, mock_get_user_by_email_user_id):
-        """Test that validation fails if there's an error communicating with Staff SSO.
-        """
+        """Test that validation fails if there's an error communicating with Staff SSO."""
         mock_get_user_by_email_user_id.side_effect = SSORequestError('Test error')
 
         data = {'search_email': 'search-email@test.test'}

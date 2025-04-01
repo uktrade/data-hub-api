@@ -40,9 +40,11 @@ def sync_investment_projects_of_subsidiary_companies(company, original_modified_
         try:
             raise Exception('Race condition in sync_investment_projects_of_subsidiary_companies')
         except Exception as exception:
-            exception.extra_info = f'Company id: {company.id}, ' + \
-                f'Company modified_on: {company.modified_on}, ' + \
-                f'original_modified_on: {original_modified_on}.'
+            exception.extra_info = (
+                f'Company id: {company.id}, '
+                + f'Company modified_on: {company.modified_on}, '
+                + f'original_modified_on: {original_modified_on}.'
+            )
             raise
 
     subsidiary_companies = Company.objects.filter(

@@ -2,17 +2,23 @@ from django.urls import path
 
 from datahub.investment_lead.views import EYBLeadAuditViewSet, EYBLeadViewSet
 
-eyb_lead_collection = EYBLeadViewSet.as_view({
-    'get': 'list',
-})
+eyb_lead_collection = EYBLeadViewSet.as_view(
+    {
+        'get': 'list',
+    },
+)
 
-eyb_lead_item = EYBLeadViewSet.as_view({
-    'get': 'retrieve',
-})
+eyb_lead_item = EYBLeadViewSet.as_view(
+    {
+        'get': 'retrieve',
+    },
+)
 
-audit_item = EYBLeadAuditViewSet.as_view({
-    'get': 'list',
-})
+audit_item = EYBLeadAuditViewSet.as_view(
+    {
+        'get': 'list',
+    },
+)
 
 urlpatterns = [
     path(

@@ -57,7 +57,11 @@ def test_run(s3_stubber, caplog):
     assert len(caplog.records) == 1
 
     assert [company.company_number for company in companies] == [
-        '012345', '456', '', '087891', '087892',
+        '012345',
+        '456',
+        '',
+        '087891',
+        '087892',
     ]
     assert all(company.modified_on == original_datetime for company in companies)
 

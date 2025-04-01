@@ -28,8 +28,7 @@ def mock_rq_get_current_job(monkeypatch):
     ],
 )
 def test_send_email_notification(context, service_name):
-    """Test the send_email_notification utility.
-    """
+    """Test the send_email_notification utility."""
     expected_service_name = service_name or DEFAULT_SERVICE_NAME
     notification_api_client = notify_gateway.clients[expected_service_name]
     notification_api_client.send_email_notification.return_value = {'id': 'someid'}
@@ -58,14 +57,13 @@ def test_send_email_notification(context, service_name):
     ],
 )
 def test_send_email_notification_retries_errors(
-        monkeypatch,
-        mock_rq_get_current_job,
-        error_status_code,
-        expect_retry,
-        get_current_job_return_none,
+    monkeypatch,
+    mock_rq_get_current_job,
+    error_status_code,
+    expect_retry,
+    get_current_job_return_none,
 ):
-    """Test the send_email_notification utility.
-    """
+    """Test the send_email_notification utility."""
     notification_api_client = notify_gateway.clients[DEFAULT_SERVICE_NAME]
     # Set up an HTTPError with the parametrized status code
     mock_response = mock.Mock()

@@ -7,7 +7,7 @@ from datahub.dataset.export_wins.utils import (
 
 
 @pytest.mark.django_db
-class TestUtils():
+class TestUtils:
     def test_enrich_data_replaces_empty_strings_with_null_on_expected_column(self):
         win = {'audit': '', 'ignore_empty_string': '', 'populated_value': 'A'}
 

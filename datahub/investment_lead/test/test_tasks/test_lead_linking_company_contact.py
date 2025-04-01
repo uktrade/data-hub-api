@@ -68,7 +68,6 @@ def user_object_processor(s3_client):
 
 @mock_aws
 class TestEYBCompanyContactLinking:
-
     def test_create_company_and_contact_success(
         self,
         triage_object_key,
@@ -92,7 +91,8 @@ class TestEYBCompanyContactLinking:
             (user_object_key, user_records, user_object_processor),
         ]:
             object_definition = (
-                object_key, compressed_json_faker(records, key_to_nest_records_under='object'),
+                object_key,
+                compressed_json_faker(records, key_to_nest_records_under='object'),
             )
             upload_objects_to_s3(object_processor, [object_definition])
 
@@ -133,18 +133,22 @@ class TestEYBCompanyContactLinking:
         hashed_uuid = generate_hashed_uuid()
 
         triage_records = [
-            eyb_lead_triage_record_faker({
-                'hashedUuid': hashed_uuid,
-            }),
+            eyb_lead_triage_record_faker(
+                {
+                    'hashedUuid': hashed_uuid,
+                },
+            ),
         ]
 
         user_records = [
-            eyb_lead_user_record_faker({
-                'hashedUuid': hashed_uuid,
-                'dunsNumber': '123',
-                'companyName': company.name,
-                'email': 'foo@bar.com',
-            }),
+            eyb_lead_user_record_faker(
+                {
+                    'hashedUuid': hashed_uuid,
+                    'dunsNumber': '123',
+                    'companyName': company.name,
+                    'email': 'foo@bar.com',
+                },
+            ),
         ]
 
         for object_key, records, object_processor in [
@@ -152,7 +156,8 @@ class TestEYBCompanyContactLinking:
             (user_object_key, user_records, user_object_processor),
         ]:
             object_definition = (
-                object_key, compressed_json_faker(records, key_to_nest_records_under='object'),
+                object_key,
+                compressed_json_faker(records, key_to_nest_records_under='object'),
             )
             upload_objects_to_s3(object_processor, [object_definition])
 

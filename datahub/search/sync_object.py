@@ -62,12 +62,13 @@ def sync_object_async(search_app, pk):
         logger.exception(
             f'An error occurred syncing a {search_app.name} object with id {pk}: {e} '
             f'Object {search_app.name} may have been deleted before being synced',
-        )        # object may be deleted
+        )  # object may be deleted
         return
 
     if obj is not None and issubclass(type(obj), BaseModel):
-        logger.info(f'Object {obj.pk} created on: {obj.created_on} '
-                    f'and modified on: {obj.modified_on}')
+        logger.info(
+            f'Object {obj.pk} created on: {obj.created_on} and modified on: {obj.modified_on}',
+        )
 
     logger.info(
         f'Task {job.id} sync_object_task {search_app.name} '
@@ -77,10 +78,10 @@ def sync_object_async(search_app, pk):
 
 
 def sync_related_objects_async(
-        related_obj,
-        related_obj_field_name,
-        related_obj_filter=None,
-        search_app_name=None,
+    related_obj,
+    related_obj_field_name,
+    related_obj_filter=None,
+    search_app_name=None,
 ):
     """Syncs objects related to another object via a specified field.
 

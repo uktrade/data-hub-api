@@ -7,8 +7,7 @@ from django.core.management import call_command
 
 
 class MockWorker:
-    """Mock queue names object returned by worker.
-    """
+    """Mock queue names object returned by worker."""
 
     queue_name = ''
 
@@ -45,7 +44,7 @@ def test_rq_health_check_rq_not_running():
                 call_command('rq_health_check', '--queue=short-running')
 
             assert exception_info.value.code == 1
-            assert "RQ queue not running: {\'short-running\'}" in str(mock_error.call_args_list)
+            assert "RQ queue not running: {'short-running'}" in str(mock_error.call_args_list)
             assert mock_error.call_count == 1
 
 
@@ -56,6 +55,7 @@ def test_command_called_without_parameter():
             call_command('rq_health_check')
 
         assert exception_info.value.code == 1
-        assert 'Nothing checked! Please provide --queue parameter' \
-            in str(mock_error.call_args_list)
+        assert 'Nothing checked! Please provide --queue parameter' in str(
+            mock_error.call_args_list,
+        )
         assert mock_error.call_count == 1

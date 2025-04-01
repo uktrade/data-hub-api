@@ -19,8 +19,7 @@ def _adviser_field_with_indexed_id():
 
 
 class Company(BaseSearchModel):
-    """OpenSearch representation of Company model.
-    """
+    """OpenSearch representation of Company model."""
 
     id = Keyword()
     archived = Boolean()

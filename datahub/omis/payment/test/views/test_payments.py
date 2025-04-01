@@ -194,7 +194,8 @@ class TestCreatePayments(APITestMixin):
         assert response.status_code == status.HTTP_201_CREATED
 
     @pytest.mark.parametrize(
-        'disallowed_status', [
+        'disallowed_status',
+        [
             OrderStatus.DRAFT,
             OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
             OrderStatus.PAID,

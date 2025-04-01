@@ -102,7 +102,9 @@ def test_non_existent_project(s3_stubber, caplog):
     assert len(caplog.records) == 1
 
     assert [project.sector for project in projects] == [
-        new_sectors[0], new_sectors[1], old_sectors[2],
+        new_sectors[0],
+        new_sectors[1],
+        old_sectors[2],
     ]
 
 
@@ -153,7 +155,9 @@ def test_non_existent_sector(s3_stubber, caplog):
     assert len(caplog.records) == 1
 
     assert [project.sector for project in projects] == [
-        new_sectors[0], new_sectors[1], old_sectors[2],
+        new_sectors[0],
+        new_sectors[1],
+        old_sectors[2],
     ]
 
 
@@ -203,17 +207,17 @@ def test_no_change(s3_stubber, caplog):
         project.refresh_from_db()
 
     assert (
-        f'Not updating InvestmentProject {projects[1]} as its '
-        'sector has not changed'
+        f'Not updating InvestmentProject {projects[1]} as its sector has not changed'
     ) in caplog.text
     assert (
-        f'Not updating InvestmentProject {projects[2]} as its '
-        'sector has not changed'
+        f'Not updating InvestmentProject {projects[2]} as its sector has not changed'
     ) in caplog.text
     assert len(caplog.records) == 2
 
     assert [project.sector for project in projects] == [
-        new_sectors[0], old_sectors[1], old_sectors[2],
+        new_sectors[0],
+        old_sectors[1],
+        old_sectors[2],
     ]
 
 
@@ -254,7 +258,10 @@ def test_simulate(s3_stubber):
     )
 
     call_command(
-        'update_investment_project_sector_disabled_signals', bucket, object_key, simulate=True,
+        'update_investment_project_sector_disabled_signals',
+        bucket,
+        object_key,
+        simulate=True,
     )
 
     for project in projects:

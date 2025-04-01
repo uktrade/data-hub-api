@@ -36,8 +36,7 @@ def mocked_notify_client(use_notification_app):
         client = notify.client
     if not isinstance(client, Mock):
         raise Exception(
-            'mocked_notify_client fixture called, but notification client is not '
-            'a Mock() object.',
+            'mocked_notify_client fixture called, but notification client is not a Mock() object.',
         )
     client.reset_mock()
     return client

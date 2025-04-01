@@ -164,9 +164,7 @@ class TestPublicCompanyViewSet:
             'export_sub_segment': company.export_sub_segment,
             'trading_names': company.trading_names,
             'vat_number': company.vat_number,
-            'uk_based': (
-                company.address_country.id == uuid.UUID(Country.united_kingdom.value.id)
-            ),
+            'uk_based': (company.address_country.id == uuid.UUID(Country.united_kingdom.value.id)),
             'uk_region': {
                 'id': str(company.uk_region.id),
                 'name': company.uk_region.name,

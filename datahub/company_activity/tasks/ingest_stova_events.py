@@ -35,7 +35,6 @@ class StovaEventIdentificationTask(BaseObjectIdentificationTask):
 
 
 class StovaEventIngestionTask(BaseObjectIngestionTask):
-
     existing_ids = []
 
     def _should_process_record(self, record: dict) -> bool:

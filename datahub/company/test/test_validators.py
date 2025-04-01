@@ -45,8 +45,7 @@ def test_validate_team_member_max_count_does_not_throw_error_when_team_members_i
 def test_validate_team_member_max_count_does_not_throw_error_when_team_members_below_max(
     size,
 ):
-    """Test no error is thrown when the team_member value contains less than the maximum allowed.
-    """
+    """Test no error is thrown when the team_member value contains less than the maximum allowed."""
     validate_team_member_max_count(['a'] * size, ValidationError)
 
 

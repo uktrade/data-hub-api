@@ -20,8 +20,7 @@ class TestGenerateReference:
         assert reference == 'something'
 
     def test_with_prefix(self):
-        """Test that if a prefix is specified, it will be used to generate the reference.
-        """
+        """Test that if a prefix is specified, it will be used to generate the reference."""
         model = mock.Mock()
         model.objects.filter().exists.return_value = False
 
@@ -41,8 +40,7 @@ class TestGenerateReference:
         assert reference == '2nd try'
 
     def test_max_retries_reached(self):
-        """Test that if there are n max collisions, the function raises RuntimeError.
-        """
+        """Test that if there are n max collisions, the function raises RuntimeError."""
         model = mock.Mock()
         model.objects.filter().exists.side_effect = [True] * 10
 
@@ -65,8 +63,7 @@ class TestGenerateDateTimeBasedReference:
 
     @freeze_time('2017-04-18 13:00:00')
     def test_with_prefix(self):
-        """Test that if a prefix is specified, it will be used to generate the reference.
-        """
+        """Test that if a prefix is specified, it will be used to generate the reference."""
         model = mock.Mock()
         model.objects.select_for_update().filter.return_value = []
         model.objects.filter().exists.return_value = False
@@ -76,8 +73,7 @@ class TestGenerateDateTimeBasedReference:
 
     @freeze_time('2017-04-18 13:00:00')
     def test_with_collision(self):
-        """Test that if there's already a record with that reference, the seq part is incremented.
-        """
+        """Test that if there's already a record with that reference, the seq part is incremented."""
         model = mock.Mock()
         model.objects.select_for_update().filter.return_value = []
         model.objects.filter().exists.side_effect = [True, False]
@@ -98,8 +94,7 @@ class TestGenerateDateTimeBasedReference:
         assert reference == '201704180003'
 
     def test_max_retries_reached(self):
-        """Test that if there are n max collisions, the function raises RuntimeError.
-        """
+        """Test that if there are n max collisions, the function raises RuntimeError."""
         model = mock.Mock()
         model.objects.select_for_update().filter.return_value = []
         model.objects.filter().exists.side_effect = [True] * 10

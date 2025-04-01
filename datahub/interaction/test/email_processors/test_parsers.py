@@ -19,8 +19,7 @@ from datahub.interaction.email_processors.parsers import (
 
 @pytest.mark.django_db
 class TestCalendarInteractionEmailParser:
-    """Test the CalendarInteractionEmailParser class.
-    """
+    """Test the CalendarInteractionEmailParser class."""
 
     def _get_parser_for_email_file(self, relative_email_file_path):
         email_file_path = PurePath(__file__).parent / relative_email_file_path
@@ -266,8 +265,7 @@ class TestCalendarInteractionEmailParser:
 
 @pytest.mark.django_db
 class TestInteractionEmailParser:
-    """Test the InteractionPlainEmailParser class.
-    """
+    """Test the InteractionPlainEmailParser class."""
 
     def _get_parser_for_email_file(self, relative_email_file_path):
         email_file_path = PurePath(__file__).parent / relative_email_file_path
@@ -281,9 +279,8 @@ class TestInteractionEmailParser:
             (
                 'email_samples/valid/outlook_online/sample.eml',
                 {
-                    'id':
-                        '<DB6PR0101MB2261E6B26A58D05C4F5CF1C8C75A0@DB6PR0101MB2261'
-                        '.eurprd01.prod.exchangelabs.com>',
+                    'id': '<DB6PR0101MB2261E6B26A58D05C4F5CF1C8C75A0@DB6PR0101MB2261'
+                    '.eurprd01.prod.exchangelabs.com>',
                     'adviser_email': 'adviser1@trade.gov.uk',
                     'contact_details': [
                         ('bill.adama@example.net', 'Company 1'),
@@ -302,8 +299,7 @@ class TestInteractionEmailParser:
             (
                 'email_samples/valid/gmail/sample.eml',
                 {
-                    'id':
-                        '<0000000000002a99a005853a155c@google.com>',
+                    'id': '<0000000000002a99a005853a155c@google.com>',
                     'adviser_email': 'adviser3@digital.trade.gov.uk',
                     'contact_details': [
                         ('bill.adama@example.net', 'Company 1'),
@@ -314,9 +310,8 @@ class TestInteractionEmailParser:
                     'secondary_adviser_emails': ['adviser2@digital.trade.gov.uk'],
                     'top_company_name': 'Company 1',
                     'date': datetime(2019, 3, 29, 11, 36, 33, tzinfo=timezone.utc),
-                    'subject':
-                        'Invitation: initial @ Fri 29 Mar 2019 4:30pm - 5:30pm '
-                        '(GMT) (bill.adama@example.net)',
+                    'subject': 'Invitation: initial @ Fri 29 Mar 2019 4:30pm - 5:30pm '
+                    '(GMT) (bill.adama@example.net)',
                     'body': 'You have been invited',
                 },
             ),

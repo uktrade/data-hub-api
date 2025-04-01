@@ -68,8 +68,7 @@ def test_set_site_address_is_company_address_when_theres_no_projects(caplog):
 
 def test_set_site_address_is_company_address_handles_error(caplog):
     with (
-        mock.patch('datahub.investment.project.models.InvestmentProject.objects')
-        as mock_objects,
+        mock.patch('datahub.investment.project.models.InvestmentProject.objects') as mock_objects,
         caplog.at_level(logging.ERROR),
     ):
         mock_objects.filter.side_effect = Exception('A mocked filtering error')

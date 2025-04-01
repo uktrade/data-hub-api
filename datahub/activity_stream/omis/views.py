@@ -7,15 +7,13 @@ from datahub.omis.order.models import Order, OrderAssignee
 
 
 class OMISOrderAddedPagination(ActivityCursorPagination):
-    """OMIS Order added pagination for activity stream.
-    """
+    """OMIS Order added pagination for activity stream."""
 
     summary = 'OMIS Order Added Activity'
 
 
 class OMISOrderAddedViewSet(ActivityViewSet):
-    """OMIS Order added ViewSet for activity stream.
-    """
+    """OMIS Order added ViewSet for activity stream."""
 
     pagination_class = OMISOrderAddedPagination
     serializer_class = OMISOrderAddedSerializer

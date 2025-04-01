@@ -33,6 +33,7 @@ def _make_thread_pool_task(fn, *args, **kwargs):
     close_old_connections() is called both before and after the execution of the task to mimic
     what Django does with requests.
     """
+
     def _task():
         try:
             close_old_connections()
@@ -44,4 +45,5 @@ def _make_thread_pool_task(fn, *args, **kwargs):
             raise
         finally:
             close_old_connections()
+
     return _task

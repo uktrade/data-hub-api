@@ -260,7 +260,6 @@ class TestSearch(APITestMixin):
                 },
                 'investable_capital',
                 [1490],
-
             ),
             (
                 {
@@ -407,7 +406,6 @@ class TestSearch(APITestMixin):
                 'investor_description',
                 ['frozen in 2010', 'North Project'],
             ),
-
         ],
     )
     def test_filters(self, search, check_response_item, expected_results):
@@ -423,10 +421,9 @@ class TestSearch(APITestMixin):
         expected_number_of_results = len(expected_results)
         assert response.data['count'] == expected_number_of_results, response.data['results']
         assert len(response.data['results']) == expected_number_of_results
-        assert (
-            Counter(result[check_response_item] for result in response.data['results'])
-            == Counter(expected_results)
-        )
+        assert Counter(
+            result[check_response_item] for result in response.data['results']
+        ) == Counter(expected_results)
 
     def test_investable_capital_filter_error(self):
         """Test investable capital filter error."""
@@ -573,7 +570,6 @@ class TestSearch(APITestMixin):
                     '2010-02-01T00:00:00+00:00',
                 ],
             ),
-
         ],
     )
     def test_sorts(self, sort_by, check_item_key, expected_results):
@@ -611,15 +607,11 @@ class TestLargeInvestorProfileExportView(APITestMixin):
                 status.HTTP_403_FORBIDDEN,
             ),
             (
-                (
-                    InvestorProfilePermission.view_investor_profile,
-                ),
+                (InvestorProfilePermission.view_investor_profile,),
                 status.HTTP_403_FORBIDDEN,
             ),
             (
-                (
-                    InvestorProfilePermission.export,
-                ),
+                (InvestorProfilePermission.export,),
                 status.HTTP_403_FORBIDDEN,
             ),
             (
@@ -632,7 +624,10 @@ class TestLargeInvestorProfileExportView(APITestMixin):
         ],
     )
     def test_user_needs_correct_permissions_to_export_data(
-        self, opensearch, permissions, expected_status_code,
+        self,
+        opensearch,
+        permissions,
+        expected_status_code,
     ):
         """Test that a user without the correct permissions cannot export data."""
         user = create_test_user(dit_team=TeamFactory(), permission_codenames=permissions)
@@ -677,7 +672,8 @@ class TestLargeInvestorProfileExportView(APITestMixin):
 
         assert response.status_code == status.HTTP_200_OK
         assert parse_header(response.get('Content-Disposition')) == (
-            'attachment', {
+            'attachment',
+            {
                 'filename': 'Data Hub - Large capital profiles - 2018-01-01-11-12-13.csv',
             },
         )
@@ -696,21 +692,26 @@ class TestLargeInvestorProfileExportView(APITestMixin):
                 'Global assets under management': profile.global_assets_under_management,
                 'Investable capital': profile.investable_capital,
                 'Investor company': get_attr_or_none(
-                    profile, 'investor_company.name',
+                    profile,
+                    'investor_company.name',
                 ),
                 'Investor description': profile.investor_description,
                 'Notes on locations': profile.notes_on_locations,
                 'Investor type': get_attr_or_none(
-                    profile, 'investor_type.name',
+                    profile,
+                    'investor_type.name',
                 ),
                 'Required checks conducted': get_attr_or_none(
-                    profile, 'required_checks_conducted.name',
+                    profile,
+                    'required_checks_conducted.name',
                 ),
                 'Minimum return rate': get_attr_or_none(
-                    profile, 'minimum_return_rate.name',
+                    profile,
+                    'minimum_return_rate.name',
                 ),
                 'Minimum equity percentage': get_attr_or_none(
-                    profile, 'minimum_equity_percentage.name',
+                    profile,
+                    'minimum_equity_percentage.name',
                 ),
                 'Date last modified': profile.modified_on,
                 'UK regions of interest': join_attr_values(
@@ -732,7 +733,8 @@ class TestLargeInvestorProfileExportView(APITestMixin):
                     profile.desired_deal_roles.order_by('name'),
                 ),
                 'Required checks conducted by': get_attr_or_none(
-                    profile, 'required_checks_conducted_by.name',
+                    profile,
+                    'required_checks_conducted_by.name',
                 ),
                 'Required checks conducted on': profile.required_checks_conducted_on,
                 'Other countries being considered': join_attr_values(

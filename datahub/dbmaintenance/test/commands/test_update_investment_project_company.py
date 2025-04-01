@@ -16,7 +16,6 @@ def test_run(s3_stubber):
 
     investment_projects = [
         # investment project in CSV doesn't exist so row should fail
-
         # fields should get updated
         InvestmentProjectFactory(
             investor_company=None,
@@ -66,7 +65,6 @@ def test_run(s3_stubber):
             uk_company=companies[17],
             uk_company_decided=True,
         ),
-
     ]
 
     file_companies = CompanyFactory.create_batch(3)

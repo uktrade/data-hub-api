@@ -54,10 +54,13 @@ def test_deleted_interaction_deleted_from_opensearch(opensearch_with_signals):
     opensearch_with_signals.indices.refresh()
 
     with pytest.raises(NotFoundError):
-        assert opensearch_with_signals.get(
-            index=InteractionSearchApp.search_model.get_write_index(),
-            id=interaction_id,
-        ) is None
+        assert (
+            opensearch_with_signals.get(
+                index=InteractionSearchApp.search_model.get_write_index(),
+                id=interaction_id,
+            )
+            is None
+        )
 
 
 def test_interaction_synced_when_dit_participant_added(opensearch_with_signals):
@@ -85,8 +88,7 @@ def test_interaction_synced_when_dit_participant_added(opensearch_with_signals):
 
 
 def test_updating_company_name_updates_interaction(opensearch_with_signals):
-    """Test that when a company name is updated, the company's interactions are synced to OpenSearch.
-    """
+    """Test that when a company name is updated, the company's interactions are synced to OpenSearch."""
     interaction = CompanyInteractionFactory()
     new_company_name = 'exogenous'
     interaction.company.name = new_company_name

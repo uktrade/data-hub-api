@@ -141,8 +141,8 @@ class RequiredChecksConductedSerializer(serializers.ModelSerializer):
         """
         if 'required_checks_conducted' in validated_data:
             if (
-                    str(validated_data['required_checks_conducted'].id)
-                    in REQUIRED_CHECKS_THAT_DO_NOT_NEED_ADDITIONAL_INFORMATION
+                str(validated_data['required_checks_conducted'].id)
+                in REQUIRED_CHECKS_THAT_DO_NOT_NEED_ADDITIONAL_INFORMATION
             ):
                 validated_data['required_checks_conducted_on'] = None
                 validated_data['required_checks_conducted_by'] = None

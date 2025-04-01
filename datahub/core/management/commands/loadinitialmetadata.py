@@ -35,9 +35,11 @@ class ExistingDataFoundError(CommandError):
 class Command(BaseCommand):
     """Loads all the metadata fixtures."""
 
-    help = ('Loads initial data for various metadata models. Only intended to be used in new '
-            'environments, and should not be used in production. Will fail if metadata records '
-            'already exist (unless --force is passed).')
+    help = (
+        'Loads initial data for various metadata models. Only intended to be used in new '
+        'environments, and should not be used in production. Will fail if metadata records '
+        'already exist (unless --force is passed).'
+    )
 
     def add_arguments(self, parser):
         """Adds additional command arguments."""

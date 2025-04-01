@@ -1510,8 +1510,7 @@ class TestUpdateCompany(APITestMixin):
         ],
     )
     def test_get_company_with_export_potential(self, score):
-        """Test imported export_potential field on a company appears as is.
-        """
+        """Test imported export_potential field on a company appears as is."""
         company = CompanyFactory(
             export_potential=score,
         )
@@ -1530,8 +1529,7 @@ class TestUpdateCompany(APITestMixin):
         ],
     )
     def test_get_company_with_great_profile_status(self, profile_status):
-        """Test imported `great_profile_status` field on a company appears as is.
-        """
+        """Test imported `great_profile_status` field on a company appears as is."""
         company = CompanyFactory(
             great_profile_status=profile_status,
         )

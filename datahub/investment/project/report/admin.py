@@ -13,11 +13,10 @@ class SPIReportAdmin(admin.ModelAdmin):
     readonly_fields = fields
 
     list_display = (
-        'created_on', 'report',
-    )
-    list_filter = (
         'created_on',
+        'report',
     )
+    list_filter = ('created_on',)
     date_hierarchy = 'created_on'
 
     def report(self, instance):

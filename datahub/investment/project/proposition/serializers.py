@@ -23,9 +23,7 @@ class CompletePropositionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Proposition
-        fields = (
-            'details',
-        )
+        fields = ('details',)
         extra_kwargs = {
             'details': {'default': ''},
         }
@@ -44,9 +42,7 @@ class AbandonPropositionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Proposition
-        fields = (
-            'details',
-        )
+        fields = ('details',)
         extra_kwargs = {
             'details': {'allow_blank': False},
         }

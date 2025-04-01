@@ -21,9 +21,11 @@ def relate_company_activity_to_interactions(batch_size=500):
     Can be used to populate the CompanyActivity with missing interactions
     or to initially populate the model.
     """
-    activity_interactions = set(CompanyActivity.objects.filter(
-        interaction__isnull=False,
-    ).values_list('interaction_id', flat=True))
+    activity_interactions = set(
+        CompanyActivity.objects.filter(
+            interaction__isnull=False,
+        ).values_list('interaction_id', flat=True),
+    )
 
     interactions = Interaction.objects.filter(
         company_id__isnull=False,
@@ -177,7 +179,8 @@ def relate_company_activity_to_eyb_lead(batch_size=500):
     objs = [
         CompanyActivity(
             eyb_lead_id=eyb_lead['id'],
-            date=eyb_lead['triage_created'] if eyb_lead['triage_created'] is not None
+            date=eyb_lead['triage_created']
+            if eyb_lead['triage_created'] is not None
             else eyb_lead['created_on'],
             company_id=eyb_lead['company_id'],
             activity_source=CompanyActivity.ActivitySource.eyb_lead,
@@ -190,8 +193,7 @@ def relate_company_activity_to_eyb_lead(batch_size=500):
 
 
 def schedule_sync_data_to_company_activity(relate_function):
-    """Schedules a task for the given function.
-    """
+    """Schedules a task for the given function."""
     job = job_scheduler(
         queue_name=LONG_RUNNING_QUEUE,
         function=relate_function,
@@ -210,7 +212,7 @@ def bulk_create_activity(objs, batch_size):
     initial = 0
 
     while True:
-        batch = objs[initial: initial + batch_size]
+        batch = objs[initial : initial + batch_size]
         if not batch:
             logger.info('Finished bulk creating CompanyActivities.')
             break

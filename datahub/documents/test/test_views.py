@@ -1,4 +1,5 @@
 """Tests for generic document views."""
+
 import logging
 import uuid
 from datetime import (
@@ -433,8 +434,10 @@ class TestCreateGenericDocumentView(APITestMixin):
         response = api_client.post(DOCUMENT_COLLECTION_URL, data=payload)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data['non_field_errors'][0] == \
-            f'Related object with id {non_existent_related_object_id} does not exist.'
+        assert (
+            response.data['non_field_errors'][0]
+            == f'Related object with id {non_existent_related_object_id} does not exist.'
+        )
 
 
 class TestCreateCompanySharePointDocumentView(APITestMixin):

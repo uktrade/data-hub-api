@@ -42,14 +42,14 @@ class Command(BaseCommand):
                     company.save(update_fields=('export_potential',))
                     reversion.set_comment('Export potential updated via management command.')
 
-                self.stdout.write(self.style.SUCCESS(
-                    f'Successfully updated Company ID {company_id}'),
+                self.stdout.write(
+                    self.style.SUCCESS(f'Successfully updated Company ID {company_id}'),
                 )
             else:
                 self.stdout.write(
                     self.style.SUCCESS(f'Would update Company ID {company_id} (SIMULATED)'),
                 )
         else:
-            self.stdout.write(self.style.SUCCESS(
-                f'{company_id} already has the desired export potential score'),
+            self.stdout.write(
+                self.style.SUCCESS(f'{company_id} already has the desired export potential score'),
             )

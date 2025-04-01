@@ -36,10 +36,13 @@ def test_set_export_enquirer_country(caplog):
     # execute job
     with caplog.at_level(logging.INFO):
         call_command('set_export_enquirer_country')
-        assert 'Found 2 GreatExportEnquiry enquiries with no company address country.' \
+        assert (
+            'Found 2 GreatExportEnquiry enquiries with no company address country.' in caplog.text
+        )
+        assert (
+            'Found 1 GreatExportEnquiry enquiring companies with no address country.'
             in caplog.text
-        assert 'Found 1 GreatExportEnquiry enquiring companies with no address country.' \
-            in caplog.text
+        )
         assert 'Finished modifying GreatExportEnquiry companies without a country.' in caplog.text
 
     # final assertions
@@ -60,6 +63,7 @@ def test_set_export_enquirer_country_handles_error(mock_filter, caplog):
     mock_filter.side_effect = Exception('A generic test exception')
     with caplog.at_level(logging.ERROR):
         call_command('set_export_enquirer_country')
-        assert \
-            'An error occurred trying to modify GreatExportEnquiry companies without a country:' \
+        assert (
+            'An error occurred trying to modify GreatExportEnquiry companies without a country:'
             in caplog.text
+        )

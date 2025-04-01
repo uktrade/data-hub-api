@@ -26,12 +26,16 @@ class Command(BaseCommand):
 
         interactions_to_update = InteractionDITParticipant.objects.filter(adviser=inactive_advisor)
 
-        self.stdout.write(self.style.SUCCESS(
-            f'{interactions_to_update.count()} interactions will be updated' # noqa
-        ))
+        self.stdout.write(
+            self.style.SUCCESS(
+                f'{interactions_to_update.count()} interactions will be updated'  # noqa
+            ),
+        )
 
         interactions_to_update.update(adviser=active_advisor)
 
-        self.stdout.write(self.style.SUCCESS(
-            f'Successully merged interactions from {inactive_advisor} into {active_advisor}' # noqa
-        ))
+        self.stdout.write(
+            self.style.SUCCESS(
+                f'Successully merged interactions from {inactive_advisor} into {active_advisor}'  # noqa
+            ),
+        )

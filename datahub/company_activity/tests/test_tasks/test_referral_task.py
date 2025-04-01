@@ -12,12 +12,10 @@ from datahub.company_referral.test.factories import CompanyReferralFactory
 
 @pytest.mark.django_db
 class TestCompanyActivityReferralTasks:
-    """Tests for the schedule_sync_referrals_to_company_activity task.
-    """
+    """Tests for the schedule_sync_referrals_to_company_activity task."""
 
     def test_referral_are_copied_to_company_activity(self):
-        """Test that referrals are added to the CompanyActivity model.
-        """
+        """Test that referrals are added to the CompanyActivity model."""
         referral = CompanyReferralFactory()
         CompanyReferralFactory()
         CompanyReferralFactory()
@@ -54,8 +52,7 @@ class TestCompanyActivityReferralTasks:
 
     @mock.patch('datahub.company_activity.models.CompanyActivity.objects.bulk_create')
     def test_referrals_are_bulk_created_in_batches(self, mocked_bulk_create, caplog):
-        """Test that referrals are bulk created in batches.
-        """
+        """Test that referrals are bulk created in batches."""
         caplog.set_level('INFO')
         batch_size = 5
 
@@ -70,14 +67,9 @@ class TestCompanyActivityReferralTasks:
         assert mocked_bulk_create.call_count == 2
 
         assert (
-            f'Creating in batches of: {batch_size} CompanyActivities. 10 remaining.'
-            in caplog.text
+            f'Creating in batches of: {batch_size} CompanyActivities. 10 remaining.' in caplog.text
         )
         assert (
-            f'Creating in batches of: {batch_size} CompanyActivities. 5 remaining.'
-            in caplog.text
+            f'Creating in batches of: {batch_size} CompanyActivities. 5 remaining.' in caplog.text
         )
-        assert (
-            'Finished bulk creating CompanyActivities.'
-            in caplog.text
-        )
+        assert 'Finished bulk creating CompanyActivities.' in caplog.text

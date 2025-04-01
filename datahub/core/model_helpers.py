@@ -22,7 +22,8 @@ def get_related_fields(model):
     :returns: list of fields of `model` that hold references via dependent objects
     """
     return [
-        f for f in model._meta.get_fields(include_hidden=True)
+        f
+        for f in model._meta.get_fields(include_hidden=True)
         if (f.one_to_many or f.one_to_one or f.many_to_many or f.many_to_one)
         and f.auto_created
         and not f.concrete
@@ -37,7 +38,8 @@ def get_self_referential_relations(model):
     :returns: list of self-referential fields of `model`
     """
     return [
-        f for f in model._meta.get_fields(include_hidden=True)
+        f
+        for f in model._meta.get_fields(include_hidden=True)
         if (f.one_to_many or f.one_to_one or f.many_to_many or f.many_to_one)
         and not f.auto_created
         and f.concrete

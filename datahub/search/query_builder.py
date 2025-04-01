@@ -111,8 +111,7 @@ def get_search_by_entities_query(
     fields_to_include=None,
     fields_to_exclude=None,
 ):
-    """Performs filtered search for the given term across given entities.
-    """
+    """Performs filtered search for the given term across given entities."""
     filter_data = filter_data or {}
     query = []
     if term != '':

@@ -6,7 +6,6 @@ from datahub.investment_lead.test.utils import assert_datetimes
 
 
 class TestAssertDatetimes:
-
     def test_same_datetime_objects(self):
         dt = datetime(2024, 10, 14, 0, 0, tzinfo=timezone.utc)
         assert_datetimes(dt, dt)

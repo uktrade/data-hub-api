@@ -8,7 +8,7 @@ from datahub.investment.project.notification.models import NotificationInnerTemp
 class NotificationInnerTemplateAdmin(BaseModelAdminMixin, admin.ModelAdmin):
     """Notification inner template Admin."""
 
-    list_display = ('notification_type', )
+    list_display = ('notification_type',)
 
     def formfield_for_dbfield(self, db_field, request, **kwargs):
         """Ensure the content field retains newlines."""

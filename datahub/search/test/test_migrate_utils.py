@@ -118,8 +118,7 @@ class TestResyncAfterMigrate:
             resync_after_migrate(mock_app)
 
     def test_resync_with_old_index_referenced(self, monkeypatch, mock_opensearch_client):
-        """Test that if the old index is still referenced, resync_after_migrate() does not delete it.
-        """
+        """Test that if the old index is still referenced, resync_after_migrate() does not delete it."""
         sync_app_mock = Mock()
         monkeypatch.setattr('datahub.search.migrate_utils.sync_app', sync_app_mock)
 
@@ -160,8 +159,7 @@ class TestResyncAfterMigrate:
         mock_client.indices.delete.assert_not_called()
 
     def test_resync_with_single_read_index(self, monkeypatch, mock_opensearch_client):
-        """Test that the function aborts if the there is only a single read index.
-        """
+        """Test that the function aborts if the there is only a single read index."""
         sync_app_mock = Mock()
         monkeypatch.setattr('datahub.search.migrate_utils.sync_app', sync_app_mock)
 

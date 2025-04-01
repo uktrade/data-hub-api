@@ -44,16 +44,20 @@ class OneListReport(QuerySetReport):
     name = 'One List'
     model = Company
     permissions_required = ('company.view_company',)
-    queryset = Company.objects.filter(
-        headquarter_type_id=constants.HeadquarterType.ghq.value.id,
-        one_list_tier_id__isnull=False,
-        one_list_account_owner_id__isnull=False,
-    ).annotate(
-        primary_contact_name=get_full_name_expression('one_list_account_owner'),
-        url=get_front_end_url_expression('company', 'pk'),
-    ).order_by(
-        'one_list_tier__order',
-        'name',
+    queryset = (
+        Company.objects.filter(
+            headquarter_type_id=constants.HeadquarterType.ghq.value.id,
+            one_list_tier_id__isnull=False,
+            one_list_account_owner_id__isnull=False,
+        )
+        .annotate(
+            primary_contact_name=get_full_name_expression('one_list_account_owner'),
+            url=get_front_end_url_expression('company', 'pk'),
+        )
+        .order_by(
+            'one_list_tier__order',
+            'name',
+        )
     )
     field_titles = {
         'name': 'Account Name',

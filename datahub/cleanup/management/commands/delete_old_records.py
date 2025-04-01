@@ -18,7 +18,10 @@ CONTACT_MODIFIED_ON_CUT_OFF = datetime(2014, 7, 22, tzinfo=timezone.utc)  # 2014
 CONTACT_EXPIRY_PERIOD = relativedelta(years=10)
 INTERACTION_EXPIRY_PERIOD = relativedelta(years=10)
 INVESTMENT_PROJECT_MODIFIED_ON_CUT_OFF = datetime(
-    2013, 11, 23, tzinfo=timezone.utc,
+    2013,
+    11,
+    23,
+    tzinfo=timezone.utc,
 )  # 2013-11-22 + 1 day
 INVESTMENT_PROJECT_EXPIRY_PERIOD = relativedelta(years=10)
 ORDER_MODIFIED_ON_CUT_OFF = datetime(2014, 7, 12, tzinfo=timezone.utc)  # 2014-07-11 + 1 day

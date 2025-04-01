@@ -285,8 +285,7 @@ class ContactV4Serializer(ContactSerializer):
 
 
 class CompanyExportCountrySerializer(serializers.ModelSerializer):
-    """Export country serializer holding `Country` and its status.
-    """
+    """Export country serializer holding `Country` and its status."""
 
     country = NestedRelatedField(meta_models.Country)
 
@@ -415,8 +414,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
                 self.fields[field].read_only = True
 
     def validate(self, data):
-        """Performs cross-field validation and adds extra fields to data.
-        """
+        """Performs cross-field validation and adds extra fields to data."""
         combiner = DataCombiner(self.instance, data)
 
         if {'global_headquarters', 'headquarter_type'} & data.keys():
@@ -476,24 +474,21 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         return global_headquarters
 
     def get_one_list_group_tier(self, obj):
-        """:returns: the One List Tier for the group that company `obj` is part of.
-        """
+        """:returns: the One List Tier for the group that company `obj` is part of."""
         one_list_tier = obj.get_one_list_group_tier()
 
         field = NestedRelatedField(OneListTier)
         return field.to_representation(one_list_tier)
 
     def get_one_list_group_global_account_manager(self, obj):
-        """:returns: the One List Global Account Manager for the group that company `obj` is part of.
-        """
+        """:returns: the One List Global Account Manager for the group that company `obj` is part of."""
         global_account_manager = obj.get_one_list_group_global_account_manager()
 
         field = NestedAdviserWithEmailAndTeamGeographyField()
         return field.to_representation(global_account_manager)
 
     def get_turnover_gbp(self, obj) -> Optional[float]:
-        """:returns: Turnover value in GBP if turnover is not None, otherwise return None
-        """
+        """:returns: Turnover value in GBP if turnover is not None, otherwise return None"""
         if obj.turnover is not None:
             return convert_usd_to_gbp(obj.turnover)
         else:
@@ -748,8 +743,7 @@ class SelfAssignAccountManagerSerializer(serializers.Serializer):
 
 
 class _RemoveCompanyFromOneListSerializer(serializers.Serializer):
-    """Serialiser for removing company from One list.
-    """
+    """Serialiser for removing company from One list."""
 
     def save(self, by):
         """Unset the company's One List account manager and tier."""
@@ -807,8 +801,7 @@ class RemoveCompanyFromOneListSerializer(_RemoveCompanyFromOneListSerializer):
 
 
 class AssignOneListTierAndGlobalAccountManagerSerializer(serializers.Serializer):
-    """Serializer for assigning One List tier and global account manager to a company.
-    """
+    """Serializer for assigning One List tier and global account manager to a company."""
 
     excluded_one_list_tier_id = OneListTierID.tier_d_international_trade_advisers.value
 
@@ -837,8 +830,7 @@ class AssignOneListTierAndGlobalAccountManagerSerializer(serializers.Serializer)
         return one_list_tier
 
     def validate(self, attrs):
-        """Validate that given one list tier and global account manager can be assigned to a company.
-        """
+        """Validate that given one list tier and global account manager can be assigned to a company."""
         attrs = super().validate(attrs)
 
         if self.instance.global_headquarters:

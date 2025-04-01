@@ -79,8 +79,7 @@ class InteractionFactoryBase(factory.django.DjangoModelFactory):
 
     @to_many_field
     def companies(self):
-        """Add support for setting `companies`.
-        """
+        """Add support for setting `companies`."""
         return [self.company] if self.company else []
 
     @to_many_field
@@ -125,8 +124,7 @@ class CompaniesInteractionFactory(InteractionFactoryBase):
 
     @to_many_field
     def companies(self):
-        """Add support for setting `companies`.
-        """
+        """Add support for setting `companies`."""
         return [CompanyFactory()]
 
 
@@ -206,8 +204,7 @@ class CompanyInteractionFactoryWithRelatedTradeAgreements(CompanyInteractionFact
 
     @to_many_field
     def related_trade_agreements(self):
-        """related_trade_agreements field.
-        """
+        """related_trade_agreements field."""
         return TradeAgreement.objects.all()[:3]
 
 
@@ -219,10 +216,16 @@ class ServiceDeliveryFactory(InteractionFactoryBase):
         lambda: random_obj_for_model(ServiceDeliveryStatus),
     )
     grant_amount_offered = factory.Faker(
-        'pydecimal', left_digits=4, right_digits=2, positive=True,
+        'pydecimal',
+        left_digits=4,
+        right_digits=2,
+        positive=True,
     )
     net_company_receipt = factory.Faker(
-        'pydecimal', left_digits=4, right_digits=2, positive=True,
+        'pydecimal',
+        left_digits=4,
+        right_digits=2,
+        positive=True,
     )
 
     class Meta:
@@ -240,10 +243,11 @@ class EventServiceDeliveryFactory(InteractionFactoryBase):
 class InteractionDITParticipantFactory(factory.django.DjangoModelFactory):
     """Factory for a DIT participant in an interaction."""
 
-    interaction = factory.SubFactory(CompanyInteractionFactory,
-                                     dit_participants=[],
-                                     contacts=[],
-                                     )
+    interaction = factory.SubFactory(
+        CompanyInteractionFactory,
+        dit_participants=[],
+        contacts=[],
+    )
     adviser = factory.SubFactory(AdviserFactory)
     team = factory.SelfAttribute('adviser.dit_team')
 
@@ -300,8 +304,7 @@ class CompaniesInteractionWithExportBarrierOtherFactory(CompanyInteractionFactor
 
     @to_many_field
     def export_barrier_types(self):
-        """Add "other" export barrier type.
-        """
+        """Add "other" export barrier type."""
         return [constants.ExportBarrierType.other.value.id]
 
 
@@ -313,6 +316,5 @@ class CompaniesInteractionWithExportBarrierFinanceFactory(CompanyInteractionFact
 
     @to_many_field
     def export_barrier_types(self):
-        """Add "other" export barrier type.
-        """
+        """Add "other" export barrier type."""
         return [constants.ExportBarrierType.finance.value.id]

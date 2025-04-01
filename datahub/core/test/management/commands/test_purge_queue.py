@@ -8,7 +8,6 @@ from datahub.core.management.commands import purge_queue
 
 @pytest.mark.django_db
 class TestPurgeQueueCommandShould:
-
     def test_fail_when_no_arguments_assigned(self):
         command = purge_queue.Command()
 
@@ -51,9 +50,7 @@ class TestPurgeQueueCommandShould:
         success_message = call_command(command, 'test-rq-health', '--queue_state=queued')
 
         assert 'Successfully purged queued on test-rq-health queue' in success_message
-        assert call().__enter__().purge('test-rq-health', 'queued') in (
-            mock_scheduler.mock_calls
-        )
+        assert call().__enter__().purge('test-rq-health', 'queued') in (mock_scheduler.mock_calls)
 
     def test_purging_failed_queues_succeeds(self, monkeypatch):
         mock_scheduler = MagicMock()
@@ -66,6 +63,4 @@ class TestPurgeQueueCommandShould:
 
         success_message = call_command(command, 'long-running', '--queue_state=failed')
         assert 'Successfully purged failed on long-running queue' in success_message
-        assert call().__enter__().purge('long-running', 'failed') in (
-            mock_scheduler.mock_calls
-        )
+        assert call().__enter__().purge('long-running', 'failed') in (mock_scheduler.mock_calls)

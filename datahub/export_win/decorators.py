@@ -48,7 +48,10 @@ def validate_script_and_html_tags(view_method):
     def wrapper(self, request, *args, **kwargs):
         data_str = request.data if isinstance(request.data, str) else json.dumps(request.data)
         if contains_disallowed_content(data_str):
-            return Response({'error': 'Input contains disallowed HTML or script tags or symbols'},
-                            status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'error': 'Input contains disallowed HTML or script tags or symbols'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         return view_method(self, request, *args, **kwargs)
+
     return wrapper

@@ -28,14 +28,12 @@ class ExportCountryHistoryView(SearchAPIView):
         'company',
         'date',
         'id',
-
         # Export country history object fields
         'country',
         'history_date',
         'history_type',
         'history_user',
         'status',
-
         # Interaction fields
         'contacts',
         'dit_participants',
@@ -64,8 +62,7 @@ class ExportCountryHistoryView(SearchAPIView):
     serializer_class = SearchExportCountryHistorySerializer
 
     def get_entities(self):
-        """Overriding to provide multiple entities.
-        """
+        """Overriding to provide multiple entities."""
         return [self.search_app.search_model, Interaction]
 
     def get_base_query(self, request, validated_data):

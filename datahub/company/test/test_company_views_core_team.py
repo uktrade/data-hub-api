@@ -189,8 +189,7 @@ class TestOneListGroupCoreTeam(APITestMixin):
         ]
 
     def test_404_with_invalid_company(self):
-        """Test that if the company doesn't exist, the endpoint returns 404.
-        """
+        """Test that if the company doesn't exist, the endpoint returns 404."""
         url = reverse(
             'api-v4:company:one-list-group-core-team',
             kwargs={'pk': '00000000-0000-0000-0000-000000000000'},
@@ -248,18 +247,18 @@ class TestUpdateOneListCoreTeam(APITestMixin):
             for core_team_member in one_list_company.one_list_core_team_members.all()
         ]
 
-        new_core_team_members = [
-            adviser.id for adviser in AdviserFactory.create_batch(2)
-        ] if new_team_count else []
+        new_core_team_members = (
+            [adviser.id for adviser in AdviserFactory.create_batch(2)] if new_team_count else []
+        )
 
         response = api_client.patch(
             url,
             {
-                'core_team_members':
-                [
+                'core_team_members': [
                     {
                         'adviser': adviser_id,
-                    } for adviser_id in new_core_team_members
+                    }
+                    for adviser_id in new_core_team_members
                 ],
             },
         )
@@ -319,7 +318,11 @@ class TestUpdateOneListCoreTeam(APITestMixin):
         api_client = self.create_api_client(user=one_list_editor)
 
         self._assert_update_core_team_members(
-            one_list_company, existing_team_count, new_team_count, api_client)
+            one_list_company,
+            existing_team_count,
+            new_team_count,
+            api_client,
+        )
 
     @pytest.mark.parametrize(
         ('existing_team_count', 'new_team_count'),
@@ -339,7 +342,11 @@ class TestUpdateOneListCoreTeam(APITestMixin):
         """
         api_client, company = self._one_list_account_owner_api_client()
         self._assert_update_core_team_members(
-            company, existing_team_count, new_team_count, api_client)
+            company,
+            existing_team_count,
+            new_team_count,
+            api_client,
+        )
 
     def test_returns_403_if_account_manager_updates_other_company(self):
         """Test that a 403 is returned if an account manager tries to update the core team from
@@ -362,21 +369,19 @@ class TestUpdateOneListCoreTeam(APITestMixin):
         response = api_client.patch(
             url,
             {
-                'core_team_members':
-                [
+                'core_team_members': [
                     {
                         'adviser': adviser_id,
                     },
-                ] * 2,
+                ]
+                * 2,
             },
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
-            'core_team_members':
-            [
+            'core_team_members': [
                 {
-                    'adviser':
-                    [
+                    'adviser': [
                         'You cannot add the same adviser more than once.',
                     ],
                 },

@@ -24,99 +24,113 @@ logger = logging.getLogger(__name__)
 def _automatic_adviser_deactivate(limit=1000, simulate=False):
     two_years_ago = date.today() - relativedelta(years=2)
     advisers_to_be_deactivated = Advisor.objects.filter(
-        ~Exists(Interaction.objects.filter(
-            (
-                Q(date__gte=two_years_ago)
-                | Q(modified_on__gte=two_years_ago)
-            )
-            & (
-                Q(created_by_id=OuterRef('pk'))
-                | Q(modified_by_id=OuterRef('pk'))
-                | Q(archived_by_id=OuterRef('pk'))
-                | Q(dit_participants__adviser_id=OuterRef('pk'))
+        ~Exists(
+            Interaction.objects.filter(
+                (Q(date__gte=two_years_ago) | Q(modified_on__gte=two_years_ago))
+                & (
+                    Q(created_by_id=OuterRef('pk'))
+                    | Q(modified_by_id=OuterRef('pk'))
+                    | Q(archived_by_id=OuterRef('pk'))
+                    | Q(dit_participants__adviser_id=OuterRef('pk'))
+                ),
             ),
-        )),
-        ~Exists(CompanyReferral.objects.filter(
-            Q(modified_on__gte=two_years_ago)
-            & (
-                Q(created_by_id=OuterRef('pk'))
-                | Q(modified_by_id=OuterRef('pk'))
-                | Q(completed_by_id=OuterRef('pk'))
-            ),
-        )),
-        ~Exists(Company.objects.filter(
-            Q(modified_on__gte=two_years_ago)
-            & (
-                Q(created_by_id=OuterRef('pk'))
-                | Q(modified_by_id=OuterRef('pk'))
-                | Q(archived_by_id=OuterRef('pk'))
-                | Q(one_list_account_owner_id=OuterRef('pk'))
-                | Q(transferred_by_id=OuterRef('pk'))
-            ),
-        )),
-        ~Exists(Contact.objects.filter(
-            Q(modified_on__gte=two_years_ago)
-            & (
-                Q(created_by_id=OuterRef('pk'))
-                | Q(modified_by_id=OuterRef('pk'))
-                | Q(archived_by_id=OuterRef('pk'))
-                | Q(adviser_id=OuterRef('pk'))
-            ),
-        )),
-        ~Exists(Order.objects.filter(
-            (
+        ),
+        ~Exists(
+            CompanyReferral.objects.filter(
                 Q(modified_on__gte=two_years_ago)
-                | Q(paid_on__gte=two_years_ago)
-                | Q(completed_on__gte=two_years_ago)
-                | Q(cancelled_on__gte=two_years_ago)
-            )
-            & (
-                Q(created_by_id=OuterRef('pk'))
-                | Q(modified_by_id=OuterRef('pk'))
-                | Q(completed_by_id=OuterRef('pk'))
-                | Q(cancelled_by_id=OuterRef('pk'))
-                | Q(assignees__adviser_id=OuterRef('pk'))
-                | Q(subscribers__adviser_id=OuterRef('pk'))
+                & (
+                    Q(created_by_id=OuterRef('pk'))
+                    | Q(modified_by_id=OuterRef('pk'))
+                    | Q(completed_by_id=OuterRef('pk'))
+                ),
             ),
-        )),
-        ~Exists(LargeCapitalOpportunity.objects.filter(
-            Q(modified_on__gte=two_years_ago)
-            & (
-                Q(created_by_id=OuterRef('pk'))
-                | Q(modified_by_id=OuterRef('pk'))
-            ),
-        )),
-        ~Exists(InvestmentProject.objects.filter(
-            Q(modified_on__gte=two_years_ago)
-            & (
-                Q(created_by_id=OuterRef('pk'))
-                | Q(modified_by_id=OuterRef('pk'))
-                | Q(archived_by_id=OuterRef('pk'))
-                | Q(client_relationship_manager_id=OuterRef('pk'))
-                | Q(project_manager_id=OuterRef('pk'))
-                | Q(project_manager_first_assigned_by_id=OuterRef('pk'))
-                | Q(referral_source_adviser_id=OuterRef('pk'))
-                | Q(project_assurance_adviser_id=OuterRef('pk'))
-            ),
-        )),
-        ~Exists(Event.objects.filter(
-            (
+        ),
+        ~Exists(
+            Company.objects.filter(
                 Q(modified_on__gte=two_years_ago)
-                | Q(start_date__gte=two_years_ago)
-                | Q(end_date__gte=two_years_ago)
-            )
-            & (
-                Q(created_by_id=OuterRef('pk'))
-                | Q(modified_by_id=OuterRef('pk'))
-                | Q(organiser_id=OuterRef('pk'))
+                & (
+                    Q(created_by_id=OuterRef('pk'))
+                    | Q(modified_by_id=OuterRef('pk'))
+                    | Q(archived_by_id=OuterRef('pk'))
+                    | Q(one_list_account_owner_id=OuterRef('pk'))
+                    | Q(transferred_by_id=OuterRef('pk'))
+                ),
             ),
-        )),
-        ~Exists(OneListCoreTeamMember.objects.filter(
-            (Q(adviser_id=OuterRef('pk'))),
-        )),
-        ~Exists(InvestmentProjectTeamMember.objects.filter(
-            (Q(adviser_id=OuterRef('pk'))),
-        )),
+        ),
+        ~Exists(
+            Contact.objects.filter(
+                Q(modified_on__gte=two_years_ago)
+                & (
+                    Q(created_by_id=OuterRef('pk'))
+                    | Q(modified_by_id=OuterRef('pk'))
+                    | Q(archived_by_id=OuterRef('pk'))
+                    | Q(adviser_id=OuterRef('pk'))
+                ),
+            ),
+        ),
+        ~Exists(
+            Order.objects.filter(
+                (
+                    Q(modified_on__gte=two_years_ago)
+                    | Q(paid_on__gte=two_years_ago)
+                    | Q(completed_on__gte=two_years_ago)
+                    | Q(cancelled_on__gte=two_years_ago)
+                )
+                & (
+                    Q(created_by_id=OuterRef('pk'))
+                    | Q(modified_by_id=OuterRef('pk'))
+                    | Q(completed_by_id=OuterRef('pk'))
+                    | Q(cancelled_by_id=OuterRef('pk'))
+                    | Q(assignees__adviser_id=OuterRef('pk'))
+                    | Q(subscribers__adviser_id=OuterRef('pk'))
+                ),
+            ),
+        ),
+        ~Exists(
+            LargeCapitalOpportunity.objects.filter(
+                Q(modified_on__gte=two_years_ago)
+                & (Q(created_by_id=OuterRef('pk')) | Q(modified_by_id=OuterRef('pk'))),
+            ),
+        ),
+        ~Exists(
+            InvestmentProject.objects.filter(
+                Q(modified_on__gte=two_years_ago)
+                & (
+                    Q(created_by_id=OuterRef('pk'))
+                    | Q(modified_by_id=OuterRef('pk'))
+                    | Q(archived_by_id=OuterRef('pk'))
+                    | Q(client_relationship_manager_id=OuterRef('pk'))
+                    | Q(project_manager_id=OuterRef('pk'))
+                    | Q(project_manager_first_assigned_by_id=OuterRef('pk'))
+                    | Q(referral_source_adviser_id=OuterRef('pk'))
+                    | Q(project_assurance_adviser_id=OuterRef('pk'))
+                ),
+            ),
+        ),
+        ~Exists(
+            Event.objects.filter(
+                (
+                    Q(modified_on__gte=two_years_ago)
+                    | Q(start_date__gte=two_years_ago)
+                    | Q(end_date__gte=two_years_ago)
+                )
+                & (
+                    Q(created_by_id=OuterRef('pk'))
+                    | Q(modified_by_id=OuterRef('pk'))
+                    | Q(organiser_id=OuterRef('pk'))
+                ),
+            ),
+        ),
+        ~Exists(
+            OneListCoreTeamMember.objects.filter(
+                (Q(adviser_id=OuterRef('pk'))),
+            ),
+        ),
+        ~Exists(
+            InvestmentProjectTeamMember.objects.filter(
+                (Q(adviser_id=OuterRef('pk'))),
+            ),
+        ),
         date_joined__lt=two_years_ago,
         is_active=True,
         sso_email_user_id__isnull=True,
@@ -154,10 +168,8 @@ def schedule_automatic_adviser_deactivate(limit=1000, simulate=False):
 
 
 def automatic_adviser_deactivate(limit=1000, simulate=False):
-    """Deactivate inactive advisers.
-    """
+    """Deactivate inactive advisers."""
     with advisory_lock('automatic_adviser_deactivate', wait=False) as acquired:
-
         if not acquired:
             logger.info('Another instance of this task is already running.')
             return

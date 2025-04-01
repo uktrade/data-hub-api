@@ -137,7 +137,8 @@ def company_names_and_postcodes(opensearch_with_collector):
             ('company_se1_3', 'SE13AJ'),
             ('company_se2', 'SE23AJ'),
             ('company_se3', 'SE33AJ'),
-        ), strict=False,
+        ),
+        strict=False,
     )
 
     CompanyFactory.create_batch(
@@ -752,8 +753,7 @@ class TestSearch(APITestMixin):
         self,
         opensearch_with_collector,
     ):
-        """Tests that one list account manager filter searches for inherited one list account manager.
-        """
+        """Tests that one list account manager filter searches for inherited one list account manager."""
         account_manager = AdviserFactory()
         CompanyFactory.create_batch(2)
 

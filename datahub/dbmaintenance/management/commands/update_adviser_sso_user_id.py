@@ -31,8 +31,7 @@ class Command(BaseCommand):
 
     @disable_search_signal_receivers(Advisor)
     def handle(self, *args, **options):
-        """Updates SSO user ID.
-        """
+        """Updates SSO user ID."""
         is_simulation = options['simulate']
         num_skipped = 0
         num_errored = 0

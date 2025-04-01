@@ -62,7 +62,9 @@ class Command(CSVBaseCommand):
             raise error
 
     def is_duns_already_assigned_to_another_company(
-        self, company: Company, duns_number: str,
+        self,
+        company: Company,
+        duns_number: str,
     ) -> bool:
         """If another company exists with the target duns, this is an issue as duns numbers are
         unique. These are logged individually.
@@ -132,8 +134,7 @@ class Command(CSVBaseCommand):
         return False
 
     def handle(self, *args, **options):
-        """Process the CSV file and logs some additional logging to help with the company duns update.
-        """
+        """Process the CSV file and logs some additional logging to help with the company duns update."""
         super().handle(*args, **options)
         logger.info('Errors:')
         logger.info(f'{self.additional_logging["errors"]}')

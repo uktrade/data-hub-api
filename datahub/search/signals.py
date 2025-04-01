@@ -97,7 +97,8 @@ def disable_search_signal_receivers(sender):
     also stop contacts from being synced when a companies is modified.
     """
     signal_receivers = [
-        receiver for search_app in get_search_apps()
+        receiver
+        for search_app in get_search_apps()
         for receiver in search_app.get_signal_receivers()
         if receiver.sender == sender and receiver.is_enabled
     ]

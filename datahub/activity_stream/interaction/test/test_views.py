@@ -48,8 +48,11 @@ def test_interaction_activity(api_client, factory):
                 'dit:exportBarrierTypes': [
                     {'name': barrier.name} for barrier in interaction.export_barrier_types.all()
                 ],
-                **({'dit:exportBarrierNotes': interaction.export_barrier_notes}
-                    if interaction.export_barrier_notes else {}),
+                **(
+                    {'dit:exportBarrierNotes': interaction.export_barrier_notes}
+                    if interaction.export_barrier_notes
+                    else {}
+                ),
             },
         )
 
@@ -59,8 +62,8 @@ def test_interaction_activity(api_client, factory):
         'summary': 'Interaction Activities',
         'type': 'OrderedCollectionPage',
         'next': 'http://testserver/v3/activity-stream/interaction'
-                + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
-                + f'&cursor={str(interaction.id)}',
+        + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
+        + f'&cursor={str(interaction.id)}',
         'orderedItems': [
             {
                 'id': f'dit:DataHubInteraction:{interaction.id}:Announce',
@@ -97,8 +100,8 @@ def test_interaction_activity(api_client, factory):
                             {
                                 'id': f'dit:DataHubAdviser:{participant.adviser.pk}',
                                 'type': ['Person', 'dit:Adviser'],
-                                'dit:emailAddress':
-                                    participant.adviser.contact_email or participant.adviser.email,
+                                'dit:emailAddress': participant.adviser.contact_email
+                                or participant.adviser.email,
                                 'name': participant.adviser.name,
                                 'dit:team': {
                                     'id': f'dit:DataHubTeam:{participant.team.pk}',
@@ -146,8 +149,8 @@ def test_interaction_investment_project_activity(api_client):
         'summary': 'Interaction Activities',
         'type': 'OrderedCollectionPage',
         'next': 'http://testserver/v3/activity-stream/interaction'
-                + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
-                + f'&cursor={str(interaction.id)}',
+        + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
+        + f'&cursor={str(interaction.id)}',
         'orderedItems': [
             {
                 'id': f'dit:DataHubInteraction:{interaction.id}:Announce',
@@ -184,8 +187,8 @@ def test_interaction_investment_project_activity(api_client):
                             {
                                 'id': f'dit:DataHubAdviser:{participant.adviser.pk}',
                                 'type': ['Person', 'dit:Adviser'],
-                                'dit:emailAddress':
-                                    participant.adviser.contact_email or participant.adviser.email,
+                                'dit:emailAddress': participant.adviser.contact_email
+                                or participant.adviser.email,
                                 'name': participant.adviser.name,
                                 'dit:team': {
                                     'id': f'dit:DataHubTeam:{participant.team.pk}',
@@ -239,8 +242,8 @@ def test_service_delivery_activity(api_client):
         'summary': 'Interaction Activities',
         'type': 'OrderedCollectionPage',
         'next': 'http://testserver/v3/activity-stream/interaction'
-                + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
-                + f'&cursor={str(interaction.id)}',
+        + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
+        + f'&cursor={str(interaction.id)}',
         'orderedItems': [
             {
                 'id': f'dit:DataHubInteraction:{interaction.id}:Announce',
@@ -276,8 +279,8 @@ def test_service_delivery_activity(api_client):
                             {
                                 'id': f'dit:DataHubAdviser:{participant.adviser.pk}',
                                 'type': ['Person', 'dit:Adviser'],
-                                'dit:emailAddress':
-                                    participant.adviser.contact_email or participant.adviser.email,
+                                'dit:emailAddress': participant.adviser.contact_email
+                                or participant.adviser.email,
                                 'name': participant.adviser.name,
                                 'dit:team': {
                                     'id': f'dit:DataHubTeam:{participant.team.pk}',
@@ -324,8 +327,8 @@ def test_service_delivery_event_activity(api_client):
         'summary': 'Interaction Activities',
         'type': 'OrderedCollectionPage',
         'next': 'http://testserver/v3/activity-stream/interaction'
-                + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
-                + f'&cursor={str(interaction.id)}',
+        + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
+        + f'&cursor={str(interaction.id)}',
         'orderedItems': [
             {
                 'id': f'dit:DataHubInteraction:{interaction.id}:Announce',
@@ -361,8 +364,8 @@ def test_service_delivery_event_activity(api_client):
                             {
                                 'id': f'dit:DataHubAdviser:{participant.adviser.pk}',
                                 'type': ['Person', 'dit:Adviser'],
-                                'dit:emailAddress':
-                                    participant.adviser.contact_email or participant.adviser.email,
+                                'dit:emailAddress': participant.adviser.contact_email
+                                or participant.adviser.email,
                                 'name': participant.adviser.name,
                                 'dit:team': {
                                     'id': f'dit:DataHubTeam:{participant.team.pk}',
@@ -408,8 +411,7 @@ def test_service_delivery_event_activity(api_client):
 
 
 def test_kinds_mapping():
-    """Tests if the mapping covers all kinds of interactions.
-    """
+    """Tests if the mapping covers all kinds of interactions."""
     model_kinds = set(Interaction.Kind.values)
     serializer_kinds = {k for k in InteractionActivitySerializer.KINDS_JSON}
     assert model_kinds == serializer_kinds
@@ -417,8 +419,7 @@ def test_kinds_mapping():
 
 @pytest.mark.django_db
 def test_interaction_ordering(api_client):
-    """Test that the interactions are ordered by ('modified_on', 'pk').
-    """
+    """Test that the interactions are ordered by ('modified_on', 'pk')."""
     interactions = []
 
     with freeze_time() as frozen_datetime:
@@ -436,17 +437,13 @@ def test_interaction_ordering(api_client):
         f'dit:DataHubInteraction:{obj.pk}'
         for obj in sorted(interactions, key=lambda obj: (obj.modified_on, obj.pk))
     ]
-    response_interaction_ids = [
-        item['object']['id']
-        for item in response.json()['orderedItems']
-    ]
+    response_interaction_ids = [item['object']['id'] for item in response.json()['orderedItems']]
     assert sorted_interaction_ids == response_interaction_ids
 
 
 @pytest.mark.django_db
 def test_contacts_ordering(api_client):
-    """Test that contacts are ordered by `pk`.
-    """
+    """Test that contacts are ordered by `pk`."""
     with freeze_time() as frozen_datetime:
         contacts = ContactFactory.create_batch(5)
         CompaniesInteractionFactory(contacts=contacts)
@@ -457,22 +454,18 @@ def test_contacts_ordering(api_client):
     assert response.status_code == status.HTTP_200_OK
 
     sorted_contact_ids = [
-        f'dit:DataHubContact:{contact.pk}'
-        for contact in sorted(contacts, key=lambda obj: obj.pk)
+        f'dit:DataHubContact:{contact.pk}' for contact in sorted(contacts, key=lambda obj: obj.pk)
     ]
     items = response.json()['orderedItems'][0]['object']['attributedTo']
     response_contact_ids = [
-        item['id']
-        for item in items
-        if item['type'] == ['Person', 'dit:Contact']
+        item['id'] for item in items if item['type'] == ['Person', 'dit:Contact']
     ]
     assert sorted_contact_ids == response_contact_ids
 
 
 @pytest.mark.django_db
 def test_dit_participant_ordering(api_client):
-    """Test that dit_participants are ordered by `pk`.
-    """
+    """Test that dit_participants are ordered by `pk`."""
     with freeze_time() as frozen_datetime:
         interaction = CompaniesInteractionFactory(dit_participants=[])
         InteractionDITParticipantFactory.create_batch(5, interaction=interaction)
@@ -488,17 +481,14 @@ def test_dit_participant_ordering(api_client):
     ]
     items = response.json()['orderedItems'][0]['object']['attributedTo']
     response_participant_ids = [
-        item['id']
-        for item in items
-        if item['type'] == ['Person', 'dit:Adviser']
+        item['id'] for item in items if item['type'] == ['Person', 'dit:Adviser']
     ]
     assert sorted_participant_ids == response_participant_ids
 
 
 @pytest.mark.django_db
 def test_null_adviser(api_client):
-    """Test that we can handle dit_participant.adviser being None.
-    """
+    """Test that we can handle dit_participant.adviser being None."""
     with freeze_time() as frozen_datetime:
         interaction = CompaniesInteractionFactory(dit_participants=[])
         InteractionDITParticipantFactory(
@@ -514,8 +504,7 @@ def test_null_adviser(api_client):
 
 @pytest.mark.django_db
 def test_null_team(api_client):
-    """Test that we can handle dit_participant.team being None.
-    """
+    """Test that we can handle dit_participant.team being None."""
     interaction = EventServiceDeliveryFactory(dit_participants=[])
     InteractionDITParticipantFactory(
         interaction=interaction,

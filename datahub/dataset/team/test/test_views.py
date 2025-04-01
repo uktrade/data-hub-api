@@ -22,8 +22,7 @@ def get_expected_data_from_team(team):
 
 @pytest.mark.django_db
 class TestTeamDatasetViewSet(BaseDatasetViewTest):
-    """Tests for the teams data-flow export endpoint.
-    """
+    """Tests for the teams data-flow export endpoint."""
 
     view_url = reverse('api-v4:dataset:teams-dataset')
     factory = TeamFactory

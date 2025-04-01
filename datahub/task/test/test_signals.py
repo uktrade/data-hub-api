@@ -72,8 +72,7 @@ class TestTaskAdviserCompletedSubscriptions:
         self,
         schedule_notify_advisers_task_archived_completed_or_amended,
     ):
-        """Note: only the triggering of the schedule is tested not the processing of it.
-        """
+        """Note: only the triggering of the schedule is tested not the processing of it."""
         adviser = AdviserFactory()
         task = TaskFactory(advisers=[adviser])
         task.save()
@@ -92,8 +91,7 @@ class TestTaskAdviserCompletedSubscriptions:
         self,
         send_task_email,
     ):
-        """Calling with adviser completed should result in sending of TaskCompletedReminder.
-        """
+        """Calling with adviser completed should result in sending of TaskCompletedReminder."""
         adviser = AdviserFactory()
         task = TaskFactory(advisers=[adviser], status=Task.Status.COMPLETE)
         task.save()

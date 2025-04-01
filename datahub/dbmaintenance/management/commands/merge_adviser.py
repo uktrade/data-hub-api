@@ -46,17 +46,23 @@ class Command(BaseCommand):
         for model, fields in model_fields_dict.items():
             for field in fields:
                 instances_to_update = model.objects.filter(**{field: inactive_advisor})
-                self.stdout.write(self.style.SUCCESS(
-                    f'{instances_to_update.count()} instances of {model.__name__} will be updated'  # noqa
-                ))
+                self.stdout.write(
+                    self.style.SUCCESS(
+                        f'{instances_to_update.count()} instances of {model.__name__} will be updated'  # noqa
+                    ),
+                )
                 instances_to_update.update(**{field: active_advisor})
-                self.stdout.write(self.style.SUCCESS(
-                    f'Successfully merged {model.__name__} instances from adviser {inactive_advisor_id} into {active_advisor_id}'  # noqa
-                ))
+                self.stdout.write(
+                    self.style.SUCCESS(
+                        f'Successfully merged {model.__name__} instances from adviser {inactive_advisor_id} into {active_advisor_id}'  # noqa
+                    ),
+                )
 
         # Once all instances have been updated, delete the inactive advisor
         inactive_advisor.delete()
 
-        self.stdout.write(self.style.SUCCESS(
-            f'Successfully deleted inactive advisor {inactive_advisor_id}'  # noqa
-        ))
+        self.stdout.write(
+            self.style.SUCCESS(
+                f'Successfully deleted inactive advisor {inactive_advisor_id}'  # noqa
+            ),
+        )

@@ -15,7 +15,5 @@ def model_to_dict_company(obj):
         'website',
     )
     return {
-        field: value
-        for field, value in model_to_dict(obj).items()
-        if field not in field_to_filter
+        field: value for field, value in model_to_dict(obj).items() if field not in field_to_filter
     }

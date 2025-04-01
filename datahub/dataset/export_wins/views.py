@@ -49,25 +49,29 @@ from datahub.metadata.query_utils import get_sector_name_subquery
 
 
 class ExportWinsAdvisersDatasetView(BaseDatasetView):
-    """A GET API view to return export win advisers.
-    """
+    """A GET API view to return export win advisers."""
 
     allow_legacy_data = False
     win_id = None
 
     def get_dataset(self):
-        if is_feature_flag_active(
-            EXPORT_WINS_LEGACY_DATASET_FEATURE_FLAG_NAME,
-        ) or self.allow_legacy_data:
+        if (
+            is_feature_flag_active(
+                EXPORT_WINS_LEGACY_DATASET_FEATURE_FLAG_NAME,
+            )
+            or self.allow_legacy_data
+        ):
             migrated_filter = {}
         else:
             migrated_filter = {
                 'win__migrated_on__isnull': True,
             }
         if self.win_id:
-            migrated_filter.update({
-                'win__id': self.win_id,
-            })
+            migrated_filter.update(
+                {
+                    'win__id': self.win_id,
+                },
+            )
 
         return (
             WinAdviser.objects.select_related('win', 'adviser', 'hq_team', 'team_type')
@@ -106,16 +110,18 @@ class ExportWinsAdvisersDatasetView(BaseDatasetView):
 
 
 class ExportWinsBreakdownsDatasetView(BaseDatasetView):
-    """A GET API view to return export win breakdowns.
-    """
+    """A GET API view to return export win breakdowns."""
 
     allow_legacy_data = False
     win_id = None
 
     def get_dataset(self):
-        if is_feature_flag_active(
-            EXPORT_WINS_LEGACY_DATASET_FEATURE_FLAG_NAME,
-        ) or self.allow_legacy_data:
+        if (
+            is_feature_flag_active(
+                EXPORT_WINS_LEGACY_DATASET_FEATURE_FLAG_NAME,
+            )
+            or self.allow_legacy_data
+        ):
             migrated_filter = {}
         else:
             migrated_filter = {
@@ -123,9 +129,11 @@ class ExportWinsBreakdownsDatasetView(BaseDatasetView):
             }
 
         if self.win_id:
-            migrated_filter.update({
-                'win__id': self.win_id,
-            })
+            migrated_filter.update(
+                {
+                    'win__id': self.win_id,
+                },
+            )
 
         return (
             Breakdown.objects.select_related('win', 'breakdown_type')
@@ -166,8 +174,7 @@ class ExportWinsBreakdownsDatasetView(BaseDatasetView):
 
 
 class ExportWinsHVCDatasetView(BaseFilterDatasetView):
-    """A GET API view to return export win HVCs.
-    """
+    """A GET API view to return export win HVCs."""
 
     pagination_class = HVCDatasetViewCursorPagination
 
@@ -191,15 +198,17 @@ class ExportWinsHVCDatasetView(BaseFilterDatasetView):
 
 
 class ExportWinsWinDatasetView(BaseDatasetView):
-    """A GET API view to return export win wins.
-    """
+    """A GET API view to return export win wins."""
 
     allow_legacy_data = False
 
     def get_dataset(self):
-        if is_feature_flag_active(
-            EXPORT_WINS_LEGACY_DATASET_FEATURE_FLAG_NAME,
-        ) or self.allow_legacy_data:
+        if (
+            is_feature_flag_active(
+                EXPORT_WINS_LEGACY_DATASET_FEATURE_FLAG_NAME,
+            )
+            or self.allow_legacy_data
+        ):
             migrated_filter = {}
         else:
             migrated_filter = {
@@ -229,16 +238,22 @@ class ExportWinsWinDatasetView(BaseDatasetView):
                 customer_details=Subquery(
                     Contact.objects.filter(
                         wins=OuterRef('pk'),
-                    ).annotate(
+                    )
+                    .annotate(
                         details=Func(
-                            Value('name'), Concat('first_name', Value(' '), 'last_name'),
-                            Value('email'), Cast('email', CharField()),
-                            Value('job_title'), 'job_title',
+                            Value('name'),
+                            Concat('first_name', Value(' '), 'last_name'),
+                            Value('email'),
+                            Cast('email', CharField()),
+                            Value('job_title'),
+                            'job_title',
                             function='jsonb_build_object',
                         ),
-                    ).order_by(
+                    )
+                    .order_by(
                         'pk',
-                    ).values('details')[:1],
+                    )
+                    .values('details')[:1],
                     output_field=JSONField(),
                 ),
                 temp_cdms_reference=F('cdms_reference'),
@@ -444,12 +459,16 @@ class ExportWinsWinDatasetView(BaseDatasetView):
                 associated_programmes=ArraySubquery(
                     AssociatedProgramme.objects.filter(
                         win=OuterRef('pk'),
-                    ).order_by('order').values('name'),
+                    )
+                    .order_by('order')
+                    .values('name'),
                 ),
                 types_of_support=ArraySubquery(
                     SupportType.objects.filter(
                         win=OuterRef('pk'),
-                    ).order_by('order').values('name'),
+                    )
+                    .order_by('order')
+                    .values('name'),
                 ),
                 export_wins_export_experience_display=F(
                     'export_experience__export_wins_export_experience__name',

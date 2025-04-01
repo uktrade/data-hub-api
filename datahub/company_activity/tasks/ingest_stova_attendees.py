@@ -272,8 +272,7 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
 
     @staticmethod
     def get_or_create_default_stova_adviser() -> Adviser:
-        """Get or create a default fake Adviser in order to create interactions for Stova Attendees.
-        """
+        """Get or create a default fake Adviser in order to create interactions for Stova Attendees."""
         adviser, _ = Adviser.objects.get_or_create(
             email='stova_default@businessandtrade.gov.uk',
             first_name='Stova Default',
@@ -316,10 +315,12 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
             )
             interaction.contacts.add(contact)
             interaction.companies.add(company)
-            interaction.dit_participants.add(InteractionDITParticipant.objects.create(
-                adviser=adviser,
-                interaction=interaction,
-            ))
+            interaction.dit_participants.add(
+                InteractionDITParticipant.objects.create(
+                    adviser=adviser,
+                    interaction=interaction,
+                ),
+            )
             return Interaction
         except IntegrityError as error:
             logger.error(

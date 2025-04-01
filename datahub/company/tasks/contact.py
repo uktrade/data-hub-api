@@ -69,10 +69,8 @@ def schedule_automatic_contact_archive(limit=1000, simulate=False):
 
 
 def automatic_contact_archive(limit=1000, simulate=False):
-    """Archive inactive contacts.
-    """
+    """Archive inactive contacts."""
     with advisory_lock('automatic_contact_archive', wait=False) as acquired:
-
         if not acquired:
             logger.info('Another instance of this task is already running.')
             return
@@ -88,7 +86,6 @@ def automatic_contact_archive(limit=1000, simulate=False):
 
 def ingest_contact_consent_data():
     with advisory_lock('ingest_contact_consent_data', wait=False) as acquired:
-
         if not acquired:
             logger.info(
                 'Another instance of this ingest_contact_consent_data task is already running.',
@@ -101,13 +98,12 @@ def ingest_contact_consent_data():
 
 env = environ.Env()
 REGION = env('AWS_DEFAULT_REGION', default='eu-west-2')
-BUCKET = f"data-flow-bucket-{env('ENVIRONMENT', default='')}"
+BUCKET = f'data-flow-bucket-{env("ENVIRONMENT", default="")}'
 PREFIX = 'data-flow/exports/'
 CONSENT_PREFIX = f'{PREFIX}ExportConsentToS3/'
 
 
 class ContactConsentIngestionTask:
-
     def _list_objects(self, client, bucket_name, prefix):
         """Returns a list all objects with specified prefix."""
         response = client.list_objects(
@@ -171,7 +167,6 @@ class ContactConsentIngestionTask:
         return contact_dict
 
     def should_update_contact(self, contact: Contact, consent_row):
-
         last_modified = consent_row['last_modified'] if 'last_modified' in consent_row else None
 
         if contact.consent_data_last_modified is None or last_modified is None:
@@ -233,7 +228,6 @@ class ContactConsentIngestionTask:
                     continue
 
                 for contact in matching_contacts:
-
                     if not self.should_update_contact(contact, consent_row):
                         logger.info(
                             'Email %s does not need to be updated',

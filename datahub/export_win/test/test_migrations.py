@@ -9,8 +9,7 @@ from datahub.export_win.test.factories import BreakdownFactory, WinAdviserFactor
 pytestmark = pytest.mark.django_db
 
 
-class TestLegacyIdMigrations():
-
+class TestLegacyIdMigrations:
     @pytest.mark.parametrize(
         ('factory', 'model'),
         [

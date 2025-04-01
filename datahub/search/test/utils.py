@@ -2,12 +2,12 @@ from unittest.mock import Mock
 
 
 def create_mock_search_app(
-        current_mapping_hash='mapping-hash',
-        target_mapping_hash='mapping-hash',
-        read_indices=('test-index',),
-        write_index='test-index',
-        bulk_batch_size=1000,
-        queryset=None,
+    current_mapping_hash='mapping-hash',
+    target_mapping_hash='mapping-hash',
+    read_indices=('test-index',),
+    write_index='test-index',
+    bulk_batch_size=1000,
+    queryset=None,
 ):
     """Creates a mock search app."""
     mock = Mock()
@@ -40,10 +40,10 @@ def doc_count(es_client, search_app):
 
 
 def _create_mock_search_model(
-        current_mapping_hash,
-        target_mapping_hash,
-        read_indices,
-        write_index,
+    current_mapping_hash,
+    target_mapping_hash,
+    read_indices,
+    write_index,
 ):
     def db_objects_to_documents(db_objects, index=None):
         for obj in db_objects:

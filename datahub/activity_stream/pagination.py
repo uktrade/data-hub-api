@@ -49,10 +49,18 @@ class ActivityCursorPagination(BasePagination):
         `key` with a single value.
         """
         parsed = urlparse(url)
-        return urlunparse(parsed._replace(query=urlencode(tuple(
-            (_key, val) for (_key, val) in parse_qsl(parsed.query, keep_blank_values=True)
-            if _key != key
-        ) + tuple((key, val) for val in vals))))
+        return urlunparse(
+            parsed._replace(
+                query=urlencode(
+                    tuple(
+                        (_key, val)
+                        for (_key, val) in parse_qsl(parsed.query, keep_blank_values=True)
+                        if _key != key
+                    )
+                    + tuple((key, val) for val in vals),
+                ),
+            ),
+        )
 
     def paginate_queryset(self, queryset, request, view=None):
         """Returns a page of results based on the cursor query string parameter. Designed to make the
@@ -89,12 +97,13 @@ class ActivityCursorPagination(BasePagination):
         # in activities being missed when the last page is polled
         one_second_ago = datetime.now() - timedelta(seconds=1)
 
-        page = list(queryset
-                    .annotate(modified_on_id=modified_on_id)
-                    .filter(modified_on_id__gt=after_ts_id, modified_on__lt=one_second_ago)
-                    # Do not use ROW expressions in order_by: it seems to have an extremely
-                    # negative performance impact
-                    .order_by('modified_on', 'id')[:self.page_size])
+        page = list(
+            queryset.annotate(modified_on_id=modified_on_id)
+            .filter(modified_on_id__gt=after_ts_id, modified_on__lt=one_second_ago)
+            # Do not use ROW expressions in order_by: it seems to have an extremely
+            # negative performance impact
+            .order_by('modified_on', 'id')[: self.page_size],
+        )
 
         # Build and store next link for all non-empty pages to be used in get_paginated_response
         if not page:
@@ -105,7 +114,8 @@ class ActivityCursorPagination(BasePagination):
             next_after_id_str = str(final_instance.id)
             self.next_link = self._replace_query_param(
                 request.build_absolute_uri(),
-                'cursor', (next_after_ts_str, next_after_id_str),
+                'cursor',
+                (next_after_ts_str, next_after_id_str),
             )
 
         return page

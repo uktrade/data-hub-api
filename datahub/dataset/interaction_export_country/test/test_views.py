@@ -25,8 +25,7 @@ def get_expected_data_from_interaction_export_country(interaction_export_country
 
 @pytest.mark.django_db
 class TestInteractionsExportCountryDatasetViewSet(BaseDatasetViewTest):
-    """Tests for InteractionsExportCountryDatasetView.
-    """
+    """Tests for InteractionsExportCountryDatasetView."""
 
     view_url = reverse('api-v4:dataset:interactions-export-country-dataset')
     factory = InteractionExportCountryFactory
@@ -83,7 +82,9 @@ class TestInteractionsExportCountryDatasetViewSet(BaseDatasetViewTest):
 
         # Check that only contact created after the `updated_since` date are returned
         expected_ids = [str(company_interaction_country_after.id)]
-        response_ids = [interaction_export_country['id']
-                        for interaction_export_country in response.json()['results']]
+        response_ids = [
+            interaction_export_country['id']
+            for interaction_export_country in response.json()['results']
+        ]
 
         assert response_ids == expected_ids

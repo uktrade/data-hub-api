@@ -2,33 +2,43 @@ from django.urls import path
 
 from datahub.company.views import ContactAuditViewSet, ContactV4ViewSet, ContactViewSet
 
-contact_collection = ContactViewSet.as_view({
-    'get': 'list',
-    'post': 'create',
-})
+contact_collection = ContactViewSet.as_view(
+    {
+        'get': 'list',
+        'post': 'create',
+    },
+)
 
-contact_item = ContactViewSet.as_view({
-    'get': 'retrieve',
-    'patch': 'partial_update',
-})
+contact_item = ContactViewSet.as_view(
+    {
+        'get': 'retrieve',
+        'patch': 'partial_update',
+    },
+)
 
 contact_archive = ContactViewSet.as_action_view('archive')
 
 contact_unarchive = ContactViewSet.as_action_view('unarchive')
 
-contact_audit = ContactAuditViewSet.as_view({
-    'get': 'list',
-})
+contact_audit = ContactAuditViewSet.as_view(
+    {
+        'get': 'list',
+    },
+)
 
-contact_v4_collection = ContactV4ViewSet.as_view({
-    'get': 'list',
-    'post': 'create',
-})
+contact_v4_collection = ContactV4ViewSet.as_view(
+    {
+        'get': 'list',
+        'post': 'create',
+    },
+)
 
-contact__v4_item = ContactV4ViewSet.as_view({
-    'get': 'retrieve',
-    'patch': 'partial_update',
-})
+contact__v4_item = ContactV4ViewSet.as_view(
+    {
+        'get': 'retrieve',
+        'patch': 'partial_update',
+    },
+)
 
 urls_v3 = [
     path('contact', contact_collection, name='list'),

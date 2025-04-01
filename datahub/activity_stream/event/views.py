@@ -5,15 +5,13 @@ from datahub.event.queryset import get_base_event_queryset
 
 
 class EventCursorPagination(ActivityCursorPagination):
-    """Cursor pagination for events.
-    """
+    """Cursor pagination for events."""
 
     summary = 'Event'
 
 
 class EventActivityViewSet(ActivityViewSet):
-    """Events ViewSet for the activity stream.
-    """
+    """Events ViewSet for the activity stream."""
 
     pagination_class = EventCursorPagination
     serializer_class = EventActivitySerializer

@@ -26,7 +26,6 @@ ALLOWED_RELATIONS_FOR_MERGING = {
     InvestmentProject.client_contacts.field,
     Order.contact.field,
     CompanyExport.contacts.field,
-
     # Merging is allowed if the source contact has quotes, but note that
     # they aren't moved to the target contact
     Quote.accepted_by.field,
@@ -49,7 +48,10 @@ def merge_contacts(source_contact: Contact, target_contact: Contact, user):
     MergeNotAllowedError will be raised if the merge is not allowed.
     """
     is_source_valid, invalid_obj = is_model_a_valid_merge_source(
-        source_contact, ALLOWED_RELATIONS_FOR_MERGING, Contact)
+        source_contact,
+        ALLOWED_RELATIONS_FOR_MERGING,
+        Contact,
+    )
     is_target_valid = is_model_a_valid_merge_target(target_contact)
 
     if not (is_source_valid and is_target_valid):

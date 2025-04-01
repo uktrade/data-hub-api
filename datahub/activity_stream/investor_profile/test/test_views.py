@@ -23,7 +23,8 @@ def test_large_capital_investor_profile_activity(api_client):
         investor_profile = LargeCapitalInvestorProfileFactory()
         frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
         response = hawk.get(
-            api_client, get_url('api-v3:activity-stream:large-capital-investor-profiles'),
+            api_client,
+            get_url('api-v3:activity-stream:large-capital-investor-profiles'),
         )
 
     assert response.status_code == status.HTTP_200_OK
@@ -32,8 +33,8 @@ def test_large_capital_investor_profile_activity(api_client):
         'summary': 'Large Capital Investor Profile Activities',
         'type': 'OrderedCollectionPage',
         'next': 'http://testserver/v3/activity-stream/investment/large-capital-investor-profiles'
-                + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
-                + f'&cursor={str(investor_profile.id)}',
+        + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
+        + f'&cursor={str(investor_profile.id)}',
         'orderedItems': [
             {
                 'id': f'dit:DataHubLargeCapitalInvestorProfile:{investor_profile.id}:Announce',
@@ -48,8 +49,7 @@ def test_large_capital_investor_profile_activity(api_client):
                         {
                             'id': f'dit:DataHubCompany:{investor_profile.investor_company.pk}',
                             'dit:dunsNumber': investor_profile.investor_company.duns_number,
-                            'dit:companiesHouseNumber':
-                                investor_profile.investor_company.company_number,
+                            'dit:companiesHouseNumber': investor_profile.investor_company.company_number,
                             'type': ['Organization', 'dit:Company'],
                             'name': investor_profile.investor_company.name,
                         },
@@ -73,7 +73,8 @@ def test_complete_large_capital_investor_profile_activity(api_client):
         investor_profile = CompleteLargeCapitalInvestorProfileFactory()
         frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
         response = hawk.get(
-            api_client, get_url('api-v3:activity-stream:large-capital-investor-profiles'),
+            api_client,
+            get_url('api-v3:activity-stream:large-capital-investor-profiles'),
         )
 
     def get_multiple_names(values):
@@ -85,8 +86,8 @@ def test_complete_large_capital_investor_profile_activity(api_client):
         'summary': 'Large Capital Investor Profile Activities',
         'type': 'OrderedCollectionPage',
         'next': 'http://testserver/v3/activity-stream/investment/large-capital-investor-profiles'
-                + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
-                + f'&cursor={str(investor_profile.id)}',
+        + '?cursor=2012-07-12T15%3A06%3A03.000000%2B00%3A00'
+        + f'&cursor={str(investor_profile.id)}',
         'orderedItems': [
             {
                 'id': f'dit:DataHubLargeCapitalInvestorProfile:{investor_profile.id}:Announce',
@@ -101,17 +102,15 @@ def test_complete_large_capital_investor_profile_activity(api_client):
                         {
                             'id': f'dit:DataHubCompany:{investor_profile.investor_company.pk}',
                             'dit:dunsNumber': investor_profile.investor_company.duns_number,
-                            'dit:companiesHouseNumber':
-                                investor_profile.investor_company.company_number,
+                            'dit:companiesHouseNumber': investor_profile.investor_company.company_number,
                             'type': ['Organization', 'dit:Company'],
                             'name': investor_profile.investor_company.name,
                         },
                         {
                             'id': f'dit:DataHubAdviser:{investor_profile.created_by.pk}',
                             'type': ['Person', 'dit:Adviser'],
-                            'dit:emailAddress':
-                                investor_profile.created_by.contact_email
-                                or investor_profile.created_by.email,
+                            'dit:emailAddress': investor_profile.created_by.contact_email
+                            or investor_profile.created_by.email,
                             'name': investor_profile.created_by.name,
                             'dit:team': {
                                 'id': f'dit:DataHubTeam:{investor_profile.created_by.dit_team.pk}',
@@ -123,13 +122,11 @@ def test_complete_large_capital_investor_profile_activity(api_client):
                         {
                             'id': f'dit:DataHubAdviser:{investor_profile.modified_by.pk}',
                             'type': ['Person', 'dit:Adviser'],
-                            'dit:emailAddress':
-                                investor_profile.modified_by.contact_email
-                                or investor_profile.modified_by.email,
+                            'dit:emailAddress': investor_profile.modified_by.contact_email
+                            or investor_profile.modified_by.email,
                             'name': investor_profile.modified_by.name,
                             'dit:team': {
-                                'id':
-                                    f'dit:DataHubTeam:{investor_profile.modified_by.dit_team.pk}',
+                                'id': f'dit:DataHubTeam:{investor_profile.modified_by.dit_team.pk}',
                                 'type': ['Group', 'dit:Team'],
                                 'name': investor_profile.modified_by.dit_team.name,
                             },
@@ -150,8 +147,7 @@ def test_complete_large_capital_investor_profile_activity(api_client):
                     'dit:desiredDealRoles': get_multiple_names(
                         investor_profile.desired_deal_roles.all(),
                     ),
-                    'dit:globalAssetsUnderManagement':
-                        investor_profile.global_assets_under_management,
+                    'dit:globalAssetsUnderManagement': investor_profile.global_assets_under_management,
                     'dit:investableCapital': investor_profile.investable_capital,
                     'dit:investmentTypes': get_multiple_names(
                         investor_profile.investment_types.all(),
@@ -169,23 +165,25 @@ def test_complete_large_capital_investor_profile_activity(api_client):
                     'dit:requiredChecksConducted': {
                         'name': investor_profile.required_checks_conducted.name,
                     },
-                    'dit:requiredChecksConductedBy': [{
-                        'id': 'dit:DataHubAdviser:'
-                        f'{investor_profile.required_checks_conducted_by.pk}',
-                        'type': ['Person', 'dit:Adviser'],
-                        'dit:emailAddress':
-                            investor_profile.required_checks_conducted_by.contact_email
+                    'dit:requiredChecksConductedBy': [
+                        {
+                            'id': 'dit:DataHubAdviser:'
+                            f'{investor_profile.required_checks_conducted_by.pk}',
+                            'type': ['Person', 'dit:Adviser'],
+                            'dit:emailAddress': investor_profile.required_checks_conducted_by.contact_email
                             or investor_profile.required_checks_conducted_by.email,
-                        'name': investor_profile.required_checks_conducted_by.name,
-                        'dit:team': {
-                            'id': 'dit:DataHubTeam:'
-                            f'{investor_profile.required_checks_conducted_by.dit_team.pk}',
-                            'type': ['Group', 'dit:Team'],
-                            'name': investor_profile.required_checks_conducted_by.dit_team.name,
+                            'name': investor_profile.required_checks_conducted_by.name,
+                            'dit:team': {
+                                'id': 'dit:DataHubTeam:'
+                                f'{investor_profile.required_checks_conducted_by.dit_team.pk}',
+                                'type': ['Group', 'dit:Team'],
+                                'name': investor_profile.required_checks_conducted_by.dit_team.name,
+                            },
                         },
-                    }],
-                    'dit:requiredChecksConductedOn':
-                        investor_profile.required_checks_conducted_on.strftime('%Y-%m-%d'),
+                    ],
+                    'dit:requiredChecksConductedOn': investor_profile.required_checks_conducted_on.strftime(
+                        '%Y-%m-%d',
+                    ),
                     'dit:restrictions': get_multiple_names(
                         investor_profile.restrictions.all(),
                     ),
@@ -203,8 +201,7 @@ def test_complete_large_capital_investor_profile_activity(api_client):
 
 @pytest.mark.django_db
 def test_investor_profiles_ordering(api_client):
-    """Test that the investor profiles are ordered by ('modified_on', 'pk').
-    """
+    """Test that the investor profiles are ordered by ('modified_on', 'pk')."""
     investor_profiles = []
 
     with freeze_time() as frozen_datetime:
@@ -215,7 +212,8 @@ def test_investor_profiles_ordering(api_client):
 
         frozen_datetime.tick(datetime.timedelta(seconds=1, microseconds=1))
         response = hawk.get(
-            api_client, get_url('api-v3:activity-stream:large-capital-investor-profiles'),
+            api_client,
+            get_url('api-v3:activity-stream:large-capital-investor-profiles'),
         )
 
     assert response.status_code == status.HTTP_200_OK
@@ -225,7 +223,6 @@ def test_investor_profiles_ordering(api_client):
         for obj in sorted(investor_profiles, key=lambda obj: (obj.modified_on, obj.pk))
     ]
     response_investor_profile_ids = [
-        item['object']['id']
-        for item in response.json()['orderedItems']
+        item['object']['id'] for item in response.json()['orderedItems']
     ]
     assert sorted_investor_profile_ids == response_investor_profile_ids

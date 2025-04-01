@@ -76,8 +76,9 @@ class TestHawkAuthentication:
                 # If the Authorization header generated from an incorrect secret
                 {
                     'content_type': '',
-                    'HTTP_AUTHORIZATION':
-                        lambda: _auth_sender(secret_key='incorrect').request_header,
+                    'HTTP_AUTHORIZATION': lambda: _auth_sender(
+                        secret_key='incorrect',
+                    ).request_header,
                 },
                 {'detail': 'Incorrect authentication credentials.'},
             ),
@@ -85,8 +86,9 @@ class TestHawkAuthentication:
                 # If the Authorization header generated from an incorrect domain
                 {
                     'content_type': '',
-                    'HTTP_AUTHORIZATION':
-                        lambda: _auth_sender(url=_url_incorrect_domain).request_header,
+                    'HTTP_AUTHORIZATION': lambda: _auth_sender(
+                        url=_url_incorrect_domain,
+                    ).request_header,
                 },
                 {'detail': 'Incorrect authentication credentials.'},
             ),
@@ -94,8 +96,9 @@ class TestHawkAuthentication:
                 # If the Authorization header generated from an incorrect path
                 {
                     'content_type': '',
-                    'HTTP_AUTHORIZATION':
-                        lambda: _auth_sender(url=_url_incorrect_path).request_header,
+                    'HTTP_AUTHORIZATION': lambda: _auth_sender(
+                        url=_url_incorrect_path,
+                    ).request_header,
                 },
                 {'detail': 'Incorrect authentication credentials.'},
             ),
@@ -112,8 +115,9 @@ class TestHawkAuthentication:
                 # content-type
                 {
                     'content_type': '',
-                    'HTTP_AUTHORIZATION':
-                        lambda: _auth_sender(content_type='incorrect').request_header,
+                    'HTTP_AUTHORIZATION': lambda: _auth_sender(
+                        content_type='incorrect',
+                    ).request_header,
                 },
                 {'detail': 'Incorrect authentication credentials.'},
             ),

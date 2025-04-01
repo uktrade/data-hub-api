@@ -55,7 +55,8 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
                     'name': item.country.name,
                 },
                 'status': item.status,
-            } for item in company.export_countries.order_by('pk')
+            }
+            for item in company.export_countries.order_by('pk')
         ]
 
     @staticmethod
@@ -85,9 +86,7 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
         response_data[field].sort(key=itemgetter('id'))
         new_countries.sort(key=attrgetter('pk'))
 
-        actual_response_country_ids = [
-            country['id'] for country in response_data[field]
-        ]
+        actual_response_country_ids = [country['id'] for country in response_data[field]]
 
         actual_export_countries = CompanyExportCountry.objects.filter(
             company=company,
@@ -142,21 +141,18 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
                             'country': {
                                 'id': Country.canada.value.id,
                             },
-                            'status':
-                                CompanyExportCountry.Status.FUTURE_INTEREST,
+                            'status': CompanyExportCountry.Status.FUTURE_INTEREST,
                         },
                         {
                             'country': {
                                 'id': Country.canada.value.id,
                             },
-                            'status':
-                                CompanyExportCountry.Status.NOT_INTERESTED,
+                            'status': CompanyExportCountry.Status.NOT_INTERESTED,
                         },
                     ],
                 },
                 {
-                    'non_field_errors':
-                        ['You cannot enter the same country in multiple fields.'],
+                    'non_field_errors': ['You cannot enter the same country in multiple fields.'],
                 },
             ),
             # export_countries must be fully formed. status must be a valid choice
@@ -183,8 +179,7 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
                             'country': {
                                 'id': '1234',
                             },
-                            'status':
-                                CompanyExportCountry.Status.CURRENTLY_EXPORTING,
+                            'status': CompanyExportCountry.Status.CURRENTLY_EXPORTING,
                         },
                     ],
                 },
@@ -200,8 +195,7 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
                             'country': {
                                 'id': '4dee26c2-799d-49a8-a533-c30c595c942c',
                             },
-                            'status':
-                                CompanyExportCountry.Status.CURRENTLY_EXPORTING,
+                            'status': CompanyExportCountry.Status.CURRENTLY_EXPORTING,
                         },
                     ],
                 },
@@ -242,8 +236,7 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
         return random.choice(export_interest_statuses)
 
     def test_update_company_with_export_countries(self):
-        """Test company export countries update.
-        """
+        """Test company export countries update."""
         company = CompanyFactory()
 
         data = {
@@ -253,8 +246,7 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
                         'id': Country.canada.value.id,
                         'name': Country.canada.value.name,
                     },
-                    'status':
-                        CompanyExportCountry.Status.CURRENTLY_EXPORTING,
+                    'status': CompanyExportCountry.Status.CURRENTLY_EXPORTING,
                 },
             ],
         }
@@ -295,8 +287,10 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
         status_wise_items = {
             outer['status']: [
                 inner['country']['id']
-                for inner in data_items if inner['status'] == outer['status']
-            ] for outer in data_items
+                for inner in data_items
+                if inner['status'] == outer['status']
+            ]
+            for outer in data_items
         }
         current_countries_request = status_wise_items.get(
             CompanyExportCountry.Status.CURRENTLY_EXPORTING,
@@ -312,13 +306,9 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
         company.refresh_from_db()
-        current_countries_response = [
-            str(c.id) for c in company.export_to_countries.all()
-        ]
+        current_countries_response = [str(c.id) for c in company.export_to_countries.all()]
 
-        future_countries_response = [
-            str(c.id) for c in company.future_interest_countries.all()
-        ]
+        future_countries_response = [str(c.id) for c in company.future_interest_countries.all()]
 
         assert current_countries_request == current_countries_response
         assert future_countries_request == future_countries_response
@@ -356,8 +346,10 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
         status_wise_items = {
             outer['status']: [
                 inner['country']['id']
-                for inner in data_items if inner['status'] == outer['status']
-            ] for outer in data_items
+                for inner in data_items
+                if inner['status'] == outer['status']
+            ]
+            for outer in data_items
         }
         current_countries_request = status_wise_items.get(
             CompanyExportCountry.Status.CURRENTLY_EXPORTING,
@@ -373,13 +365,9 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
         company.refresh_from_db()
-        current_countries_response = [
-            str(c.id) for c in company.export_to_countries.all()
-        ]
+        current_countries_response = [str(c.id) for c in company.export_to_countries.all()]
 
-        future_countries_response = [
-            str(c.id) for c in company.future_interest_countries.all()
-        ]
+        future_countries_response = [str(c.id) for c in company.future_interest_countries.all()]
 
         assert current_countries_request == current_countries_response
         assert future_countries_request == future_countries_response
@@ -496,9 +484,12 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
         # due to collation/locale differences. Here we sort in the database to choose the
         # same 10 countries each run of the test, and then sort in Python to able to
         # compare with other Python-sorted lists later in the test
-        countries_set = sorted(list(
-            CountryModel.objects.order_by('name')[:10],
-        ), key=lambda c: c.name)
+        countries_set = sorted(
+            list(
+                CountryModel.objects.order_by('name')[:10],
+            ),
+            key=lambda c: c.name,
+        )
         data_items = [
             {
                 'country': {
@@ -516,8 +507,10 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
         status_wise_items = {
             outer['status']: [
                 inner['country']['id']
-                for inner in data_items if inner['status'] == outer['status']
-            ] for outer in data_items
+                for inner in data_items
+                if inner['status'] == outer['status']
+            ]
+            for outer in data_items
         }
 
         export_country_url = reverse(
@@ -532,29 +525,32 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
         response_data['export_countries'].sort(key=lambda item: item['country']['name'])
-        current_countries_request = sorted(status_wise_items.get(
-            CompanyExportCountry.Status.CURRENTLY_EXPORTING,
-            [],
-        ))
-        current_countries_response = sorted([
-            c['id'] for c in response_data.get('export_to_countries', [])
-        ])
+        current_countries_request = sorted(
+            status_wise_items.get(
+                CompanyExportCountry.Status.CURRENTLY_EXPORTING,
+                [],
+            ),
+        )
+        current_countries_response = sorted(
+            [c['id'] for c in response_data.get('export_to_countries', [])],
+        )
 
-        future_countries_request = sorted(status_wise_items.get(
-            CompanyExportCountry.Status.FUTURE_INTEREST,
-            [],
-        ))
-        future_countries_response = sorted([
-            c['id'] for c in response_data.get('future_interest_countries', [])
-        ])
+        future_countries_request = sorted(
+            status_wise_items.get(
+                CompanyExportCountry.Status.FUTURE_INTEREST,
+                [],
+            ),
+        )
+        future_countries_response = sorted(
+            [c['id'] for c in response_data.get('future_interest_countries', [])],
+        )
 
         assert response_data['export_countries'] == data['export_countries']
         assert current_countries_request == current_countries_response
         assert future_countries_request == future_countries_response
 
     def test_delete_company_export_countries_check_history_tracks_correct_user(self):
-        """Check that history correctly tracks the user who deletes the export country.
-        """
+        """Check that history correctly tracks the user who deletes the export country."""
         company = CompanyFactory()
         country = CountryModel.objects.order_by('name')[0]
         adviser = AdviserFactory()

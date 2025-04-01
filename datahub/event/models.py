@@ -68,7 +68,8 @@ class Event(BaseModel, DisableableModel):
     )
 
     archived_documents_url_path = models.CharField(
-        max_length=MAX_LENGTH, blank=True,
+        max_length=MAX_LENGTH,
+        blank=True,
         help_text='Legacy field. File browser path to the archived documents for this event.',
     )
     stova_event = models.ForeignKey(

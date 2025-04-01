@@ -87,8 +87,7 @@ class Notify:
         }
 
     def _get_all_advisers(self, order):
-        """:returns: all advisers on the order
-        """
+        """:returns: all advisers on the order"""
         return itertools.chain(
             (item.adviser for item in order.assignees.all()),
             (item.adviser for item in order.subscribers.all()),
@@ -145,8 +144,7 @@ class Notify:
 
             if not market:
                 data['why'] = (
-                    f'country {order.primary_market.name} '
-                    "doesn't have an OMIS market defined"
+                    f"country {order.primary_market.name} doesn't have an OMIS market defined"
                 )
             else:
                 data['why'] = (
@@ -157,8 +155,7 @@ class Notify:
             self.order_info(**data)
 
     def _order_created_for_regional_managers(self, order):
-        """Notify the related regional managers that a new order has been created.
-        """
+        """Notify the related regional managers that a new order has been created."""
         # no UK region specified for this order => skip
         if not order.uk_region:
             return
@@ -187,8 +184,7 @@ class Notify:
             )
 
     def order_created(self, order):
-        """Notify post managers and regional managers that a new order has been created.
-        """
+        """Notify post managers and regional managers that a new order has been created."""
         self._order_created_for_post_managers(order)
         self._order_created_for_regional_managers(order)
 
@@ -213,7 +209,8 @@ class Notify:
             email_address=adviser.get_current_email(),
             template_id=Template.you_have_been_removed_for_adviser.value,
             personalisation=self._prepare_personalisation(
-                order, {'recipient name': adviser.name},
+                order,
+                {'recipient name': adviser.name},
             ),
         )
 
@@ -240,7 +237,8 @@ class Notify:
                 email_address=adviser.get_current_email(),
                 template_id=Template.order_paid_for_adviser.value,
                 personalisation=self._prepare_personalisation(
-                    order, {'recipient name': adviser.name},
+                    order,
+                    {'recipient name': adviser.name},
                 ),
             )
 
@@ -253,7 +251,8 @@ class Notify:
                 email_address=adviser.get_current_email(),
                 template_id=Template.order_completed_for_adviser.value,
                 personalisation=self._prepare_personalisation(
-                    order, {'recipient name': adviser.name},
+                    order,
+                    {'recipient name': adviser.name},
                 ),
             )
 
@@ -280,7 +279,8 @@ class Notify:
                 email_address=adviser.get_current_email(),
                 template_id=Template.order_cancelled_for_adviser.value,
                 personalisation=self._prepare_personalisation(
-                    order, {'recipient name': adviser.name},
+                    order,
+                    {'recipient name': adviser.name},
                 ),
             )
 
@@ -307,7 +307,8 @@ class Notify:
                 email_address=adviser.get_current_email(),
                 template_id=Template.quote_sent_for_adviser.value,
                 personalisation=self._prepare_personalisation(
-                    order, {'recipient name': adviser.name},
+                    order,
+                    {'recipient name': adviser.name},
                 ),
             )
 
@@ -334,7 +335,8 @@ class Notify:
                 email_address=adviser.get_current_email(),
                 template_id=Template.quote_accepted_for_adviser.value,
                 personalisation=self._prepare_personalisation(
-                    order, {'recipient name': adviser.name},
+                    order,
+                    {'recipient name': adviser.name},
                 ),
             )
 

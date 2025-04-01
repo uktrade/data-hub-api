@@ -1,4 +1,5 @@
 """General mixins."""
+
 from django.conf import settings
 from rest_framework import mixins, serializers, status
 from rest_framework.decorators import action

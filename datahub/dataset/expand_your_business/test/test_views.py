@@ -18,8 +18,9 @@ def get_expected_data_from_eyb(eyb_lead):
 
     investment_project_ids = []
     if investment_projects.count() > 0:
-        investment_project_ids = [str(investment_project.id) for investment_project in
-                                  investment_projects]
+        investment_project_ids = [
+            str(investment_project.id) for investment_project in investment_projects
+        ]
 
     data = {
         'modified_on': format_date_or_datetime(eyb_lead.modified_on),
@@ -31,16 +32,15 @@ def get_expected_data_from_eyb(eyb_lead):
         'sector_segments': eyb_lead.sector_segments,
         'intent': eyb_lead.intent,
         'intent_other': eyb_lead.intent_other,
-        'proposed_investment_region': str(eyb_lead.proposed_investment_region.id) if (
-            eyb_lead.proposed_investment_region
-        ) else None,
+        'proposed_investment_region': str(eyb_lead.proposed_investment_region.id)
+        if (eyb_lead.proposed_investment_region)
+        else None,
         'proposed_investment_city': eyb_lead.proposed_investment_city,
         'proposed_investment_location_none': eyb_lead.proposed_investment_location_none,
         'hiring': eyb_lead.hiring,
         'spend': eyb_lead.spend,
         'spend_other': eyb_lead.spend_other,
         'is_high_value': eyb_lead.is_high_value,
-
         # User component
         'user_hashed_uuid': eyb_lead.user_hashed_uuid,
         'user_created': format_date_or_datetime(eyb_lead.user_created),
@@ -63,7 +63,6 @@ def get_expected_data_from_eyb(eyb_lead):
         'landing_timeframe': eyb_lead.landing_timeframe,
         'company': str(eyb_lead.company.id) if eyb_lead.company else None,
         'investment_project_ids': investment_project_ids,
-
         # Marketing component
         'marketing_hashed_uuid': eyb_lead.marketing_hashed_uuid,
         'utm_name': eyb_lead.utm_name,
@@ -76,16 +75,14 @@ def get_expected_data_from_eyb(eyb_lead):
 
 @pytest.mark.django_db
 class TestEYBLeadsDatasetViewSet(BaseDatasetViewTest):
-    """Tests for EYBDatasetView.
-    """
+    """Tests for EYBDatasetView."""
 
     view_url = reverse('api-v4:dataset:expand-your-business-dataset')
     factory = EYBLeadFactory
 
     def test_success_with_one(self, data_flow_api_client):
         """Test that the endpoint returns expected data for a single eyb lead."""
-        eyb_lead = self.factory(
-        )
+        eyb_lead = self.factory()
         response = data_flow_api_client.get(self.view_url)
         assert response.status_code == status.HTTP_200_OK
 
@@ -104,8 +101,7 @@ class TestEYBLeadsDatasetViewSet(BaseDatasetViewTest):
         eyb_lead_two = self.factory(
             company=CompanyFactory(),
         )
-        eyb_lead_three = self.factory(
-        )
+        eyb_lead_three = self.factory()
         eyb_lead_four = self.factory(
             investment_projects=InvestmentProjectFactory.create_batch(3),
         )
@@ -119,7 +115,6 @@ class TestEYBLeadsDatasetViewSet(BaseDatasetViewTest):
         eyb_leads_from_response = results_from_response
         expected_eyb_leads = [
             get_expected_data_from_eyb(eyb_lead)
-            for eyb_lead
-            in [eyb_lead_one, eyb_lead_two, eyb_lead_three, eyb_lead_four]
+            for eyb_lead in [eyb_lead_one, eyb_lead_two, eyb_lead_three, eyb_lead_four]
         ]
         assert eyb_leads_from_response == expected_eyb_leads

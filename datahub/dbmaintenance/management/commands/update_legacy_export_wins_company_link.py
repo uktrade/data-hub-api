@@ -37,8 +37,6 @@ class Command(CSVBaseCommand):
             if not simulate:
                 with reversion.create_revision():
                     export_win.save(
-                        update_fields=(
-                            'company_id',
-                        ),
+                        update_fields=('company_id',),
                     )
                     reversion.set_comment('Legacy export wins company migration - after.')

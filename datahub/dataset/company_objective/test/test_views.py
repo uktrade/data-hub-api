@@ -27,8 +27,7 @@ def get_expected_data_from_company_objective(objective):
 
 @pytest.mark.django_db
 class TestCompanyObjectiveDatasetViewSet(BaseDatasetViewTest):
-    """Tests for CompanyObjectiveDatasetView.
-    """
+    """Tests for CompanyObjectiveDatasetView."""
 
     view_url = reverse('api-v4:dataset:company-objective-dataset')
     factory = ObjectiveFactory

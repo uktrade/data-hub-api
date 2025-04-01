@@ -229,9 +229,7 @@ class TestGetChangeURL:
     def test_generates_urls_for_saved_objects(self):
         """Test that a valid change URL is generated."""
         book = BookFactory()
-        assert get_change_url(book) == (
-            f'/admin/support/book/{book.pk}/change/'
-        )
+        assert get_change_url(book) == (f'/admin/support/book/{book.pk}/change/')
 
     def test_returns_empty_string_if_no_pk(self):
         """Test that if the object has no pk, an empty URL is returned."""
@@ -299,7 +297,8 @@ class TestAdminAccountLockout:
         'AXES_FAILURE_LIMIT': 4,
         'AXES_COOLOFF_TIME': COOLOFF_TIME,
         'MIDDLEWARE': settings.MIDDLEWARE + ['axes.middleware.AxesMiddleware'],
-        'AUTHENTICATION_BACKENDS': settings.AUTHENTICATION_BACKENDS + [
+        'AUTHENTICATION_BACKENDS': settings.AUTHENTICATION_BACKENDS
+        + [
             'axes.backends.AxesBackend',
         ],
     }
@@ -307,7 +306,8 @@ class TestAdminAccountLockout:
     def create_admin_user(self, email=None, password=PASSWORD):
         """Creates admin user."""
         return get_user_model().objects.create_superuser(
-            email=email or Faker().email(), password=password,
+            email=email or Faker().email(),
+            password=password,
         )
 
     @override_settings(**SETTINGS)
@@ -337,15 +337,14 @@ class TestAdminAccountLockout:
             response = client.post(path=reverse('admin:login'), data=data, follow=True)
             assert response.status_code == (
                 status.HTTP_200_OK
-                if attempt < settings.AXES_FAILURE_LIMIT else
-                status.HTTP_403_FORBIDDEN
+                if attempt < settings.AXES_FAILURE_LIMIT
+                else status.HTTP_403_FORBIDDEN
             ), (attempt, settings.AXES_FAILURE_LIMIT)
             assert auth.get_user(client).is_authenticated is False
 
 
 @pytest.mark.django_db
 class TestHandleExportWinsAdminPermissions:
-
     def test_request_path_is_autocomplete(self):
         expected_response = 'ABC'
 
@@ -353,7 +352,9 @@ class TestHandleExportWinsAdminPermissions:
         request.path = '/admin/autocomplete'
 
         result = handle_export_wins_admin_permissions(
-            request, '', check_permission_function=expected_response,
+            request,
+            '',
+            check_permission_function=expected_response,
         )
 
         assert result == expected_response
@@ -369,7 +370,9 @@ class TestHandleExportWinsAdminPermissions:
         request.path = ''
 
         result = handle_export_wins_admin_permissions(
-            request, '', check_permission_function=expected_response,
+            request,
+            '',
+            check_permission_function=expected_response,
         )
 
         assert result == expected_response
@@ -385,7 +388,9 @@ class TestHandleExportWinsAdminPermissions:
         request.path = ''
 
         result = handle_export_wins_admin_permissions(
-            request, '', check_permission_function=expected_response,
+            request,
+            '',
+            check_permission_function=expected_response,
         )
 
         assert result == expected_response
@@ -400,7 +405,9 @@ class TestHandleExportWinsAdminPermissions:
         request.path = ''
 
         result = handle_export_wins_admin_permissions(
-            request, 'export_win', check_permission_function=None,
+            request,
+            'export_win',
+            check_permission_function=None,
         )
 
         assert result is True
@@ -415,7 +422,9 @@ class TestHandleExportWinsAdminPermissions:
         request.path = ''
 
         result = handle_export_wins_admin_permissions(
-            request, 'company', check_permission_function=None,
+            request,
+            'company',
+            check_permission_function=None,
         )
 
         assert result is False

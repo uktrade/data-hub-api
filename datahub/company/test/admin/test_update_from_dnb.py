@@ -16,18 +16,17 @@ DNB_V2_SEARCH_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'v2/companies/s
 
 
 class TestUpdateFromDNB(AdminTestMixin):
-    """Tests GET requests to 'Update from DNB'.
-    """
+    """Tests GET requests to 'Update from DNB'."""
 
     def _create_company(self, **kwargs):
         self.company = CompanyFactory(**kwargs)
         change_url = reverse(
             admin_urlname(Company._meta, 'change'),
-            args=(self.company.pk, ),
+            args=(self.company.pk,),
         )
         update_url = reverse(
             admin_urlname(Company._meta, 'update-from-dnb'),
-            args=(self.company.pk, ),
+            args=(self.company.pk,),
         )
         return (change_url, update_url)
 
@@ -97,8 +96,7 @@ class TestUpdateFromDNB(AdminTestMixin):
         assert self.company.address_country.iso_alpha2_code == dnb_company['address_country']
         assert not self.company.pending_dnb_investigation
         assert (
-            self.company.global_ultimate_duns_number
-            == dnb_company['global_ultimate_duns_number']
+            self.company.global_ultimate_duns_number == dnb_company['global_ultimate_duns_number']
         )
 
         versions = list(Version.objects.get_for_object(self.company))

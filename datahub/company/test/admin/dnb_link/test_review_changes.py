@@ -27,12 +27,10 @@ def _get_review_changes_url(company, duns_number):
 
 
 class TestReviewChangesViewGet(AdminTestMixin):
-    """Test the review changes view with GET requests.
-    """
+    """Test the review changes view with GET requests."""
 
     def test_permission_required(self):
-        """Test that a user without permission to change companies gets a 403.
-        """
+        """Test that a user without permission to change companies gets a 403."""
         review_changes_url = _get_review_changes_url(CompanyFactory(), '123456789')
         user = create_test_user(
             permission_codenames=(CompanyPermission.view_company,),
@@ -66,8 +64,7 @@ class TestReviewChangesViewGet(AdminTestMixin):
         ],
     )
     def test_validation_errors_rendered(self, data_overrides, expected_errors):
-        """Test that validation errors are rendered as expected.
-        """
+        """Test that validation errors are rendered as expected."""
         review_changes_route_name = admin_urlname(Company._meta, 'dnb-link-review-changes')
         data = {
             'company': CompanyFactory().id,
@@ -86,8 +83,7 @@ class TestReviewChangesViewGet(AdminTestMixin):
             assert expected_error in response.rendered_content
 
     def test_dh_company_already_linked_renders_error(self):
-        """Test that a validation error is rendered if the Data Hub company is already D&B linked.
-        """
+        """Test that a validation error is rendered if the Data Hub company is already D&B linked."""
         review_changes_url = _get_review_changes_url(
             CompanyFactory(duns_number='123456789'),
             '999999999',
@@ -117,8 +113,7 @@ class TestReviewChangesViewGet(AdminTestMixin):
         assert expected_error in response.rendered_content
 
     def test_changes_returned(self, requests_mock, dnb_response):
-        """Test that the review changes view renders proposed D&B changes.
-        """
+        """Test that the review changes view renders proposed D&B changes."""
         requests_mock.post(
             DNB_V2_SEARCH_URL,
             json=dnb_response,
@@ -135,12 +130,10 @@ class TestReviewChangesViewGet(AdminTestMixin):
 
 
 class TestReviewChangesViewPost(AdminTestMixin):
-    """Test the review changes view with POST requests.
-    """
+    """Test the review changes view with POST requests."""
 
     def test_post(self, requests_mock, dnb_response):
-        """Test that a post request to 'review changes' updates the company.
-        """
+        """Test that a post request to 'review changes' updates the company."""
         requests_mock.post(
             DNB_V2_SEARCH_URL,
             json=dnb_response,
@@ -163,8 +156,7 @@ class TestReviewChangesViewPost(AdminTestMixin):
 
 
 class TestReviewChangesViewDNBErrors(AdminTestMixin):
-    """Test the review changes view - for both GET and POST - when dnb-service returns errors.
-    """
+    """Test the review changes view - for both GET and POST - when dnb-service returns errors."""
 
     @pytest.mark.parametrize(
         'http_method',

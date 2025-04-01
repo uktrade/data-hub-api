@@ -26,10 +26,12 @@ class Command(CSVBaseCommand):
 
                 stack.enter_context(atomic())
                 total_deleted, deletions_by_model = investment_project.delete()
-                logger.info((
-                    f'{total_deleted} records deleted for investment project: '
-                    f'{investment_project_id}. Breakdown by model:'
-                ))
+                logger.info(
+                    (
+                        f'{total_deleted} records deleted for investment project: '
+                        f'{investment_project_id}. Breakdown by model:'
+                    ),
+                )
                 for deletion_model, model_deletion_count in deletions_by_model.items():
                     logger.info(f'{deletion_model}: {model_deletion_count}')
 

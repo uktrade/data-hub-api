@@ -76,7 +76,8 @@ def test_validate_business_activity_other_update_data():
         'business_activities': [constants.InvestmentBusinessActivity.other.value.id],
     }
     errors = validate(
-        instance=project, update_data=data,
+        instance=project,
+        update_data=data,
         fields=CORE_FIELDS,
     )
     assert errors == {
@@ -129,7 +130,8 @@ def test_validate_project_update_data():
         'referral_source_activity': referral_source,
     }
     errors = validate(
-        instance=project, update_data=update_data,
+        instance=project,
+        update_data=update_data,
         fields=CORE_FIELDS,
     )
     assert 'referral_source_activity_marketing' in errors
@@ -140,7 +142,8 @@ def test_validate_project_update_data():
 def test_validate_value_fail():
     """Tests validating an incomplete value section."""
     project = InvestmentProjectFactory(
-        sector_id=None, stage_id=constants.InvestmentProjectStage.assign_pm.value.id,
+        sector_id=None,
+        stage_id=constants.InvestmentProjectStage.assign_pm.value.id,
     )
     errors = validate(instance=project, fields=VALUE_FIELDS)
     assert errors == {

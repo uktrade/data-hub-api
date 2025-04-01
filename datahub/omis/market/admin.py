@@ -10,4 +10,4 @@ class MarketAdmin(admin.ModelAdmin):
     fields = ('country', 'manager_email', 'disabled_on')
     list_display = ('country', 'manager_email', 'disabled_on')
     readonly_fields = ('country',)
-    search_fields = ('country__name', )
+    search_fields = ('country__name',)

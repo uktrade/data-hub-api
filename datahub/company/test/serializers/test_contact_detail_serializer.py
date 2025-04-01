@@ -22,8 +22,7 @@ request = Mock(
 
 @freeze_time(FROZEN_TIME)
 class TestContactV4Serializer:
-    """Tests for the Contact V4 Serializer.
-    """
+    """Tests for the Contact V4 Serializer."""
 
     @pytest.mark.parametrize(
         ('country_id', 'expected_response', 'is_valid', 'address_area'),

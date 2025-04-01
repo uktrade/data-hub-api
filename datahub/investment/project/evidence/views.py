@@ -29,9 +29,7 @@ class EvidenceDocumentViewSet(BaseEntityDocumentModelViewSet):
         'tags',
     )
 
-    filter_backends = (
-        DjangoFilterBackend,
-    )
+    filter_backends = (DjangoFilterBackend,)
 
     def initial(self, request, *args, **kwargs):
         """Raise an Http404 if there is no project corresponding to the project ID specified in

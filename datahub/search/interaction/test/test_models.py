@@ -45,25 +45,35 @@ def test_interaction_to_dict(opensearch, factory_cls):
             'id': str(interaction.company.pk),
             'name': interaction.company.name,
             'trading_names': interaction.company.trading_names,
-        } if interaction.company else None,
+        }
+        if interaction.company
+        else None,
         'companies': [
             {
                 'id': str(company.pk),
                 'name': company.name,
                 'trading_names': company.trading_names,
-            } for company in sorted(interaction.companies.all(), key=attrgetter('id'))
+            }
+            for company in sorted(interaction.companies.all(), key=attrgetter('id'))
         ],
         'company_sector': {
             'id': str(interaction.company.sector.pk),
             'name': interaction.company.sector.name,
-            'ancestors': [{
-                'id': str(ancestor.pk),
-            } for ancestor in interaction.company.sector.get_ancestors()],
-        } if interaction.company else None,
+            'ancestors': [
+                {
+                    'id': str(ancestor.pk),
+                }
+                for ancestor in interaction.company.sector.get_ancestors()
+            ],
+        }
+        if interaction.company
+        else None,
         'company_one_list_group_tier': {
             'id': str(interaction.company.get_one_list_group_tier().pk),
             'name': interaction.company.get_one_list_group_tier().name,
-        } if interaction.company and interaction.company.get_one_list_group_tier() else None,
+        }
+        if interaction.company and interaction.company.get_one_list_group_tier()
+        else None,
         'contacts': [
             {
                 'id': str(obj.pk),
@@ -103,25 +113,34 @@ def test_interaction_to_dict(opensearch, factory_cls):
         'investment_project': {
             'id': str(interaction.investment_project.pk),
             'name': interaction.investment_project.name,
-        } if interaction.investment_project else None,
+        }
+        if interaction.investment_project
+        else None,
         'investment_project_sector': {
             'id': str(interaction.investment_project.sector.pk),
             'name': interaction.investment_project.sector.name,
-            'ancestors': [{
-                'id': str(ancestor.pk),
-            } for ancestor in interaction.investment_project.sector.get_ancestors()],
-        } if interaction.investment_project else None,
+            'ancestors': [
+                {
+                    'id': str(ancestor.pk),
+                }
+                for ancestor in interaction.investment_project.sector.get_ancestors()
+            ],
+        }
+        if interaction.investment_project
+        else None,
         'policy_areas': [
             {
                 'id': str(obj.pk),
                 'name': obj.name,
-            } for obj in sorted(interaction.policy_areas.all(), key=attrgetter('id'))
+            }
+            for obj in sorted(interaction.policy_areas.all(), key=attrgetter('id'))
         ],
         'policy_issue_types': [
             {
                 'id': str(obj.pk),
                 'name': obj.name,
-            } for obj in sorted(interaction.policy_issue_types.all(), key=attrgetter('id'))
+            }
+            for obj in sorted(interaction.policy_issue_types.all(), key=attrgetter('id'))
         ],
         'service_delivery_status': None,
         'grant_amount_offered': None,
@@ -167,19 +186,25 @@ def test_service_delivery_to_dict(opensearch):
                 'id': str(company.pk),
                 'name': company.name,
                 'trading_names': company.trading_names,
-            } for company in sorted(interaction.companies.all(), key=attrgetter('id'))
+            }
+            for company in sorted(interaction.companies.all(), key=attrgetter('id'))
         ],
         'company_sector': {
             'id': str(interaction.company.sector.pk),
             'name': interaction.company.sector.name,
-            'ancestors': [{
-                'id': str(ancestor.pk),
-            } for ancestor in interaction.company.sector.get_ancestors()],
+            'ancestors': [
+                {
+                    'id': str(ancestor.pk),
+                }
+                for ancestor in interaction.company.sector.get_ancestors()
+            ],
         },
         'company_one_list_group_tier': {
             'id': interaction.company.get_one_list_group_tier().pk,
             'name': interaction.company.get_one_list_group_tier().name,
-        } if interaction.company.get_one_list_group_tier() else None,
+        }
+        if interaction.company.get_one_list_group_tier()
+        else None,
         'contacts': [
             {
                 'id': str(obj.pk),

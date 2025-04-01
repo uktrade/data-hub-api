@@ -55,7 +55,9 @@ def test_identification_task_schedules_ingestion_task(user_object_key, caplog):
     with (
         mock.patch('datahub.ingest.tasks.job_scheduler') as mock_scheduler,
         mock.patch.object(
-            S3ObjectProcessor, 'get_most_recent_object_key', return_value=user_object_key,
+            S3ObjectProcessor,
+            'get_most_recent_object_key',
+            return_value=user_object_key,
         ),
         mock.patch.object(S3ObjectProcessor, 'has_object_been_ingested', return_value=False),
         caplog.at_level(logging.INFO),
@@ -79,17 +81,21 @@ def test_identification_task_schedules_ingestion_task(user_object_key, caplog):
 
 @mock_aws
 def test_ingestion_task_triggers_company_linking(
-    user_object_key, s3_object_processor, caplog,
+    user_object_key,
+    s3_object_processor,
+    caplog,
 ):
     records = [eyb_lead_user_record_faker()]
     object_definition = (
-        user_object_key, compressed_json_faker(records, key_to_nest_records_under='object'),
+        user_object_key,
+        compressed_json_faker(records, key_to_nest_records_under='object'),
     )
     upload_objects_to_s3(s3_object_processor, [object_definition])
 
     with (
-        mock.patch('datahub.investment_lead.tasks.ingest_eyb_user.link_leads_to_companies')
-        as mocked_company_linking_task,
+        mock.patch(
+            'datahub.investment_lead.tasks.ingest_eyb_user.link_leads_to_companies',
+        ) as mocked_company_linking_task,
         caplog.at_level(logging.INFO),
     ):
         eyb_user_ingestion_task(user_object_key)
@@ -100,17 +106,21 @@ def test_ingestion_task_triggers_company_linking(
 
 @mock_aws
 def test_ingestion_task_schedules_marketing_identification_task(
-    user_object_key, s3_object_processor, caplog,
+    user_object_key,
+    s3_object_processor,
+    caplog,
 ):
     records = [eyb_lead_user_record_faker()]
     object_definition = (
-        user_object_key, compressed_json_faker(records, key_to_nest_records_under='object'),
+        user_object_key,
+        compressed_json_faker(records, key_to_nest_records_under='object'),
     )
     upload_objects_to_s3(s3_object_processor, [object_definition])
 
     with (
-        mock.patch('datahub.investment_lead.tasks.ingest_eyb_user.job_scheduler')
-        as mock_scheduler,
+        mock.patch(
+            'datahub.investment_lead.tasks.ingest_eyb_user.job_scheduler',
+        ) as mock_scheduler,
         caplog.at_level(logging.INFO),
     ):
         eyb_user_ingestion_task(user_object_key)
@@ -119,8 +129,10 @@ def test_ingestion_task_schedules_marketing_identification_task(
         assert 'EYB user ingestion task finished.' in caplog.text
         assert EYBLead.objects.filter(user_hashed_uuid=records[0]['hashedUuid']).exists()
 
-        assert 'EYB user ingestion task has scheduled EYB marketing identification task' \
+        assert (
+            'EYB user ingestion task has scheduled EYB marketing identification task'
             in caplog.text
+        )
         mock_scheduler.assert_called_once_with(
             function=eyb_marketing_identification_task,
             description='Identify new EYB marketing objects',
@@ -129,7 +141,6 @@ def test_ingestion_task_schedules_marketing_identification_task(
 
 @mock_aws
 class TestEYBUserIngestionTask:
-
     @pytest.fixture
     def ingestion_task(self, user_object_key):
         return EYBUserIngestionTask(
@@ -144,8 +155,9 @@ class TestEYBUserIngestionTask:
 
     def test_get_record_from_line(self, ingestion_task):
         deserialized_line = {'object': eyb_lead_user_record_faker()}
-        assert ingestion_task._get_record_from_line(deserialized_line) == \
-            deserialized_line['object']
+        assert (
+            ingestion_task._get_record_from_line(deserialized_line) == deserialized_line['object']
+        )
 
     def test_process_record_creates_eyb_lead_instance(self, ingestion_task):
         hashed_uuid = generate_hashed_uuid()

@@ -96,9 +96,8 @@ class TestUnarchiveCompany(APITestMixin):
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json() == {
-            api_settings.NON_FIELD_ERRORS_KEY:
-                [
-                    'This record is no longer in use and its data has been transferred to another '
-                    'record for the following reason: Duplicate record.',
-                ],
+            api_settings.NON_FIELD_ERRORS_KEY: [
+                'This record is no longer in use and its data has been transferred to another '
+                'record for the following reason: Duplicate record.',
+            ],
         }

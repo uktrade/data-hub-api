@@ -86,7 +86,11 @@ def test_get_changes(old_version, new_version, expected_result):
 )
 @unittest.mock.patch('datahub.core.audit_utils._get_object_name_for_pk')
 def test_make_value_friendly(
-    mock_get_repr, field_name, values, expected_result, number_of_times_get_repr_called,
+    mock_get_repr,
+    field_name,
+    values,
+    expected_result,
+    number_of_times_get_repr_called,
 ):
     """Tests get a friendly value for a given field and return object name.
     Tests foreign key, many to many and char fields.

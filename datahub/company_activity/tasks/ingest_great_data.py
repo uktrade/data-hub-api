@@ -63,8 +63,10 @@ class GreatIngestionTask:
             address_country=Country.objects.get(iso_alpha2_code='GB'),
             source=Company.Source.GREAT,
         )
-        logger.info(f'Could not match company for Great Export Enquiry: {form_id}.'
-                    f'Created new company with id: {company.id}.')
+        logger.info(
+            f'Could not match company for Great Export Enquiry: {form_id}.'
+            f'Created new company with id: {company.id}.',
+        )
         self._create_contact(data, company, form_id)
         return company
 
@@ -85,8 +87,10 @@ class GreatIngestionTask:
             company=company,
             source=Contact.Source.GREAT,
         )
-        logger.info(f'Could not match contact for Great Export Enquiry: {form_id}.'
-                    f'Created new contact with id: {contact.id}.')
+        logger.info(
+            f'Could not match contact for Great Export Enquiry: {form_id}.'
+            f'Created new contact with id: {contact.id}.',
+        )
         return contact
 
     def _get_company(self, data, form_id):
@@ -231,10 +235,10 @@ class GreatIngestionTask:
             'submission_action': jsn.get('submission_action', ''),
             'company': company,
             'contact': contact,
-
             'meta_sender_ip_address': meta.get('sender_ip_address', ''),
             'meta_sender_country': self._country_from_iso_code(
-                sender.get('country_code', None), form_id,
+                sender.get('country_code', None),
+                form_id,
             ),
             'meta_sender_email_address': meta.get('sender_email_address', ''),
             'meta_subject': meta.get('subject', ''),
@@ -244,7 +248,6 @@ class GreatIngestionTask:
             'meta_service_name': meta.get('service_name', ''),
             'meta_spam_control': meta.get('spam_control', ''),
             'meta_email_address': meta.get('email_address', ''),
-
             'data_search': data.get('search', ''),
             'data_enquiry': data.get('enquiry', ''),
             'data_find_out_about': data.get('find_out_about', ''),
@@ -278,7 +281,6 @@ class GreatIngestionTask:
                 data.get('help_us_further', ''),
             ),
             'data_help_us_improve': data.get('help_us_improve', ''),
-
             'actor_type': actor_type,
             'actor_id': actor_id,
             'actor_dit_email_address': actor.get('dit:emailAddress', ''),

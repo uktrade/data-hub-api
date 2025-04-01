@@ -32,8 +32,7 @@ class SerializerNotPartialError(Exception):
 
 
 class DNBMatchedCompanySerializer(PermittedFieldsModelSerializer):
-    """Serialiser for data hub companies matched with a DNB entry.
-    """
+    """Serialiser for data hub companies matched with a DNB entry."""
 
     latest_interaction = serializers.SerializerMethodField()
 
@@ -204,8 +203,7 @@ class DNBCompanySerializer(CompanySerializer):
 
 
 class DUNSNumberSerializer(serializers.Serializer):
-    """Parses duns_number from request body and validates format.
-    """
+    """Parses duns_number from request body and validates format."""
 
     duns_number = serializers.CharField(
         write_only=True,
@@ -239,15 +237,13 @@ class LegacyDNBInvestigationDataSerializer(serializers.Serializer):
 
 
 class DNBCompanyLinkSerializer(DUNSNumberSerializer):
-    """Validate POST data for DNBCompanyLinkView.
-    """
+    """Validate POST data for DNBCompanyLinkView."""
 
     company_id = NestedRelatedField('company.Company', required=True)
 
 
 class DNBAddressSerializer(serializers.Serializer):
-    """Validate address and convert it to the format expected by dnb-service.
-    """
+    """Validate address and convert it to the format expected by dnb-service."""
 
     line_1 = serializers.CharField(source='address_line_1')
     line_2 = serializers.CharField(source='address_line_2', required=False, allow_blank=True)
@@ -258,22 +254,19 @@ class DNBAddressSerializer(serializers.Serializer):
     area = NestedRelatedField(model=AdministrativeArea, source='address_area', required=False)
 
     def validate_area(self, area):
-        """Return area name and abbrev_name as an object.
-        """
+        """Return area name and abbrev_name as an object."""
         return {
             'name': area.name,
             'abbrev_name': area.area_code,
         }
 
     def validate_country(self, country):
-        """Return iso_alpha2_code only.
-        """
+        """Return iso_alpha2_code only."""
         return country.iso_alpha2_code
 
 
 class AddressRequestSerializer(DNBAddressSerializer):
-    """Validate address and convert it to the format expected by dnb-service.
-    """
+    """Validate address and convert it to the format expected by dnb-service."""
 
     line_1 = serializers.CharField(source='address_line_1', required=False)
     town = serializers.CharField(source='address_town', required=False)
@@ -281,8 +274,7 @@ class AddressRequestSerializer(DNBAddressSerializer):
 
 
 class ChangeRequestSerializer(serializers.Serializer):
-    """Validate change requests and convert it to the format expected by dnb-service.
-    """
+    """Validate change requests and convert it to the format expected by dnb-service."""
 
     name = serializers.CharField(source='primary_name', required=False)
     trading_names = serializers.ListField(required=False)
@@ -295,16 +287,14 @@ class ChangeRequestSerializer(serializers.Serializer):
     turnover_gbp = serializers.IntegerField(source='annual_sales', required=False)
 
     def validate_turnover_gbp(self, value):
-        """Convert turnover from GBP to USD.
-        """
+        """Convert turnover from GBP to USD."""
         return convert_gbp_to_usd(value)
 
     address = AddressRequestSerializer(required=False)
     website = RelaxedURLField(source='domain', required=False)
 
     def validate_website(self, website):
-        """Change website to domain.
-        """
+        """Change website to domain."""
         return urlparse(website).netloc
 
 
@@ -322,8 +312,7 @@ class DNBCompanyChangeRequestSerializer(serializers.Serializer):
     changes = ChangeRequestSerializer()
 
     def validate_duns_number(self, duns_number):
-        """Validate duns_number.
-        """
+        """Validate duns_number."""
         try:
             company = Company.objects.get(duns_number=duns_number)
         except Company.DoesNotExist:
@@ -334,8 +323,7 @@ class DNBCompanyChangeRequestSerializer(serializers.Serializer):
         return duns_number
 
     def validate_changes(self, changes):
-        """Changes should not be empty.
-        """
+        """Changes should not be empty."""
         if not changes:
             raise serializers.ValidationError(
                 'No changes submitted.',
@@ -343,8 +331,7 @@ class DNBCompanyChangeRequestSerializer(serializers.Serializer):
         return changes
 
     def validate(self, data):
-        """Augment address changes with unchanged address fields and un-nest address changes.
-        """
+        """Augment address changes with unchanged address fields and un-nest address changes."""
         address_changes = data['changes'].pop('address', {})
         if address_changes:
             existing_address_data = {
@@ -373,8 +360,7 @@ class DNBCompanyChangeRequestSerializer(serializers.Serializer):
 
 
 class DNBGetCompanyChangeRequestSerializer(serializers.Serializer):
-    """Validate GET data for DNBCompanyChangeRequestView.
-    """
+    """Validate GET data for DNBCompanyChangeRequestView."""
 
     duns_number = serializers.CharField(
         max_length=9,
@@ -388,8 +374,7 @@ class DNBGetCompanyChangeRequestSerializer(serializers.Serializer):
     )
 
     def validate_duns_number(self, duns_number):
-        """Validate duns_number.
-        """
+        """Validate duns_number."""
         try:
             company = Company.objects.get(duns_number=duns_number)
         except Company.DoesNotExist:
@@ -419,13 +404,11 @@ class DNBCompanyInvestigationSerializer(serializers.Serializer):
     )
 
     def validate_website(self, website):
-        """Change website to domain.
-        """
+        """Change website to domain."""
         return urlparse(website).netloc
 
     def validate(self, data):
-        """Validate if either website or telephone_number is present.
-        """
+        """Validate if either website or telephone_number is present."""
         data = super().validate(data)
 
         if data.get('domain') in (None, '') and data.get('telephone_number') in (None, ''):
@@ -441,8 +424,7 @@ class DNBCompanyInvestigationSerializer(serializers.Serializer):
 
 
 class DNBCompanyHierarchySerializer(serializers.Serializer):
-    """Validate GET data for DNBCompanyHierarchyView.
-    """
+    """Validate GET data for DNBCompanyHierarchyView."""
 
     duns_number = serializers.CharField(
         max_length=9,
@@ -451,8 +433,7 @@ class DNBCompanyHierarchySerializer(serializers.Serializer):
     )
 
     def validate_duns_number(self, duns_number):
-        """Validate duns_number.
-        """
+        """Validate duns_number."""
         try:
             company = Company.objects.get(duns_number=duns_number)
         except Company.DoesNotExist:

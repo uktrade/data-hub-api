@@ -95,7 +95,6 @@ class TestAddServiceDelivery(APITestMixin):
             'contacts': [contact.pk],
             'service': Service.inbound_referral.value.id,
             'was_policy_feedback_provided': False,
-
             **resolve_data(extra_data),
         }
         response = self.api_client.post(url, request_data)
@@ -124,8 +123,10 @@ class TestAddServiceDelivery(APITestMixin):
             'net_company_receipt': request_data.get('net_company_receipt'),
             'communication_channel': None,
             'policy_feedback_notes': request_data.get('policy_feedback_notes', ''),
-            'was_policy_feedback_provided':
-                request_data.get('was_policy_feedback_provided', False),
+            'was_policy_feedback_provided': request_data.get(
+                'was_policy_feedback_provided',
+                False,
+            ),
             'subject': 'whatever',
             'date': '2017-04-18',
             'dit_participants': [
@@ -147,17 +148,21 @@ class TestAddServiceDelivery(APITestMixin):
                 'id': str(company.pk),
                 'name': company.name,
             },
-            'companies': [{
-                'id': str(company.pk),
-                'name': company.name,
-            }],
-            'contacts': [{
-                'id': str(contact.pk),
-                'name': contact.name,
-                'first_name': contact.first_name,
-                'last_name': contact.last_name,
-                'job_title': contact.job_title,
-            }],
+            'companies': [
+                {
+                    'id': str(company.pk),
+                    'name': company.name,
+                },
+            ],
+            'contacts': [
+                {
+                    'id': str(contact.pk),
+                    'name': contact.name,
+                    'first_name': contact.first_name,
+                    'last_name': contact.last_name,
+                    'job_title': contact.job_title,
+                },
+            ],
             'event': event_response,
             'service': {
                 'id': str(Service.inbound_referral.value.id),
@@ -209,7 +214,6 @@ class TestAddServiceDelivery(APITestMixin):
                     'was_policy_feedback_provided': ['This field is required.'],
                 },
             ),
-
             # required fields for service delivery
             (
                 {
@@ -228,7 +232,6 @@ class TestAddServiceDelivery(APITestMixin):
                     'is_event': ['This field is required.'],
                 },
             ),
-
             # policy feedback fields cannot be omitted when policy feedback provided
             (
                 {
@@ -245,16 +248,15 @@ class TestAddServiceDelivery(APITestMixin):
                     'is_event': True,
                     'event': EventFactory,
                     'service_delivery_status': partial(
-                        random_obj_for_model, ServiceDeliveryStatus,
+                        random_obj_for_model,
+                        ServiceDeliveryStatus,
                     ),
-
                     'was_policy_feedback_provided': True,
                 },
                 {
                     'policy_feedback_notes': ['This field is required.'],
                 },
             ),
-
             # policy feedback fields cannot be blank when policy feedback provided
             (
                 {
@@ -271,9 +273,9 @@ class TestAddServiceDelivery(APITestMixin):
                     'is_event': True,
                     'event': EventFactory,
                     'service_delivery_status': partial(
-                        random_obj_for_model, ServiceDeliveryStatus,
+                        random_obj_for_model,
+                        ServiceDeliveryStatus,
                     ),
-
                     'was_policy_feedback_provided': True,
                     'policy_feedback_notes': '',
                 },
@@ -281,7 +283,6 @@ class TestAddServiceDelivery(APITestMixin):
                     'policy_feedback_notes': ['This field is required.'],
                 },
             ),
-
             # fields not allowed
             (
                 {
@@ -298,12 +299,12 @@ class TestAddServiceDelivery(APITestMixin):
                     'is_event': True,
                     'event': EventFactory,
                     'service_delivery_status': partial(
-                        random_obj_for_model, ServiceDeliveryStatus,
+                        random_obj_for_model,
+                        ServiceDeliveryStatus,
                     ),
                     'grant_amount_offered': '1111.11',
                     'net_company_receipt': '8888.11',
                     'was_policy_feedback_provided': False,
-
                     # fields not allowed
                     'communication_channel': partial(random_obj_for_model, CommunicationChannel),
                     'policy_feedback_notes': 'Policy feedback notes.',
@@ -317,7 +318,6 @@ class TestAddServiceDelivery(APITestMixin):
                     'investment_project': ['This field is only valid for interactions.'],
                 },
             ),
-
             # fields where None is not allowed
             (
                 {
@@ -332,11 +332,11 @@ class TestAddServiceDelivery(APITestMixin):
                     'is_event': True,
                     'event': EventFactory,
                     'service_delivery_status': partial(
-                        random_obj_for_model, ServiceDeliveryStatus,
+                        random_obj_for_model,
+                        ServiceDeliveryStatus,
                     ),
                     'grant_amount_offered': '1111.11',
                     'net_company_receipt': '8888.11',
-
                     # fields where None is not allowed
                     'was_policy_feedback_provided': None,
                     'policy_feedback_notes': None,
@@ -347,7 +347,6 @@ class TestAddServiceDelivery(APITestMixin):
                     'policy_feedback_notes': ['This field may not be null.'],
                 },
             ),
-
             # theme=investment not allowed
             (
                 {
@@ -361,20 +360,19 @@ class TestAddServiceDelivery(APITestMixin):
                     ],
                     'service': Service.inbound_referral.value.id,
                     'service_delivery_status': partial(
-                        random_obj_for_model, ServiceDeliveryStatus,
+                        random_obj_for_model,
+                        ServiceDeliveryStatus,
                     ),
                     'grant_amount_offered': '1111.11',
                     'net_company_receipt': '8888.11',
                     'was_policy_feedback_provided': False,
                     'is_event': False,
-
                     'theme': Interaction.Theme.INVESTMENT,
                 },
                 {
                     'kind': ["This value can't be selected for investment interactions."],
                 },
             ),
-
             # event field not allowed for non-event service delivery
             (
                 {
@@ -389,12 +387,12 @@ class TestAddServiceDelivery(APITestMixin):
                     ],
                     'service': Service.inbound_referral.value.id,
                     'service_delivery_status': partial(
-                        random_obj_for_model, ServiceDeliveryStatus,
+                        random_obj_for_model,
+                        ServiceDeliveryStatus,
                     ),
                     'grant_amount_offered': '1111.11',
                     'net_company_receipt': '8888.11',
                     'was_policy_feedback_provided': False,
-
                     # 'is_event' is False so 'event' should be empty
                     'is_event': False,
                     'event': EventFactory,
@@ -403,7 +401,6 @@ class TestAddServiceDelivery(APITestMixin):
                     'event': ['This field is only valid for event service deliveries.'],
                 },
             ),
-
             # event field required for event service delivery
             (
                 {
@@ -417,12 +414,12 @@ class TestAddServiceDelivery(APITestMixin):
                     ],
                     'service': Service.inbound_referral.value.id,
                     'service_delivery_status': partial(
-                        random_obj_for_model, ServiceDeliveryStatus,
+                        random_obj_for_model,
+                        ServiceDeliveryStatus,
                     ),
                     'grant_amount_offered': '1111.11',
                     'net_company_receipt': '8888.11',
                     'was_policy_feedback_provided': False,
-
                     # 'is_event' is False so 'event' should be set
                     'is_event': True,
                 },
@@ -430,7 +427,6 @@ class TestAddServiceDelivery(APITestMixin):
                     'event': ['This field is required.'],
                 },
             ),
-
             # multiple contacts not allowed for event service delivery
             (
                 {
@@ -443,14 +439,14 @@ class TestAddServiceDelivery(APITestMixin):
                     ],
                     'service': Service.inbound_referral.value.id,
                     'service_delivery_status': partial(
-                        random_obj_for_model, ServiceDeliveryStatus,
+                        random_obj_for_model,
+                        ServiceDeliveryStatus,
                     ),
                     'grant_amount_offered': '1111.11',
                     'net_company_receipt': '8888.11',
                     'was_policy_feedback_provided': False,
                     'is_event': True,
                     'event': EventFactory,
-
                     # multiple contacts should not be allowed
                     'contacts': [ContactFactory, ContactFactory],
                 },
@@ -458,7 +454,6 @@ class TestAddServiceDelivery(APITestMixin):
                     'contacts': ['Only one contact can be provided for event service deliveries.'],
                 },
             ),
-
             # dit_participants cannot be empty list
             (
                 {
@@ -469,7 +464,6 @@ class TestAddServiceDelivery(APITestMixin):
                     'contacts': [ContactFactory],
                     'service': Service.inbound_referral.value.id,
                     'was_policy_feedback_provided': False,
-
                     'dit_participants': [],
                 },
                 {

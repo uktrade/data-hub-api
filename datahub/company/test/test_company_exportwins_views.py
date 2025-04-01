@@ -82,9 +82,7 @@ class TestGetCompanyExportWins(APITestMixin):
         404 is raised.
         """
         user = create_test_user(
-            permission_codenames=(
-                CompanyPermission.view_export_win,
-            ),
+            permission_codenames=(CompanyPermission.view_export_win,),
         )
         api_client = self.create_api_client(user=user)
         dummy_company_id = uuid.uuid4()
@@ -202,10 +200,12 @@ class TestGetCompanyExportWins(APITestMixin):
                     'value': {
                         'export': {
                             'total': win.total_expected_export_value,
-                            'breakdowns': [{
-                                'year': financial_year,
-                                'value': breakdown.value,
-                            }],
+                            'breakdowns': [
+                                {
+                                    'year': financial_year,
+                                    'value': breakdown.value,
+                                },
+                            ],
                         },
                     },
                     'customer': win.company_name,
@@ -252,9 +252,7 @@ class TestGetCompanyExportWins(APITestMixin):
         }
 
         user = create_test_user(
-            permission_codenames=(
-                CompanyPermission.view_export_win,
-            ),
+            permission_codenames=(CompanyPermission.view_export_win,),
         )
         api_client = self.create_api_client(user=user)
         url = reverse('api-v4:company:export-win', kwargs={'pk': company.id})
@@ -313,9 +311,12 @@ class TestGetCompanyExportWins(APITestMixin):
         Win.objects.update(company_id=company.id)
         url = reverse('api-v4:company:export-win', kwargs={'pk': company.id})
 
-        response = self.api_client.get(url, data={
-            'confirmed': confirmed,
-        })
+        response = self.api_client.get(
+            url,
+            data={
+                'confirmed': confirmed,
+            },
+        )
         assert response.status_code == status.HTTP_200_OK
         results = response.json()
 
@@ -326,9 +327,15 @@ class TestGetCompanyExportWins(APITestMixin):
             'false': False,
             'null': None,
         }
-        assert all(
-            getattr(
-                result['response'], 'get', lambda x: None,
-            )('confirmed') == expected[confirmed]
-            for result in results['results']
-        ) is True
+        assert (
+            all(
+                getattr(
+                    result['response'],
+                    'get',
+                    lambda x: None,
+                )('confirmed')
+                == expected[confirmed]
+                for result in results['results']
+            )
+            is True
+        )

@@ -14,24 +14,32 @@ class InteractionActivitySerializer(ActivitySerializer):
         model = Interaction
 
     def _get_project_context(self, project):
-        return {} if project is None else {
-            'id': f'dit:DataHubInvestmentProject:{project.pk}',
-            'type': 'dit:InvestmentProject',
-            'name': project.name,
-            'url': project.get_absolute_url(),
-        }
+        return (
+            {}
+            if project is None
+            else {
+                'id': f'dit:DataHubInvestmentProject:{project.pk}',
+                'type': 'dit:InvestmentProject',
+                'name': project.name,
+                'url': project.get_absolute_url(),
+            }
+        )
 
     def _get_event_context(self, event):
-        return {} if event is None else {
-            'id': f'dit:DataHubEvent:{event.pk}',
-            'type': 'dit:Event',
-            'dit:eventType': {'name': event.event_type.name},
-            'name': event.name,
-            'startTime': event.start_date,
-            'endTime': event.end_date,
-            'dit:team': self._get_team(event.lead_team),
-            'url': event.get_absolute_url(),
-        }
+        return (
+            {}
+            if event is None
+            else {
+                'id': f'dit:DataHubEvent:{event.pk}',
+                'type': 'dit:Event',
+                'dit:eventType': {'name': event.event_type.name},
+                'name': event.name,
+                'startTime': event.start_date,
+                'endTime': event.end_date,
+                'dit:team': self._get_team(event.lead_team),
+                'url': event.get_absolute_url(),
+            }
+        )
 
     def _get_context(self, instance):
         if instance.kind == Interaction.Kind.INTERACTION:

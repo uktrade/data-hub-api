@@ -76,8 +76,7 @@ class TestUpdateGVAOnBusinessActivitiesM2MChanged:
 
 @pytest.mark.django_db
 class TestInvestorCompanyUpdate:
-    """Tests for the update_country_investment_originates_from_post_save signal receiver.
-    """
+    """Tests for the update_country_investment_originates_from_post_save signal receiver."""
 
     def test_update_investor_company_updates_country_of_origin_for_in_progress_project(self):
         """Test that in progress investment projects' country investment originates from field
@@ -140,7 +139,6 @@ class TestInvestorCompanyUpdate:
 
 @pytest.mark.django_db
 class TestUpdateProjectSiteAddressFieldsWhenCompanyAddressChanges:
-
     def test_update_project_site_address_fields_when_company_address_changes(self):
         """Test post save signal updates site address in applicable investment projects."""
         old_address_fields = {

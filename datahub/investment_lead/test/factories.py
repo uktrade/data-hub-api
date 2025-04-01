@@ -108,8 +108,7 @@ class EYBLeadFactory(factory.django.DjangoModelFactory):
 
     @to_many_field
     def investment_projects(self):
-        """Add support for setting `investment_projects`.
-        """
+        """Add support for setting `investment_projects`."""
         return []
 
 
@@ -123,10 +122,12 @@ def eyb_lead_user_record_faker(overrides: dict | None = None) -> dict:
     data = {
         'hashedUuid': generate_hashed_uuid(),
         'created': fake.date_time_between(
-            start_date='-1y', tzinfo=timezone.utc,
+            start_date='-1y',
+            tzinfo=timezone.utc,
         ),
         'modified': fake.date_time_between(
-            start_date='-1y', tzinfo=timezone.utc,
+            start_date='-1y',
+            tzinfo=timezone.utc,
         ),
         'companyName': fake.company(),
         'dunsNumber': fake.numerify(text='00#######'),
@@ -153,18 +154,22 @@ def eyb_lead_user_record_faker(overrides: dict | None = None) -> dict:
 def eyb_lead_triage_record_faker(overrides: dict | None = None) -> dict:
     """Creates a fake triage record."""
     sector = random_sector_instance()
-    level_zero_segment, level_one_segment, level_two_segment = \
+    level_zero_segment, level_one_segment, level_two_segment = (
         Sector.get_segments_from_sector_instance(sector)
+    )
     data = {
         'hashedUuid': generate_hashed_uuid(),
         'triage_created': fake.date_time_between(
-            start_date='-1y', tzinfo=timezone.utc,
+            start_date='-1y',
+            tzinfo=timezone.utc,
         ),
         'created': fake.date_time_between(
-            start_date='-1y', tzinfo=timezone.utc,
+            start_date='-1y',
+            tzinfo=timezone.utc,
         ),
         'modified': fake.date_time_between(
-            start_date='-1y', tzinfo=timezone.utc,
+            start_date='-1y',
+            tzinfo=timezone.utc,
         ),
         'sector': level_zero_segment,
         'sectorSub': level_one_segment,

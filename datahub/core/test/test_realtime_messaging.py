@@ -6,14 +6,12 @@ from slack.errors import SlackClientError  # the base error class
 from datahub.core.realtime_messaging import send_realtime_message
 
 
-class TestRealtimeMessaging():
-    """Test the realtime messaging wrapper.
-    """
+class TestRealtimeMessaging:
+    """Test the realtime messaging wrapper."""
 
     @override_settings(ENABLE_SLACK_MESSAGING=False)
     def test_disabled_facility_aborts_message(self, caplog, monkeypatch):
-        """Test that an disabling the facility setting aborts the send process gracefully.
-        """
+        """Test that an disabling the facility setting aborts the send process gracefully."""
         caplog.set_level('INFO')
         mock_web_client = mock.Mock()
         monkeypatch.setattr(
@@ -30,8 +28,7 @@ class TestRealtimeMessaging():
         SLACK_MESSAGE_CHANNEL='MESSAGE_CHANNEL',
     )
     def test_absent_api_token_aborts_message(self, caplog, monkeypatch):
-        """Test that an absence of Slack API token aborts the send process gracefully.
-        """
+        """Test that an absence of Slack API token aborts the send process gracefully."""
         caplog.set_level('INFO')
         mock_web_client = mock.Mock()
         monkeypatch.setattr(
@@ -48,8 +45,7 @@ class TestRealtimeMessaging():
         SLACK_MESSAGE_CHANNEL=None,
     )
     def test_absent_message_channel_aborts_message(self, caplog, monkeypatch):
-        """Test that an absence of a message channel aborts the send process gracefully.
-        """
+        """Test that an absence of a message channel aborts the send process gracefully."""
         caplog.set_level('INFO')
         mock_web_client = mock.Mock()
         monkeypatch.setattr(
@@ -67,8 +63,7 @@ class TestRealtimeMessaging():
         SLACK_TIMEOUT_SECONDS=11,
     )
     def test_slack_client_initiated(self, monkeypatch):
-        """Test that the Slack client gets passed the token and timeout from the config.
-        """
+        """Test that the Slack client gets passed the token and timeout from the config."""
         mock_web_client = mock.Mock()
         monkeypatch.setattr(
             'datahub.core.realtime_messaging.WebClient',
@@ -85,8 +80,7 @@ class TestRealtimeMessaging():
         SLACK_MESSAGE_CHANNEL='MESSAGE_CHANNEL',
     )
     def test_message_method_called(self, monkeypatch):
-        """Test that the Slack client 'send' method is called appropriately.
-        """
+        """Test that the Slack client 'send' method is called appropriately."""
         mock_web_client = mock.Mock()
         monkeypatch.setattr(
             'datahub.core.realtime_messaging.WebClient',
@@ -107,8 +101,7 @@ class TestRealtimeMessaging():
         caplog,
         monkeypatch,
     ):
-        """Test that Slack client errors are caught and reported.
-        """
+        """Test that Slack client errors are caught and reported."""
         caplog.set_level('ERROR')
         mock_web_client = mock.Mock()
         monkeypatch.setattr(

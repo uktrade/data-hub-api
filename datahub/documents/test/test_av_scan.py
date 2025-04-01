@@ -117,7 +117,7 @@ def test_virus_scan_document_file_not_found(get_signed_url_mock, requests_mock):
     with pytest.raises(
         VirusScanException,
         match=rf'Unable to download the document with ID {document.pk} '
-              rf'for scanning \(status_code\=404\).',
+        rf'for scanning \(status_code\=404\).',
     ):
         virus_scan_document(str(document.id))
     document.refresh_from_db()

@@ -62,7 +62,11 @@ def test_run(s3_stubber, caplog):
     assert len(caplog.records) == 2
 
     assert [project.actual_land_date for project in investment_projects] == [
-        None, None, None, date(2016, 8, 24), date(2016, 8, 23),
+        None,
+        None,
+        None,
+        date(2016, 8, 24),
+        date(2016, 8, 23),
     ]
 
 
@@ -72,7 +76,8 @@ def test_simulate(s3_stubber, caplog):
 
     old_dates = [date(2016, 2, 20), None, date(2013, 6, 13), date(2016, 8, 23)]
     investment_projects = InvestmentProjectFactory.create_batch(
-        4, actual_land_date=factory.Iterator(old_dates),
+        4,
+        actual_land_date=factory.Iterator(old_dates),
     )
 
     bucket = 'test_bucket'

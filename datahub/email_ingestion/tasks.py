@@ -10,14 +10,12 @@ logger = getLogger(__name__)
 
 
 def process_mailbox_emails():
-    """Process new emails for S3 mailboxes.
-    """
+    """Process new emails for S3 mailboxes."""
     # NOTE: This is a long-lived feature flag which allows us to quickly switch off email
     # ingestion in case of any problems with third party (SMTP) services or security issues
     if not is_feature_flag_active(MAILBOX_INGESTION_FEATURE_FLAG_NAME):
         logger.info(
-            f'Feature flag "{MAILBOX_INGESTION_FEATURE_FLAG_NAME}" is not active, '
-            'exiting.',
+            f'Feature flag "{MAILBOX_INGESTION_FEATURE_FLAG_NAME}" is not active, exiting.',
         )
         return
     # Acquire a processing lock for the duration of the current DB session -

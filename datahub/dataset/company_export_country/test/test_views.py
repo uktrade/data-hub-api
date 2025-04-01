@@ -25,8 +25,7 @@ def get_expected_data_from_company_export_country(company_export_country):
 
 @pytest.mark.django_db
 class TestCompanyExportCountryDatasetView(BaseDatasetViewTest):
-    """Tests for CompanyExportCountryDatasetView.
-    """
+    """Tests for CompanyExportCountryDatasetView."""
 
     factory = CompanyExportCountryFactory
     view_url = reverse('api-v4:dataset:company-export-country-dataset')

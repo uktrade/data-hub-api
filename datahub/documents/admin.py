@@ -9,14 +9,15 @@ class DocumentsAdmin(BaseModelAdminMixin, admin.ModelAdmin):
     """Documents admin."""
 
     list_display = (
-        'id', 'name', 'uploaded_on', 'av_clean', 'scan_initiated_on', 'scanned_on',
-    )
-    raw_id_fields = (
-        'archived_by',
-    )
-    list_filter = (
+        'id',
+        'name',
+        'uploaded_on',
         'av_clean',
+        'scan_initiated_on',
+        'scanned_on',
     )
+    raw_id_fields = ('archived_by',)
+    list_filter = ('av_clean',)
     readonly_fields = (
         'created',
         'modified',

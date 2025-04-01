@@ -499,7 +499,7 @@ def test_indexed_doc(order_factory, opensearch):
     invoice = order.invoice
 
     doc = SearchOrder.to_document(order)
-    opensearch_client.bulk(actions=(doc, ), chunk_size=1)
+    opensearch_client.bulk(actions=(doc,), chunk_size=1)
 
     opensearch.indices.refresh()
 
@@ -540,9 +540,12 @@ def test_indexed_doc(order_factory, opensearch):
         'sector': {
             'id': str(order.sector.pk),
             'name': order.sector.name,
-            'ancestors': [{
-                'id': str(ancestor.pk),
-            } for ancestor in order.sector.get_ancestors()],
+            'ancestors': [
+                {
+                    'id': str(ancestor.pk),
+                }
+                for ancestor in order.sector.get_ancestors()
+            ],
         },
         'uk_region': {
             'id': str(order.uk_region.pk),
@@ -617,17 +620,23 @@ def test_indexed_doc(order_factory, opensearch):
             'first_name': order.completed_by.first_name,
             'last_name': order.completed_by.last_name,
             'name': order.completed_by.name,
-        } if order.completed_by else None,
+        }
+        if order.completed_by
+        else None,
         'completed_on': order.completed_on.isoformat() if order.completed_on else None,
         'cancelled_by': {
             'id': str(order.cancelled_by.pk),
             'first_name': order.cancelled_by.first_name,
             'last_name': order.cancelled_by.last_name,
             'name': order.cancelled_by.name,
-        } if order.cancelled_by else None,
+        }
+        if order.cancelled_by
+        else None,
         'cancelled_on': order.cancelled_on.isoformat() if order.cancelled_on else None,
         'cancellation_reason': {
             'id': str(order.cancellation_reason.pk),
             'name': order.cancellation_reason.name,
-        } if order.cancellation_reason else None,
+        }
+        if order.cancellation_reason
+        else None,
     }

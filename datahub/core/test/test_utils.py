@@ -156,8 +156,7 @@ def test_format_currency_range(values, expected):
     ],
 )
 def test_format_currency_range_string(string, expected):
-    """Test range with and without currency symbol.
-    """
+    """Test range with and without currency symbol."""
     assert format_currency_range_string(string) == expected
     assert format_currency_range_string(string, symbol='') == expected.replace('£', '')
     assert format_currency_range_string(string, symbol='A$') == expected.replace('£', 'A$')
@@ -179,8 +178,7 @@ def test_format_currency_range_string(string, expected):
     ],
 )
 def test_format_currency_range_string_separator(string, expected):
-    """Test range with separator symbol.
-    """
+    """Test range with separator symbol."""
     assert format_currency_range_string(string, separator='...') == expected
 
 
@@ -209,21 +207,32 @@ def test_format_currency_range_string_separator(string, expected):
     ],
 )
 def test_format_currency_range_string_more_or_less_parameters(
-        string,
-        more_or_less,
-        smart_more_or_less,
-        expected,
+    string,
+    more_or_less,
+    smart_more_or_less,
+    expected,
 ):
-    """Test range with and without currency symbol.
-    """
+    """Test range with and without currency symbol."""
+    assert (
+        format_currency_range_string(
+            string,
+            more_or_less=more_or_less,
+            smart_more_or_less=smart_more_or_less,
+        )
+        == expected
+    )
     assert format_currency_range_string(
-        string, more_or_less=more_or_less, smart_more_or_less=smart_more_or_less) == expected
+        string,
+        more_or_less=more_or_less,
+        smart_more_or_less=smart_more_or_less,
+        symbol='',
+    ) == expected.replace('£', '')
     assert format_currency_range_string(
-        string, more_or_less=more_or_less, smart_more_or_less=smart_more_or_less, symbol='') == \
-        expected.replace('£', '')
-    assert format_currency_range_string(
-        string, more_or_less=more_or_less, smart_more_or_less=smart_more_or_less, symbol='A$') == \
-        expected.replace('£', 'A$')
+        string,
+        more_or_less=more_or_less,
+        smart_more_or_less=smart_more_or_less,
+        symbol='A$',
+    ) == expected.replace('£', 'A$')
 
 
 def test_slice_iterable_into_chunks():
@@ -330,8 +339,7 @@ def test_get_financial_year(date_obj, expected_financial_year):
 @mock.patch('datahub.core.utils.sentry_sdk.push_scope')
 @mock.patch('datahub.core.utils.sentry_sdk.capture_message')
 def test_log_to_sentry(mocked_capture_message, mocked_push_scope, level, extra):
-    """Test log_to_sentry utility.
-    """
+    """Test log_to_sentry utility."""
     kwargs = {}
     expected_extra = {}
     if extra:

@@ -15,8 +15,7 @@ ZERO_PRICING = OrderPricing(0, 0, 0, 0)
 
 
 def get_pricing_from_order(order, in_pence=True):
-    """:returns: an instance of OrderPricing from the obj `order`
-    """
+    """:returns: an instance of OrderPricing from the obj `order`"""
     if in_pence:
         transform = lambda x: x  # noqa: E731
     else:
@@ -104,8 +103,7 @@ def _calculate_pricing(estimated_time, hourly_rate, vat_value, discount_value):
 
 
 def calculate_order_pricing(order):
-    """:returns: the pricing for `order`
-    """
+    """:returns: the pricing for `order`"""
     if not can_pricing_be_calculated(order):
         return ZERO_PRICING
 

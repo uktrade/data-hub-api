@@ -62,7 +62,10 @@ class InvestmentProjectsDatasetView(BaseFilterDatasetView):
             project_first_moved_to_won=Subquery(
                 InvestmentProjectStageLog.objects.filter(
                     investment_project_id=OuterRef('pk'),
-                    stage_id=Stage.won.value.id).order_by('created_on').values('created_on')[:1],
+                    stage_id=Stage.won.value.id,
+                )
+                .order_by('created_on')
+                .values('created_on')[:1],
             ),
             project_reference=get_project_code_expression(),
             strategic_driver_names=get_array_agg_subquery(

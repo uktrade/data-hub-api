@@ -77,7 +77,7 @@ class PublicOrderViewSet(CoreViewSet):
     """ViewSet for Hawk authenticated public facing order endpoint."""
 
     authentication_classes = (PaaSIPAuthentication, HawkAuthentication)
-    permission_classes = (HawkScopePermission, )
+    permission_classes = (HawkScopePermission,)
     required_hawk_scope = HawkScope.public_omis
 
     lookup_field = 'public_token'
@@ -116,8 +116,7 @@ class SubscriberListView(APIView):
         return Response(serializer.data)
 
     def get(self, request, order_pk, format=None):
-        """Returns a serialised list of advisers subscribed to the order.
-        """
+        """Returns a serialised list of advisers subscribed to the order."""
         order = self.get_order(order_pk)
         return self.get_list_response(order)
 
@@ -149,8 +148,7 @@ class AssigneeView(APIView):
     FORCE_DELETE_PARAM = 'force-delete'
 
     def get_order(self, order_pk):
-        """Returns the related order or raises Http404 if it doesn't exist.
-        """
+        """Returns the related order or raises Http404 if it doesn't exist."""
         try:
             return Order.objects.get(pk=order_pk)
         except Order.DoesNotExist:
@@ -166,8 +164,7 @@ class AssigneeView(APIView):
         return Response(serializer.data)
 
     def get(self, request, order_pk, format=None):
-        """Returns a serialised list of advisers assigned to the order.
-        """
+        """Returns a serialised list of advisers assigned to the order."""
         order = self.get_order(order_pk)
         return self.get_list_response(order)
 
@@ -205,8 +202,7 @@ class BaseNestedOrderViewSet(CoreViewSet):
     order_queryset = Order.objects
 
     def get_order(self):
-        """:returns: the main order from url kwargs (or None if it a matching order is not found).
-        """
+        """:returns: the main order from url kwargs (or None if it a matching order is not found)."""
         try:
             return self.order_queryset.get(
                 **{self.order_lookup_field: self.kwargs[self.order_lookup_url_kwarg]},

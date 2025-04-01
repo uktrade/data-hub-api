@@ -29,6 +29,4 @@ def is_provided_and_is_date_less_than_a_year_ago(value):
         return False
     return _is_provided_and_is_date_in_the_past(
         value,
-    ) and (
-        value > date.today() - relativedelta(years=1)
-    )
+    ) and (value > date.today() - relativedelta(years=1))

@@ -18,7 +18,7 @@ def retry_with_backoff(
         except Exception:
             if count == retries:
                 raise
-        sleep = (backoff_in_seconds * 2 ** count)
+        sleep = backoff_in_seconds * 2**count
         logger.info(f'Waiting to retry after {sleep} seconds')
         time.sleep(sleep)
         count += 1

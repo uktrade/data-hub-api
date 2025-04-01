@@ -29,7 +29,6 @@ from datahub.investment.validate import (
             False,
         ),
     ],
-
 )
 @freeze_time('2019-02-01')
 def test_is_date_in_the_past(data_date, expected_result):
@@ -65,7 +64,6 @@ def test_is_date_in_the_past(data_date, expected_result):
             False,
         ),
     ],
-
 )
 @freeze_time('2019-02-01')
 def test_is_date_less_than_a_year_ago(post_data, expected_result):

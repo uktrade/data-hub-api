@@ -56,8 +56,8 @@ class LargeCapitalOpportunityActivitySerializer(ActivitySerializer):
             },
         }
         if instance.promoters:
-            investment_opportunity['object']['dit:promoters'] = (
-                self._get_companies(instance.promoters)
+            investment_opportunity['object']['dit:promoters'] = self._get_companies(
+                instance.promoters,
             )
 
         if instance.required_checks_conducted_by:
@@ -114,7 +114,8 @@ class LargeCapitalOpportunityActivitySerializer(ActivitySerializer):
         for attr in optional_attributes:
             if getattr(instance, attr):
                 investment_opportunity['object'][f'dit:{format_key(attr)}'] = getattr(
-                    instance, attr,
+                    instance,
+                    attr,
                 )
 
         return investment_opportunity

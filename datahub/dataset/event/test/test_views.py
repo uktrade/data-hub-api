@@ -34,24 +34,26 @@ def get_expected_data_from_event(event):
         'uk_region__name': event.uk_region.name,
         'related_programme_names': (
             [x.name for x in event.related_programmes.all()]
-            if event.related_programmes.exists() else None
+            if event.related_programmes.exists()
+            else None
         ),
     }
 
 
 @pytest.mark.django_db
 class TestEventDatasetViewSet(BaseDatasetViewTest):
-    """Tests for the events dataset endpoint.
-    """
+    """Tests for the events dataset endpoint."""
 
     view_url = reverse('api-v4:dataset:events-dataset')
     factory = EventFactory
 
     @pytest.mark.parametrize(
-        'event_factory', [
+        'event_factory',
+        [
             EventFactory,
             DisabledEventFactory,
-        ])
+        ],
+    )
     def test_success(self, data_flow_api_client, event_factory):
         """Test that endpoint returns with expected data for a single event."""
         event = event_factory()

@@ -42,8 +42,7 @@ def with_empty_teams():
 # We are not using the existing model factories, because they pollute the
 # metadata.Team model with lot of records, complicating assertions about them.
 def order_assignee_factory(team):
-    """Creates a :class:`datahub.omis.order.models.OrderAssignee` instance related to ``team``.
-    """
+    """Creates a :class:`datahub.omis.order.models.OrderAssignee` instance related to ``team``."""
     adviser = Advisor.objects.create(
         first_name='John',
         last_name='Doe',
@@ -56,7 +55,8 @@ def order_assignee_factory(team):
             primary_market=Country.objects.create(),
         ),
         adviser=adviser,
-        created_by=adviser)
+        created_by=adviser,
+    )
     order_assignee.team = team
     order_assignee.save()
     return order_assignee
@@ -86,8 +86,7 @@ def event_with_teams_factory(team):
 
 
 def adviser_factory(team):
-    """Creates a :class:`datahub.company.models.adviser.Advisor` related to ``team``.
-    """
+    """Creates a :class:`datahub.company.models.adviser.Advisor` related to ``team``."""
     return Advisor.objects.create(email=f'{uuid4()}@example.com', dit_team=team)
 
 
@@ -108,18 +107,20 @@ RELATIONSHIP_FACTORY_MAP = {
 RELATIONS_POWER_SET = power_set({OrderAssignee, Event, Advisor, EVENT_TEAMS})
 
 
-@pytest.mark.parametrize('teams', [
-    # All possible relation combinations
-    RELATIONS_POWER_SET,
-    # Only non-related teams
-    repeat((), 7),
-    # Plenty of related and non-related teams
-    chain(repeat((), 5), chain(*repeat(RELATIONS_POWER_SET, 3))),
-])
+@pytest.mark.parametrize(
+    'teams',
+    [
+        # All possible relation combinations
+        RELATIONS_POWER_SET,
+        # Only non-related teams
+        repeat((), 7),
+        # Plenty of related and non-related teams
+        chain(repeat((), 5), chain(*repeat(RELATIONS_POWER_SET, 3))),
+    ],
+)
 @pytest.mark.django_db
 def test_command(teams, with_empty_teams):
-    """Tests the :class:`datahub.cleanup.management.commands.delete_orphaned_teams.Command`.
-    """
+    """Tests the :class:`datahub.cleanup.management.commands.delete_orphaned_teams.Command`."""
     should_be_deleted = set()
     should_stay = set()
     for related_models in teams:
@@ -127,12 +128,13 @@ def test_command(teams, with_empty_teams):
         relations = [RELATIONSHIP_FACTORY_MAP[model](team) for model in related_models]
         (should_stay if relations else should_be_deleted).add(team)
 
-    assert should_be_deleted & should_stay == set(), \
+    assert should_be_deleted & should_stay == set(), (
         'The sets of related and non-related teams should have no overlap'
-    assert set(Team.objects.all()) == should_stay | should_be_deleted, \
+    )
+    assert set(Team.objects.all()) == should_stay | should_be_deleted, (
         'The model should have both related and non-related teams'
+    )
 
     call_command(Command())
 
-    assert set(Team.objects.all()) == should_stay, \
-        'The model should only have related teams'
+    assert set(Team.objects.all()) == should_stay, 'The model should only have related teams'

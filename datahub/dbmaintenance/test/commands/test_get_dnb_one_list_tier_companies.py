@@ -27,8 +27,7 @@ MANAGER_2_ID = uuid4()
 
 @pytest.fixture
 def one_list_companies():
-    """Test fixture of sample one list tier companies.
-    """
+    """Test fixture of sample one list tier companies."""
     manager_1 = AdviserFactory(
         first_name='Manager 1',
         pk=MANAGER_1_ID,
@@ -154,8 +153,7 @@ def test_get_company_ids(
     account_manager_ids,
     expected_company_names,
 ):
-    """Test the _get_company_ids helper function.
-    """
+    """Test the _get_company_ids helper function."""
     company_ids = _get_company_ids(one_list_tier_ids, account_manager_ids)
     companies = Company.objects.filter(pk__in=company_ids)
     company_names = {company.name for company in companies}
@@ -163,8 +161,7 @@ def test_get_company_ids(
 
 
 def test_command(caplog, one_list_companies):
-    """Test the command prints out ids for the correct companies.
-    """
+    """Test the command prints out ids for the correct companies."""
     caplog.set_level('INFO')
 
     call_command(

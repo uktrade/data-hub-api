@@ -10,8 +10,7 @@ logger = getLogger(__name__)
 
 
 class Command(BaseCommand):
-    """Management command which returns the count for all the metadata models.
-    """
+    """Management command which returns the count for all the metadata models."""
 
     help = 'Return a count of all the metadata models.'
 
@@ -33,8 +32,7 @@ class Command(BaseCommand):
         )
 
         sorted_models_and_counts = ','.join(
-            ':'.join(map(str, model_and_count))
-            for model_and_count in sorted_models_and_counts
+            ':'.join(map(str, model_and_count)) for model_and_count in sorted_models_and_counts
         )
         logger.info(sorted_models_and_counts)
 

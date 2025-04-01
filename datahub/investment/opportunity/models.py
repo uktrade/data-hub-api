@@ -95,7 +95,10 @@ class LargeCapitalOpportunity(BaseModel):
     )
 
     opportunity_value = models.DecimalField(
-        blank=True, null=True, max_digits=19, decimal_places=0,
+        blank=True,
+        null=True,
+        max_digits=19,
+        decimal_places=0,
         help_text='Opportunity value (£)',
     )
 
@@ -106,12 +109,18 @@ class LargeCapitalOpportunity(BaseModel):
     )
 
     total_investment_sought = models.DecimalField(
-        blank=True, null=True, max_digits=19, decimal_places=0,
+        blank=True,
+        null=True,
+        max_digits=19,
+        decimal_places=0,
         help_text='Total investment sought (£)',
     )
 
     current_investment_secured = models.DecimalField(
-        blank=True, null=True, max_digits=19, decimal_places=0,
+        blank=True,
+        null=True,
+        max_digits=19,
+        decimal_places=0,
         help_text='Current investment secured (£)',
     )
 
@@ -168,9 +177,7 @@ class LargeCapitalOpportunity(BaseModel):
 
     class Meta:
         verbose_name_plural = 'large capital opportunities'
-        permissions = (
-            ('export_largecapitalopportunity', 'Can export large capital opportunity'),
-        )
+        permissions = (('export_largecapitalopportunity', 'Can export large capital opportunity'),)
 
     def get_absolute_url(self):
         """URL to the object in the Data Hub internal front end."""

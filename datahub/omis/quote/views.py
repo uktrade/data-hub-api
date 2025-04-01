@@ -58,7 +58,7 @@ class PublicQuoteViewSet(HawkResponseSigningMixin, BaseQuoteViewSet):
     """ViewSet for Hawk authenticated public facing API."""
 
     authentication_classes = (PaaSIPAuthentication, HawkAuthentication)
-    permission_classes = (HawkScopePermission, )
+    permission_classes = (HawkScopePermission,)
     required_hawk_scope = HawkScope.public_omis
     serializer_class = PublicQuoteSerializer
 

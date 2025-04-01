@@ -28,7 +28,10 @@ class BaseEventSerializer(serializers.ModelSerializer):
     address_country = NestedRelatedField('metadata.Country')
     uk_region = NestedRelatedField('metadata.UKRegion', required=False, allow_null=True)
     related_programmes = NestedRelatedField(
-        'event.Programme', many=True, required=False, allow_empty=True,
+        'event.Programme',
+        many=True,
+        required=False,
+        allow_empty=True,
     )
     service = NestedRelatedField('metadata.Service')
     start_date = serializers.DateField()
@@ -100,7 +103,10 @@ class EventSerializer(BaseEventSerializer):
     """Event serialiser for V3 endpoint."""
 
     related_trade_agreements = NestedRelatedField(
-        'metadata.TradeAgreement', many=True, required=False, allow_empty=True,
+        'metadata.TradeAgreement',
+        many=True,
+        required=False,
+        allow_empty=True,
     )
 
     class Meta:
@@ -141,15 +147,17 @@ class EventSerializerV4(BaseEventSerializer):
     """Event serialiser for V4 endpoint."""
 
     default_error_messages = {
-        'related_trade_agreements':
-            gettext_lazy(
-                "'Related trade agreements' is inconsistent with 'Has related trade agreements?'",
-            ),
+        'related_trade_agreements': gettext_lazy(
+            "'Related trade agreements' is inconsistent with 'Has related trade agreements?'",
+        ),
     }
 
     has_related_trade_agreements = serializers.BooleanField(required=True)
     related_trade_agreements = NestedRelatedField(
-        'metadata.TradeAgreement', many=True, required=True, allow_empty=True,
+        'metadata.TradeAgreement',
+        many=True,
+        required=True,
+        allow_empty=True,
     )
 
     def validate(self, attrs):
@@ -159,9 +167,7 @@ class EventSerializerV4(BaseEventSerializer):
         errors = {}
         combiner = DataCombiner(self.instance, attrs)
 
-        validators = (
-            self._validate_related_trade_agreements,
-        )
+        validators = (self._validate_related_trade_agreements,)
         for validator in validators:
             errors.update(validator(combiner))
 
@@ -179,7 +185,8 @@ class EventSerializerV4(BaseEventSerializer):
         has_related_trade_agreements = combiner.get_value('has_related_trade_agreements')
 
         if (related_trade_agreements_count == 0 and has_related_trade_agreements) or (
-                related_trade_agreements_count > 0 and not has_related_trade_agreements):
+            related_trade_agreements_count > 0 and not has_related_trade_agreements
+        ):
             errors['related_trade_agreements'] = self.error_messages['related_trade_agreements']
         return errors
 

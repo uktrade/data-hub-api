@@ -21,8 +21,11 @@ class Command(CSVBaseCommand):
     def add_arguments(self, parser):
         """Define extra arguments."""
         super().add_arguments(parser)
-        parser.add_argument('team_id', type=str,
-                            help='team id to move the interaction to a new team')
+        parser.add_argument(
+            'team_id',
+            type=str,
+            help='team id to move the interaction to a new team',
+        )
 
     def _process_row(self, row, simulate=False, **options):
         """Processes a CSV file row."""
@@ -37,11 +40,15 @@ class Command(CSVBaseCommand):
 
         # All advisers for the current interaction which are not already in the
         # correct team.
-        interaction_participants = InteractionDITParticipant.objects.filter(
-            interaction_id=interaction_pk,
-        ).exclude(
-            team_id=team_id,
-        ).select_related('team', 'adviser')
+        interaction_participants = (
+            InteractionDITParticipant.objects.filter(
+                interaction_id=interaction_pk,
+            )
+            .exclude(
+                team_id=team_id,
+            )
+            .select_related('team', 'adviser')
+        )
 
         if not interaction_participants:
             logger.warning(f'No interaction participants for interaction: {interaction_pk}')
@@ -65,7 +72,8 @@ class Command(CSVBaseCommand):
         # Bulk update all adviser teams.
         with reversion.create_revision():
             InteractionDITParticipant.objects.bulk_update(
-                interaction_participants, ['team'],
+                interaction_participants,
+                ['team'],
             )
             reversion.set_comment(
                 f'Updated interaction {interaction_pk} participants to have team id {team_id}',

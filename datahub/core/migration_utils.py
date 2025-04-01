@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 def _build_model_data(model, obj_pk, fields_data, using):
     data = {}
     # Handle each field
-    for (field_name, field_value) in fields_data.items():
+    for field_name, field_value in fields_data.items():
         field = model._meta.get_field(field_name)
 
         # Handle many-to-many relations
@@ -93,8 +93,7 @@ class DeleteModelWithMetadata(DeleteModel):
     """
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        """Delete permissions and contenttypes before deleting the model.
-        """
+        """Delete permissions and contenttypes before deleting the model."""
         DeleteModelWithMetadata.delete_metadata(
             from_state.apps,
             app_label,
@@ -104,8 +103,7 @@ class DeleteModelWithMetadata(DeleteModel):
 
     @staticmethod
     def delete_metadata(apps, app_label, model_name):
-        """Delete associated permissions and contenttypes for the given model.
-        """
+        """Delete associated permissions and contenttypes for the given model."""
         permission_model = apps.get_model('auth', 'Permission')
         _, deletions_by_model = permission_model.objects.filter(
             content_type__app_label=app_label,

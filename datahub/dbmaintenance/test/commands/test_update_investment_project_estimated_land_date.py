@@ -53,10 +53,16 @@ def test_run(s3_stubber, caplog):
     assert len(caplog.records) == 1
 
     assert [project.allow_blank_estimated_land_date for project in investment_projects] == [
-        True, False, False, True,
+        True,
+        False,
+        False,
+        True,
     ]
     assert [project.estimated_land_date for project in investment_projects] == [
-        None, date(2018, 1, 1), date(2017, 1, 5), date(2016, 8, 23),
+        None,
+        date(2018, 1, 1),
+        date(2017, 1, 5),
+        date(2016, 8, 23),
     ]
 
 
@@ -94,7 +100,10 @@ def test_simulate(s3_stubber, caplog):
     )
 
     call_command(
-        'update_investment_project_estimated_land_date', bucket, object_key, simulate=True,
+        'update_investment_project_estimated_land_date',
+        bucket,
+        object_key,
+        simulate=True,
     )
 
     for project in investment_projects:
@@ -103,8 +112,9 @@ def test_simulate(s3_stubber, caplog):
     assert 'InvestmentProject matching query does not exist' in caplog.text
     assert len(caplog.records) == 1
 
-    assert [project.allow_blank_estimated_land_date
-            for project in investment_projects] == allow_blank_estimated_land_date
+    assert [
+        project.allow_blank_estimated_land_date for project in investment_projects
+    ] == allow_blank_estimated_land_date
     assert [project.estimated_land_date for project in investment_projects] == estimated_land_date
 
 

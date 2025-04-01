@@ -57,13 +57,14 @@ def test_is_global_ultimate(
     assert company.is_global_ultimate == expected_is_global_ultimate
 
 
-class TestOneListAccountOwner():
+class TestOneListAccountOwner:
     """Test schedule_sync_investment_projects_of_subsidiary_companies is only called when
     one_list_account_owner has changed.
     """
 
-    mock_schedule_sync_investment_projects_of_subsidiary_companies_target = \
+    mock_schedule_sync_investment_projects_of_subsidiary_companies_target = (
         'datahub.company.signals.schedule_sync_investment_projects_of_subsidiary_companies'
+    )
 
     def test_one_list_account_owner_changed(self, monkeypatch: pytest.MonkeyPatch):
         one_list_account_owner = AdviserFactory()
@@ -110,7 +111,6 @@ class TestCompany:
         ],
     )
     def test_has_name(self, name: str, expected_return: bool) -> None:
-        """Test the has_name property returns the correct response for a variety of scenarios.
-        """
+        """Test the has_name property returns the correct response for a variety of scenarios."""
         company = CompanyFactory(name=name)
         assert company.has_name == expected_return

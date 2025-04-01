@@ -28,8 +28,7 @@ MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 @pytest.fixture
 def interaction_email_notification_feature_flag():
-    """Creates the email ingestion feature flag.
-    """
+    """Creates the email ingestion feature flag."""
     return FeatureFlagFactory(code=MAILBOX_NOTIFICATION_FEATURE_FLAG_NAME)
 
 
@@ -52,8 +51,7 @@ def base_interaction_data_fixture():
 
 @pytest.fixture
 def mock_notify_adviser_by_email(monkeypatch):
-    """Mocks the notify_adviser_by_email function.
-    """
+    """Mocks the notify_adviser_by_email function."""
     mock_notify_adviser_by_email = mock.Mock()
     monkeypatch.setattr(
         'datahub.interaction.email_processors.notify.notify_adviser_by_email',
@@ -64,14 +62,10 @@ def mock_notify_adviser_by_email(monkeypatch):
 
 @pytest.fixture
 def mock_message(base_interaction_data_fixture):
-    """Mock email messsage.
-    """
+    """Mock email messsage."""
     message = mock.Mock()
     message.from_ = [(None, base_interaction_data_fixture['sender_email'])]
-    message.to = [
-        (None, email)
-        for email in base_interaction_data_fixture['contact_emails']
-    ]
+    message.to = [(None, email) for email in base_interaction_data_fixture['contact_emails']]
     message.cc = []
     message.message_id = 'abc123'
     message.received = [{'date_utc': '2019-08-01T00:00:01'}]
@@ -80,14 +74,10 @@ def mock_message(base_interaction_data_fixture):
 
 @pytest.fixture
 def mock_plain_message(base_interaction_data_fixture):
-    """Mock email messsage.
-    """
+    """Mock email messsage."""
     message = mock.Mock()
     message.from_ = [(None, base_interaction_data_fixture['sender_email'])]
-    message.to = [
-        (None, email)
-        for email in base_interaction_data_fixture['contact_emails']
-    ]
+    message.to = [(None, email) for email in base_interaction_data_fixture['contact_emails']]
     message.cc = []
     message.message_id = 'abc123'
     message.received = [{'date_utc': '2019-08-01T00:00:01'}]
@@ -98,8 +88,7 @@ def mock_plain_message(base_interaction_data_fixture):
 
 @pytest.mark.django_db
 class TestCalendarInteractionEmailProcessor:
-    """Test the CalendarInteractionEmailProcessor class.
-    """
+    """Test the CalendarInteractionEmailProcessor class."""
 
     def _get_email_parser_mock(self, interaction_data, monkeypatch):
         """Given a spec of interaction data and monkeypatch object, sets a mocked
@@ -192,8 +181,7 @@ class TestCalendarInteractionEmailProcessor:
             *interaction_data['secondary_adviser_emails'],
         }
         interaction_adviser_emails = {
-            participant.adviser.email for participant
-            in interaction.dit_participants.all()
+            participant.adviser.email for participant in interaction.dit_participants.all()
         }
         assert interaction_adviser_emails == expected_adviser_emails
 
@@ -314,9 +302,7 @@ class TestCalendarInteractionEmailProcessor:
         )
         assert expected_log in caplog.record_tuples
         if expected_to_notify:
-            expected_error_message = (
-                EXCEPTION_NOTIFY_MESSAGES[invalid_invite_exception_class]
-            )
+            expected_error_message = EXCEPTION_NOTIFY_MESSAGES[invalid_invite_exception_class]
             mock_notify_adviser_by_email.assert_called_once_with(
                 Advisor.objects.filter(
                     email=base_interaction_data_fixture['sender_email'],
@@ -379,8 +365,7 @@ class TestCalendarInteractionEmailProcessor:
 
 @pytest.mark.django_db
 class TestInteractionPlainEmailProcessor:
-    """Test the InteractionPlainEmailProcessor class.
-    """
+    """Test the InteractionPlainEmailProcessor class."""
 
     def _get_email_parser_mock(self, interaction_data, monkeypatch):
         """Given a spec of interaction data and monkeypatch object, sets a mocked
@@ -454,8 +439,7 @@ class TestInteractionPlainEmailProcessor:
         mock_message,
         monkeypatch,
     ):
-        """Test that process_email saves a draft interaction when the email parser yields good data.
-        """
+        """Test that process_email saves a draft interaction when the email parser yields good data."""
         interaction_data = {
             **base_interaction_data_fixture,
             **interaction_data_overrides,
@@ -476,8 +460,7 @@ class TestInteractionPlainEmailProcessor:
             *interaction_data['secondary_adviser_emails'],
         }
         interaction_adviser_emails = {
-            participant.adviser.email for participant
-            in interaction.dit_participants.all()
+            participant.adviser.email for participant in interaction.dit_participants.all()
         }
         assert interaction_adviser_emails == expected_adviser_emails
 

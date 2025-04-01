@@ -19,8 +19,7 @@ class Command(BaseCommand):
     )
 
     def add_arguments(self, parser):
-        """Parse arguments/options for this command.
-        """
+        """Parse arguments/options for this command."""
         parser.add_argument(
             'last_updated_after',
             help=(
@@ -38,8 +37,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        """Run the scheduled task.
-        """
+        """Run the scheduled task."""
         schedule_get_company_updates(
             last_updated_after=options['last_updated_after'],
             fields_to_update=options['fields'],

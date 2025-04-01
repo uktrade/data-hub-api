@@ -44,8 +44,7 @@ class AddressValidator:
         return any(data_combined.values())
 
     def _validate_fields(self, data_combined):
-        """:returns: a dict containing potential errors
-        """
+        """:returns: a dict containing potential errors"""
         errors = {}
         for field_name, mapping in self.fields_mapping.items():
             if not mapping['required']:

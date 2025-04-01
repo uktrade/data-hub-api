@@ -54,8 +54,7 @@ logger = logging.getLogger(__name__)
 
 
 class DNBCompanySearchView(APIView):
-    """View for searching DNB companies.
-    """
+    """View for searching DNB companies."""
 
     permission_classes = (
         HasPermissions(
@@ -163,8 +162,7 @@ class DNBCompanySearchView(APIView):
 
 
 class DNBCompanyCreateView(APIView):
-    """View for creating datahub company from DNB data.
-    """
+    """View for creating datahub company from DNB data."""
 
     permission_classes = (
         HasPermissions(
@@ -221,8 +219,7 @@ class DNBCompanyCreateView(APIView):
 
 
 class DNBCompanyLinkView(APIView):
-    """View for linking a company to a DNB record.
-    """
+    """View for linking a company to a DNB record."""
 
     permission_classes = (
         HasPermissions(
@@ -268,8 +265,7 @@ class DNBCompanyLinkView(APIView):
 
 
 class DNBCompanyChangeRequestView(APIView):
-    """View for requesting change/s to DNB companies.
-    """
+    """View for requesting change/s to DNB companies."""
 
     permission_classes = (
         HasPermissions(
@@ -280,8 +276,7 @@ class DNBCompanyChangeRequestView(APIView):
 
     @method_decorator(enforce_request_content_type('application/json'))
     def post(self, request):
-        """A thin wrapper around the dnb-service change request API.
-        """
+        """A thin wrapper around the dnb-service change request API."""
         change_request_serializer = DNBCompanyChangeRequestSerializer(data=request.data)
         change_request_serializer.is_valid(raise_exception=True)
 
@@ -298,8 +293,7 @@ class DNBCompanyChangeRequestView(APIView):
         return Response(response)
 
     def get(self, request):
-        """A thin wrapper around the dnb-service change request API.
-        """
+        """A thin wrapper around the dnb-service change request API."""
         duns_number = request.query_params.get('duns_number', None)
         status = request.query_params.get('status', None)
 
@@ -323,8 +317,7 @@ class DNBCompanyChangeRequestView(APIView):
 
 
 class DNBCompanyInvestigationView(APIView):
-    """View for creating a new investigation to get D&B to investigate and create a company record.
-    """
+    """View for creating a new investigation to get D&B to investigate and create a company record."""
 
     permission_classes = (
         HasPermissions(
@@ -335,8 +328,7 @@ class DNBCompanyInvestigationView(APIView):
 
     @method_decorator(enforce_request_content_type('application/json'))
     def post(self, request):
-        """A wrapper around the investigation API endpoint for dnb-service.
-        """
+        """A wrapper around the investigation API endpoint for dnb-service."""
         investigation_serializer = DNBCompanyInvestigationSerializer(data=request.data)
         investigation_serializer.is_valid(raise_exception=True)
 
@@ -369,8 +361,7 @@ class DNBCompanyHierarchyView(APIView):
 
     @method_decorator(cache_page(COMPANY_TREE_TIMEOUT, key_prefix='company_hierarchy'))
     def get(self, request, company_id):
-        """Given a Company Id, get the data for the company hierarchy from dnb-service.
-        """
+        """Given a Company Id, get the data for the company hierarchy from dnb-service."""
         duns_number = validate_company_id(company_id)
 
         try:
@@ -447,16 +438,14 @@ class DNBCompanyHierarchyReducedView(DNBCompanyHierarchyView):
 
 
 class DNBCompanyHierarchyFullView(DNBCompanyHierarchyView):
-    """View for receiving datahub hierarchy of a company from DNB data.
-    """
+    """View for receiving datahub hierarchy of a company from DNB data."""
 
     def get_data(self, duns_number, companies_count):
         return get_company_hierarchy_data(duns_number)
 
 
 class DNBRelatedCompaniesView(APIView):
-    """View for receiving datahub hierarchy of a company from DNB data and return Data Hub IDs.
-    """
+    """View for receiving datahub hierarchy of a company from DNB data and return Data Hub IDs."""
 
     permission_classes = (
         HasPermissions(
@@ -484,8 +473,7 @@ class DNBRelatedCompaniesView(APIView):
 
 
 class DNBRelatedCompaniesCountView(APIView):
-    """View for returning the count of related companies a company has.
-    """
+    """View for returning the count of related companies a company has."""
 
     permission_classes = (
         HasPermissions(

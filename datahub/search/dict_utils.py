@@ -138,8 +138,11 @@ def core_team_advisers_list_of_dicts(list_of_obj):
     """
     if list_of_obj is None:
         return None
-    return [contact_or_adviser_dict(obj['adviser']) for obj in list_of_obj
-            if not obj['is_global_account_manager']]
+    return [
+        contact_or_adviser_dict(obj['adviser'])
+        for obj in list_of_obj
+        if not obj['is_global_account_manager']
+    ]
 
 
 def contact_or_adviser_list_of_dicts(manager):
@@ -163,8 +166,7 @@ def _computed_nested_dict(nested_field, dict_func):
     def get_dict(obj):
         fields = nested_field.split('.', maxsplit=1)
         if len(fields) != 2:
-            raise ValueError(
-                "nested_field must be in 'nested_object.nested_field' format.")
+            raise ValueError("nested_field must be in 'nested_object.nested_field' format.")
 
         related_object = getattr(obj, fields[0])
         if related_object is None:
@@ -185,12 +187,12 @@ def computed_field_function(function_name, dict_func):
     def get_dict(obj):
         field = getattr(obj, function_name, None)
         if field is None:
-            raise ValueError(
-                f'The object function "{function_name}" does not exist.')
+            raise ValueError(f'The object function "{function_name}" does not exist.')
         if not callable(field):
             raise ValueError(f'"{function_name}" is not callable.')
 
         return dict_func(field())
+
     return get_dict
 
 

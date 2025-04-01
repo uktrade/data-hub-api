@@ -16,8 +16,7 @@ class TestGetSearchApp:
     """Tests related to `get_search_app`."""
 
     def test_found(self, mocked_load_search_apps):
-        """Test that get_search_app returns the right search app for the name passed in.
-        """
+        """Test that get_search_app returns the right search app for the name passed in."""
         search_app = mock.Mock()
 
         mocked_load_search_apps.return_value = {

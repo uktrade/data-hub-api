@@ -1240,8 +1240,7 @@ class TestContactListV4(ContactListBase):
 
 
 class ContactVersioningBase(APITestMixin):
-    """Tests for versions created when interacting with the contact endpoints.
-    """
+    """Tests for versions created when interacting with the contact endpoints."""
 
     endpoint_namespace = None
 

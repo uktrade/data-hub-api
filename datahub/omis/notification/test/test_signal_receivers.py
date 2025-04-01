@@ -44,8 +44,7 @@ class TestNofityPostSaveOrderAdviser:
     """Tests for notifications sent when an adviser is added to an order."""
 
     def test_notify_on_order_assignee_added(self, mocked_notify_client):
-        """Test that a notification is sent to the adviser when they get assigned to an order.
-        """
+        """Test that a notification is sent to the adviser when they get assigned to an order."""
         order = OrderFactory(assignees=[])
 
         mocked_notify_client.reset_mock()
@@ -57,8 +56,7 @@ class TestNofityPostSaveOrderAdviser:
         assert call_args['template_id'] == Template.you_have_been_added_for_adviser.value
 
     def test_notify_on_order_subscriber_added(self, mocked_notify_client):
-        """Test that a notification is sent to the adviser when they get subscribed to an order.
-        """
+        """Test that a notification is sent to the adviser when they get subscribed to an order."""
         order = OrderFactory(assignees=[])
 
         mocked_notify_client.reset_mock()
@@ -75,8 +73,7 @@ class TestNofityPostDeleteOrderAdviser:
     """Tests for notifications sent when an adviser is removed from an order."""
 
     def test_notify_on_order_assignee_deleted(self, mocked_notify_client):
-        """Test that a notification is sent to the adviser when they get removed from an order.
-        """
+        """Test that a notification is sent to the adviser when they get removed from an order."""
         order = OrderFactory(assignees=[])
         assignee = OrderAssigneeFactory(order=order)
 
@@ -90,8 +87,7 @@ class TestNofityPostDeleteOrderAdviser:
         assert call_args['template_id'] == Template.you_have_been_removed_for_adviser.value
 
     def test_notify_on_order_subscriber_deleted(self, mocked_notify_client):
-        """Test that a notification is sent to the adviser when they get removed from an order.
-        """
+        """Test that a notification is sent to the adviser when they get removed from an order."""
         order = OrderFactory(assignees=[])
         subscriber = OrderSubscriberFactory(order=order)
 

@@ -37,8 +37,10 @@ class EmptyModelSerializer(serializers.ModelSerializer):
 
 def _create_get_for_object_stub(num_versions):
     """Creates a stub replacement for Version.objects.get_for_object."""
+
     def mock_versions(obj, model_db=None):
         return _VersionQuerySetStub(num_versions)
+
     return mock_versions
 
 
@@ -192,10 +194,12 @@ class TestAuditLog:
 
         assert response.data['count'] == 9  # 10 versions = 9 changes
         assert len(response.data['results']) == 2  # limited to 2 results
-        assert _create_canonical_url_object(response.data['next']) == \
-            _create_canonical_url_object('http://test/audit?limit=2&offset=6')
-        assert _create_canonical_url_object(response.data['previous']) == \
-            _create_canonical_url_object('http://test/audit?limit=2&offset=2')
+        assert _create_canonical_url_object(response.data['next']) == _create_canonical_url_object(
+            'http://test/audit?limit=2&offset=6',
+        )
+        assert _create_canonical_url_object(
+            response.data['previous'],
+        ) == _create_canonical_url_object('http://test/audit?limit=2&offset=2')
 
 
 class TestAuditField:

@@ -17,17 +17,14 @@ API_CALL_INTERVAL = 1 / API_CALLS_PER_SECOND
 
 
 class CompanyNotDunsLinkedError(Exception):
-    """Exception for when a company does not have a duns_number.
-    """
+    """Exception for when a company does not have a duns_number."""
 
 
 class Command(CSVBaseCommand):
-    """Command to update companies with the latest DNB data.
-    """
+    """Command to update companies with the latest DNB data."""
 
     def __init__(self, *args, **kwargs):
-        """Set some initial state related to API rate limiting.
-        """
+        """Set some initial state related to API rate limiting."""
         self.last_called_api_time = time.perf_counter()
         self.start_timestamp = now().isoformat(timespec='seconds')
         self.update_descriptor = f'command:update_company_dnb_data:{self.start_timestamp}'
@@ -37,15 +34,13 @@ class Command(CSVBaseCommand):
         super().__init__(*args, **kwargs)
 
     def handle(self, *args, **options):
-        """Override handle method to add some audit logging.
-        """
+        """Override handle method to add some audit logging."""
         super().handle(*args, **options)
         if not options['simulate']:
             self._record_audit_log()
 
     def add_arguments(self, parser):
-        """Set arguments for the management command.
-        """
+        """Set arguments for the management command."""
         super().add_arguments(parser)
         parser.add_argument(
             '-f',

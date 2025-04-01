@@ -27,7 +27,7 @@ def company_one_list_account_owner_changed(sender, instance, **kwargs):
     except sender.DoesNotExist:
         pass
     else:
-        if (original.one_list_account_owner_id is not instance.one_list_account_owner_id):
+        if original.one_list_account_owner_id is not instance.one_list_account_owner_id:
             schedule_sync_investment_projects_of_subsidiary_companies(
                 instance,
                 original.modified_on,
@@ -53,8 +53,7 @@ def company_business_type_post_migrate(sender, **kwargs):
     dispatch_uid='record_export_country_history_update',
 )
 def record_export_country_history_update(sender, instance, created, by, **kwargs):
-    """Record export country changes to history.
-    """
+    """Record export country changes to history."""
     action = CompanyExportCountryHistory.HistoryType.UPDATE
     if created:
         action = CompanyExportCountryHistory.HistoryType.INSERT
@@ -68,8 +67,7 @@ def record_export_country_history_update(sender, instance, created, by, **kwargs
     dispatch_uid='record_export_country_history_delete',
 )
 def record_export_country_history_delete(sender, instance, by, **kwargs):
-    """Record export country deletions to history.
-    """
+    """Record export country deletions to history."""
     action = CompanyExportCountryHistory.HistoryType.DELETE
     _record_export_country_history(instance, action, by)
 

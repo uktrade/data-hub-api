@@ -17,4 +17,4 @@ class CheckDatabase:
             return False, e
 
 
-services_to_check = (CheckDatabase, )
+services_to_check = (CheckDatabase,)

@@ -938,7 +938,8 @@ US_ZIP_STATES = (
     ('996', 'AK', 'Alaska'),
     ('997', 'AK', 'Alaska'),
     ('998', 'AK', 'Alaska'),
-    ('999', 'AK', 'Alaska'))
+    ('999', 'AK', 'Alaska'),
+)
 
 
 class CountryPostcodeReplacement(Enum):
@@ -947,14 +948,18 @@ class CountryPostcodeReplacement(Enum):
     # https://regex101.com/r/4XUuax/2 full explanation and examples of the regex
     united_states = CountryPostcodeReplacementConstant(
         Country.united_states.value.id,
-        (r'^.*?(?:(\d{5}-\d{4})|(\d{5}\s-\s\d{4})'
-         r'|(\d{5}\s–\s\d{4})|(\d{9})|(\d)\s?(\d{4})).*?$'),
+        (
+            r'^.*?(?:(\d{5}-\d{4})|(\d{5}\s-\s\d{4})'
+            r'|(\d{5}\s–\s\d{4})|(\d{9})|(\d)\s?(\d{4})).*?$'
+        ),
         r'\1\2\3\4\5\6',
     )
     # https://regex101.com/r/yTwwar/1/ full explanation and examples
     canada = CountryPostcodeReplacementConstant(
         Country.canada.value.id,
-        (r'(^(?!.*[DFIOQU])[A-VXY][0-9][A-Z] ?-?[0-9][A-Z][0-9]$)'
-         r'|^.*?((?!.*[DFIOQU])[A-VXY][0-9][A-Z] ?[0-9][A-Z][0-9])'),
+        (
+            r'(^(?!.*[DFIOQU])[A-VXY][0-9][A-Z] ?-?[0-9][A-Z][0-9]$)'
+            r'|^.*?((?!.*[DFIOQU])[A-VXY][0-9][A-Z] ?[0-9][A-Z][0-9])'
+        ),
         r'\1\2',
     )

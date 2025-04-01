@@ -12,8 +12,7 @@ from datahub.event.test.factories import EventFactory
 
 @pytest.mark.django_db
 def test_event_activity(api_client):
-    """Get a list of Events and test the returned JSON is valid.
-    """
+    """Get a list of Events and test the returned JSON is valid."""
     start = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
     with freeze_time(start) as frozen_datetime:
         event = EventFactory()
@@ -91,15 +90,15 @@ def test_event_activity(api_client):
                             ],
                         ],
                         'dit:hasRelatedTradeAgreements': event.has_related_trade_agreements,
-                        'dit:relatedTradeAgreements':
-                        [
+                        'dit:relatedTradeAgreements': [
                             *[
                                 {
                                     'id': f'dit:DataHubTradeAgreement:{trade_agreement.pk}',
                                     'name': trade_agreement.name,
                                 }
-                                for trade_agreement in
-                                event.related_trade_agreements.order_by('pk')
+                                for trade_agreement in event.related_trade_agreements.order_by(
+                                    'pk',
+                                )
                             ],
                         ],
                     },

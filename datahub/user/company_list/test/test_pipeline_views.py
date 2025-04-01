@@ -83,10 +83,12 @@ class TestGetPipelineItemsView(APITestMixin):
         data = []
         with freeze_time('Jan 14th, 2020', auto_tick_seconds=15):
             for name in names:
-                data.append(PipelineItemFactory(
-                    adviser=self.user,
-                    name=name,
-                ))
+                data.append(
+                    PipelineItemFactory(
+                        adviser=self.user,
+                        name=name,
+                    ),
+                )
             return data
 
     def test_default_is_sorted_by_created_on_desc(self, items):
@@ -778,10 +780,12 @@ class TestAddPipelineItemView(APITestMixin):
             'status': pipeline_status,
             'created_on': '2017-04-19T15:25:30.986208Z',
             'modified_on': '2017-04-19T15:25:30.986208Z',
-            'contacts': [{
-                'id': str(contact.pk),
-                'name': contact.name,
-            }],
+            'contacts': [
+                {
+                    'id': str(contact.pk),
+                    'name': contact.name,
+                },
+            ],
             'sector': {
                 'id': str(sector.pk),
                 'segment': sector.segment,
@@ -1271,8 +1275,9 @@ class TestPatchPipelineItemView(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
 
         response_data = response.json()
-        assert format_date_or_datetime(response_data['modified_on']) > \
-            format_date_or_datetime(item.modified_on)
+        assert format_date_or_datetime(response_data['modified_on']) > format_date_or_datetime(
+            item.modified_on,
+        )
 
     def test_cannot_patch_non_existent_contact(self):
         """Test that non existent contact can't be patched."""

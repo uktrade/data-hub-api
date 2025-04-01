@@ -55,7 +55,11 @@ def test_run(s3_stubber, caplog):
     assert len(caplog.records) == 1
 
     assert [list(project.actual_uk_regions.all()) for project in investment_projects] == [
-        [], regions[2:3], regions[0:1], regions[1:2], regions[3:5],
+        [],
+        regions[2:3],
+        regions[0:1],
+        regions[1:2],
+        regions[3:5],
     ]
 
 
@@ -105,7 +109,11 @@ def test_simulate(s3_stubber, caplog):
     assert len(caplog.records) == 2
 
     assert [list(project.actual_uk_regions.all()) for project in investment_projects] == [
-        [], [], regions[0:1], regions[1:2], [],
+        [],
+        [],
+        regions[0:1],
+        regions[1:2],
+        [],
     ]
 
 

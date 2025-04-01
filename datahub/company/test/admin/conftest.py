@@ -5,8 +5,7 @@ import pytest
 
 @pytest.fixture
 def dnb_response():
-    """Minimal valid DNB response.
-    """
+    """Minimal valid DNB response."""
     return {
         'results': [
             {

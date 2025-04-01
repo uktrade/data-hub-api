@@ -67,8 +67,7 @@ class TestContactWorksAtCompanyValidator:
             validator(data, serializer)
 
     def test_with_different_field_names(self):
-        """Test that the validation passes when using different field names.
-        """
+        """Test that the validation passes when using different field names."""
         serializer = mock.Mock()
         company = serializer.instance.company
         new_main_contact = mock.Mock(company=company)
@@ -229,13 +228,14 @@ class TestOrderDetailsFilledInSubValidator:
             OrderDetailsFilledInSubValidator,
             'get_extra_validators',
         ) as get_extra_validators:
-
             # trigger a second validation error on the same field
             get_extra_validators.return_value = [
                 mock.Mock(
-                    side_effect=ValidationError({
-                        'description': ['A different error...'],
-                    }),
+                    side_effect=ValidationError(
+                        {
+                            'description': ['A different error...'],
+                        },
+                    ),
                 ),
             ]
 
@@ -298,8 +298,7 @@ class TestOrderInStatusSubValidator:
     """Tests for the OrderInStatusSubValidator."""
 
     def test_validation_passes(self):
-        """Test that the validation passes if order.status is one of the allowed statuses.
-        """
+        """Test that the validation passes if order.status is one of the allowed statuses."""
         order = OrderFactory(status=OrderStatus.COMPLETE)
 
         validator = OrderInStatusSubValidator(
@@ -316,8 +315,7 @@ class TestOrderInStatusSubValidator:
             pytest.fail('Should not raise a validator error.')
 
     def test_validation_fails(self):
-        """Test that the validation fails if order.status is NOT one of the allowed statuses.
-        """
+        """Test that the validation fails if order.status is NOT one of the allowed statuses."""
         order = OrderFactory(status=OrderStatus.COMPLETE)
 
         validator = OrderInStatusSubValidator(
@@ -361,8 +359,7 @@ class TestOrderInStatusValidator:
         ],
     )
     def test_validation_passes(self, serializer_factory):
-        """Test that the validation passes if order.status is one of the allowed statuses.
-        """
+        """Test that the validation passes if order.status is one of the allowed statuses."""
         order = OrderFactory(status=OrderStatus.COMPLETE)
 
         validator = OrderInStatusValidator(
@@ -387,8 +384,7 @@ class TestOrderInStatusValidator:
         ],
     )
     def test_validation_fails(self, serializer_factory):
-        """Test that the validation fails if order.status is NOT one of the allowed statuses.
-        """
+        """Test that the validation fails if order.status is NOT one of the allowed statuses."""
         order = OrderFactory(status=OrderStatus.COMPLETE)
 
         validator = OrderInStatusValidator(
@@ -577,11 +573,11 @@ class TestCompletableOrderSubValidator:
     """Tests for the CompletableOrderSubValidator."""
 
     def test_ok_with_all_actual_time_fields_set(self):
-        """Test that the validation succeeds when all assignee.actual_time fields are set.
-        """
+        """Test that the validation succeeds when all assignee.actual_time fields are set."""
         order = mock.MagicMock()
         order.assignees.all.return_value = (
-            mock.MagicMock(actual_time=100), mock.MagicMock(actual_time=0),
+            mock.MagicMock(actual_time=100),
+            mock.MagicMock(actual_time=0),
         )
         validator = CompletableOrderSubValidator()
 
@@ -591,11 +587,11 @@ class TestCompletableOrderSubValidator:
             pytest.fail('Should not raise a validator error.')
 
     def test_fails_if_not_all_actual_time_fields_set(self):
-        """Test that the validation fails if not all assignee.actual_time fields are set.
-        """
+        """Test that the validation fails if not all assignee.actual_time fields are set."""
         order = mock.MagicMock()
         order.assignees.all.return_value = (
-            mock.MagicMock(actual_time=100), mock.MagicMock(actual_time=None),
+            mock.MagicMock(actual_time=100),
+            mock.MagicMock(actual_time=None),
         )
         validator = CompletableOrderSubValidator()
 
@@ -604,8 +600,7 @@ class TestCompletableOrderSubValidator:
 
         assert exc.value.detail == {
             'non_field_errors': (
-                'You must set the actual time for all assignees '
-                'to complete this order.'
+                'You must set the actual time for all assignees to complete this order.'
             ),
         }
 
@@ -623,7 +618,6 @@ class TestCancellableOrderSubValidator:
             (OrderStatus.PAID, False, False),
             (OrderStatus.COMPLETE, False, False),
             (OrderStatus.CANCELLED, False, False),
-
             # with force=True
             (OrderStatus.DRAFT, True, True),
             (OrderStatus.QUOTE_AWAITING_ACCEPTANCE, True, True),

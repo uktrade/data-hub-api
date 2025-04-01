@@ -19,12 +19,8 @@ class _Address:
             setattr(self, attr_name, model_field_value)
 
     def is_blank(self):
-        """:returns: True if none of the field values are defined, False otherwise.
-        """
-        return not any(
-            getattr(self, attr)
-            for attr in self.MAPPING
-        )
+        """:returns: True if none of the field values are defined, False otherwise."""
+        return not any(getattr(self, attr) for attr in self.MAPPING)
 
 
 def compose_official_address(company):
@@ -77,8 +73,7 @@ def populate_billing_data(order):
         'billing_address_country': company_address.country,
     }
     order_billing_address = {
-        field_name: getattr(order, field_name)
-        for field_name in default_billing_address
+        field_name: getattr(order, field_name) for field_name in default_billing_address
     }
 
     # compose the final data dict, default values are overridden

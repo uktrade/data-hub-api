@@ -1,8 +1,14 @@
 # flake8: noqa
 
-from gevent import monkey; monkey.patch_all()
-from psycogreen.gevent import patch_psycopg; patch_psycopg()
-from elasticapm.instrumentation.control import instrument; instrument()  # noqa: E402,E702
+from gevent import monkey
+
+monkey.patch_all()
+from psycogreen.gevent import patch_psycopg
+
+patch_psycopg()
+from elasticapm.instrumentation.control import instrument
+
+instrument()  # noqa: E402,E702
 
 import os
 import signal

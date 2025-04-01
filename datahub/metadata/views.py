@@ -38,9 +38,11 @@ def _create_metadata_view(mapping):
         attrs,
     )
 
-    return view_set.as_view({
-        'get': 'list',
-    })
+    return view_set.as_view(
+        {
+            'get': 'list',
+        },
+    )
 
 
 urls_args = []

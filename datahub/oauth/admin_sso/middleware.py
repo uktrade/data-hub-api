@@ -7,8 +7,7 @@ from datahub.core.utils import reverse_with_query_string
 
 
 class OAuthSessionMiddleware:
-    """OAuthSessionMiddleware checks if user has been logged in via OAuth.
-    """
+    """OAuthSessionMiddleware checks if user has been logged in via OAuth."""
 
     def __init__(self, get_response):
         """Get response."""

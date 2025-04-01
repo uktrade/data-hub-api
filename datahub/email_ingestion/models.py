@@ -15,8 +15,7 @@ class MailboxProcessingStatus(models.TextChoices):
 
 
 class MailboxLogging(models.Model):
-    """Model for mailbox logging.
-    """
+    """Model for mailbox logging."""
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     content = models.TextField()

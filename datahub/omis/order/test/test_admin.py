@@ -79,9 +79,11 @@ class TestCancelOrderAdmin(AdminTestMixin):
             ),
             (
                 {'reason': '00000000-0000-0000-0000-000000000000'},
-                {'reason': [
-                    'Select a valid choice. That choice is not one of the available choices.',
-                ]},
+                {
+                    'reason': [
+                        'Select a valid choice. That choice is not one of the available choices.',
+                    ],
+                },
             ),
         ],
     )
@@ -106,17 +108,20 @@ class TestCancelOrderAdmin(AdminTestMixin):
         ],
     )
     def test_400_if_in_disallowed_status(self, order_factory):
-        """Test that the action fails if the order is not in one of the allowed statuses.
-        """
+        """Test that the action fails if the order is not in one of the allowed statuses."""
         order = order_factory()
         url = reverse('admin:order_order_cancel', args=(order.pk,))
 
         response = self.client.get(url)
         assert response.status_code == 200
 
-        reason = CancellationReason.objects.filter(
-            disabled_on__isnull=True,
-        ).order_by('?').first()
+        reason = (
+            CancellationReason.objects.filter(
+                disabled_on__isnull=True,
+            )
+            .order_by('?')
+            .first()
+        )
 
         response = self.client.post(url, data={'reason': reason.pk})
         assert response.status_code == 200
@@ -126,8 +131,7 @@ class TestCancelOrderAdmin(AdminTestMixin):
         assert 'form' in response.context
         assert not response.context['form'].is_valid()
         err_msg = (
-            'The action cannot be performed '
-            f'in the current status {order.get_status_display()}.'
+            f'The action cannot be performed in the current status {order.get_status_display()}.'
         )
         assert response.context['form'].errors == {
             NON_FIELD_ERRORS: [err_msg],
@@ -153,17 +157,20 @@ class TestCancelOrderAdmin(AdminTestMixin):
         ],
     )
     def test_200_if_in_allowed_status(self, order_factory):
-        """Test that the order gets cancelled if it's in one of the allowed statuses.
-        """
+        """Test that the order gets cancelled if it's in one of the allowed statuses."""
         order = order_factory()
         url = reverse('admin:order_order_cancel', args=(order.pk,))
 
         response = self.client.get(url)
         assert response.status_code == 200
 
-        reason = CancellationReason.objects.filter(
-            disabled_on__isnull=True,
-        ).order_by('?').first()
+        reason = (
+            CancellationReason.objects.filter(
+                disabled_on__isnull=True,
+            )
+            .order_by('?')
+            .first()
+        )
 
         response = self.client.post(url, data={'reason': reason.pk}, follow=True)
         assert response.status_code == 200
