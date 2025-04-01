@@ -3,13 +3,11 @@ from uuid import uuid4
 
 import pytest
 from django.core.management import call_command
-
 from reversion.models import Version
 
 from datahub.company.test.factories import ExportExperienceFactory
 from datahub.export_win.models import Win
 from datahub.export_win.test.factories import WinFactory
-
 
 pytestmark = pytest.mark.django_db
 
@@ -25,7 +23,7 @@ def test_run(s3_stubber, caplog):
     bucket = 'test_bucket'
     object_key = 'test_key'
     csv_contents = ['export_win_id,export_experience_id']
-    for uuid, export_experience in zip(uuids, export_experiences):
+    for uuid, export_experience in zip(uuids, export_experiences, strict=False):
         csv_contents.append(f'{uuid},{export_experience.id}')
 
     csv_contents.append(f'{uuid4()},{uuid4()}')
@@ -45,7 +43,7 @@ def test_run(s3_stubber, caplog):
 
     call_command('update_legacy_export_wins_export_experience', bucket, object_key)
 
-    for uuid, export_experience in zip(uuids, export_experiences):
+    for uuid, export_experience in zip(uuids, export_experiences, strict=False):
         win = Win.objects.get(id=uuid)
         assert win.export_experience_id == export_experience.id
 
@@ -70,7 +68,7 @@ def test_simulate(s3_stubber, caplog):
     bucket = 'test_bucket'
     object_key = 'test_key'
     csv_contents = ['export_win_id,export_experience_id']
-    for uuid, export_experience in zip(uuids, export_experiences):
+    for uuid, export_experience in zip(uuids, export_experiences, strict=False):
         csv_contents.append(f'{uuid},{export_experience.id}')
 
     csv_contents.append(f'{uuid4()},{uuid4()}')
@@ -90,7 +88,7 @@ def test_simulate(s3_stubber, caplog):
 
     call_command('update_legacy_export_wins_export_experience', bucket, object_key, simulate=True)
 
-    for uuid, export_experience in zip(uuids, export_experiences):
+    for uuid, export_experience in zip(uuids, export_experiences, strict=False):
         win = Win.objects.get(id=uuid)
         assert win.export_experience_id != export_experience.id
 

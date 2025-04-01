@@ -23,7 +23,6 @@ from datahub.dnb_api.utils import (
     update_company_from_dnb,
 )
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -31,8 +30,7 @@ logger = logging.getLogger(__name__)
 @method_decorator(require_http_methods(['GET', 'POST']))
 @method_decorator(csrf_protect)
 def update_from_dnb(model_admin, request, object_id):
-    """
-    Tool to let admin users update company with a valid `duns_number`
+    """Tool to let admin users update company with a valid `duns_number`
     by pulling fresh data from D&B.
 
     The company record will be versioned after the update from

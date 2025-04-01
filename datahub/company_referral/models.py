@@ -12,8 +12,7 @@ from datahub.core.utils import get_front_end_url
 
 @reversion.register_base_model()
 class CompanyReferral(BaseModel):
-    """
-    An internal referral of a company, from one adviser (the creator of the referrer)
+    """An internal referral of a company, from one adviser (the creator of the referrer)
     to another (the recipient).
     """
 
@@ -86,8 +85,7 @@ class CompanyReferral(BaseModel):
         self.completed_on = now()
 
     def save(self, *args, **kwargs):
-        """
-        Create a `CompanyActivity` linked to this referral for
+        """Create a `CompanyActivity` linked to this referral for
         showing all activities related to a company.
         """
         with transaction.atomic():

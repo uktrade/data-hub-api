@@ -12,8 +12,7 @@ class QuoteManager(models.Manager):
     """Custom Quote Manager."""
 
     def create_from_order(self, order, by, commit=True):
-        """
-        :param order: Order instance for this quote
+        """:param order: Order instance for this quote
         :param by: who made the action
         :param commit: True if the changes have to be committed
 

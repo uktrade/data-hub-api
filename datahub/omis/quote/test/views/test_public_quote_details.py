@@ -8,8 +8,8 @@ from datahub.core.test_utils import APITestMixin, format_date_or_datetime
 from datahub.omis.order.constants import OrderStatus
 from datahub.omis.order.test.factories import (
     OrderFactory,
+    OrderWithOpenQuoteFactory,
 )
-from datahub.omis.order.test.factories import OrderWithOpenQuoteFactory
 from datahub.omis.quote.models import TermsAndConditions
 from datahub.omis.quote.test.factories import QuoteFactory
 
@@ -56,7 +56,7 @@ class TestPublicGetQuote(APITestMixin):
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    @pytest.mark.parametrize('verb', ('post', 'patch', 'delete'))
+    @pytest.mark.parametrize('verb', ['post', 'patch', 'delete'])
     def test_verbs_not_allowed(self, verb, public_omis_api_client):
         """Test that makes sure the other verbs are not allowed."""
         order = OrderFactory(
@@ -73,12 +73,12 @@ class TestPublicGetQuote(APITestMixin):
 
     @pytest.mark.parametrize(
         'order_status',
-        (
+        [
             OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
             OrderStatus.QUOTE_ACCEPTED,
             OrderStatus.PAID,
             OrderStatus.COMPLETE,
-        ),
+        ],
     )
     def test_get(self, order_status, public_omis_api_client):
         """Test a successful call to get a quote."""
@@ -169,7 +169,7 @@ class TestPublicGetQuote(APITestMixin):
 
     @pytest.mark.parametrize(
         'order_status',
-        (OrderStatus.DRAFT, OrderStatus.CANCELLED),
+        [OrderStatus.DRAFT, OrderStatus.CANCELLED],
     )
     def test_404_if_in_disallowed_status(self, order_status, public_omis_api_client):
         """Test that if the order is not in an allowed state, the endpoint returns 404."""
@@ -237,13 +237,13 @@ class TestAcceptOrder(APITestMixin):
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     @pytest.mark.parametrize(
-        'disallowed_status,quote_fields',
-        (
+        ('disallowed_status', 'quote_fields'),
+        [
             (OrderStatus.DRAFT, {'cancelled_on': now()}),
             (OrderStatus.QUOTE_ACCEPTED, {}),
             (OrderStatus.PAID, {}),
             (OrderStatus.COMPLETE, {}),
-        ),
+        ],
     )
     def test_409_if_order_in_disallowed_status(
         self,
@@ -251,8 +251,7 @@ class TestAcceptOrder(APITestMixin):
         quote_fields,
         public_omis_api_client,
     ):
-        """
-        Test that if the order is not in one of the allowed statuses, the endpoint
+        """Test that if the order is not in one of the allowed statuses, the endpoint
         returns 409.
         """
         quote = QuoteFactory(**quote_fields)

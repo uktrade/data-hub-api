@@ -9,15 +9,13 @@ class MetadataModel(BaseConstantModel):
 
 
 class InheritedModel(BaseModel):
-    """
-    Simple model extending BaseModel.
+    """Simple model extending BaseModel.
     This is to test the inherited fields.
     """
 
 
-class EmptyModel(models.Model):
-    """
-    Empty Django model.
+class EmptyModel(models.Model):  # noqa: DJ008
+    """Empty Django model.
     This is not going to have any fields apart from id.
     """
 
@@ -26,7 +24,7 @@ class MyDisableableModel(DisableableModel):
     """Simple DisableableModel."""
 
 
-class PermissionModel(models.Model):
+class PermissionModel(models.Model):  # noqa: DJ008
     """Simple Model with Permission."""
 
 
@@ -34,11 +32,11 @@ def _default_value_for_nullable_with_callable_default():
     return 'default value'
 
 
-class NullableWithDefaultModel(models.Model):
+class NullableWithDefaultModel(models.Model):  # noqa: DJ008
     """Model that has a nullable field with a default value."""
 
     nullable_with_default = models.BooleanField(null=True, default=True)
-    nullable_with_callable_default = models.CharField(
+    nullable_with_callable_default = models.CharField(  # noqa: DJ001
         null=True,
         max_length=255,
         default=_default_value_for_nullable_with_callable_default,
@@ -47,7 +45,7 @@ class NullableWithDefaultModel(models.Model):
     non_nullable_with_default = models.BooleanField(default=True)
 
 
-class ForeignAndM2MModel(models.Model):
+class ForeignAndM2MModel(models.Model):  # noqa: DJ008
     """Model with both a foreign key and many-to-many field with the same target model."""
 
     value = models.ForeignKey(
@@ -60,12 +58,12 @@ class ForeignAndM2MModel(models.Model):
     values = models.ManyToManyField(MetadataModel, blank=True, related_name='+')
 
 
-class Person(models.Model):
+class Person(models.Model):  # noqa: DJ008
     """Person model."""
 
     first_name = models.TextField()
     last_name = models.TextField()
-    country = models.TextField(null=True, blank=True)
+    country = models.TextField(null=True, blank=True)  # noqa: DJ001
 
 
 class Book(models.Model):
@@ -85,7 +83,7 @@ class Book(models.Model):
     )
     authors = models.ManyToManyField(Person, related_name='books')
     published_on = models.DateField()
-    genre = models.CharField(null=True, max_length=255, choices=GENRES)
+    genre = models.CharField(null=True, max_length=255, choices=GENRES)  # noqa: DJ001
 
     def __str__(self):
         """Human-friendly string representation."""
@@ -102,13 +100,13 @@ class PersonListItem(models.Model):
         return self.name
 
 
-class MultiAddressModel(models.Model):
+class MultiAddressModel(models.Model):  # noqa: DJ008
     """Model that has 2 addresses."""
 
     primary_address_1 = models.CharField(max_length=255)
     primary_address_2 = models.CharField(max_length=255, blank=True)
     primary_address_town = models.CharField(max_length=255)
-    primary_address_county = models.CharField(
+    primary_address_county = models.CharField(  # noqa: DJ001
         max_length=255,
         blank=True,
         null=True,  # deliberately  null=True
@@ -128,7 +126,7 @@ class MultiAddressModel(models.Model):
     primary_address_postcode = models.CharField(max_length=255, blank=True)
 
     secondary_address_1 = models.CharField(max_length=255, blank=True)
-    secondary_address_2 = models.CharField(
+    secondary_address_2 = models.CharField(  # noqa: DJ001
         max_length=255,
         blank=True,
         null=True,  # deliberately  null=True

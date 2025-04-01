@@ -12,13 +12,11 @@ from datahub.company.models import Company, CompanyPermission
 from datahub.company.test.factories import CompanyFactory
 from datahub.core.test_utils import AdminTestMixin, create_test_user
 
-
 DNB_V2_SEARCH_URL = urljoin(f'{settings.DNB_SERVICE_BASE_URL}/', 'v2/companies/search/')
 
 
 class TestUpdateFromDNB(AdminTestMixin):
-    """
-    Tests GET requests to 'Update from DNB'.
+    """Tests GET requests to 'Update from DNB'.
     """
 
     def _create_company(self, **kwargs):
@@ -34,8 +32,7 @@ class TestUpdateFromDNB(AdminTestMixin):
         return (change_url, update_url)
 
     def test_get(self, requests_mock, dnb_response):
-        """
-        Test that the link exists for a company with duns_number
+        """Test that the link exists for a company with duns_number
         and a user with the change company permission.
         """
         change_url, update_url = self._create_company(duns_number='123456789')
@@ -49,8 +46,7 @@ class TestUpdateFromDNB(AdminTestMixin):
         assert response.status_code == status.HTTP_200_OK
 
     def test_get_view_permission_only(self):
-        """
-        Test that the link does not exist for a company with duns_number
+        """Test that the link does not exist for a company with duns_number
         but a user with only the view company permission.
         """
         change_url, update_url = self._create_company(duns_number='123456789')
@@ -66,8 +62,7 @@ class TestUpdateFromDNB(AdminTestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_get_no_duns_number(self):
-        """
-        Test that the link does not exist when the company does not
+        """Test that the link does not exist when the company does not
         have a duns_number.
         """
         change_url, update_url = self._create_company()
@@ -77,8 +72,7 @@ class TestUpdateFromDNB(AdminTestMixin):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_post(self, requests_mock, dnb_response):
-        """
-        Test that a post request to 'update-from-dnb' updates
+        """Test that a post request to 'update-from-dnb' updates
         the company.
         """
         _, update_url = self._create_company(
@@ -113,17 +107,16 @@ class TestUpdateFromDNB(AdminTestMixin):
 
     @pytest.mark.parametrize(
         'dnb_response_code',
-        (
+        [
             status.HTTP_400_BAD_REQUEST,
             status.HTTP_401_UNAUTHORIZED,
             status.HTTP_403_FORBIDDEN,
             status.HTTP_404_NOT_FOUND,
             status.HTTP_500_INTERNAL_SERVER_ERROR,
-        ),
+        ],
     )
     def test_post_dnb_error(self, requests_mock, dnb_response_code):
-        """
-        Tests that the users get an error message if the dnb-service
+        """Tests that the users get an error message if the dnb-service
         doesn't return with a 200 status code.
         """
         _, update_url = self._create_company(duns_number='123456789')
@@ -139,8 +132,8 @@ class TestUpdateFromDNB(AdminTestMixin):
         assert str(messages[0]) == 'Something went wrong in an upstream service.'
 
     @pytest.mark.parametrize(
-        'search_results, expected_message',
-        (
+        ('search_results', 'expected_message'),
+        [
             (
                 [],
                 'No matching company found in D&B database.',
@@ -153,7 +146,7 @@ class TestUpdateFromDNB(AdminTestMixin):
                 [{'duns_number': '012345678'}],
                 'Something went wrong in an upstream service.',
             ),
-        ),
+        ],
     )
     def test_post_dnb_response_invalid(
         self,
@@ -161,8 +154,7 @@ class TestUpdateFromDNB(AdminTestMixin):
         search_results,
         expected_message,
     ):
-        """
-        Test if we get anything other than a single company from dnb-service,
+        """Test if we get anything other than a single company from dnb-service,
         we return an error message to the user.
         """
         _, update_url = self._create_company(duns_number='123456789')
@@ -182,8 +174,7 @@ class TestUpdateFromDNB(AdminTestMixin):
         requests_mock,
         dnb_response,
     ):
-        """
-        Tests that if the data returned from DNB does not
+        """Tests that if the data returned from DNB does not
         clear DataHub validation, we show an appropriate
         message to our users.
         """

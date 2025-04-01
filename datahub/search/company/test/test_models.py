@@ -8,7 +8,7 @@ pytestmark = pytest.mark.django_db
 
 
 class TestCompanySearchModel:
-    """Test for the company OpenSearch model"""
+    """Test for the company OpenSearch model."""
 
     def test_company_dbmodel_to_dict(self, opensearch):
         """Tests conversion of db model to dict."""

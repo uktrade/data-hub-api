@@ -18,8 +18,7 @@ pytestmark = pytest.mark.django_db
 
 @pytest.fixture
 def mock_time(monkeypatch):
-    """
-    Mock time.sleep() and time.perf_counter().
+    """Mock time.sleep() and time.perf_counter().
     """
     # Freeze perf_counter's perception of time at a value of 1.0
     mock_perf_counter = mock.Mock(return_value=1.0)
@@ -48,8 +47,7 @@ def mock_time(monkeypatch):
 
 @pytest.fixture
 def mock_job_scheduler(monkeypatch):
-    """
-    Mock sync_company_with_dnb
+    """Mock sync_company_with_dnb.
     """
     mocked_job_scheduler = mock.Mock()
     monkeypatch.setattr(
@@ -62,10 +60,10 @@ def mock_job_scheduler(monkeypatch):
 
 @pytest.mark.parametrize(
     'fields',
-    (
+    [
         None,
         ['global_ultimate_duns_number', 'name'],
-    ),
+    ],
 )
 @mock.patch('datahub.dbmaintenance.management.commands.update_company_dnb_data.log_to_sentry')
 @freeze_time('2019-01-01 11:12:13')
@@ -77,8 +75,7 @@ def test_run(
     mock_job_scheduler,
     fields,
 ):
-    """
-    Test that the command updates the specified records (ignoring ones with errors).
+    """Test that the command updates the specified records (ignoring ones with errors).
     """
     mock_sleep = mock_time['mock_sleep']
     caplog.set_level('WARNING')
@@ -151,8 +148,7 @@ def test_simulate(
     caplog,
     mock_job_scheduler,
 ):
-    """
-    Test that the command simulates updates if --simulate is passed in.
+    """Test that the command simulates updates if --simulate is passed in.
     """
     caplog.set_level('WARNING')
 
@@ -195,8 +191,7 @@ def test_simulate(
 
 
 def test_limit_call_rate(mock_time):
-    """
-    Test that the _limit_call_rate() method will enforce the API_CALLS_PER_SECOND
+    """Test that the _limit_call_rate() method will enforce the API_CALLS_PER_SECOND
     limit.
     """
     mock_sleep = mock_time['mock_sleep']

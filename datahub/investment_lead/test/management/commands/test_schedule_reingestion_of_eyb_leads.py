@@ -1,5 +1,4 @@
 import logging
-
 from datetime import (
     datetime,
     timedelta,
@@ -8,7 +7,6 @@ from datetime import (
 from unittest import mock
 
 import pytest
-
 from django.core.management import call_command
 from freezegun import freeze_time
 
@@ -29,13 +27,12 @@ from datahub.investment_lead.tasks.ingest_eyb_marketing import MARKETING_PREFIX
 from datahub.investment_lead.tasks.ingest_eyb_triage import TRIAGE_PREFIX
 from datahub.investment_lead.tasks.ingest_eyb_user import USER_PREFIX
 from datahub.investment_lead.test.factories import (
+    EYBLeadFactory,
     eyb_lead_marketing_record_faker,
     eyb_lead_triage_record_faker,
     eyb_lead_user_record_faker,
-    EYBLeadFactory,
     generate_hashed_uuid,
 )
-
 
 pytestmark = pytest.mark.django_db
 

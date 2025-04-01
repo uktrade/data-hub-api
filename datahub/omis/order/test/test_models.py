@@ -49,15 +49,12 @@ class TestGetLeadAssignee:
     """Tests for the get_lead_assignee() logic."""
 
     def test_without_assignees(self):
-        """
-        Test that get_lead_assignee() returns None if there are no assignees.
-        """
+        """Test that get_lead_assignee() returns None if there are no assignees."""
         order = OrderFactory(assignees=[])
         assert not order.get_lead_assignee()
 
     def test_without_lead_assignee(self):
-        """
-        Test that get_lead_assignee() returns None if there are assignees
+        """Test that get_lead_assignee() returns None if there are assignees
         but none of them is a lead.
         """
         order = OrderFactory(assignees=[])
@@ -65,9 +62,7 @@ class TestGetLeadAssignee:
         assert not order.get_lead_assignee()
 
     def test_with_lead_assignee(self):
-        """
-        Test that get_lead_assignee() returns the lead assignee if present.
-        """
+        """Test that get_lead_assignee() returns the lead assignee if present."""
         order = OrderFactory(assignees=[])
         lead_assignee = OrderAssigneeFactory(order=order, is_lead=True)
         OrderAssigneeFactory(order=order, is_lead=False)
@@ -80,11 +75,12 @@ class TestOrderGenerateReference:
     @freeze_time('2017-07-12 13:00:00.000000')
     @mock.patch('datahub.omis.order.models.get_random_string')
     def test_generates_reference_if_doesnt_exist(self, mock_get_random_string):
-        """
-        Test that if an Order is saved without reference, the system generates one automatically.
-        """
+        """Test that if an Order is saved without reference, the system generates one automatically."""
         mock_get_random_string.side_effect = [
-            'ABC', '123', 'CBA', '321',
+            'ABC',
+            '123',
+            'CBA',
+            '321',
         ]
 
         # create 1st
@@ -98,15 +94,17 @@ class TestOrderGenerateReference:
     @freeze_time('2017-07-12 13:00:00.000000')
     @mock.patch('datahub.omis.order.models.get_random_string')
     def test_doesnt_generate_reference_if_present(self, mock_get_random_string):
-        """
-        Test that when creating a new Order, if the system generates a reference that already
+        """Test that when creating a new Order, if the system generates a reference that already
         exists, it skips it and generates the next one.
         """
         # create existing Order with ref == 'ABC123/17'
         OrderWithRandomPublicTokenFactory(reference='ABC123/17')
 
         mock_get_random_string.side_effect = [
-            'ABC', '123', 'CBA', '321',
+            'ABC',
+            '123',
+            'CBA',
+            '321',
         ]
 
         # ABC123/17 already exists so create CBA321/17 instead
@@ -116,8 +114,7 @@ class TestOrderGenerateReference:
     @freeze_time('2017-07-12 13:00:00.000000')
     @mock.patch('datahub.omis.order.models.get_random_string')
     def test_cannot_generate_reference(self, mock_get_random_string):
-        """
-        Test that if there are more than 10 collisions, the generator algorithm raises a
+        """Test that if there are more than 10 collisions, the generator algorithm raises a
         RuntimeError.
         """
         max_retries = 10
@@ -125,7 +122,7 @@ class TestOrderGenerateReference:
 
         mock_get_random_string.side_effect = ['ABC', '123'] * max_retries
 
-        with pytest.raises(RuntimeError):
+        with pytest.raises(RuntimeError):  # noqa: PT012
             for _ in range(max_retries):
                 OrderWithRandomPublicTokenFactory()
 
@@ -135,8 +132,7 @@ class TestOrderGeneratePublicToken:
 
     @mock.patch('datahub.omis.order.models.secrets')
     def test_generates_public_token_if_doesnt_exist(self, mock_secrets):
-        """
-        Test that if an order is saved without public_token,
+        """Test that if an order is saved without public_token,
         the system generates one automatically.
         """
         mock_secrets.token_urlsafe.side_effect = ['9999', '8888']
@@ -151,8 +147,7 @@ class TestOrderGeneratePublicToken:
 
     @mock.patch('datahub.omis.order.models.secrets')
     def test_look_for_unused_public_token(self, mock_secrets):
-        """
-        Test that when creating a new order, if the system generates a public token
+        """Test that when creating a new order, if the system generates a public token
         that already exists, it skips it and generates the next one.
         """
         # create existing order with public_token == '9999'
@@ -166,8 +161,7 @@ class TestOrderGeneratePublicToken:
 
     @mock.patch('datahub.omis.order.models.secrets')
     def test_cannot_generate_public_token(self, mock_secrets):
-        """
-        Test that if there are more than 10 collisions, the generator algorithm raises a
+        """Test that if there are more than 10 collisions, the generator algorithm raises a
         RuntimeError.
         """
         max_retries = 10
@@ -175,7 +169,7 @@ class TestOrderGeneratePublicToken:
 
         mock_secrets.token_urlsafe.side_effect = ['9999'] * max_retries
 
-        with pytest.raises(RuntimeError):
+        with pytest.raises(RuntimeError):  # noqa: PT012
             for _ in range(max_retries):
                 OrderWithRandomReferenceFactory()
 
@@ -203,13 +197,13 @@ class TestGenerateQuote:
 
     @pytest.mark.parametrize(
         'disallowed_status',
-        (
+        [
             OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
             OrderStatus.QUOTE_ACCEPTED,
             OrderStatus.PAID,
             OrderStatus.COMPLETE,
             OrderStatus.CANCELLED,
-        ),
+        ],
     )
     def test_fails_if_order_not_in_draft(self, disallowed_status):
         """Test that if the order is not in `draft`, a quote cannot be generated."""
@@ -223,7 +217,7 @@ class TestGenerateQuote:
         with mock.patch.object(order, 'save') as mocked_save:
             mocked_save.side_effect = Exception()
 
-            with pytest.raises(Exception):
+            with pytest.raises(Exception):  # noqa: PT011
                 order.generate_quote(by=None)
             assert not Quote.objects.count()
 
@@ -295,15 +289,13 @@ class TestReopen:
 
     @pytest.mark.parametrize(
         'allowed_status',
-        (
+        [
             OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
             OrderStatus.QUOTE_ACCEPTED,
-        ),
+        ],
     )
     def test_ok_if_order_in_allowed_status(self, allowed_status):
-        """
-        Test that an order can be reopened if it's in one of the allowed statuses.
-        """
+        """Test that an order can be reopened if it's in one of the allowed statuses."""
         order = OrderFactory(status=allowed_status)
 
         order.reopen(by=AdviserFactory())
@@ -311,9 +303,7 @@ class TestReopen:
         assert order.status == OrderStatus.DRAFT
 
     def test_with_active_quote(self):
-        """
-        Test that if an order with an active quote is reopened, the quote is cancelled.
-        """
+        """Test that if an order with an active quote is reopened, the quote is cancelled."""
         order = OrderWithOpenQuoteFactory()
         assert not order.quote.is_cancelled()
 
@@ -329,12 +319,12 @@ class TestReopen:
 
     @pytest.mark.parametrize(
         'disallowed_status',
-        (
+        [
             OrderStatus.DRAFT,
             OrderStatus.PAID,
             OrderStatus.COMPLETE,
             OrderStatus.CANCELLED,
-        ),
+        ],
     )
     def test_fails_if_order_not_in_allowed_status(self, disallowed_status):
         """Test that if the order is in a disallowed status, it cannot be reopened."""
@@ -349,9 +339,7 @@ class TestUpdateInvoiceDetails:
     """Tests for the update_invoice_details method."""
 
     def test_ok_if_order_in_quote_accepted(self):
-        """
-        Test that update_invoice_details creates a new invoice and links it to the order.
-        """
+        """Test that update_invoice_details creates a new invoice and links it to the order."""
         order = OrderWithAcceptedQuoteFactory()
         old_invoice = order.invoice
 
@@ -362,18 +350,16 @@ class TestUpdateInvoiceDetails:
 
     @pytest.mark.parametrize(
         'disallowed_status',
-        (
+        [
             OrderStatus.DRAFT,
             OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
             OrderStatus.PAID,
             OrderStatus.COMPLETE,
             OrderStatus.CANCELLED,
-        ),
+        ],
     )
     def test_fails_if_order_not_in_allowed_status(self, disallowed_status):
-        """
-        Test that if the order is in a disallowed status, the invoice details cannot be updated.
-        """
+        """Test that if the order is in a disallowed status, the invoice details cannot be updated."""
         order = OrderFactory(status=disallowed_status)
         with pytest.raises(APIConflictException):
             order.update_invoice_details()
@@ -386,11 +372,10 @@ class TestAcceptQuote:
 
     @pytest.mark.parametrize(
         'allowed_status',
-        (OrderStatus.QUOTE_AWAITING_ACCEPTANCE,),
+        [OrderStatus.QUOTE_AWAITING_ACCEPTANCE],
     )
     def test_ok_if_order_in_allowed_status(self, allowed_status):
-        """
-        Test that the quote of an order can be accepted if the order is
+        """Test that the quote of an order can be accepted if the order is
         in one of the allowed statuses.
         """
         order = OrderWithOpenQuoteFactory(status=allowed_status)
@@ -415,12 +400,12 @@ class TestAcceptQuote:
 
     @pytest.mark.parametrize(
         'disallowed_status',
-        (
+        [
             OrderStatus.QUOTE_ACCEPTED,
             OrderStatus.PAID,
             OrderStatus.COMPLETE,
             OrderStatus.CANCELLED,
-        ),
+        ],
     )
     def test_fails_if_order_not_in_allowed_status(self, disallowed_status):
         """Test that if the order is in a disallowed status, the quote cannot be accepted."""
@@ -436,7 +421,7 @@ class TestAcceptQuote:
         with mock.patch.object(order, 'save') as mocked_save:
             mocked_save.side_effect = Exception()
 
-            with pytest.raises(Exception):
+            with pytest.raises(Exception):  # noqa: PT011
                 order.accept_quote(by=None)
 
             quote = order.quote
@@ -452,12 +437,10 @@ class TestMarkOrderAsPaid:
 
     @pytest.mark.parametrize(
         'allowed_status',
-        (OrderStatus.QUOTE_ACCEPTED,),
+        [OrderStatus.QUOTE_ACCEPTED],
     )
     def test_ok_if_order_in_allowed_status(self, allowed_status):
-        """
-        Test that the order can be marked as paid if the order is in one of the allowed statuses.
-        """
+        """Test that the order can be marked as paid if the order is in one of the allowed statuses."""
         order = OrderWithAcceptedQuoteFactory(status=allowed_status)
         adviser = AdviserFactory()
 
@@ -487,18 +470,16 @@ class TestMarkOrderAsPaid:
 
     @pytest.mark.parametrize(
         'disallowed_status',
-        (
+        [
             OrderStatus.DRAFT,
             OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
             OrderStatus.PAID,
             OrderStatus.COMPLETE,
             OrderStatus.CANCELLED,
-        ),
+        ],
     )
     def test_fails_if_order_not_in_allowed_status(self, disallowed_status):
-        """
-        Test that if the order is in a disallowed status, the order cannot be marked as paid.
-        """
+        """Test that if the order is in a disallowed status, the order cannot be marked as paid."""
         order = OrderFactory(status=disallowed_status)
         with pytest.raises(APIConflictException):
             order.mark_as_paid(by=None, payments_data=[])
@@ -506,20 +487,20 @@ class TestMarkOrderAsPaid:
         assert order.status == disallowed_status
 
     def test_atomicity(self):
-        """
-        Test that if there's a problem with saving the order, the payments are not saved either.
-        """
+        """Test that if there's a problem with saving the order, the payments are not saved either."""
         order = OrderWithAcceptedQuoteFactory()
         with mock.patch.object(order, 'save') as mocked_save:
             mocked_save.side_effect = Exception()
 
-            with pytest.raises(Exception):
+            with pytest.raises(Exception):  # noqa: PT011
                 order.mark_as_paid(
                     by=None,
-                    payments_data=[{
-                        'amount': order.total_cost,
-                        'received_on': dateutil_parse('2017-01-02').date(),
-                    }],
+                    payments_data=[
+                        {
+                            'amount': order.total_cost,
+                            'received_on': dateutil_parse('2017-01-02').date(),
+                        },
+                    ],
                 )
 
             order.refresh_from_db()
@@ -528,9 +509,7 @@ class TestMarkOrderAsPaid:
             assert not Payment.objects.count()
 
     def test_validation_error_if_amounts_less_then_total_cost(self):
-        """
-        Test that if the sum of the amounts is < order.total_cose, the call fails.
-        """
+        """Test that if the sum of the amounts is < order.total_cose, the call fails."""
         order = OrderWithAcceptedQuoteFactory()
         with pytest.raises(ValidationError):
             order.mark_as_paid(
@@ -549,12 +528,10 @@ class TestCompleteOrder:
 
     @pytest.mark.parametrize(
         'allowed_status',
-        (OrderStatus.PAID,),
+        [OrderStatus.PAID],
     )
     def test_ok_if_order_in_allowed_status(self, allowed_status):
-        """
-        Test that the order can be marked as complete if it's in one of the allowed statuses.
-        """
+        """Test that the order can be marked as complete if it's in one of the allowed statuses."""
         order = OrderPaidFactory(status=allowed_status, assignees=[])
         OrderAssigneeCompleteFactory(order=order)
         adviser = AdviserFactory()
@@ -569,18 +546,16 @@ class TestCompleteOrder:
 
     @pytest.mark.parametrize(
         'disallowed_status',
-        (
+        [
             OrderStatus.DRAFT,
             OrderStatus.QUOTE_AWAITING_ACCEPTANCE,
             OrderStatus.QUOTE_ACCEPTED,
             OrderStatus.COMPLETE,
             OrderStatus.CANCELLED,
-        ),
+        ],
     )
     def test_fails_if_order_not_in_allowed_status(self, disallowed_status):
-        """
-        Test that if the order is in a disallowed status, the order cannot be marked as complete.
-        """
+        """Test that if the order is in a disallowed status, the order cannot be marked as complete."""
         order = OrderFactory(status=disallowed_status)
         with pytest.raises(APIConflictException):
             order.complete(by=None)
@@ -588,15 +563,13 @@ class TestCompleteOrder:
         assert order.status == disallowed_status
 
     def test_atomicity(self):
-        """
-        Test that if there's a problem with saving the order, nothing gets saved.
-        """
+        """Test that if there's a problem with saving the order, nothing gets saved."""
         order = OrderPaidFactory(assignees=[])
         OrderAssigneeCompleteFactory(order=order)
         with mock.patch.object(order, 'save') as mocked_save:
             mocked_save.side_effect = Exception()
 
-            with pytest.raises(Exception):
+            with pytest.raises(Exception):  # noqa: PT011
                 order.complete(by=None)
 
             order.refresh_from_db()
@@ -605,8 +578,7 @@ class TestCompleteOrder:
             assert not order.completed_by
 
     def test_validation_error_if_not_all_actual_time_set(self):
-        """
-        Test that if not all assignee actual time fields have been set,
+        """Test that if not all assignee actual time fields have been set,
         a validation error is raised and the call fails.
         """
         order = OrderPaidFactory(assignees=[])
@@ -621,23 +593,20 @@ class TestCancelOrder:
     """Tests for when an order is cancelled."""
 
     @pytest.mark.parametrize(
-        'allowed_status,force',
-        (
+        ('allowed_status', 'force'),
+        [
             # force=False
             (OrderStatus.DRAFT, False),
             (OrderStatus.QUOTE_AWAITING_ACCEPTANCE, False),
-
             # force=True
             (OrderStatus.DRAFT, True),
             (OrderStatus.QUOTE_AWAITING_ACCEPTANCE, True),
             (OrderStatus.QUOTE_ACCEPTED, True),
             (OrderStatus.PAID, True),
-        ),
+        ],
     )
     def test_ok_if_order_in_allowed_status(self, allowed_status, force):
-        """
-        Test that the order can be cancelled if it's in one of the allowed statuses.
-        """
+        """Test that the order can be cancelled if it's in one of the allowed statuses."""
         reason = CancellationReason.objects.order_by('?').first()
         order = OrderFactory(status=allowed_status)
         adviser = AdviserFactory()
@@ -652,23 +621,20 @@ class TestCancelOrder:
         assert order.cancelled_by == adviser
 
     @pytest.mark.parametrize(
-        'disallowed_status,force',
-        (
+        ('disallowed_status', 'force'),
+        [
             # force=False
             (OrderStatus.QUOTE_ACCEPTED, False),
             (OrderStatus.PAID, False),
             (OrderStatus.COMPLETE, False),
             (OrderStatus.CANCELLED, False),
-
             # force=True
             (OrderStatus.COMPLETE, True),
             (OrderStatus.CANCELLED, True),
-        ),
+        ],
     )
     def test_fails_if_order_not_in_allowed_status(self, disallowed_status, force):
-        """
-        Test that if the order is in a disallowed status, the order cannot be cancelled.
-        """
+        """Test that if the order is in a disallowed status, the order cannot be cancelled."""
         reason = CancellationReason.objects.order_by('?').first()
         order = OrderFactory(status=disallowed_status)
 
@@ -678,16 +644,14 @@ class TestCancelOrder:
         assert order.status == disallowed_status
 
     def test_atomicity(self):
-        """
-        Test that if there's a problem with saving the order, nothing gets saved.
-        """
+        """Test that if there's a problem with saving the order, nothing gets saved."""
         reason = CancellationReason.objects.order_by('?').first()
         order = OrderFactory(status=OrderStatus.DRAFT)
 
         with mock.patch.object(order, 'save') as mocked_save:
             mocked_save.side_effect = Exception()
 
-            with pytest.raises(Exception):
+            with pytest.raises(Exception):  # noqa: PT011
                 order.cancel(by=None, reason=reason)
 
             order.refresh_from_db()
@@ -701,8 +665,7 @@ class TestOrderAssignee:
     """Tests for the OrderAssignee model."""
 
     def test_set_team_country_on_create(self):
-        """
-        Tests that when creating a new OrderAssignee, the `team` and `country`
+        """Tests that when creating a new OrderAssignee, the `team` and `country`
         properties get populated automatically.
         """
         # adviser belonging to a team with a country
@@ -729,8 +692,7 @@ class TestOrderAssignee:
         assert not assignee.country
 
     def test_team_country_dont_change_after_creation(self):
-        """
-        Tests that after creating an OrderAssignee, the `team` and `country`
+        """Tests that after creating an OrderAssignee, the `team` and `country`
         properties don't change with further updates.
         """
         team_france = TeamFactory(country_id=constants.Country.france.value.id)
@@ -754,7 +716,7 @@ class TestOrderAssignee:
         adviser = AdviserFactory()
         assignee = OrderAssigneeFactory(adviser=adviser)
 
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError):  # noqa: PT011, PT012
             assignee.adviser = AdviserFactory()
             assignee.save()
 
@@ -772,8 +734,7 @@ class TestOrder:
     """Tests for the Omis Order model."""
 
     def test_save(self):
-        """
-        Test save also saves to the `CompanyActivity` model and does not save to the
+        """Test save also saves to the `CompanyActivity` model and does not save to the
         `CompanyActivity` model if it already exists.
         """
         assert not CompanyActivity.objects.all().exists()

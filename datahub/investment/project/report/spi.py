@@ -1,5 +1,4 @@
-"""
-Investment project SPI report functions.
+"""Investment project SPI report functions.
 
 Service Performance Indicator report should have following metrics:
 
@@ -15,12 +14,13 @@ SPI5_END    - earliest interaction when aftercare was offered, only for new inve
 from dateutil.parser import parse as dateutil_parse
 from django.db.models import Q
 
-from datahub.core.constants import InvestmentProjectStage as Stage, Service
+from datahub.core.constants import InvestmentProjectStage as Stage
+from datahub.core.constants import Service
 from datahub.core.csv import csv_iterator
 from datahub.core.query_utils import (
+    JSONBBuildObject,
     get_array_agg_subquery,
     get_full_name_expression,
-    JSONBBuildObject,
 )
 from datahub.interaction.models import Interaction
 from datahub.investment.project.constants import InvestorType
@@ -135,8 +135,7 @@ class SPIReport:
         self.proposition_formatter = proposition_formatter
 
     def _get_spi_interactions(self, investment_project):
-        """
-        Gets SPI interactions for given Investment Project.
+        """Gets SPI interactions for given Investment Project.
 
         Takes earliest interaction for each SPI, if available.
         """
@@ -169,8 +168,7 @@ class SPIReport:
         )
 
     def _find_when_project_moved_to_won(self, investment_project):
-        """
-        Finds when project has been moved to Won stage.
+        """Finds when project has been moved to Won stage.
 
         Earliest date counts.
         """
@@ -181,8 +179,7 @@ class SPIReport:
         return stage_log.created_on if stage_log else None
 
     def _format_propositions(self, propositions):
-        """
-        Formats propositions.
+        """Formats propositions.
 
         Propositions need to be presented in the cell in following format:
 

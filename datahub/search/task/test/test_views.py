@@ -2,7 +2,6 @@ from datetime import datetime, timedelta
 from unittest import mock
 
 import pytest
-
 from rest_framework import status as status_codes
 from rest_framework.reverse import reverse
 
@@ -12,7 +11,6 @@ from datahub.investment.project.test.factories import InvestmentProjectFactory
 from datahub.metadata.test.factories import TeamFactory
 from datahub.search.task.apps import TaskSearchApp
 from datahub.task.test.factories import TaskFactory
-
 
 pytestmark = [
     pytest.mark.django_db,
@@ -25,7 +23,7 @@ class TestTaskSearch(APITestMixin):
     """Tests task search views."""
 
     def test_task_search_no_permissions(self):
-        """Should return 403"""
+        """Should return 403."""
         user = create_test_user(dit_team=TeamFactory())
         api_client = self.create_api_client(user=user)
         url = reverse('api-v4:search:task')
@@ -122,8 +120,7 @@ class TestTaskSearch(APITestMixin):
         self,
         opensearch_with_collector,
     ):
-        """
-        Tests task not created by id filter works in combination with other parameters.
+        """Tests task not created by id filter works in combination with other parameters.
         We're testing this with an adviser.
         """
         created_by_adviser = AdviserFactory()
@@ -215,8 +212,7 @@ class TestTaskSearch(APITestMixin):
         deep_get,
         opensearch_with_collector,
     ):
-        """
-        Tests edge case where no filter returned from raw_query
+        """Tests edge case where no filter returned from raw_query.
         """
         deep_get.return_value = None
 
@@ -243,8 +239,7 @@ class TestTaskSearch(APITestMixin):
         deep_get,
         opensearch_with_collector,
     ):
-        """
-        Test edge case where no filter_index found in raw_query filter
+        """Test edge case where no filter_index found in raw_query filter.
         """
         not_created_by_adviser = AdviserFactory()
         deep_get.return_value = [{}]
@@ -267,14 +262,14 @@ class TestTaskSearch(APITestMixin):
 
         assert response.data['count'] == 1
 
-    @pytest.mark.parametrize('sort_order, expected_order', [('asc', [0, 1]), ('desc', [1, 0])])
+    @pytest.mark.parametrize(('sort_order', 'expected_order'), [('asc', [0, 1]), ('desc', [1, 0])])
     def test_search_task_due_date_ordering(
         self,
         opensearch_with_collector,
         sort_order,
         expected_order,
     ):
-        """Tests task search ordering on due date"""
+        """Tests task search ordering on due date."""
         current_adviser = AdviserFactory()
         current_adviser.id = self.user.id
 
@@ -300,14 +295,14 @@ class TestTaskSearch(APITestMixin):
         assert response.data['results'][expected_order[0]]['id'] == str(yesterday_task.id)
         assert response.data['results'][expected_order[1]]['id'] == str(today_task.id)
 
-    @pytest.mark.parametrize('sort_order, expected_order', [('asc', [0, 1]), ('desc', [1, 0])])
+    @pytest.mark.parametrize(('sort_order', 'expected_order'), [('asc', [0, 1]), ('desc', [1, 0])])
     def test_search_task_company_name_ordering(
         self,
         opensearch_with_collector,
         sort_order,
         expected_order,
     ):
-        """Tests task search ordering on company name"""
+        """Tests task search ordering on company name."""
         company1 = CompanyFactory(name='Apple')
         company2 = CompanyFactory(name='Zebra')
 
@@ -336,7 +331,7 @@ class TestTaskSearch(APITestMixin):
         self,
         opensearch_with_collector,
     ):
-        """Tests task search ordering on company name puts companies with a name first"""
+        """Tests task search ordering on company name puts companies with a name first."""
         company1 = CompanyFactory(name='Apple')
         company2 = CompanyFactory(name='Zebra')
 
@@ -364,14 +359,14 @@ class TestTaskSearch(APITestMixin):
         assert response.data['results'][1]['id'] == str(company_task_2.id)
         assert response.data['results'][2]['id'] == str(generic_task.id)
 
-    @pytest.mark.parametrize('sort_order, expected_order', [('asc', [0, 1]), ('desc', [1, 0])])
+    @pytest.mark.parametrize(('sort_order', 'expected_order'), [('asc', [0, 1]), ('desc', [1, 0])])
     def test_search_task_investment_project_name_ordering(
         self,
         opensearch_with_collector,
         sort_order,
         expected_order,
     ):
-        """Tests task search ordering on investment project name"""
+        """Tests task search ordering on investment project name."""
         investment_project1 = InvestmentProjectFactory(name='Apple')
         investment_project2 = InvestmentProjectFactory(name='Zebra')
 
@@ -442,7 +437,7 @@ class TestTaskInvestmentProjectSearch(APITestMixin):
             'id': str(investment_project.investor_company.id),
         }
 
-    @pytest.mark.parametrize('archived', (True, False))
+    @pytest.mark.parametrize('archived', [True, False])
     def test_search_task_by_archived(self, opensearch_with_collector, archived):
         """Tests task search by archived."""
         current_adviser = AdviserFactory()
@@ -479,7 +474,7 @@ class TestTaskInvestmentProjectSearch(APITestMixin):
             tasks_for_assert,
         )
 
-    @pytest.mark.parametrize('status', ('Active', 'Complete'))
+    @pytest.mark.parametrize('status', ['Active', 'Complete'])
     def test_search_task_by_status(self, opensearch_with_collector, status):
         """Tests task search by status."""
         current_adviser = AdviserFactory()
@@ -517,14 +512,13 @@ class TestTaskInvestmentProjectSearch(APITestMixin):
             tasks_for_assert,
         )
 
-    @pytest.mark.parametrize('archived', (True, False))
+    @pytest.mark.parametrize('archived', [True, False])
     def test_search_task_by_archived_for_current_adviser(
         self,
         opensearch_with_collector,
         archived,
     ):
-        """
-        Only return tasks created by the current adviser or where they have been assigned as an
+        """Only return tasks created by the current adviser or where they have been assigned as an
         adviser even if there additional filters added. This tests uses archived for this.
         """
         current_adviser = AdviserFactory()

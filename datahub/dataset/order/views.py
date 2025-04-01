@@ -9,8 +9,7 @@ from datahub.omis.order.models import Order
 
 
 class OMISDatasetView(BaseFilterDatasetView):
-    """
-    An APIView that provides 'get' action which queries and returns desired fields for OMIS Dataset
+    """An APIView that provides 'get' action which queries and returns desired fields for OMIS Dataset
     to be consumed by Data-flow periodically. Data-flow uses response result to insert data into
     Dataworkspace through its defined API endpoints. The goal is presenting various reports to the
     users out of flattened table and let analyst to work on denormalized table to get
@@ -18,7 +17,7 @@ class OMISDatasetView(BaseFilterDatasetView):
     """
 
     def get_dataset(self, request):
-        """Returns list of OMIS Dataset records"""
+        """Returns list of OMIS Dataset records."""
         queryset = Order.objects.annotate(
             refund_created=get_aggregate_subquery(Order, Max('refunds__created_on')),
             refund_total_amount=get_aggregate_subquery(Order, Sum('refunds__total_amount')),

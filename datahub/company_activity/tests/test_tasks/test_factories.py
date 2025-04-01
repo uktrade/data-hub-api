@@ -8,8 +8,7 @@ from datahub.company_activity.tests.factories import CompanyActivityGreatExportE
 class TestCompanyActivityGreatExportEnquiryFactory:
 
     def test_factory_does_not_create_duplicates(self):
-        """
-        As the GreatExportEnquiry models save method is overwritten to create a company
+        """As the GreatExportEnquiry models save method is overwritten to create a company
         activity. The _create method on the factory returns the created activity from the save
         rather than creating a new one causing duplicates.
         """

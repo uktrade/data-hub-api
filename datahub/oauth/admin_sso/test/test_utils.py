@@ -138,15 +138,14 @@ def test_get_adviser_by_sso_user_profile_email_id():
 
 @pytest.mark.parametrize(
     'flags',
-    (
+    [
         {'is_staff': False, 'is_active': True},
         {'is_staff': True, 'is_active': False},
         {'is_staff': False, 'is_active': False},
-    ),
+    ],
 )
 def test_get_adviser_by_sso_email_id_non_staff_or_active(flags):
-    """
-    Test that AuthenticationFailed is raised if SSO email user id matches and user has neither
+    """Test that AuthenticationFailed is raised if SSO email user id matches and user has neither
     is_staff nor is_active flags set.
     """
     AdviserFactory(sso_email_user_id='some-123@email', **flags)

@@ -22,7 +22,8 @@ class CompanyExportAdminForm(forms.ModelForm):
 
     class Meta:
         model = CompanyExport
-        exclude = []  # fields are specified in CompanyExportAdmin
+        # fields are specified in CompanyExportAdmin
+        exclude = []  # noqa: DJ006
 
 
 @admin.register(CompanyExport)
@@ -47,9 +48,7 @@ class CompanyExportAdmin(BaseModelAdminMixin, VersionAdmin):
         'owner',
         'team_members',
     )
-    read_only_fields = (
-        'id',
-    )
+    read_only_fields = ('id',)
     list_display = (
         'title',
         'company',

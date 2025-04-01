@@ -34,9 +34,7 @@ def test_sector_name_level_two():
 
 
 def test_sector_save_recursive_via_parent():
-    """
-    Test that it's not possible to save a sector when it's part of a recursive hierarchy.
-    """
+    """Test that it's not possible to save a sector when it's part of a recursive hierarchy."""
     parent = SectorFactory()
     sector = SectorFactory(parent=parent)
     parent.parent = sector
@@ -45,15 +43,14 @@ def test_sector_save_recursive_via_parent():
 
 
 def test_sector_name_recursive_via_parent_unsaved():
-    """
-    Test that accessing the path of a sector raises an exception when it's part of a recursive
+    """Test that accessing the path of a sector raises an exception when it's part of a recursive
     hierarchy.
     """
     parent = SectorFactory()
     sector = SectorFactory(parent=parent)
     parent.parent = sector
     with pytest.raises(DataHubError):
-        sector.name
+        sector.name  # noqa: B018
 
 
 def test_sector_save_recursive():
@@ -65,18 +62,17 @@ def test_sector_save_recursive():
 
 
 def test_sector_name_level_recursive_unsaved():
-    """
-    Test that accessing the path of a sector raises an exception when its parent points at
+    """Test that accessing the path of a sector raises an exception when its parent points at
     itself.
     """
     sector = SectorFactory()
     sector.parent = sector
     with pytest.raises(DataHubError):
-        sector.name
+        sector.name  # noqa: B018
 
 
 @pytest.mark.parametrize(
-    ['segments', 'expected_name'],
+    ('segments', 'expected_name'),
     [
         (
             ['Level 0', 'Level 1', 'Level 2'],
@@ -106,7 +102,7 @@ def test_get_name_from_segments(segments, expected_name):
 
 
 @pytest.mark.parametrize(
-    ['name', 'expected_segments'],
+    ('name', 'expected_segments'),
     [
         (
             'Level 0 : Level 1 : Level 2',
@@ -147,8 +143,7 @@ def test_get_segments_from_sector_instance():
 
 
 def test_service_with_children_has_no_contexts():
-    """
-    Test that services with children have no context.
+    """Test that services with children have no context.
 
     Services with children are being shown depending on if any of their children
     have desired context.

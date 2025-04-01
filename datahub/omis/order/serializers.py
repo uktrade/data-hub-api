@@ -31,7 +31,6 @@ from datahub.omis.order.validators import (
     OrderInStatusValidator,
 )
 
-
 ORDER_FIELDS_INVOICE_RELATED = {
     'billing_address_1',
     'billing_address_2',
@@ -47,7 +46,7 @@ ORDER_FIELDS_INVOICE_RELATED = {
 
 
 class OrderSerializer(serializers.ModelSerializer):
-    """Order DRF serializer"""
+    """Order DRF serializer."""
 
     created_by = NestedRelatedField(Advisor, read_only=True)
     modified_by = NestedRelatedField(Advisor, read_only=True)
@@ -165,9 +164,15 @@ class OrderSerializer(serializers.ModelSerializer):
                 {
                     OrderStatus.DRAFT: {
                         *ORDER_FIELDS_INVOICE_RELATED,
-                        'description', 'service_types', 'sector', 'uk_region',
-                        'contacts_not_to_approach', 'contact', 'existing_agents',
-                        'further_info', 'delivery_date',
+                        'description',
+                        'service_types',
+                        'sector',
+                        'uk_region',
+                        'contacts_not_to_approach',
+                        'contact',
+                        'existing_agents',
+                        'further_info',
+                        'delivery_date',
                     },
                     OrderStatus.QUOTE_AWAITING_ACCEPTANCE: {
                         *ORDER_FIELDS_INVOICE_RELATED,
@@ -254,24 +259,19 @@ class OrderSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        """
-        Populate `uk_region` during the order creation if not otherwise specified.
-        """
+        """Populate `uk_region` during the order creation if not otherwise specified."""
         if 'uk_region' not in validated_data:
             validated_data['uk_region'] = validated_data['company'].uk_region
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
-        """
-        Update invoice details if any of the invoice related fields has changed.
-        """
+        """Update invoice details if any of the invoice related fields has changed."""
         with transaction.atomic():
             instance = super().update(instance, validated_data)
 
             # update invoice details if necessary
-            if (
-                instance.status == OrderStatus.QUOTE_ACCEPTED
-                and (ORDER_FIELDS_INVOICE_RELATED & validated_data.keys())
+            if instance.status == OrderStatus.QUOTE_ACCEPTED and (
+                ORDER_FIELDS_INVOICE_RELATED & validated_data.keys()
             ):
                 instance.update_invoice_details()
 
@@ -359,9 +359,7 @@ class PublicOrderSerializer(serializers.ModelSerializer):
 
 
 def existing_adviser(adviser_id):
-    """
-    DRF Validator. It raises a ValidationError if adviser_id is not a valid adviser id.
-    """
+    """DRF Validator. It raises a ValidationError if adviser_id is not a valid adviser id."""
     try:
         Advisor.objects.get(id=adviser_id)
     except Advisor.DoesNotExist:
@@ -384,20 +382,15 @@ class SubscribedAdviserListSerializer(serializers.ListSerializer):
     ]
 
     def save(self, **kwargs):
-        """
-        Overrides save as the logic is not the standard DRF one.
+        """Overrides save as the logic is not the standard DRF one.
 
         1. if a subscriber is still in the list, don't do anything
         2. if a subscriber was not in the list, add it
         3. if a subscriber is not in the list any more, remove it
         """
-        assert hasattr(self, '_errors'), (
-            'You must call `.is_valid()` before calling `.save()`.'
-        )
+        assert hasattr(self, '_errors'), 'You must call `.is_valid()` before calling `.save()`.'
 
-        assert not self.errors, (
-            'You cannot call `.save()` on a serializer with invalid data.'
-        )
+        assert not self.errors, 'You cannot call `.save()` on a serializer with invalid data.'
 
         order = self.context['order']
         modified_by = self.context['modified_by']
@@ -434,9 +427,7 @@ class TeamWithRegionSerializer(serializers.ModelSerializer):
 
 
 class SubscribedAdviserSerializer(serializers.Serializer):
-    """
-    DRF serializer for an adviser subscribed to an order.
-    """
+    """DRF serializer for an adviser subscribed to an order."""
 
     id = serializers.UUIDField(validators=[existing_adviser])
     first_name = serializers.CharField(read_only=True)
@@ -478,9 +469,7 @@ class OrderAssigneeListSerializer(serializers.ListSerializer):
         return data
 
     def validate_only_one_lead(self, data):
-        """
-        If the order is in draft, validate that only one assignee can be marked as lead.
-        """
+        """If the order is in draft, validate that only one assignee can be marked as lead."""
         order = self.context['order']
         force_delete = self.context['force_delete']
 
@@ -508,31 +497,22 @@ class OrderAssigneeListSerializer(serializers.ListSerializer):
         # in case of PATCH if not force_delete, you don't have to pass all the elements
         # so we need to check the remaining db records.
         if not force_delete:
-            leads += [
-                adviser_id
-                for adviser_id, is_lead in existing_assignees.items()
-                if is_lead
-            ]
+            leads += [adviser_id for adviser_id, is_lead in existing_assignees.items() if is_lead]
 
         if len(leads) > 1:
             raise ValidationError('Only one lead allowed.')
         return data
 
     def save(self, **kwargs):
-        """
-        Overrides save as the logic is not the standard DRF one.
+        """Overrides save as the logic is not the standard DRF one.
 
         1. if an assignee is not in data and force_delete is True then, assignee is deleted
         2. if the assignee is in data, it gets updated
         3. if data has extra assignees, they get created
         """
-        assert hasattr(self, '_errors'), (
-            'You must call `.is_valid()` before calling `.save()`.'
-        )
+        assert hasattr(self, '_errors'), 'You must call `.is_valid()` before calling `.save()`.'
 
-        assert not self.errors, (
-            'You cannot call `.save()` on a serializer with invalid data.'
-        )
+        assert not self.errors, 'You cannot call `.save()` on a serializer with invalid data.'
 
         order = self.context['order']
         modified_by = self.context['modified_by']
@@ -566,7 +546,7 @@ class OrderAssigneeListSerializer(serializers.ListSerializer):
 
         # ADD
         for data in validated_data_dict.values():
-            data = {
+            data = {  # noqa: PLW2901
                 **data,
                 'order': order,
                 'created_by': modified_by,
@@ -612,7 +592,6 @@ class OrderAssigneeSerializer(serializers.ModelSerializer):
                         ],
                     ),
                 ),
-
                 # can't be changed when in quote_awaiting_acceptance, quote_accepted or paid
                 ValidationRule(
                     'readonly',

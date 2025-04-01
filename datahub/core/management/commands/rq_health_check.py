@@ -1,5 +1,4 @@
 import sys
-
 from functools import reduce
 from logging import getLogger
 from operator import concat
@@ -8,7 +7,6 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from redis import Redis
 from rq import Worker
-
 
 logger = getLogger(__name__)
 

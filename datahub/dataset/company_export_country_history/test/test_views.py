@@ -1,7 +1,5 @@
 import pytest
-
 from django.urls import reverse
-
 from freezegun import freeze_time
 
 from datahub.company.test.factories import CompanyExportCountryHistoryFactory
@@ -10,7 +8,7 @@ from datahub.dataset.core.test import BaseDatasetViewTest
 
 
 def get_expected_data_from_export_country_history(export_country_history):
-    """Returns export_country_history data as a dictionary"""
+    """Returns export_country_history data as a dictionary."""
     return {
         'id': str(export_country_history.id),
         'company_id': str(export_country_history.company_id),
@@ -25,15 +23,14 @@ def get_expected_data_from_export_country_history(export_country_history):
 
 @pytest.mark.django_db
 class TestCompanyExportCountryHistoryDatasetView(BaseDatasetViewTest):
-    """
-    Tests for CompanyExportCountryHistoryDatasetView
+    """Tests for CompanyExportCountryHistoryDatasetView.
     """
 
     factory = CompanyExportCountryHistoryFactory
     view_url = reverse('api-v4:dataset:company-export-country-history-dataset')
 
     def test_success(self, data_flow_api_client):
-        """Test that endpoint returns with expected data for a single event"""
+        """Test that endpoint returns with expected data for a single event."""
         export_country_history = self.factory()
         response = data_flow_api_client.get(self.view_url)
         assert response.status_code == 200
@@ -46,7 +43,7 @@ class TestCompanyExportCountryHistoryDatasetView(BaseDatasetViewTest):
         assert result == expected_result
 
     def test_with_multiple_events(self, data_flow_api_client):
-        """Test that endpoint returns correct order of event records"""
+        """Test that endpoint returns correct order of event records."""
         with freeze_time('2019-01-01 12:30:00'):
             export_country_history_1 = self.factory()
         with freeze_time('2019-01-03 12:00:00'):

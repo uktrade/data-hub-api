@@ -1,5 +1,4 @@
 import pytest
-
 from django.db.models.signals import m2m_changed, post_delete, post_save, pre_delete, pre_save
 
 
@@ -21,5 +20,5 @@ def mute_task_signals(request):
                 signal.sender_receivers_cache.clear()
                 signal.receivers = receivers
 
-        request.addfinalizer(restore_signals)
+        request.addfinalizer(restore_signals)  # noqa: PT021
         yield

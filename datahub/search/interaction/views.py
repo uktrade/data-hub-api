@@ -9,13 +9,13 @@ from datahub.core.query_utils import (
     get_full_name_expression,
     get_string_agg_subquery,
 )
-from datahub.interaction.models import Interaction as DBInteraction, InteractionDITParticipant
+from datahub.interaction.models import Interaction as DBInteraction
+from datahub.interaction.models import InteractionDITParticipant
 from datahub.metadata.models import Sector
-from datahub.metadata.query_utils import get_sector_name_subquery
-from datahub.metadata.query_utils import get_service_name_subquery
+from datahub.metadata.query_utils import get_sector_name_subquery, get_service_name_subquery
 from datahub.search.interaction import InteractionSearchApp
 from datahub.search.interaction.serializers import SearchInteractionQuerySerializer
-from datahub.search.views import register_v3_view, SearchAPIView, SearchExportAPIView
+from datahub.search.views import SearchAPIView, SearchExportAPIView, register_v3_view
 
 
 class SearchInteractionAPIViewMixin:

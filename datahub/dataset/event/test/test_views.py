@@ -9,7 +9,7 @@ from datahub.event.test.factories import DisabledEventFactory, EventFactory
 
 
 def get_expected_data_from_event(event):
-    """Returns event data as a dictionary"""
+    """Returns event data as a dictionary."""
     return {
         'address_1': event.address_1,
         'address_2': event.address_2,
@@ -41,20 +41,19 @@ def get_expected_data_from_event(event):
 
 @pytest.mark.django_db
 class TestEventDatasetViewSet(BaseDatasetViewTest):
-    """
-    Tests for the events dataset endpoint
+    """Tests for the events dataset endpoint.
     """
 
     view_url = reverse('api-v4:dataset:events-dataset')
     factory = EventFactory
 
     @pytest.mark.parametrize(
-        'event_factory', (
+        'event_factory', [
             EventFactory,
             DisabledEventFactory,
-        ))
+        ])
     def test_success(self, data_flow_api_client, event_factory):
-        """Test that endpoint returns with expected data for a single event"""
+        """Test that endpoint returns with expected data for a single event."""
         event = event_factory()
         response = data_flow_api_client.get(self.view_url)
         assert response.status_code == status.HTTP_200_OK
@@ -65,7 +64,7 @@ class TestEventDatasetViewSet(BaseDatasetViewTest):
         assert result == expected_result
 
     def test_with_multiple_events(self, data_flow_api_client):
-        """Test that endpoint returns correct order of event records"""
+        """Test that endpoint returns correct order of event records."""
         with freeze_time('2019-01-01 12:30:00'):
             event_1 = EventFactory()
         with freeze_time('2019-01-03 12:00:00'):

@@ -51,8 +51,7 @@ from datahub.metadata.serializers import SERVICE_LEAF_NODE_NOT_SELECTED_MESSAGE
 
 
 class InteractionDITParticipantSerializer(UniqueAdvisersBaseSerializer):
-    """
-    Interaction DIT participant serialiser.
+    """Interaction DIT participant serialiser.
 
     Used as a field in InteractionSerializer.
     """
@@ -89,8 +88,7 @@ NestedCompanyReferralDetail = partial(
 
 
 class BaseInteractionSerializer(serializers.ModelSerializer):
-    """
-    Interaction serialiser.
+    """Interaction serialiser.
 
     Note that interactions can also be created and/or modified by:
 
@@ -233,8 +231,7 @@ class BaseInteractionSerializer(serializers.ModelSerializer):
         return value
 
     def to_internal_value(self, data):
-        """
-        Add support for both `company` and `companies` field.
+        """Add support for both `company` and `companies` field.
 
         TODO: this method should be removed once `company` field is removed.
         """
@@ -250,8 +247,7 @@ class BaseInteractionSerializer(serializers.ModelSerializer):
         return super().to_internal_value(data)
 
     def validate(self, data):
-        """
-        Validates and cleans the data.
+        """Validates and cleans the data.
 
         This removes the semi-virtual field is_event from the data.
 
@@ -281,8 +277,7 @@ class BaseInteractionSerializer(serializers.ModelSerializer):
 
     @atomic
     def create(self, validated_data):
-        """
-        Create an interaction.
+        """Create an interaction.
 
         Overridden to handle updating of dit_participants
         and export_countries.
@@ -298,8 +293,7 @@ class BaseInteractionSerializer(serializers.ModelSerializer):
 
     @atomic
     def update(self, instance, validated_data):
-        """
-        Create an interaction.
+        """Create an interaction.
 
         Overridden to handle updating of dit_participants
         and export_countries.
@@ -329,8 +323,7 @@ class BaseInteractionSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(error, code='cannot_unset_theme')
 
     def _save_dit_participants(self, interaction, validated_dit_participants):
-        """
-        Updates the DIT participants for an interaction.
+        """Updates the DIT participants for an interaction.
 
         This compares the provided list of participants with the current list, and adds and
         removes participants as necessary.
@@ -363,8 +356,7 @@ class BaseInteractionSerializer(serializers.ModelSerializer):
             old_adviser_mapping[adviser].delete()
 
     def _save_export_countries(self, interaction, validated_export_countries):
-        """
-        Adds export countries related to an interaction.
+        """Adds export countries related to an interaction.
 
         Syncs interaction export countries into company export countries
         when interaction is created.
@@ -407,7 +399,7 @@ class BaseInteractionSerializer(serializers.ModelSerializer):
 
 
 class InteractionSerializer(BaseInteractionSerializer):
-    """Interaction Serializer for V3 endpoint"""
+    """Interaction Serializer for V3 endpoint."""
 
     related_trade_agreements = NestedRelatedField(
         'metadata.TradeAgreement', many=True, required=False, allow_empty=True,
@@ -610,7 +602,7 @@ class InteractionSerializer(BaseInteractionSerializer):
 
 
 class InteractionSerializerV4(BaseInteractionSerializer):
-    """Interaction Serializer for V4 Endpoint"""
+    """Interaction Serializer for V4 Endpoint."""
 
     related_trade_agreements = NestedRelatedField(
         'metadata.TradeAgreement', many=True, required=True, allow_empty=True,

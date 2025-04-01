@@ -1,4 +1,5 @@
 """Tests for the update_company_sector management command."""
+
 from datetime import datetime, timezone
 from io import BytesIO
 
@@ -16,21 +17,21 @@ pytestmark = pytest.mark.django_db
 
 
 @pytest.mark.parametrize(
-    'simulate,overwrite',
-    (
+    ('simulate', 'overwrite'),
+    [
         (True, False),
         (False, False),
         (False, True),
-    ),
+    ],
 )
 def test_run(s3_stubber, caplog, simulate, overwrite):
-    """
-    Test that the command:
+    """Test the command.
 
-    - updates records if simulate=False is passed
-    - doesn't update records if simulate=True is passed
-    - only overwrites non-None values if overwrite=True is passed
-    - ignores rows with errors
+    It should:
+    - update records if simulate=False is passed
+    - not update records if simulate=True is passed
+    - only overwrite non-None values if overwrite=True is passed
+    - ignore rows with errors
     """
     caplog.set_level('ERROR')
 

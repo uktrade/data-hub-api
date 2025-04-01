@@ -11,8 +11,7 @@ pytestmark = pytest.mark.django_db
 
 
 def test_run(s3_stubber, caplog):
-    """
-    Test that the command updates the specified records, checking if current business activities
+    """Test that the command updates the specified records, checking if current business activities
     match the old business activities in the CSV.
     """
     caplog.set_level('ERROR')
@@ -21,7 +20,7 @@ def test_run(s3_stubber, caplog):
     old_business_activities = [[], [], business_activities[0:2], business_activities[2:3]]
     investment_projects = InvestmentProjectFactory.create_batch(4)
 
-    for project, project_business_activities in zip(investment_projects, old_business_activities):
+    for project, project_business_activities in zip(investment_projects, old_business_activities, strict=False):
         project.business_activities.set(project_business_activities)
 
     bucket = 'test_bucket'
@@ -69,7 +68,7 @@ def test_simulate(s3_stubber, caplog):
     old_business_activities = [[], [], business_activities[0:2], business_activities[2:3]]
     investment_projects = InvestmentProjectFactory.create_batch(4)
 
-    for project, project_business_activities in zip(investment_projects, old_business_activities):
+    for project, project_business_activities in zip(investment_projects, old_business_activities, strict=False):
         project.business_activities.set(project_business_activities)
 
     bucket = 'test_bucket'

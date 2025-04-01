@@ -6,9 +6,9 @@ from django.core.cache import cache
 from freezegun import freeze_time
 
 from datahub.interaction.admin_csv_import.cache_utils import (
-    _cache_key_for_token,
     CACHE_VALUE_TIMEOUT,
     CacheKeyType,
+    _cache_key_for_token,
     load_file_contents_and_name,
     load_unmatched_rows_csv_contents,
     save_file_contents_and_name,
@@ -39,14 +39,14 @@ class TestLoadFileContentsAndName:
 
     @pytest.mark.parametrize(
         'cache_data',
-        (
+        [
             # only the file contents
             {_cache_key_for_token('test-token', CacheKeyType.file_contents): b'data'},
             # only the file name
             {_cache_key_for_token('test-token', CacheKeyType.file_name): 'name'},
             # nothing
             {},
-        ),
+        ],
     )
     def test_returns_none_if_any_key_not_found(self, cache_data):
         """Test that load_file_contents_and_name() returns None if a cache key is missing."""
@@ -125,23 +125,23 @@ class TestCacheKeyForToken:
     """Tests for _cache_key_for_token()."""
 
     @pytest.mark.parametrize(
-        'token,type_,key',
-        (
+        ('token', 'type_', 'key'),
+        [
             ('token1', CacheKeyType.file_contents, 'interaction-csv-import:token1:file-contents'),
             ('token2', CacheKeyType.file_name, 'interaction-csv-import:token2:file-name'),
-        ),
+        ],
     )
     def test_generates_keys(self, token, type_, key):
         """Test that the expected keys are generated."""
         assert _cache_key_for_token(token, type_) == key
 
     @pytest.mark.parametrize(
-        'token,type_,error',
-        (
+        ('token', 'type_', 'error'),
+        [
             (None, CacheKeyType.file_contents, ValueError),
             ('', CacheKeyType.file_contents, ValueError),
             ('token', None, TypeError),
-        ),
+        ],
     )
     def test_raises_error_on_invalid_input(self, token, type_, error):
         """Test that an error is raised if an invalid token or type_ is provided."""

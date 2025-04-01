@@ -3,7 +3,7 @@ from unittest import mock
 import pytest
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_export_win_tasks_notify_gateway(monkeypatch):
     mock_notify_gateway = mock.Mock()
     monkeypatch.setattr(
@@ -13,7 +13,7 @@ def mock_export_win_tasks_notify_gateway(monkeypatch):
     return mock_notify_gateway
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_export_win_serializer_notify(monkeypatch):
     mock_notify = mock.Mock()
     monkeypatch.setattr(

@@ -5,9 +5,7 @@ import pytest
 from datahub.company.test.factories import AdviserFactory, CompanyFactory, ContactFactory
 from datahub.core import constants
 from datahub.core.test_utils import random_obj_for_model
-
 from datahub.investment.project.constants import InvestorType, Involvement, SpecificProgramme
-
 from datahub.investment.project.models import InvestmentDeliveryPartner
 from datahub.investment.project.serializers import (
     CORE_FIELDS,
@@ -217,11 +215,11 @@ def test_validate_reqs_competitor_countries_present():
 
 
 @pytest.mark.parametrize(
-    'allow_blank_possible_uk_regions,is_error',
-    (
+    ('allow_blank_possible_uk_regions', 'is_error'),
+    [
         (True, False),
         (False, True),
-    ),
+    ],
 )
 def test_validate_possible_uk_regions(allow_blank_possible_uk_regions, is_error):
     """Tests uk_region_locations (possible UK regions) conditional validation."""
@@ -384,15 +382,15 @@ def test_likelihood_to_land_assign_pm_stage_missing_error():
 
 
 @pytest.mark.parametrize(
-    'desired_stage,next_stage,expected_stage_order',
-    (
+    ('desired_stage', 'next_stage', 'expected_stage_order'),
+    [
         (constants.InvestmentProjectStage.prospect.value, None, 200),
         (constants.InvestmentProjectStage.prospect.value, True, 300),
         (constants.InvestmentProjectStage.assign_pm.value, None, 300),
         (constants.InvestmentProjectStage.assign_pm.value, True, 400),
         (constants.InvestmentProjectStage.active.value, None, 400),
         (constants.InvestmentProjectStage.active.value, True, 500),
-    ),
+    ],
 )
 def test_get_desired_stage_order(desired_stage, next_stage, expected_stage_order):
     """Test get desired stage order."""
@@ -414,7 +412,7 @@ def test_site_address_is_company_address_is_marked_incomplete_at_active_stage():
     assert 'address_postcode' not in incomplete_fields
 
 
-@pytest.mark.parametrize('value', (True, False))
+@pytest.mark.parametrize('value', [True, False])
 def test_site_address_fields_are_marked_incomplete_at_active_stage(value):
     project = ActiveInvestmentProjectFactory(
         site_address_is_company_address=False,
@@ -442,7 +440,7 @@ def test_site_address_is_company_address_is_required_at_verify_win_stage():
     assert 'address_postcode' not in errors
 
 
-@pytest.mark.parametrize('value', (True, False))
+@pytest.mark.parametrize('value', [True, False])
 def test_site_address_fields_are_required_at_verify_win_stage_after_condition_met(value):
     project = VerifyWinInvestmentProjectFactory(
         site_address_is_company_address=value,

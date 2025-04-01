@@ -8,8 +8,7 @@ from datahub.core.test_utils import APITestMixin, create_test_user
 
 
 def pytest_generate_tests(metafunc):
-    """
-    Parametrizes the tests that use the `insufficient_activity_permissions` fixture
+    """Parametrizes the tests that use the `insufficient_activity_permissions` fixture
     by creating lists with all required permissions except one.
     """
     if 'insufficient_activity_permissions' in metafunc.fixturenames:
@@ -35,8 +34,8 @@ class TestActivityFeedView(APITestMixin):
     """Activity Feed view test case."""
 
     @pytest.mark.parametrize(
-        'request_data,response_status_code,response_content',
-        (
+        ('request_data', 'response_status_code', 'response_content'),
+        [
             (
                 b'{"arg": "value"}',
                 200,
@@ -52,7 +51,7 @@ class TestActivityFeedView(APITestMixin):
                 500,
                 b'{"error":"msg"}',
             ),
-        ),
+        ],
     )
     def test_get(self, requests_mock, request_data, response_status_code, response_content):
         """Test for GET proxy."""
@@ -77,12 +76,12 @@ class TestActivityFeedView(APITestMixin):
         assert requests_mock.last_request.body == request_data
 
     @pytest.mark.parametrize(
-        'content_type,expected_status_code',
-        (
+        ('content_type', 'expected_status_code'),
+        [
             (None, status.HTTP_406_NOT_ACCEPTABLE),
             ('text/html', status.HTTP_406_NOT_ACCEPTABLE),
             ('application/json', status.HTTP_200_OK),
-        ),
+        ],
     )
     def test_content_type(self, requests_mock, content_type, expected_status_code):
         """Test that 406 is returned if Content Type is not application/json."""
@@ -103,8 +102,7 @@ class TestActivityFeedView(APITestMixin):
         self,
         insufficient_activity_permissions,
     ):
-        """
-        Test that an empty list is returned if the authenticated user doesn't have permission
+        """Test that an empty list is returned if the authenticated user doesn't have permission
         to view all activity models.
         """
         requester = create_test_user(

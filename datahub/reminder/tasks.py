@@ -1,6 +1,5 @@
 from logging import getLogger
 
-
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.db.models import Q
@@ -78,9 +77,7 @@ logger = getLogger(__name__)
 
 
 def send_estimated_land_date_reminder(project, adviser, days_left, reminders):
-    """
-    Sends approaching estimated land date reminder by email.
-    """
+    """Sends approaching estimated land date reminder by email."""
     logger.info(f'send_investment_notification.{days_left}')
 
     notify_adviser_by_rq_email(
@@ -93,9 +90,7 @@ def send_estimated_land_date_reminder(project, adviser, days_left, reminders):
 
 
 def send_estimated_land_date_summary(projects, adviser, current_date, reminders):
-    """
-    Sends approaching estimated land date summary reminder by email.
-    """
+    """Sends approaching estimated land date summary reminder by email."""
     logger.info('send_estimated_land_date_summary')
 
     notifications = get_projects_summary_list(projects)
@@ -122,9 +117,7 @@ def send_no_recent_export_interaction_reminder(
     current_date,
     reminders,
 ):
-    """
-    Sends no recent export interaction reminder by email.
-    """
+    """Sends no recent export interaction reminder by email."""
     logger.info(f'send_no_recent_export_interaction_notification.{reminder_days}')
 
     item = get_company_item(company)
@@ -191,9 +184,7 @@ def send_no_recent_interaction_reminder(
     current_date,
     reminders,
 ):
-    """
-    Sends no recent interaction reminder by email.
-    """
+    """Sends no recent interaction reminder by email."""
     logger.info(f'send_no_recent_interaction_notification.{reminder_days}')
 
     item = get_project_item(project)
@@ -271,9 +262,7 @@ def update_new_export_interaction_reminder_email_status(email_notification_id, r
 
 
 def generate_estimated_land_date_reminders():
-    """
-    Generates Estimated Land Date Reminders according to each adviser's Subscriptions
-    """
+    """Generates Estimated Land Date Reminders according to each adviser's Subscriptions."""
     with advisory_lock(
         'generate_estimated_land_date_reminders',
         wait=False,
@@ -322,9 +311,7 @@ def schedule_generate_estimated_land_date_reminders_for_subscription(subscriptio
 
 
 def generate_estimated_land_date_reminders_for_subscription(subscription, current_date):
-    """
-    Generates the estimated land date reminders for a given subscription.
-    """
+    """Generates the estimated land date reminders for a given subscription."""
     if not is_user_feature_flag_active(
         INVESTMENT_ESTIMATED_LAND_DATE_REMINDERS_FEATURE_FLAG_NAME,
         subscription.adviser,
@@ -381,15 +368,13 @@ def generate_estimated_land_date_reminders_for_subscription(subscription, curren
         )
 
     logger.info(
-        'Task generate_estimated_land_date_reminders_for_subscription completed',
+        'Task generate_estimated_land_date_reminders_for_subscription completed '
         f'subscription set to {subscription} and current_date set to {current_date}',
     )
 
 
 def generate_no_recent_interaction_reminders():
-    """
-    Generates No Recent Interaction Reminders according to each adviser's Subscriptions
-    """
+    """Generates No Recent Interaction Reminders according to each adviser's Subscriptions."""
     with advisory_lock(
         'generate_no_recent_interaction_reminders',
         wait=False,
@@ -422,9 +407,7 @@ def generate_no_recent_interaction_reminders():
 
 
 def generate_no_recent_interaction_reminders_for_subscription(subscription, current_date):
-    """
-    Generates the no recent interaction reminders for a given subscription.
-    """
+    """Generates the no recent interaction reminders for a given subscription."""
     if not is_user_feature_flag_active(
         INVESTMENT_NO_RECENT_INTERACTION_REMINDERS_FEATURE_FLAG_NAME,
         subscription.adviser,
@@ -460,9 +443,7 @@ def generate_no_recent_interaction_reminders_for_subscription(subscription, curr
 
 
 def generate_no_recent_export_interaction_reminders():
-    """
-    Generates No Recent Export Interaction Reminders according to each adviser's Subscriptions
-    """
+    """Generates No Recent Export Interaction Reminders according to each adviser's Subscriptions."""
     with advisory_lock(
         'generate_no_recent_export_interaction_reminders',
         wait=False,
@@ -499,9 +480,7 @@ def generate_no_recent_export_interaction_reminders():
 
 
 def generate_no_recent_export_interaction_reminders_for_subscription(subscription, current_date):
-    """
-    Generates the no recent export interaction reminders for a given subscription.
-    """
+    """Generates the no recent export interaction reminders for a given subscription."""
     if not is_user_feature_flag_active(
         EXPORT_NO_RECENT_INTERACTION_REMINDERS_FEATURE_FLAG_NAME,
         subscription.adviser,
@@ -541,9 +520,7 @@ def generate_no_recent_export_interaction_reminders_for_subscription(subscriptio
 
 
 def generate_new_export_interaction_reminders():
-    """
-    Generates New Export Interaction Reminders according to each adviser's Subscriptions
-    """
+    """Generates New Export Interaction Reminders according to each adviser's Subscriptions."""
     with advisory_lock(
         'generate_new_export_interaction_reminders',
         wait=False,
@@ -580,9 +557,7 @@ def generate_new_export_interaction_reminders():
 
 
 def generate_new_export_interaction_reminders_for_subscription(subscription, current_date):
-    """
-    Generates the new export interaction reminders for a given subscription.
-    """
+    """Generates the new export interaction reminders for a given subscription."""
     if not is_user_feature_flag_active(
         EXPORT_NEW_INTERACTION_REMINDERS_FEATURE_FLAG_NAME,
         subscription.adviser,
@@ -619,8 +594,7 @@ def generate_new_export_interaction_reminders_for_subscription(subscription, cur
 
 
 def create_estimated_land_date_reminder(project, adviser, send_email, current_date):
-    """
-    Creates a reminder and sends an email if required.
+    """Creates a reminder and sends an email if required.
 
     If a reminder has already been sent on the same day, then do nothing.
     """
@@ -664,8 +638,7 @@ def create_no_recent_export_interaction_reminder(
     send_email,
     current_date,
 ):
-    """
-    Creates a no recent export interaction reminder and sends an email if required.
+    """Creates a no recent export interaction reminder and sends an email if required.
 
     If a reminder has already been sent on the same day, then do nothing.
     """
@@ -707,8 +680,7 @@ def create_new_export_interaction_reminder(
     send_email,
     current_date,
 ):
-    """
-    Creates a new export interaction reminder and sends an email if required.
+    """Creates a new export interaction reminder and sends an email if required.
 
     If a reminder has already been sent on the same day, then do nothing.
     """
@@ -747,8 +719,7 @@ def create_no_recent_interaction_reminder(
     send_email,
     current_date,
 ):
-    """
-    Creates a no recent interaction reminder and sends an email if required.
+    """Creates a no recent interaction reminder and sends an email if required.
 
     If a reminder has already been sent on the same day, then do nothing.
     """
@@ -787,8 +758,7 @@ def notify_adviser_by_rq_email(
     update_task,
     reminders=None,
 ):
-    """
-    Notify an adviser, using a GOVUK notify template and some template context.
+    """Notify an adviser, using a GOVUK notify template and some template context.
 
     Link a separate task to store notification_id, so it is possible to track the
     status of email delivery.
@@ -821,8 +791,7 @@ def send_email_notification_via_rq(
     context=None,
     notify_service_name=None,
 ):
-    """
-    Email notification function to be scheduled by RQ,
+    """Email notification function to be scheduled by RQ,
     setting up a second task to update the email delivery status.
     """
     logger.info(
@@ -1048,9 +1017,7 @@ def update_notify_email_delivery_status_for_no_recent_interaction():
 
 
 def _get_active_projects(adviser):
-    """
-    Get active projects for given adviser.
-    """
+    """Get active projects for given adviser."""
     return InvestmentProject.objects.filter(
         Q(project_manager=adviser)
         | Q(project_assurance_adviser=adviser)
@@ -1065,9 +1032,8 @@ def _get_active_projects(adviser):
 
 
 def _get_managed_companies(adviser):
-    """
-    For given adviser, get the companies for which they are the global account manager OR where
-    they are a member of the one list core team
+    """For given adviser, get the companies for which they are the global account manager OR where
+    they are a member of the one list core team.
     """
     return Company.objects.filter(
         (

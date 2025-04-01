@@ -12,8 +12,8 @@ class TestCompanyAdminPermissions(AdminTestMixin):
     """Test permission handling in various views."""
 
     @pytest.mark.parametrize(
-        'route_name,method',
-        (
+        ('route_name', 'method'),
+        [
             (
                 admin_urlname(Company._meta, 'merge-select-other-company'),
                 'get',
@@ -34,7 +34,7 @@ class TestCompanyAdminPermissions(AdminTestMixin):
                 admin_urlname(Company._meta, 'merge-confirm'),
                 'post',
             ),
-        ),
+        ],
     )
     def test_redirects_to_login_page_if_not_logged_in(self, route_name, method):
         """Test that the view redirects to the login page if the user isn't authenticated."""
@@ -48,8 +48,8 @@ class TestCompanyAdminPermissions(AdminTestMixin):
         assert response['Location'] == self.login_url_with_redirect(url)
 
     @pytest.mark.parametrize(
-        'route_name,method',
-        (
+        ('route_name', 'method'),
+        [
             (
                 admin_urlname(Company._meta, 'merge-select-other-company'),
                 'get',
@@ -70,7 +70,7 @@ class TestCompanyAdminPermissions(AdminTestMixin):
                 admin_urlname(Company._meta, 'merge-confirm'),
                 'post',
             ),
-        ),
+        ],
     )
     def test_redirects_to_login_page_if_not_staff(self, route_name, method):
         """Test that the view redirects to the login page if the user isn't a member of staff."""
@@ -86,8 +86,8 @@ class TestCompanyAdminPermissions(AdminTestMixin):
         assert response['Location'] == self.login_url_with_redirect(url)
 
     @pytest.mark.parametrize(
-        'route_name,method',
-        (
+        ('route_name', 'method'),
+        [
             (
                 admin_urlname(Company._meta, 'merge-select-other-company'),
                 'get',
@@ -108,15 +108,14 @@ class TestCompanyAdminPermissions(AdminTestMixin):
                 admin_urlname(Company._meta, 'merge-confirm'),
                 'post',
             ),
-        ),
+        ],
     )
     def test_permission_denied_if_staff_and_without_change_permission(
             self,
             route_name,
             method,
     ):
-        """
-        Test that the view returns a 403 response if the staff user does not have the
+        """Test that the view returns a 403 response if the staff user does not have the
         change company permission.
         """
         url = reverse(route_name)

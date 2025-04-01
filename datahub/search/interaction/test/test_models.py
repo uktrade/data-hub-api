@@ -17,12 +17,12 @@ pytestmark = pytest.mark.django_db
 
 @pytest.mark.parametrize(
     'factory_cls',
-    (
+    [
         CompanyInteractionFactory,
         InvestmentProjectInteractionFactory,
         CompanyInteractionFactoryWithPolicyFeedback,
         ExportCountriesInteractionFactory,
-    ),
+    ],
 )
 def test_interaction_to_dict(opensearch, factory_cls):
     """Test converting an interaction to a dict."""

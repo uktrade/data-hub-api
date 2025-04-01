@@ -1,5 +1,5 @@
 from datetime import date
-from unittest.mock import call, MagicMock, Mock
+from unittest.mock import MagicMock, Mock, call
 from uuid import uuid4
 
 import pytest
@@ -105,8 +105,7 @@ class TestNestedRelatedField:
         }
 
     def test_to_representation_extra_fields_with_nested_related(self):
-        """
-        Tests that if the field has a nested related field,
+        """Tests that if the field has a nested related field,
         `to_representation` returns '<nested-field>': {...} using the nested mapping.
         """
         nested_pk = uuid4()
@@ -135,8 +134,7 @@ class TestNestedRelatedField:
         }
 
     def test_to_representation_extra_fields_with_nested_related_none(self):
-        """
-        Tests that if the field has a nested related field and its value is
+        """Tests that if the field has a nested related field and its value is
         None, `to_representation` returns '<nested-field>': None.
         """
         nested_field = NestedRelatedField(
@@ -183,24 +181,24 @@ class TestNestedRelatedField:
         )]
 
         @pytest.mark.parametrize(
-            'input_website,expected_website', (
+            ('input_website', 'expected_website'), [
                 ('www.google.com', 'http://www.google.com'),
                 ('http://www.google.com', 'http://www.google.com'),
                 ('https://www.google.com', 'https://www.google.com'),
                 ('', ''),
-            ),
+            ],
         )
         def test_url_field_input(self, input_website, expected_website):
             """Tests that RelaxedURLField prepends http:// when one is not provided."""
             assert RelaxedURLField().run_validation(input_website) == expected_website
 
         @pytest.mark.parametrize(
-            'input_website,expected_website', (
+            ('input_website', 'expected_website'), [
                 ('www.google.com', 'http://www.google.com'),
                 ('http://www.google.com', 'http://www.google.com'),
                 ('https://www.google.com', 'https://www.google.com'),
                 ('', ''),
-            ),
+            ],
         )
         def test_url_field_output(self, input_website, expected_website):
             """Tests that RelaxedURLField prepends http:// when one is not stored."""
@@ -211,15 +209,15 @@ class TestRelaxedDateField:
     """Tests for RelaxedDateField."""
 
     @pytest.mark.parametrize(
-        'input_value,expected_date',
-        (
+        ('input_value', 'expected_date'),
+        [
             ('2018-01-10', date(2018, 1, 10)),
             ('2018-1-10', date(2018, 1, 10)),
             ('2018-10-1', date(2018, 10, 1)),
             ('2018/01/10', date(2018, 1, 10)),
             ('2018/1/10', date(2018, 1, 10)),
             ('2018/10/1', date(2018, 10, 1)),
-        ),
+        ],
     )
     def test_parses_dates(self, input_value, expected_date):
         """Test that various input values are parsed and interpreted as the correct date."""
@@ -232,8 +230,8 @@ class TestAddressSerializer(APITestMixin):
     """Tests for the AddressSerializer."""
 
     @pytest.mark.parametrize(
-        'post_data,expected_response',
-        (
+        ('post_data', 'expected_response'),
+        [
             # only primary address
             (
                 {
@@ -405,7 +403,7 @@ class TestAddressSerializer(APITestMixin):
                     'secondary_address': None,
                 },
             ),
-        ),
+        ],
     )
     def test_create(self, post_data, expected_response):
         """Tests for creating a model using the address serializer."""
@@ -416,8 +414,8 @@ class TestAddressSerializer(APITestMixin):
         assert response.json() == expected_response
 
     @pytest.mark.parametrize(
-        'post_data,expected_errors',
-        (
+        ('post_data', 'expected_errors'),
+        [
             # primary address: required
             (
                 {},
@@ -556,7 +554,7 @@ class TestAddressSerializer(APITestMixin):
                     },
                 },
             ),
-        ),
+        ],
     )
     def test_create_validation(self, post_data, expected_errors):
         """Tests for validation errors when creating a model using an address serializer."""
@@ -567,8 +565,8 @@ class TestAddressSerializer(APITestMixin):
         assert response.json() == expected_errors
 
     @pytest.mark.parametrize(
-        'initial_model_values,patch_data,expected_response',
-        (
+        ('initial_model_values', 'patch_data', 'expected_response'),
+        [
             # primary address: update line_1
             (
                 {
@@ -844,7 +842,7 @@ class TestAddressSerializer(APITestMixin):
                     'secondary_address': None,
                 },
             ),
-        ),
+        ],
     )
     def test_update(self, initial_model_values, patch_data, expected_response):
         """Tests updating a model using an address serializer."""
@@ -856,8 +854,8 @@ class TestAddressSerializer(APITestMixin):
         assert response.json() == expected_response
 
     @pytest.mark.parametrize(
-        'initial_model_values,patch_data,expected_errors',
-        (
+        ('initial_model_values', 'patch_data', 'expected_errors'),
+        [
             # primary address: can't be None
             (
                 {
@@ -1064,7 +1062,7 @@ class TestAddressSerializer(APITestMixin):
                     },
                 },
             ),
-        ),
+        ],
     )
     def test_update_validation(self, initial_model_values, patch_data, expected_errors):
         """Tests for validation errors when updating a model using an address serializer."""
@@ -1076,8 +1074,8 @@ class TestAddressSerializer(APITestMixin):
         assert response.json() == expected_errors
 
     @pytest.mark.parametrize(
-        'initial_model_values,expected_response',
-        (
+        ('initial_model_values', 'expected_response'),
+        [
             # primary address only
             (
                 {
@@ -1207,7 +1205,7 @@ class TestAddressSerializer(APITestMixin):
                     },
                 },
             ),
-        ),
+        ],
     )
     def test_get(self, initial_model_values, expected_response):
         """Tests for getting a model using an address serializer."""

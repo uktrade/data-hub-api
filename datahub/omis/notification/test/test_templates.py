@@ -18,7 +18,6 @@ from datahub.omis.order.test.factories import (
 )
 from datahub.omis.region.models import UKRegionalSettings
 
-
 pytestmark = pytest.mark.django_db
 
 
@@ -30,8 +29,7 @@ def notify_task_return_value_tracker(mocker):
 
 @pytest.fixture
 def end_to_end_notify(monkeypatch, settings):
-    """
-    A fixture for a notify client which uses the new datahub.notification app
+    """A fixture for a notify client which uses the new datahub.notification app
     under the hood and calls through to the GOVUK notify service (with
     settings.OMIS_NOTIFICATION_TEST_API_KEY).
 
@@ -53,8 +51,7 @@ def end_to_end_notify(monkeypatch, settings):
 )
 @pytest.mark.usefixtures('synchronous_thread_pool')
 class TestTemplates:
-    """
-    These tests are going to be run only if `OMIS_NOTIFICATION_TEST_API_KEY` is set
+    """These tests are going to be run only if `OMIS_NOTIFICATION_TEST_API_KEY` is set
     and it's meant to check that the templates in GOV.UK notifications have not been
     changed.
     If `OMIS_NOTIFICATION_TEST_API_KEY` is not set they will not run as they are
@@ -66,8 +63,7 @@ class TestTemplates:
         assert mock_call.spy_exception is None, mock_call.spy_exception.message
 
     def test_order_info(self, end_to_end_notify, notify_task_return_value_tracker):
-        """
-        Test the order info template.
+        """Test the order info template.
         If the template variables have been changed in GOV.UK notifications the
         RQ task will be unsuccessful.
         """
@@ -75,8 +71,7 @@ class TestTemplates:
         self._assert_tasks_successful(1, notify_task_return_value_tracker)
 
     def test_order_created(self, end_to_end_notify, notify_task_return_value_tracker):
-        """
-        Test the order created template.
+        """Test the order created template.
         If the template variables have been changed in GOV.UK notifications the
         RQ task will be unsuccessful.
         """
@@ -102,8 +97,7 @@ class TestTemplates:
         end_to_end_notify,
         notify_task_return_value_tracker,
     ):
-        """
-        Test the notification for when an adviser is added to an order.
+        """Test the notification for when an adviser is added to an order.
         If the template variables have been changed in GOV.UK notifications the
         RQ task will be unsuccessful.
         """
@@ -122,8 +116,7 @@ class TestTemplates:
         end_to_end_notify,
         notify_task_return_value_tracker,
     ):
-        """
-        Test the notification for when an adviser is removed from an order.
+        """Test the notification for when an adviser is removed from an order.
         If the template variables have been changed in GOV.UK notifications the
         RQ task will be unsuccessful.
         """
@@ -133,8 +126,7 @@ class TestTemplates:
         self._assert_tasks_successful(1, notify_task_return_value_tracker)
 
     def test_order_paid(self, end_to_end_notify, notify_task_return_value_tracker):
-        """
-        Test templates of order paid for customer and advisers.
+        """Test templates of order paid for customer and advisers.
         If the template variables have been changed in GOV.UK notifications the
         RQ task will be unsuccessful.
         """
@@ -144,8 +136,7 @@ class TestTemplates:
         self._assert_tasks_successful(2, notify_task_return_value_tracker)
 
     def test_order_completed(self, end_to_end_notify, notify_task_return_value_tracker):
-        """
-        Test templates of order completed for advisers.
+        """Test templates of order completed for advisers.
         If the template variables have been changed in GOV.UK notifications the
         RQ task will be unsuccessful.
         """
@@ -155,8 +146,7 @@ class TestTemplates:
         self._assert_tasks_successful(1, notify_task_return_value_tracker)
 
     def test_order_cancelled(self, end_to_end_notify, notify_task_return_value_tracker):
-        """
-        Test templates of order cancelled for customer and advisers.
+        """Test templates of order cancelled for customer and advisers.
         If the template variables have been changed in GOV.UK notifications the
         RQ task will be unsuccessful.
         """
@@ -166,8 +156,7 @@ class TestTemplates:
         self._assert_tasks_successful(2, notify_task_return_value_tracker)
 
     def test_quote_sent(self, end_to_end_notify, notify_task_return_value_tracker):
-        """
-        Test templates of quote sent for customer and advisers.
+        """Test templates of quote sent for customer and advisers.
         If the template variables have been changed in GOV.UK notifications the
         RQ task will be unsuccessful.
         """
@@ -177,8 +166,7 @@ class TestTemplates:
         self._assert_tasks_successful(2, notify_task_return_value_tracker)
 
     def test_quote_accepted(self, end_to_end_notify, notify_task_return_value_tracker):
-        """
-        Test templates of quote accepted for customer and advisers.
+        """Test templates of quote accepted for customer and advisers.
         If the template variables have been changed in GOV.UK notifications the
         RQ task will be unsuccessful.
         """
@@ -188,8 +176,7 @@ class TestTemplates:
         self._assert_tasks_successful(2, notify_task_return_value_tracker)
 
     def test_quote_cancelled(self, end_to_end_notify, notify_task_return_value_tracker):
-        """
-        Test templates of quote cancelled for customer and advisers.
+        """Test templates of quote cancelled for customer and advisers.
         If the template variables have been changed in GOV.UK notifications the
         RQ task will be unsuccessful.
         """
@@ -205,8 +192,7 @@ class TestTemplates:
 )
 @pytest.mark.usefixtures('synchronous_thread_pool')
 class TestTemplatesLegacyOMISNotification:
-    """
-    TODO: This will need removing when we switch over fully to using the
+    """TODO: This will need removing when we switch over fully to using the
     datahub.notification app.
 
     These tests are going to be run only if `OMIS_NOTIFICATION_TEST_API_KEY` is set
@@ -217,8 +203,7 @@ class TestTemplatesLegacyOMISNotification:
     """
 
     def test_order_info(self, settings):
-        """
-        Test the order info template.
+        """Test the order info template.
         If the template variables have been changed in GOV.UK notifications this
         is going to raise HTTPError (400 - Bad Request).
         """
@@ -228,8 +213,7 @@ class TestTemplatesLegacyOMISNotification:
         notify.order_info(OrderFactory(), what_happened='', why='')
 
     def test_order_created(self, settings):
-        """
-        Test the order created template.
+        """Test the order created template.
         If the template variables have been changed in GOV.UK notifications this
         is going to raise HTTPError (400 - Bad Request).
         """
@@ -253,8 +237,7 @@ class TestTemplatesLegacyOMISNotification:
         notify.order_created(order)
 
     def test_you_have_been_added_for_adviser(self, settings):
-        """
-        Test the notification for when an adviser is added to an order.
+        """Test the notification for when an adviser is added to an order.
         If the template variables have been changed in GOV.UK notifications this
         is going to raise HTTPError (400 - Bad Request).
         """
@@ -271,8 +254,7 @@ class TestTemplatesLegacyOMISNotification:
         )
 
     def test_you_have_been_removed_for_adviser(self, settings):
-        """
-        Test the notification for when an adviser is removed from an order.
+        """Test the notification for when an adviser is removed from an order.
         If the template variables have been changed in GOV.UK notifications this
         is going to raise HTTPError (400 - Bad Request).
         """
@@ -284,8 +266,7 @@ class TestTemplatesLegacyOMISNotification:
         notify.adviser_removed(order=order, adviser=AdviserFactory())
 
     def test_order_paid(self, settings):
-        """
-        Test templates of order paid for customer and advisers.
+        """Test templates of order paid for customer and advisers.
         If the template variables have been changed in GOV.UK notifications this
         is going to raise HTTPError (400 - Bad Request).
         """
@@ -297,8 +278,7 @@ class TestTemplatesLegacyOMISNotification:
         notify.order_paid(order)
 
     def test_order_completed(self, settings):
-        """
-        Test templates of order completed for advisers.
+        """Test templates of order completed for advisers.
         If the template variables have been changed in GOV.UK notifications this
         is going to raise HTTPError (400 - Bad Request).
         """
@@ -310,8 +290,7 @@ class TestTemplatesLegacyOMISNotification:
         notify.order_completed(order)
 
     def test_order_cancelled(self, settings):
-        """
-        Test templates of order cancelled for customer and advisers.
+        """Test templates of order cancelled for customer and advisers.
         If the template variables have been changed in GOV.UK notifications this
         is going to raise HTTPError (400 - Bad Request).
         """
@@ -323,8 +302,7 @@ class TestTemplatesLegacyOMISNotification:
         notify.order_cancelled(order)
 
     def test_quote_sent(self, settings):
-        """
-        Test templates of quote sent for customer and advisers.
+        """Test templates of quote sent for customer and advisers.
         If the template variables have been changed in GOV.UK notifications this
         is going to raise HTTPError (400 - Bad Request).
         """
@@ -336,8 +314,7 @@ class TestTemplatesLegacyOMISNotification:
         notify.quote_generated(order)
 
     def test_quote_accepted(self, settings):
-        """
-        Test templates of quote accepted for customer and advisers.
+        """Test templates of quote accepted for customer and advisers.
         If the template variables have been changed in GOV.UK notifications this
         is going to raise HTTPError (400 - Bad Request).
         """
@@ -349,8 +326,7 @@ class TestTemplatesLegacyOMISNotification:
         notify.quote_accepted(order)
 
     def test_quote_cancelled(self, settings):
-        """
-        Test templates of quote cancelled for customer and advisers.
+        """Test templates of quote cancelled for customer and advisers.
         If the template variables have been changed in GOV.UK notifications this
         is going to raise HTTPError (400 - Bad Request).
         """

@@ -8,7 +8,7 @@ from datahub.investment_lead.test.factories import EYBLeadFactory
 
 @pytest.mark.django_db
 class TestEYBLead:
-    """Tests EYB Lead model"""
+    """Tests EYB Lead model."""
 
     def test_save_without_company_no_company_activity(self):
         assert not CompanyActivity.objects.all().exists()
@@ -44,5 +44,5 @@ class TestEYBLead:
         assert company_activity.activity_source == CompanyActivity.ActivitySource.eyb_lead
 
     def test_str(self, eyb_lead_instance_from_db):
-        """Test the human friendly string representation of the object"""
+        """Test the human friendly string representation of the object."""
         assert str(eyb_lead_instance_from_db) == eyb_lead_instance_from_db.name

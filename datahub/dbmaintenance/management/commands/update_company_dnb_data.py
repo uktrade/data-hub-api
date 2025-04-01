@@ -11,26 +11,22 @@ from datahub.dbmaintenance.utils import parse_uuid
 from datahub.dnb_api.constants import ALL_DNB_UPDATED_SERIALIZER_FIELDS
 from datahub.dnb_api.tasks import sync_company_with_dnb
 
-
 logger = logging.getLogger(__name__)
 API_CALLS_PER_SECOND = 1
 API_CALL_INTERVAL = 1 / API_CALLS_PER_SECOND
 
 
 class CompanyNotDunsLinkedError(Exception):
-    """
-    Exception for when a company does not have a duns_number.
+    """Exception for when a company does not have a duns_number.
     """
 
 
 class Command(CSVBaseCommand):
-    """
-    Command to update companies with the latest DNB data.
+    """Command to update companies with the latest DNB data.
     """
 
     def __init__(self, *args, **kwargs):
-        """
-        Set some initial state related to API rate limiting.
+        """Set some initial state related to API rate limiting.
         """
         self.last_called_api_time = time.perf_counter()
         self.start_timestamp = now().isoformat(timespec='seconds')
@@ -41,16 +37,14 @@ class Command(CSVBaseCommand):
         super().__init__(*args, **kwargs)
 
     def handle(self, *args, **options):
-        """
-        Override handle method to add some audit logging.
+        """Override handle method to add some audit logging.
         """
         super().handle(*args, **options)
         if not options['simulate']:
             self._record_audit_log()
 
     def add_arguments(self, parser):
-        """
-        Set arguments for the management command.
+        """Set arguments for the management command.
         """
         super().add_arguments(parser)
         parser.add_argument(
@@ -73,8 +67,7 @@ class Command(CSVBaseCommand):
         log_to_sentry('update_company_dnb_data command completed.', extra=audit)
 
     def _limit_call_rate(self):
-        """
-        The method will return once enough time has elapsed to maintain the
+        """The method will return once enough time has elapsed to maintain the
         API_CALLS_PER_SECOND rate.
         """
         next_api_call_time = self.last_called_api_time + API_CALL_INTERVAL

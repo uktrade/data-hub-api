@@ -1,9 +1,7 @@
 import logging
-
 from unittest import mock
 
 import factory
-
 import pytest
 from freezegun import freeze_time
 
@@ -40,7 +38,7 @@ from datahub.reminder.test.factories import (
 class TestITAUsersMigration:
     @pytest.mark.parametrize(
         'lock_acquired',
-        (False, True),
+        [False, True],
     )
     def test_lock(
         self,
@@ -48,8 +46,7 @@ class TestITAUsersMigration:
         monkeypatch,
         lock_acquired,
     ):
-        """
-        Test that the task doesn't run if it cannot acquire
+        """Test that the task doesn't run if it cannot acquire
         the advisory_lock.
         """
         caplog.set_level(logging.INFO, logger='datahub.reminder.migration_tasks')
@@ -86,9 +83,7 @@ class TestITAUsersMigration:
         caplog,
         monkeypatch,
     ):
-        """
-        Test that the task runs but no users are migrated when the setting is disabled
-        """
+        """Test that the task runs but no users are migrated when the setting is disabled."""
         monkeypatch.setattr(
             'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_ITA_USER_MIGRATIONS',
             False,
@@ -115,9 +110,8 @@ class TestITAUsersMigration:
         self,
         monkeypatch,
     ):
-        """
-        Test when an adviser belongs to a company that is not in the Tier D -Internation Trade
-        Advisors tier they are excluded from the migration
+        """Test when an adviser belongs to a company that is not in the Tier D -Internation Trade
+        Advisors tier they are excluded from the migration.
         """
         monkeypatch.setattr(
             'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_ITA_USER_MIGRATIONS',
@@ -141,9 +135,7 @@ class TestITAUsersMigration:
         self,
         monkeypatch,
     ):
-        """
-        Test when an adviser belongs to no notification group they are excluded from the migration
-        """
+        """Test when an adviser belongs to no notification group they are excluded from the migration."""
         monkeypatch.setattr(
             'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_ITA_USER_MIGRATIONS',
             True,
@@ -169,9 +161,8 @@ class TestITAUsersMigration:
         self,
         monkeypatch,
     ):
-        """
-        Test when an advisor already has the export-notifications feature flag they are excluded
-        from the migration
+        """Test when an advisor already has the export-notifications feature flag they are excluded
+        from the migration.
         """
         monkeypatch.setattr(
             'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_ITA_USER_MIGRATIONS',
@@ -196,9 +187,8 @@ class TestITAUsersMigration:
         self,
         monkeypatch,
     ):
-        """
-        Test when an advisor already has the export subscriptions but not the feature flag they
-        are only assigned the feature flag but not any additional subscriptions
+        """Test when an advisor already has the export subscriptions but not the feature flag they
+        are only assigned the feature flag but not any additional subscriptions.
         """
         monkeypatch.setattr(
             'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_ITA_USER_MIGRATIONS',
@@ -232,11 +222,10 @@ class TestITAUsersMigration:
         self,
         monkeypatch,
     ):
-        """
-        Test when an advisor is the account owner for a company in the Tier D -Internation Trade
+        """Test when an advisor is the account owner for a company in the Tier D -Internation Trade
         Advisors tier and do not have the export-notifications feature flag or export
         subscriptions, they are given the export-notifications feature flag and added to the
-        export subscriptions
+        export subscriptions.
         """
         monkeypatch.setattr(
             'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_ITA_USER_MIGRATIONS',
@@ -266,9 +255,7 @@ class TestPostUsersMigration:
         investment_flag,
         advisor,
     ):
-        """
-        Check the advisor does not have any subscriptions or contain any of the feature flags
-        """
+        """Check the advisor does not have any subscriptions or contain any of the feature flags."""
         self._assert_advisor_not_given_subscriptions(advisor)
         assert Advisor.objects.filter(id=advisor.id, feature_groups=export_flag).exists() is False
         assert (
@@ -276,9 +263,7 @@ class TestPostUsersMigration:
         )
 
     def _assert_advisor_not_given_subscriptions(self, advisor):
-        """
-        Check the advisor does not have any subscriptions or contain any of the feature flags
-        """
+        """Check the advisor does not have any subscriptions or contain any of the feature flags."""
         assert NewExportInteractionSubscription.objects.filter(adviser=advisor).exists() is False
         assert (
             NoRecentExportInteractionSubscription.objects.filter(adviser=advisor).exists() is False
@@ -297,9 +282,7 @@ class TestPostUsersMigration:
         investment_flag,
         advisor,
     ):
-        """
-        Check the advisor has all the subscriptions and all feature flags
-        """
+        """Check the advisor has all the subscriptions and all feature flags."""
         self.assert_advisor_given_subscriptions(advisor)
 
         assert Advisor.objects.filter(feature_groups=export_flag).exists() is True
@@ -322,7 +305,7 @@ class TestPostUsersMigration:
 
     @pytest.mark.parametrize(
         'lock_acquired',
-        (False, True),
+        [False, True],
     )
     def test_lock(
         self,
@@ -330,8 +313,7 @@ class TestPostUsersMigration:
         monkeypatch,
         lock_acquired,
     ):
-        """
-        Test that the task doesn't run if it cannot acquire
+        """Test that the task doesn't run if it cannot acquire
         the advisory_lock.
         """
         caplog.set_level(logging.INFO, logger='datahub.reminder.migration_tasks')
@@ -369,9 +351,7 @@ class TestPostUsersMigration:
         caplog,
         monkeypatch,
     ):
-        """
-        Test that the task runs but no users are migrated when the setting is disabled
-        """
+        """Test that the task runs but no users are migrated when the setting is disabled."""
         monkeypatch.setattr(
             'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_POST_USER_MIGRATIONS',
             False,
@@ -402,7 +382,7 @@ class TestPostUsersMigration:
     ):
         caplog.set_level(logging.INFO, logger='datahub.reminder.migration_tasks')
         monkeypatch.setattr(Advisor.objects, 'filter', mock.Mock(side_effect=ValueError))
-        with pytest.raises(Exception):
+        with pytest.raises(Exception):  # noqa: PT011
             assert caplog.messages == [
                 'Starting migration of POST users',
                 'Error migrating POST users',
@@ -412,10 +392,9 @@ class TestPostUsersMigration:
         self,
         monkeypatch,
     ):
-        """
-        Test an advisor that belongs to a team that has role of POST, is not a member of the one
+        """Test an advisor that belongs to a team that has role of POST, is not a member of the one
         list core team, is not a global account manager for a company on the Tier D - Overseas
-        Post Accounts one list tier and is not linked to a project is excluded from migration
+        Post Accounts one list tier and is not linked to a project is excluded from migration.
         """
         monkeypatch.setattr(
             'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_POST_USER_MIGRATIONS',
@@ -434,11 +413,10 @@ class TestPostUsersMigration:
         self,
         monkeypatch,
     ):
-        """
-        Test an advisor that belongs to a team that DOES NOT have a role of POST, is a member of
+        """Test an advisor that belongs to a team that DOES NOT have a role of POST, is a member of
         the one list core team, is not a global account manager for a company on the
         Tier D - Overseas Post Accounts one list tier and is not linked to a project is
-        excluded from migration
+        excluded from migration.
         """
         monkeypatch.setattr(
             'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_POST_USER_MIGRATIONS',
@@ -460,11 +438,10 @@ class TestPostUsersMigration:
         self,
         monkeypatch,
     ):
-        """
-        Test an advisor that belongs to a team that has a role of POST, is a member of
+        """Test an advisor that belongs to a team that has a role of POST, is a member of
         the one list core team and is not a global account manager for a company on the
         Tier D - Overseas Post Accounts one list tier and is not linked to a project is
-        included in the migration
+        included in the migration.
         """
         monkeypatch.setattr(
             'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_POST_USER_MIGRATIONS',
@@ -484,17 +461,16 @@ class TestPostUsersMigration:
 
     @pytest.mark.parametrize(
         'feature_flag',
-        ('export-notifications', 'investment-notifications'),
+        ['export-notifications', 'investment-notifications'],
     )
     def test_advisor_in_post_team_in_one_list_core_member_not_global_account_manager_no_project_link_only_one_feature_flag_added_to_subscription_and_assigned_feature_flag(  # noqa: E501
         self,
         monkeypatch,
         feature_flag,
     ):
-        """
-        Test an advisor that belongs to a team that has a role of POST, is a member of the one
+        """Test an advisor that belongs to a team that has a role of POST, is a member of the one
         list core team and is not a global account manager for a company on the Tier D - Overseas
-        Post Accounts one list tier and is not linked to a project is included in the migration
+        Post Accounts one list tier and is not linked to a project is included in the migration.
         """
         monkeypatch.setattr(
             'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_POST_USER_MIGRATIONS',
@@ -516,11 +492,10 @@ class TestPostUsersMigration:
         self,
         monkeypatch,
     ):
-        """
-        Test an advisor that belongs to a team that DOES NOT have a role of POST, is a member of
+        """Test an advisor that belongs to a team that DOES NOT have a role of POST, is a member of
         the one list core team and is a global account manager but for a company not on the
         Tier D - Overseas Post Accounts one list tier and is not linked to a project is excluded
-        from the migration
+        from the migration.
         """
         monkeypatch.setattr(
             'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_POST_USER_MIGRATIONS',
@@ -546,11 +521,10 @@ class TestPostUsersMigration:
         self,
         monkeypatch,
     ):
-        """
-        Test an advisor that belongs to a team that DOES NOT have a role of POST, is NOT a member
+        """Test an advisor that belongs to a team that DOES NOT have a role of POST, is NOT a member
         of the one list core team, is a global account manager for a company on the Tier D -
         Overseas Post Accounts one list tier and is not linked to a project is included from the
-        migration
+        migration.
         """
         monkeypatch.setattr(
             'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_POST_USER_MIGRATIONS',
@@ -573,11 +547,10 @@ class TestPostUsersMigration:
         self,
         monkeypatch,
     ):
-        """
-        Test an advisor that belongs to a team that has a role of POST, is NOT a member
+        """Test an advisor that belongs to a team that has a role of POST, is NOT a member
         of the one list core team, is a global account manager for a company on the Tier D -
         Overseas Post Accounts one list tier and is not linked to a project is included from the
-        migration
+        migration.
         """
         monkeypatch.setattr(
             'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_POST_USER_MIGRATIONS',
@@ -598,21 +571,21 @@ class TestPostUsersMigration:
 
     @pytest.mark.parametrize(
         'status',
-        (
+        [
             InvestmentProject.Status.LOST,
             InvestmentProject.Status.ABANDONED,
             InvestmentProject.Status.DORMANT,
             InvestmentProject.Status.WON,
-        ),
+        ],
     )
     @pytest.mark.parametrize(
         'advisor_project_role',
-        (
+        [
             'project_manager',
             'project_assurance_adviser',
             'client_relationship_manager',
             'referral_source_adviser',
-        ),
+        ],
     )
     def test_advisor_not_in_post_team_not_in_one_list_core_member_not_global_account_manager_assigned_to_invalid_project_status_is_excluded_from_migration(  # noqa: E501
         self,
@@ -620,11 +593,10 @@ class TestPostUsersMigration:
         advisor_project_role,
         status,
     ):
-        """
-        Test an advisor that belongs to a team that DOES NOT have a role of POST, is NOT a member'
+        """Test an advisor that belongs to a team that DOES NOT have a role of POST, is NOT a member'
         ' of the one list core team and is NOT a global account manager for a company on the'
         ' Tier D - Overseas Post Accounts one list tier but is assigned to an investment project'
-        ' as an {advisor_project_role} with an invalid status is excluded from the migration
+        ' as an {advisor_project_role} with an invalid status is excluded from the migration.
         """
         monkeypatch.setattr(
             'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_POST_USER_MIGRATIONS',
@@ -647,19 +619,19 @@ class TestPostUsersMigration:
 
     @pytest.mark.parametrize(
         'status',
-        (
+        [
             InvestmentProject.Status.ONGOING,
             InvestmentProject.Status.DELAYED,
-        ),
+        ],
     )
     @pytest.mark.parametrize(
         'advisor_project_role',
-        (
+        [
             'project_manager',
             'project_assurance_adviser',
             'client_relationship_manager',
             'referral_source_adviser',
-        ),
+        ],
     )
     def test_advisor_in_post_team_not_in_one_list_core_member_not_global_account_manager_assigned_to_project_with_valid_status_and_stage_added_to_subscription_and_assigned_feature_flag(  # noqa: E501
         self,
@@ -667,11 +639,10 @@ class TestPostUsersMigration:
         advisor_project_role,
         status,
     ):
-        """
-        Test an advisor that belongs to a team that DOES NOT have a role of POST, is NOT a member'
+        """Test an advisor that belongs to a team that DOES NOT have a role of POST, is NOT a member'
         ' of the one list core team and is NOT a global account manager for a company on the'
         ' Tier D - Overseas Post Accounts one list tier but is assigned to an investment project'
-        ' as an {advisor_project_role} with allowed stage is included in the migration
+        ' as an {advisor_project_role} with allowed stage is included in the migration.
         """
         monkeypatch.setattr(
             'django.conf.settings.ENABLE_AUTOMATIC_REMINDER_POST_USER_MIGRATIONS',
@@ -707,16 +678,16 @@ class TestPostUsersMigration:
 
     @pytest.mark.parametrize(
         'advisor_project_role',
-        (
+        [
             'project_manager',
             'project_assurance_adviser',
             'client_relationship_manager',
             'referral_source_adviser',
-        ),
+        ],
     )
     @pytest.mark.parametrize(
         'excluded',
-        (True, False),
+        [True, False],
     )
     def test_when_large_number_of_advisors_meeting_migration_criteria_are_found_all_are_migrated(
         self,

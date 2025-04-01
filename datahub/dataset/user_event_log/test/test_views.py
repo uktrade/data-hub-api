@@ -14,7 +14,7 @@ from datahub.user_event_log.utils import record_user_event
 
 
 def get_expected_data_from_user_log(event):
-    """Returns user event log data as a dictionary"""
+    """Returns user event log data as a dictionary."""
     return {
         'adviser__id': str(event.adviser.id),
         'type': event.type,
@@ -25,8 +25,7 @@ def get_expected_data_from_user_log(event):
 
 @pytest.mark.django_db
 class TestUserEventsViewSet:
-    """
-    Tests for the user event logs dataset endpoint
+    """Tests for the user event logs dataset endpoint.
     """
 
     factory = AdviserFactory
@@ -34,7 +33,7 @@ class TestUserEventsViewSet:
 
     @pytest.mark.parametrize(
         'data',
-        (
+        [
             (None, None),
             (
                 {'a': 'b'},
@@ -50,10 +49,10 @@ class TestUserEventsViewSet:
             ),
             ('string', 'string'),
             ([0, 2, 3], [0, 2, 3]),
-        ),
+        ],
     )
     def test_success(self, data, data_flow_api_client):
-        """Test that endpoint returns with expected data for a single user event"""
+        """Test that endpoint returns with expected data for a single user event."""
         request = Mock(user=self.factory(), path='test-path')
         event = record_user_event(request, UserEventType.SEARCH_EXPORT, data=data)
         event.refresh_from_db()

@@ -27,8 +27,7 @@ class CompanyReferralViewSet(CoreViewSet):
     )
 
     def get_queryset(self):
-        """
-        Get a queryset for list action that is filtered to the authenticated user's sent and
+        """Get a queryset for list action that is filtered to the authenticated user's sent and
         received referrals, otherwise return original queryset.
         """
         if self.action == 'list':
@@ -47,8 +46,7 @@ class CompanyReferralViewSet(CoreViewSet):
         ],
     )
     def complete(self, request, **kwargs):
-        """
-        View for completing a referral.
+        """View for completing a referral.
 
         Completing a referral involves creating an interaction and linking the referral and
         interaction together. Hence, this view creates an interaction and updates the referral

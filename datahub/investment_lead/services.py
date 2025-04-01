@@ -39,8 +39,7 @@ def get_leads_to_process():
 
 
 def raise_exception_for_eyb_lead_without_company(eyb_lead: EYBLead):
-    """
-    Check for required attributes on EYB Lead to ensure there is a company
+    """Check for required attributes on EYB Lead to ensure there is a company.
     """
     if not eyb_lead.company:
         raise AttributeError('The ''company'' attribute is not set for the ''EYBLead'' object.')
@@ -48,13 +47,14 @@ def raise_exception_for_eyb_lead_without_company(eyb_lead: EYBLead):
 
 def find_match_by_duns_number(duns_number):
     """Uses an EYB lead provided DnB number
-    to search Data Hub for existing Companies
+    to search Data Hub for existing Companies.
 
     Args:
         duns_number (string): a DnB number
     Returns:
         found (boolean): true/false based on success of search
         company (object): a Company object or None
+
     """
     companies = Company.objects.filter(duns_number=duns_number)
 
@@ -66,8 +66,7 @@ def find_match_by_duns_number(duns_number):
 
 
 def add_new_company_from_eyb_lead(eyb_lead: EYBLead):
-    """
-    Add new company from EYB lead and link it.
+    """Add new company from EYB lead and link it.
     """
     # Create company record
     company = Company()
@@ -93,12 +92,13 @@ def add_new_company_from_eyb_lead(eyb_lead: EYBLead):
 
 
 def match_or_create_company_for_eyb_lead(eyb_lead):
-    """Matches an EYB lead with an existing Company via DnB number
+    """Matches an EYB lead with an existing Company via DnB number.
 
     Args:
         eyb_lead (object): an EYB lead object
     Returns:
         company (object): a company object
+
     """
     company = None
     if eyb_lead.duns_number:
@@ -113,8 +113,7 @@ def match_or_create_company_for_eyb_lead(eyb_lead):
 
 
 def email_matches_contact_on_eyb_lead_company(eyb_lead: EYBLead):
-    """
-    Check whether a contact exists with the EYB lead email address on the EYB Lead company
+    """Check whether a contact exists with the EYB lead email address on the EYB Lead company.
     """
     raise_exception_for_eyb_lead_without_company(eyb_lead)
 
@@ -126,9 +125,8 @@ def email_matches_contact_on_eyb_lead_company(eyb_lead: EYBLead):
 
 
 def create_company_contact_for_eyb_lead(eyb_lead: EYBLead):
-    """
-    Given an EYB lead with a linked company record:
-    Create a company contact
+    """Given an EYB lead with a linked company record:
+    Create a company contact.
     """
     raise_exception_for_eyb_lead_without_company(eyb_lead)
 
@@ -149,9 +147,8 @@ def create_company_contact_for_eyb_lead(eyb_lead: EYBLead):
 
 
 def create_or_skip_eyb_lead_as_company_contact(eyb_lead: EYBLead):
-    """
-    Given an EYB Lead with a linked company record:
-    Create new company contact if not exists
+    """Given an EYB Lead with a linked company record:
+    Create new company contact if not exists.
     """
     raise_exception_for_eyb_lead_without_company(eyb_lead)
 

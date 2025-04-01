@@ -1,11 +1,9 @@
 import logging
 from decimal import Decimal
-
 from unittest import mock
 
 import boto3
 import pytest
-
 from moto import mock_aws
 from sentry_sdk import init
 from sentry_sdk.transport import Transport
@@ -20,9 +18,9 @@ from datahub.metadata.models import (
     PostcodeData,
 )
 from datahub.metadata.tasks import (
+    POSTCODE_DATA_PREFIX,
     postcode_data_identification_task,
     postcode_data_ingestion_task,
-    POSTCODE_DATA_PREFIX,
 )
 from datahub.metadata.test.factories import (
     PostcodeDataFactory,
@@ -36,17 +34,13 @@ def test_file_path():
 
 @pytest.fixture
 def test_file():
-    filepath = (
-        'datahub/metadata/test/fixtures/postcodes.json.gz'
-    )
+    filepath = 'datahub/metadata/test/fixtures/postcodes.json.gz'
     return open(filepath, 'rb')
 
 
 @pytest.fixture
 def empty_test_file():
-    filepath = (
-        'datahub/metadata/test/fixtures/empty.json.gz'
-    )
+    filepath = 'datahub/metadata/test/fixtures/empty.json.gz'
     return open(filepath, 'rb')
 
 
@@ -86,7 +80,9 @@ def test_identification_task_schedules_ingestion_task(test_file_path, caplog):
     with (
         mock.patch('datahub.ingest.tasks.job_scheduler') as mock_scheduler,
         mock.patch.object(
-            S3ObjectProcessor, 'get_most_recent_object_key', return_value=test_file_path,
+            S3ObjectProcessor,
+            'get_most_recent_object_key',
+            return_value=test_file_path,
         ),
         mock.patch.object(S3ObjectProcessor, 'has_object_been_ingested', return_value=False),
         caplog.at_level(logging.INFO),
@@ -112,8 +108,7 @@ class TestPostcodeDataIngestionTask:
     @pytest.mark.django_db
     @mock_aws
     def test_ingesting_postcodes(self, test_file_path, test_file):
-        """
-        Test that when given a postcode file, the task inserts new records,
+        """Test that when given a postcode file, the task inserts new records,
         updates the field values of existing records, and deletes records
         that exist in the database but not in the file.
         """
@@ -135,9 +130,8 @@ class TestPostcodeDataIngestionTask:
     @pytest.mark.django_db
     @mock_aws
     def test_only_delete_if_valid_records_found(self, test_file_path, empty_test_file):
-        """
-        Test that we don't delete postcode records if no valid ids are found in the
-        file as that indicates something has gone wrong with processing it
+        """Test that we don't delete postcode records if no valid ids are found in the
+        file as that indicates something has gone wrong with processing it.
         """
         PostcodeDataFactory(id=400859, region_name='South West', lat=44.244941)
         PostcodeDataFactory(id=999999999)
@@ -152,13 +146,11 @@ class TestPostcodeDataIngestionTask:
     @pytest.mark.django_db
     @mock_aws
     def test_invalid_file(self, test_file_path):
-        """
-        Test that an exception is raised when the file is not valid
-        """
+        """Test that an exception is raised when the file is not valid."""
         mock_transport = MockSentryTransport()
         init(transport=mock_transport)
         setup_s3_bucket(S3_BUCKET_NAME)
-        with pytest.raises(Exception) as e:
+        with pytest.raises(Exception) as e:  # noqa: PT011
             postcode_data_ingestion_task(test_file_path)
         exception = e.value.args[0]
         assert " key: 'data-flow/exports/ExportPostcodeDirectory/object.json.gz" in exception

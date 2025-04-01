@@ -15,15 +15,14 @@ from datahub.core.models import (
     BaseModel,
     BaseOrderedConstantModel,
 )
-from datahub.core.utils import get_front_end_url, StrEnum
+from datahub.core.utils import StrEnum, get_front_end_url
 from datahub.metadata import models as metadata_models
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
 class InteractionPermission(StrEnum):
-    """
-    Permission codename constants.
+    """Permission codename constants.
 
     (Defined here rather than in permissions to avoid an import of that module.)
 
@@ -71,29 +70,23 @@ class CommunicationChannel(BaseConstantModel):
 
 
 class ServiceDeliveryStatus(BaseOrderedConstantModel):
-    """
-    Status of a service delivery.
+    """Status of a service delivery.
 
     Primarily used for Tradeshow Access Programme (TAP) grants.
     """
 
 
 class PolicyArea(BaseOrderedConstantModel):
-    """
-    Policy area for a policy feedback interaction.
-    """
+    """Policy area for a policy feedback interaction."""
 
 
 class PolicyIssueType(BaseOrderedConstantModel):
-    """
-    Policy issue type for a policy feedback interaction.
-    """
+    """Policy issue type for a policy feedback interaction."""
 
 
 @reversion.register_base_model()
 class InteractionDITParticipant(models.Model):
-    """
-    Many-to-many model between an interaction and an adviser (called a DIT participant).
+    """Many-to-many model between an interaction and an adviser (called a DIT participant).
 
     Due to a small number of old records that have only a team or an adviser,
     adviser and team are nullable (but do not have blank=True, to avoid any further
@@ -119,13 +112,13 @@ class InteractionDITParticipant(models.Model):
         related_name='+',
     )
 
-    def __str__(self):
-        """Human-readable representation."""
-        return f'{self.interaction} – {self.adviser} – {self.team}'
-
     class Meta:
         default_permissions = ()
         unique_together = (('interaction', 'adviser'),)
+
+    def __str__(self):
+        """Human-readable representation."""
+        return f'{self.interaction} - {self.adviser} - {self.team}'
 
 
 class ServiceQuestion(BaseOrderedConstantModel):
@@ -191,7 +184,7 @@ class Interaction(ArchivableModel, BaseModel):
         __empty__ = 'Not set'
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
-    theme = models.CharField(
+    theme = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         choices=Theme.choices,
         null=True,
@@ -256,17 +249,23 @@ class Interaction(ArchivableModel, BaseModel):
     subject = models.TextField()
     notes = models.TextField(max_length=10000, blank=True)
     communication_channel = models.ForeignKey(
-        'CommunicationChannel', blank=True, null=True,
+        'CommunicationChannel',
+        blank=True,
+        null=True,
         on_delete=models.SET_NULL,
         help_text='For interactions only.',
     )
     archived_documents_url_path = models.CharField(
-        max_length=MAX_LENGTH, blank=True,
+        max_length=MAX_LENGTH,
+        blank=True,
         help_text='Legacy field. File browser path to the archived documents for this '
-                  'interaction.',
+        'interaction.',
     )
     service_delivery_status = models.ForeignKey(
-        'ServiceDeliveryStatus', blank=True, null=True, on_delete=models.PROTECT,
+        'ServiceDeliveryStatus',
+        blank=True,
+        null=True,
+        on_delete=models.PROTECT,
         verbose_name='status',
         help_text='For service deliveries only.',
     )
@@ -300,11 +299,17 @@ class Interaction(ArchivableModel, BaseModel):
 
     # Grants
     grant_amount_offered = models.DecimalField(
-        null=True, blank=True, max_digits=19, decimal_places=2,
+        null=True,
+        blank=True,
+        max_digits=19,
+        decimal_places=2,
         help_text='For service deliveries only.',
     )
     net_company_receipt = models.DecimalField(
-        null=True, blank=True, max_digits=19, decimal_places=2,
+        null=True,
+        blank=True,
+        max_digits=19,
+        decimal_places=2,
         help_text='For service deliveries only.',
     )
     # Policy feedback
@@ -351,8 +356,7 @@ class Interaction(ArchivableModel, BaseModel):
         return self.subject
 
     def save(self, *args, **kwargs):
-        """
-        Create a `CompanyActivity` linked to this interaction for
+        """Create a `CompanyActivity` linked to this interaction for
         showing all activities related to a company, if the relation
         doesn't already exist.
         """
@@ -410,9 +414,8 @@ class Interaction(ArchivableModel, BaseModel):
 
 @reversion.register_base_model()
 class InteractionExportCountry(BaseModel):
-    """
-    Record `Interaction`'s exporting status to a `Country`.
-    Where `status` is `CompanyExportCountry.Status`
+    """Record `Interaction`'s exporting status to a `Country`.
+    Where `status` is `CompanyExportCountry.Status`.
 
     This data will help consolidate company level countries
     in `company.CompanyExportCountry`
@@ -447,9 +450,5 @@ class InteractionExportCountry(BaseModel):
         verbose_name_plural = 'interaction export countries'
 
     def __str__(self):
-        """
-        Admin human readable name
-        """
-        return (
-            f'{self.interaction} {self.country} {self.status}'
-        )
+        """Admin human readable name."""
+        return f'{self.interaction} {self.country} {self.status}'

@@ -12,11 +12,9 @@ import pytest
 from dateutil.parser import parse as dateutil_parse
 from django.conf import settings
 from django.utils.timezone import now
-
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
-
 
 from datahub.company.models import OneListTier
 from datahub.company.test.factories import AdviserFactory, CompanyFactory
@@ -101,7 +99,7 @@ def investment_project_with_stage_log(opensearch_with_collector):
     ]
     opensearch_with_collector.flush_and_refresh()
 
-    yield investment_projects
+    return investment_projects
 
 
 @pytest.fixture
@@ -160,7 +158,7 @@ def setup_data(opensearch_with_collector, project_with_max_gross_value_added):
     ]
     opensearch_with_collector.flush_and_refresh()
 
-    yield investment_projects
+    return investment_projects
 
 
 @pytest.fixture
@@ -183,7 +181,7 @@ def created_on_data(opensearch_with_collector):
 
     opensearch_with_collector.flush_and_refresh()
 
-    yield investment_projects
+    return investment_projects
 
 
 class TestSearch(APITestMixin):
@@ -206,8 +204,8 @@ class TestSearch(APITestMixin):
         assert response.data['results'][0]['name'] == 'abc defg'
 
     @pytest.mark.parametrize(
-        'search,expected_gross_value_added,expected_project_name',
-        (
+        ('search', 'expected_gross_value_added', 'expected_project_name'),
+        [
             (
                 {
                     'gross_value_added_start': 99999999999999,
@@ -237,7 +235,7 @@ class TestSearch(APITestMixin):
                 [],
                 [],
             ),
-        ),
+        ],
     )
     def test_gross_value_added_filters(
         self,
@@ -359,8 +357,8 @@ class TestSearch(APITestMixin):
         assert {result['id'] for result in results} == expected_ids
 
     @pytest.mark.parametrize(
-        'query,num_results',
-        (
+        ('query', 'num_results'),
+        [
             (
                 {
                     'estimated_land_date_before': '2017-06-13',
@@ -387,7 +385,7 @@ class TestSearch(APITestMixin):
                 },
                 0,
             ),
-        ),
+        ],
     )
     def test_search_investment_project_estimated_land_date_json(
         self,
@@ -408,15 +406,15 @@ class TestSearch(APITestMixin):
         for result in results:
             estimated_land_date = dateutil_parse(result['estimated_land_date'])
             for filter_key, date in query.items():
-                date = dateutil_parse(date)
+                date = dateutil_parse(date)  # noqa: PLW2901
                 if filter_key == 'estimated_land_date_before':
                     assert estimated_land_date <= date
                 if filter_key == 'estimated_land_date_after':
                     assert estimated_land_date >= date
 
     @pytest.mark.parametrize(
-        'query,expected_results',
-        (
+        ('query', 'expected_results'),
+        [
             (
                 {
                     'actual_land_date_before': '2010-12-13',
@@ -468,7 +466,7 @@ class TestSearch(APITestMixin):
                 },
                 [],
             ),
-        ),
+        ],
     )
     def test_search_investment_project_actual_land_date_json(
         self,
@@ -487,8 +485,8 @@ class TestSearch(APITestMixin):
         assert Counter(result['name'] for result in results) == Counter(expected_results)
 
     @pytest.mark.parametrize(
-        'query,num_results',
-        (
+        ('query', 'num_results'),
+        [
             (
                 {
                     'created_on_before': '2016-09-13T09:44:31.062870Z',
@@ -527,7 +525,7 @@ class TestSearch(APITestMixin):
                 },
                 0,
             ),
-        ),
+        ],
     )
     def test_search_investment_project_created_on_json(self, created_on_data, query, num_results):
         """Tests detailed investment project search."""
@@ -543,7 +541,7 @@ class TestSearch(APITestMixin):
         for result in results:
             created_on = dateutil_parse(result['created_on']).replace(tzinfo=datetime.timezone.utc)
             for filter_key, date in query.items():
-                date = dateutil_parse(date)
+                date = dateutil_parse(date)  # noqa: PLW2901
                 if filter_key == 'created_on_before':
                     assert created_on <= date
                 if filter_key == 'created_on_after':
@@ -651,8 +649,8 @@ class TestSearch(APITestMixin):
         assert response.data['results'][0]['name'] == 'new project'
 
     @pytest.mark.parametrize(
-        'query,expected_results',
-        (
+        ('query', 'expected_results'),
+        [
             (
                 {
                     'level_of_involvement_simplified': 'unspecified',
@@ -736,7 +734,7 @@ class TestSearch(APITestMixin):
                     'new project',
                 ],
             ),
-        ),
+        ],
     )
     def test_search_involvement_json(
         self,
@@ -754,8 +752,8 @@ class TestSearch(APITestMixin):
         assert Counter(result['name'] for result in results) == Counter(expected_results)
 
     @pytest.mark.parametrize(
-        'query,expected_error',
-        (
+        ('query', 'expected_error'),
+        [
             (
                 {
                     'level_of_involvement_simplified': 'unspecified1',
@@ -785,7 +783,7 @@ class TestSearch(APITestMixin):
                     },
                 },
             ),
-        ),
+        ],
     )
     def test_search_involvement_incorrect_filter_json(
         self,
@@ -818,7 +816,7 @@ class TestSearch(APITestMixin):
 
     @pytest.mark.parametrize(
         'sector_level',
-        (0, 1, 2),
+        [0, 1, 2],
     )
     def test_sector_descends_filter(
         self,
@@ -989,14 +987,14 @@ class TestSearchFinancialYearFilter(APITestMixin):
     """Tests the financial year filter on the search endpoint."""
 
     @pytest.mark.parametrize(
-        'query,num_results',
-        (
+        ('query', 'num_results'),
+        [
             ({'financial_year_start': ['2014']}, 0),
             ({'financial_year_start': ['2015']}, 1),
             ({'financial_year_start': ['2016']}, 1),
             ({'financial_year_start': ['2022']}, 1),
             ({'financial_year_start': ['2014', '2015']}, 1),
-        ),
+        ],
     )
     def test_prospects_use_created_date(
         self,
@@ -1024,14 +1022,14 @@ class TestSearchFinancialYearFilter(APITestMixin):
         assert len(results) == num_results
 
     @pytest.mark.parametrize(
-        'query,num_results',
-        (
+        ('query', 'num_results'),
+        [
             ({'financial_year_start': ['2015']}, 0),
             ({'financial_year_start': ['2016']}, 0),
             ({'financial_year_start': ['2017']}, 1),
             ({'financial_year_start': ['2018']}, 0),
             ({'financial_year_start': ['2017', '2018']}, 1),
-        ),
+        ],
     )
     def test_non_prospects_use_actual_land_date(
         self,
@@ -1059,14 +1057,14 @@ class TestSearchFinancialYearFilter(APITestMixin):
         assert len(results) == num_results
 
     @pytest.mark.parametrize(
-        'query,num_results',
-        (
+        ('query', 'num_results'),
+        [
             ({'financial_year_start': ['2015']}, 0),
             ({'financial_year_start': ['2016']}, 1),
             ({'financial_year_start': ['2017']}, 0),
             ({'financial_year_start': ['2018']}, 0),
             ({'financial_year_start': ['2016', '2017']}, 1),
-        ),
+        ],
     )
     def test_non_prospects_fall_back_to_estimated_land_date(
         self,
@@ -1097,16 +1095,16 @@ class TestSearchFinancialYearFilter(APITestMixin):
 class TestSearchLandDateFilter(APITestMixin):
     """Tests the land date financial year filter on the search endpoint."""
 
-    @pytest.mark.parametrize('stage', ('verify_win', 'prospect'))
+    @pytest.mark.parametrize('stage', ['verify_win', 'prospect'])
     @pytest.mark.parametrize(
-        'query,num_results',
-        (
+        ('query', 'num_results'),
+        [
             ({'land_date_financial_year_start': ['2015']}, 0),
             ({'land_date_financial_year_start': ['2016']}, 0),
             ({'land_date_financial_year_start': ['2017']}, 1),
             ({'land_date_financial_year_start': ['2018']}, 0),
             ({'land_date_financial_year_start': ['2017', '2018']}, 1),
-        ),
+        ],
     )
     def test_actual_land_date(
         self,
@@ -1132,16 +1130,16 @@ class TestSearchLandDateFilter(APITestMixin):
         results = response.data['results']
         assert len(results) == num_results
 
-    @pytest.mark.parametrize('stage', ('active', 'prospect'))
+    @pytest.mark.parametrize('stage', ['active', 'prospect'])
     @pytest.mark.parametrize(
-        'query,num_results',
-        (
+        ('query', 'num_results'),
+        [
             ({'land_date_financial_year_start': ['2015']}, 0),
             ({'land_date_financial_year_start': ['2016']}, 1),
             ({'land_date_financial_year_start': ['2017']}, 0),
             ({'land_date_financial_year_start': ['2018']}, 0),
             ({'land_date_financial_year_start': ['2016', '2017']}, 1),
-        ),
+        ],
     )
     def test_fall_back_to_estimated_land_date(
         self,
@@ -1172,7 +1170,7 @@ class TestSearchPermissions(APITestMixin):
     """Tests search view permissions."""
 
     def test_investment_project_no_permissions(self):
-        """Should return 403"""
+        """Should return 403."""
         user = create_test_user(dit_team=TeamFactory())
         api_client = self.create_api_client(user=user)
         url = reverse('api-v3:search:investment_project')
@@ -1181,10 +1179,10 @@ class TestSearchPermissions(APITestMixin):
 
     @pytest.mark.parametrize(
         'permissions',
-        (
+        [
             (InvestmentProjectPermission.view_all,),
             (InvestmentProjectPermission.view_associated, InvestmentProjectPermission.view_all),
-        ),
+        ],
     )
     def test_non_restricted_user_can_see_all_projects(
         self,
@@ -1222,8 +1220,7 @@ class TestSearchPermissions(APITestMixin):
         }
 
     def test_restricted_user_with_no_team_cannot_see_projects(self, opensearch_with_collector):
-        """
-        Checks that a restricted user that doesn't have a team cannot view any projects (in
+        """Checks that a restricted user that doesn't have a team cannot view any projects (in
         particular projects associated with other advisers that don't have teams).
         """
         url = reverse('api-v3:search:investment_project')
@@ -1293,7 +1290,7 @@ class TestSummaryAggregation(APITestMixin):
     """Tests that stage counts are provided."""
 
     def test_unfiltered(self, setup_data):
-        """All results should be counted when not filtered"""
+        """All results should be counted when not filtered."""
         url = reverse('api-v3:search:investment_project')
         response = self.api_client.post(url, {'show_summary': True})
 
@@ -1334,7 +1331,7 @@ class TestSummaryAggregation(APITestMixin):
         }
 
     def test_show_summary_empty(self, setup_data):
-        """If show_summary is not present, a summary should not be returned"""
+        """If show_summary is not present, a summary should not be returned."""
         url = reverse('api-v3:search:investment_project')
         response = self.api_client.post(url, {})
 
@@ -1343,7 +1340,7 @@ class TestSummaryAggregation(APITestMixin):
         assert 'summary' not in response.data
 
     def test_show_summary_false(self, setup_data):
-        """If show_summary is False, a summary should not be returned"""
+        """If show_summary is False, a summary should not be returned."""
         url = reverse('api-v3:search:investment_project')
         response = self.api_client.post(url, {'show_summary': False})
 
@@ -1352,7 +1349,7 @@ class TestSummaryAggregation(APITestMixin):
         assert 'summary' not in response.data
 
     def test_filter_by_stage(self, opensearch_with_collector):
-        """Other stage counts should be 0 when filtered by stage"""
+        """Other stage counts should be 0 when filtered by stage."""
         InvestmentProjectFactory(
             stage_id=constants.InvestmentProjectStage.prospect.value.id,
         )
@@ -1412,7 +1409,7 @@ class TestSummaryAggregation(APITestMixin):
         opensearch_with_collector,
         investment_project_with_stage_log,
     ):
-        """Details of last won project should be shown in won summary for a investor company"""
+        """Details of last won project should be shown in won summary for a investor company."""
         investment_project = investment_project_with_stage_log[0]
         investor_company = investment_project.investor_company
 
@@ -1451,7 +1448,7 @@ class TestSummaryAggregation(APITestMixin):
         self,
         opensearch_with_collector,
     ):
-        """Details of last won project should be shown in won summary for a investor company"""
+        """Details of last won project should be shown in won summary for a investor company."""
         early_created = InvestmentProjectFactory(
             stage_id=constants.InvestmentProjectStage.won.value.id,
             created_on=now() - datetime.timedelta(days=7),
@@ -1520,7 +1517,7 @@ class TestSummaryAggregation(APITestMixin):
         opensearch_with_collector,
         investment_project_with_stage_log,
     ):
-        """Details of last won project should be shown in won summary for a investor company"""
+        """Details of last won project should be shown in won summary for a investor company."""
         investment_project = investment_project_with_stage_log[0]
         investor_company = investment_project.investor_company
 
@@ -1575,11 +1572,11 @@ class TestInvestmentProjectExportView(APITestMixin):
 
     @pytest.mark.parametrize(
         'permissions',
-        (
+        [
             (),
             (InvestmentProjectPermission.view_all,),
             (InvestmentProjectPermission.export,),
-        ),
+        ],
     )
     def test_user_without_permission_cannot_export(self, opensearch, permissions):
         """Test that a user without the correct permissions cannot export data."""
@@ -1642,11 +1639,11 @@ class TestInvestmentProjectExportView(APITestMixin):
         return get_attr_or_none(gam, 'name')
 
     @pytest.mark.parametrize(
-        'request_sortby,orm_ordering',
-        (
+        ('request_sortby', 'orm_ordering'),
+        [
             ('created_on:desc', '-created_on'),
             ('stage.name', 'stage__name'),
-        ),
+        ],
     )
     def test_export(self, opensearch_with_collector, request_sortby, orm_ordering):
         """Test export of investment project search results."""
@@ -1729,16 +1726,16 @@ class TestInvestmentProjectExportView(APITestMixin):
                 'Other team members': join_attr_values(
                     project.team_members.order_by('adviser__first_name', 'adviser__last_name'),
                     'adviser.name',
-                ),  # noqa: E123
+                ),
                 'Delivery partners': join_attr_values(
                     project.delivery_partners.order_by('name'),
-                ),  # noqa: E123
+                ),
                 'Possible UK regions': join_attr_values(
                     project.uk_region_locations.order_by('name'),
-                ),  # noqa: E123
+                ),
                 'Actual UK regions': join_attr_values(
                     project.actual_uk_regions.order_by('name'),
-                ),  # noqa: E123
+                ),
                 'Specific investment programmes': join_attr_values(
                     project.specific_programmes.order_by('name'),
                 ),
@@ -1869,10 +1866,10 @@ class TestBasicSearchPermissions(APITestMixin):
 
     @pytest.mark.parametrize(
         'permissions',
-        (
+        [
             (InvestmentProjectPermission.view_all,),
             (InvestmentProjectPermission.view_associated, InvestmentProjectPermission.view_all),
-        ),
+        ],
     )
     def test_global_non_restricted_user_can_see_all_projects(
         self,
@@ -1919,9 +1916,7 @@ class TestBasicSearchPermissions(APITestMixin):
         self,
         opensearch_with_collector,
     ):
-        """
-        Automatic filter to see only associated IP for a specific (leps) user
-        """
+        """Automatic filter to see only associated IP for a specific (leps) user."""
         team = TeamFactory()
         team_other = TeamFactory()
         adviser_other = AdviserFactory(dit_team_id=team_other.id)
@@ -1972,8 +1967,7 @@ class TestBasicSearchPermissions(APITestMixin):
         self,
         opensearch_with_collector,
     ):
-        """
-        Checks that a restricted user that doesn't have a team cannot view projects associated
+        """Checks that a restricted user that doesn't have a team cannot view projects associated
         with other advisers that don't have teams.
         """
         adviser_other = AdviserFactory(dit_team_id=None)
@@ -2005,7 +1999,7 @@ class TestRelatedSearch(APITestMixin):
     """Tests searching view when related companies are engaged."""
 
     def test_search_investment_no_parents_no_subsidiaries(self, opensearch_with_collector):
-        """Tests company that has no parents or subsidiaries"""
+        """Tests company that has no parents or subsidiaries."""
         url = reverse('api-v3:search:investment_project')
         investment_project1 = InvestmentProjectFactory(
             investment_type_id=constants.InvestmentType.fdi.value.id,
@@ -2052,7 +2046,7 @@ class TestRelatedSearch(APITestMixin):
         opensearch_with_collector,
     ):
         """Tests results from company with a parent and subsidiary
-        that have investments
+        that have investments.
         """
         parent_company = CompanyFactory()
 
@@ -2124,7 +2118,7 @@ class TestRelatedSearch(APITestMixin):
         opensearch_with_collector,
     ):
         """Tests results from company with a parent and subsidiary
-        but the call to get related information errors
+        but the call to get related information errors.
         """
         parent_company = CompanyFactory()
 

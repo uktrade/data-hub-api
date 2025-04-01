@@ -2,10 +2,7 @@ import pytest
 
 from datahub.company.test.factories import AdviserFactory
 from datahub.export_win.constants import EXPORT_WINS_LEGACY_ID_START_VALUE
-from datahub.export_win.models import (
-    Breakdown,
-    update_total_values,
-    WinAdviser)
+from datahub.export_win.models import Breakdown, WinAdviser, update_total_values
 from datahub.export_win.test.factories import BreakdownFactory, WinAdviserFactory, WinFactory
 from datahub.export_win.utils import calculate_totals_for_export_win
 

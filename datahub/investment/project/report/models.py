@@ -11,8 +11,7 @@ MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
 class SPIReportPermission(StrEnum):
-    """
-    Permission codename constant.
+    """Permission codename constant.
 
     The following codename means that the user can view any type of spi report:
 

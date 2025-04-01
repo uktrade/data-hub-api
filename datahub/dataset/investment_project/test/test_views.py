@@ -35,7 +35,7 @@ pytestmark = pytest.mark.django_db
 def ist_adviser():
     """Provides IST adviser."""
     team = TeamFactory(tags=[Team.Tag.INVESTMENT_SERVICES_TEAM])
-    yield AdviserFactory(dit_team_id=team.id)
+    return AdviserFactory(dit_team_id=team.id)
 
 
 @pytest.fixture
@@ -83,11 +83,11 @@ def propositions(ist_adviser):
 
         items[2].abandon(by=adviser, details='what')
 
-    yield items
+    return items
 
 
 def get_expected_data_from_project(project, won_date=None):
-    """Returns expected dictionary based on given project"""
+    """Returns expected dictionary based on given project."""
     client_contacts = list(project.client_contacts.order_by('first_name')[:2])
     return {
         'actual_land_date': format_date_or_datetime(project.actual_land_date),
@@ -211,26 +211,25 @@ def get_expected_data_from_project(project, won_date=None):
 
 @pytest.mark.django_db
 class TestInvestmentProjectsDatasetViewSet(BaseDatasetViewTest):
-    """
-    Tests for InvestmentProjectsDatasetView
+    """Tests for InvestmentProjectsDatasetView.
     """
 
     view_url = reverse('api-v4:dataset:investment-projects-dataset')
     factory = InvestmentProjectFactory
 
     @pytest.mark.parametrize(
-        'project_factory,won_date',
-        (
+        ('project_factory', 'won_date'),
+        [
             (InvestmentProjectFactory, None),
             (FDIInvestmentProjectFactory, None),
             (AssignPMInvestmentProjectFactory, None),
             (ActiveInvestmentProjectFactory, None),
             (VerifyWinInvestmentProjectFactory, None),
             (WonInvestmentProjectFactory, '2017-01-01T00:00:00Z'),
-        ),
+        ],
     )
     def test_success(self, data_flow_api_client, project_factory, won_date):
-        """Test that endpoint returns with expected data for a single project"""
+        """Test that endpoint returns with expected data for a single project."""
         with freeze_time('2017-01-01 00:00:00'):
             project = project_factory()
         response = data_flow_api_client.get(self.view_url)
@@ -256,7 +255,7 @@ class TestInvestmentProjectsDatasetViewSet(BaseDatasetViewTest):
         assert result == expected_result
 
     def test_with_team_members(self, data_flow_api_client):
-        """Test that endpoint returns with expected data for a single project with team members"""
+        """Test that endpoint returns with expected data for a single project with team members."""
         project = InvestmentProjectTeamMemberFactory().investment_project
         response = data_flow_api_client.get(self.view_url)
         assert response.status_code == status.HTTP_200_OK
@@ -277,7 +276,7 @@ class TestInvestmentProjectsDatasetViewSet(BaseDatasetViewTest):
         assert result == expected_result
 
     def test_with_multiple_projects(self, data_flow_api_client):
-        """Test that endpoint returns correct number of record in expected response"""
+        """Test that endpoint returns correct number of record in expected response."""
         with freeze_time('2019-01-01 12:30:00'):
             project_1 = InvestmentProjectFactory()
         with freeze_time('2019-01-03 12:00:00'):
@@ -297,8 +296,7 @@ class TestInvestmentProjectsDatasetViewSet(BaseDatasetViewTest):
 
 
 class TestInvestmentProjectsActivityDatasetViewSet(BaseDatasetViewTest):
-    """
-    Tests for InvestmentProjectsActivityDatasetView
+    """Tests for InvestmentProjectsActivityDatasetView.
 
     It only tests if results are being returned. The results are validated in separate tests
     in the investment project app.

@@ -5,14 +5,10 @@ from unittest.mock import ANY, call
 from uuid import uuid4
 
 import pytest
-
-
 from django.test.utils import override_settings
 from django.utils import timezone
 
-
 from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
-
 from datahub.reminder.models import (
     TaskAmendedByOthersReminder,
     TaskAmendedByOthersSubscription,
@@ -42,7 +38,6 @@ from datahub.task.emails import (
     UpcomingTaskEmailTemplate,
 )
 from datahub.task.models import Task
-
 from datahub.task.tasks import (
     create_task_amended_by_others_subscription,
     create_task_completed_subscription,
@@ -70,7 +65,7 @@ from datahub.task.test.factories import AdviserFactory, TaskFactory
 pytestmark = [pytest.mark.django_db]
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_job_scheduler(monkeypatch):
     mock_job_scheduler = mock.Mock()
     monkeypatch.setattr(
@@ -82,8 +77,7 @@ def mock_job_scheduler(monkeypatch):
 
 @pytest.fixture
 def mock_notify_adviser_by_rq_email(monkeypatch):
-    """
-    Mocks the notify_adviser_by_rq_email function.
+    """Mocks the notify_adviser_by_rq_email function.
     """
     mock_notify_adviser_by_rq_email = mock.Mock()
     monkeypatch.setattr(
@@ -95,8 +89,7 @@ def mock_notify_adviser_by_rq_email(monkeypatch):
 
 @pytest.fixture
 def mock_logger(monkeypatch):
-    """
-    Returns a mock logger client instance.
+    """Returns a mock logger client instance.
     """
     mock_logger = mock.Mock()
     monkeypatch.setattr(
@@ -235,10 +228,10 @@ def mock_notify_adviser_archived_completed_or_amended_task_call(task, adviser, t
 class TestTaskReminders:
     @pytest.mark.parametrize(
         'lock_acquired',
-        (
+        [
             False,
             True,
-        ),
+        ],
     )
     def test_lock(
         self,
@@ -247,8 +240,7 @@ class TestTaskReminders:
         lock_acquired,
         mock_notify_adviser_by_rq_email,
     ):
-        """
-        Test that the task doesn't run if it cannot acquire
+        """Test that the task doesn't run if it cannot acquire
         the advisory_lock.
         """
         adviser = AdviserFactory()
@@ -431,8 +423,7 @@ class TestTaskReminders:
     def test_update_task_reminder_email_status(
         self,
     ):
-        """
-        Test it updates reminder data with the connected email notification information.
+        """Test it updates reminder data with the connected email notification information.
         """
         task = TaskFactory()
         reminder_number = 3
@@ -457,8 +448,7 @@ class TestTaskReminders:
         caplog,
         mock_job_scheduler,
     ):
-        """
-        Generate reminders upcoming tasks should be called from
+        """Generate reminders upcoming tasks should be called from
         scheduler.
         """
         caplog.set_level(logging.INFO)
@@ -673,8 +663,7 @@ class TestTasksAssignedToMeFromOthers:
     def test_task_assigned_to_me_from_others_reminder_email_status(
         self,
     ):
-        """
-        Test it updates reminder data with the connected email notification information.
+        """Test it updates reminder data with the connected email notification information.
         """
         task = TaskFactory()
         reminder_number = 3
@@ -700,8 +689,7 @@ class TestTasksAssignedToMeFromOthers:
     def test_update_task_deleted_email_status(
         self,
     ):
-        """
-        Test it updates reminder data with the connected email notification information.
+        """Test it updates reminder data with the connected email notification information.
         """
         task = TaskFactory()
         reminder_number = 3
@@ -1218,10 +1206,10 @@ class TestTaskScheduler:
 class TestTasksOverdue:
     @pytest.mark.parametrize(
         'lock_acquired',
-        (
+        [
             False,
             True,
-        ),
+        ],
     )
     def test_lock(
         self,
@@ -1230,8 +1218,7 @@ class TestTasksOverdue:
         lock_acquired,
         mock_notify_adviser_by_rq_email,
     ):
-        """
-        Test that the task doesn't run if it cannot acquire
+        """Test that the task doesn't run if it cannot acquire
         the advisory_lock.
         """
         adviser = AdviserFactory()
@@ -1461,8 +1448,7 @@ class TestTasksOverdue:
     def test_update_task_reminder_email_status(
         self,
     ):
-        """
-        Test it updates reminder data with the connected email notification information.
+        """Test it updates reminder data with the connected email notification information.
         """
         task1 = TaskFactory()
         reminder_number = 3
@@ -1487,8 +1473,7 @@ class TestTasksOverdue:
         caplog,
         mock_job_scheduler,
     ):
-        """
-        Generate reminders tasks overdue should be called from
+        """Generate reminders tasks overdue should be called from
         scheduler.
         """
         caplog.set_level(logging.INFO)

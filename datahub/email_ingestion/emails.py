@@ -9,7 +9,6 @@ from rest_framework import status
 from datahub.email_ingestion.models import MailboxLogging, MailboxProcessingStatus
 from datahub.interaction.email_processors.processors import InteractionPlainEmailProcessor
 
-
 logger = getLogger(__name__)
 
 BUCKET_ID = 'mailbox'
@@ -72,8 +71,7 @@ def delete_message(token, message_id):
 
 
 def process_ingestion_emails():
-    """
-    Gets all new mail documents in the bucket and process each message.
+    """Gets all new mail documents in the bucket and process each message.
     """
     processor = InteractionPlainEmailProcessor()
 

@@ -34,7 +34,7 @@ class Country(Enum):
 
 
 class AdministrativeArea(Enum):
-    """Administrative Areas"""
+    """Administrative Areas."""
 
     # United States
     alabama = AdministrativeAreaConstant(

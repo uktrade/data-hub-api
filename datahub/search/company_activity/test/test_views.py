@@ -33,7 +33,6 @@ from datahub.interaction.test.factories import (
 from datahub.metadata.test.factories import TeamFactory
 from datahub.search.company_activity import CompanyActivitySearchApp
 
-
 pytestmark = [
     pytest.mark.django_db,
     # Index objects for this search app only
@@ -71,14 +70,14 @@ def company_activities(opensearch_with_collector):
 
     opensearch_with_collector.flush_and_refresh()
 
-    yield data
+    return data
 
 
 class TestCompanyActivityEntitySearchView(APITestMixin):
     """Tests company-activity search views."""
 
     def test_company_activity_search_no_permissions(self):
-        """Should return 403"""
+        """Should return 403."""
         user = create_test_user(dit_team=TeamFactory())
         api_client = self.create_api_client(user=user)
         url = reverse('api-v4:search:company-activity')
@@ -86,8 +85,7 @@ class TestCompanyActivityEntitySearchView(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_get_all(self, company_activities):
-        """
-        Tests that all company activities are returned with an empty POST body.
+        """Tests that all company activities are returned with an empty POST body.
         """
         url = reverse('api-v4:search:company-activity')
 
@@ -158,11 +156,11 @@ class TestCompanyActivityEntitySearchView(APITestMixin):
                 for item in response_data['results']] == expected_dates
 
     @pytest.mark.parametrize(
-        'sortby,error',
-        (
+        ('sortby', 'error'),
+        [
             ('date:backwards', '"backwards" is not a valid sort direction.'),
             ('gyratory:asc', '"gyratory" is not a valid choice for the sort field.'),
-        ),
+        ],
     )
     def test_sort_by_invalid_field(self, opensearch_with_collector, sortby, error):
         """Tests attempting to sort by an invalid field and direction."""
@@ -231,8 +229,8 @@ class TestCompanyActivityEntitySearchView(APITestMixin):
         assert results[0]['company']['id'] == str(companies[5].id)
 
     @pytest.mark.parametrize(
-        'name_term,matched_company_name',
-        (
+        ('name_term', 'matched_company_name'),
+        [
             # name
             ('whiskers', 'whiskers and tabby'),
             ('whi', 'whiskers and tabby'),
@@ -242,7 +240,7 @@ class TestCompanyActivityEntitySearchView(APITestMixin):
             # non-matches
             ('whi lorem', None),
             ('wh', None),
-        ),
+        ],
     )
     def test_filter_by_company_name(
         self,
@@ -292,8 +290,8 @@ class TestCompanyActivityEntitySearchView(APITestMixin):
             assert len(response.data['results']) == 0
 
     @pytest.mark.parametrize(
-        'data,results',
-        (
+        ('data', 'results'),
+        [
             (
                 {
                     'date_after': '2017-12-01',
@@ -320,7 +318,7 @@ class TestCompanyActivityEntitySearchView(APITestMixin):
                     'Email about exhibition',
                 },
             ),
-        ),
+        ],
     )
     def test_filter_by_date(self, opensearch_with_collector, data, results):
         """Tests filtering activities by date."""
@@ -366,13 +364,12 @@ class TestCompanyActivityEntitySearchView(APITestMixin):
         get_datahub_ids_dnb_service_company_hierarchy_mock,
         opensearch_with_collector,
     ):
-        """
-        Tests that when the following parameters are given, a company and its parent
+        """Tests that when the following parameters are given, a company and its parent
         company activities are shown.
         ```
             company
             include_parent_companies
-        ```
+        ```.
         """
         # Dummy companies with parent companies.
         SubsidiaryFactory.create_batch(4)
@@ -417,13 +414,12 @@ class TestCompanyActivityEntitySearchView(APITestMixin):
         get_datahub_ids_dnb_service_company_hierarchy_mock,
         opensearch_with_collector,
     ):
-        """
-        Tests that when the following parameters are given, a company and its subsidiary
+        """Tests that when the following parameters are given, a company and its subsidiary
         company activities are shown.
         ```
             company
             include_subsidiary_companies
-        ```
+        ```.
         """
         # Dummy companies with parent companies.
         SubsidiaryFactory.create_batch(4)
@@ -461,12 +457,12 @@ class TestCompanyActivityEntitySearchView(APITestMixin):
         )
 
     @pytest.mark.parametrize(
-        'subject_term,matched_interaction_subject',
-        (
+        ('subject_term', 'matched_interaction_subject'),
+        [
             ('Touch', 'Touch point interaction'),
             ('Have', 'Have another go'),
             ('Blah', None),
-        ),
+        ],
     )
     def test_filter_by_company_interaction_subject(
         self,

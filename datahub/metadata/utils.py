@@ -33,8 +33,7 @@ def get_latest_exchange_rate():
 
 
 def get_country_by_country_name(name: str, default_iso='') -> Country:
-    """
-    Attempts to match a Country from the given name or by the given default_iso is match by name
+    """Attempts to match a Country from the given name or by the given default_iso is match by name
     is not found.
 
     :param name: a country name

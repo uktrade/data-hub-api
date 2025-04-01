@@ -32,7 +32,6 @@ from datahub.reminder.models import (
     UpcomingEstimatedLandDateSubscription,
 )
 
-
 logger = getLogger(__name__)
 
 
@@ -136,7 +135,7 @@ def run_post_users_migration():
 
 
 def get_post_user_ids_to_migrate():
-    """Get all POST advisor ids to migrate"""
+    """Get all POST advisor ids to migrate."""
     one_list_account_owner_ids = _get_one_list_account_owner_ids(
         OneListTierID.tier_d_overseas_post_accounts.value,
     )
@@ -156,7 +155,7 @@ def get_post_user_ids_to_migrate():
     )
 
     def _get_advisor_ids_matching_query(query: Q):
-        """Get all advisor id's matching the {query} AND are advisors with a role of POST"""
+        """Get all advisor id's matching the {query} AND are advisors with a role of POST."""
         return Advisor.objects.filter((query & Q(pk__in=post_advisor_ids))).values_list(
             'id',
             flat=True,
@@ -303,8 +302,7 @@ def _log_post_advisor_migration(advisor_id, logger):
 
 
 def _generate_advisor_investment_project_query(role):
-    """
-    Generate a django Q object using the advisor role to match against an investment project
+    """Generate a django Q object using the advisor role to match against an investment project.
     """
     return Q(
         **{

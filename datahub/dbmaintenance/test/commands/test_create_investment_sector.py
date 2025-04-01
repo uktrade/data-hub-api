@@ -10,12 +10,11 @@ from datahub.investment.project.test.factories import FDISICGroupingFactory
 from datahub.metadata.models import Sector
 from datahub.metadata.test.factories import SectorFactory
 
-
 pytestmark = pytest.mark.django_db
 
 
 def test_happy_path(s3_stubber):
-    """Test that command creates specified investment sectors"""
+    """Test that command creates specified investment sectors."""
     sectors = SectorFactory.create_batch(
         3,
         segment=factory.Iterator(['sector1', 'sector2', 'sector3']),
@@ -127,8 +126,7 @@ def test_non_existent_sector(s3_stubber, caplog):
 
 
 def test_non_existent_fdi_sic_grouping(s3_stubber, caplog):
-    """
-    Test that the command logs an error when the FDISICGrouping
+    """Test that the command logs an error when the FDISICGrouping
     PK does not exist.
     """
     caplog.set_level('ERROR')
@@ -187,9 +185,8 @@ def test_non_existent_fdi_sic_grouping(s3_stubber, caplog):
 
 
 def test_entry_already_exists_for_sector(s3_stubber, caplog):
-    """
-    Test that the command ignores records for with sector_ids that already
-    exist in the InvestmentSector table
+    """Test that the command ignores records for with sector_ids that already
+    exist in the InvestmentSector table.
     """
     caplog.set_level('ERROR')
 

@@ -1,6 +1,12 @@
 from django.conf import settings
 from rest_framework.fields import (
-    BooleanField, CharField, ChoiceField, DateField, DecimalField, EmailField, UUIDField,
+    BooleanField,
+    CharField,
+    ChoiceField,
+    DateField,
+    DecimalField,
+    EmailField,
+    UUIDField,
 )
 
 

@@ -211,7 +211,7 @@ class NoRecentExportInteractionReminderSerializer(serializers.ModelSerializer):
 
 
 class ReminderTaskSerializer(TaskSerializer):
-    """Serializer for the task in a reminder"""
+    """Serializer for the task in a reminder."""
 
     class Meta:
         model = Task
@@ -241,7 +241,7 @@ class UpcomingTaskReminderSerializer(serializers.ModelSerializer):
 
 
 class TaskAssignedToMeFromOthersReminderSerializer(serializers.ModelSerializer):
-    """Serializer for task assigned to me from others"""
+    """Serializer for task assigned to me from others."""
 
     task = ReminderTaskSerializer()
 
@@ -256,7 +256,7 @@ class TaskAssignedToMeFromOthersReminderSerializer(serializers.ModelSerializer):
 
 
 class TaskOverdueReminderSerializer(serializers.ModelSerializer):
-    """Serializer for task overdue"""
+    """Serializer for task overdue."""
 
     task = ReminderTaskSerializer()
 
@@ -271,7 +271,7 @@ class TaskOverdueReminderSerializer(serializers.ModelSerializer):
 
 
 class TaskCompletedReminderSerializer(serializers.ModelSerializer):
-    """Serializer for task completed"""
+    """Serializer for task completed."""
 
     task = ReminderTaskSerializer()
 
@@ -286,7 +286,7 @@ class TaskCompletedReminderSerializer(serializers.ModelSerializer):
 
 
 class TaskAmendedByOthersReminderSerializer(serializers.ModelSerializer):
-    """Serializer for task completed"""
+    """Serializer for task completed."""
 
     task = ReminderTaskSerializer()
 
@@ -301,7 +301,7 @@ class TaskAmendedByOthersReminderSerializer(serializers.ModelSerializer):
 
 
 class TaskDeletedByOthersReminderSerializer(serializers.ModelSerializer):
-    """Serializer for task completed"""
+    """Serializer for task completed."""
 
     task = ReminderTaskSerializer()
 

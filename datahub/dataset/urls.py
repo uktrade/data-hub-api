@@ -34,7 +34,6 @@ from datahub.dataset.task.views import TasksDatasetView
 from datahub.dataset.team.views import TeamsDatasetView
 from datahub.dataset.user_event_log.views import UserEventsView
 
-
 urlpatterns = [
     path('advisers-dataset', AdvisersDatasetView.as_view(), name='advisers-dataset'),
     path('omis-dataset', OMISDatasetView.as_view(), name='omis-dataset'),

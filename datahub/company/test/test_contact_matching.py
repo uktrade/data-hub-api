@@ -2,12 +2,11 @@ import pytest
 
 from datahub.company.contact_matching import (
     ContactMatchingStatus,
-    find_active_contact_by_email_address,
     MatchStrategy,
+    find_active_contact_by_email_address,
 )
 from datahub.company.test.factories import ContactFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
-
 
 EMAIL_MATCHING_CONTACT_TEST_DATA = [
     {
@@ -41,8 +40,8 @@ EMAIL_MATCHING_CONTACT_TEST_DATA = [
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    'email,expected_matching_status,match_strategy',
-    (
+    ('email', 'expected_matching_status', 'match_strategy'),
+    [
         # same case, match on email
         ('unique1@primary.com', ContactMatchingStatus.matched, MatchStrategy.DEFAULT),
         # different case, match on email
@@ -63,7 +62,7 @@ EMAIL_MATCHING_CONTACT_TEST_DATA = [
         ('duplicate@primary.com', ContactMatchingStatus.matched, MatchStrategy.MAX_INTERACTIONS),
         # archived contact ignored (email value specified)
         ('archived1@primary.com', ContactMatchingStatus.unmatched, MatchStrategy.MAX_INTERACTIONS),
-    ),
+    ],
 )
 def test_find_active_contact_by_email_address(
     email,

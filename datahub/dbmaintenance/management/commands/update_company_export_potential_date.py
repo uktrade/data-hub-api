@@ -1,12 +1,9 @@
 import codecs
 import csv
-
 from contextlib import closing
-
 from logging import getLogger
 
 import reversion
-
 from django.db import transaction
 from django.utils.timezone import now
 
@@ -57,8 +54,7 @@ class Command(CSVBaseCommand):
 
     @disable_search_signal_receivers(Company)
     def _handle(self, *args, **options):
-        """
-        Internal version of the `handle` method, adapted for streaming and batching from S3.
+        """Internal version of the `handle` method, adapted for streaming and batching from S3.
 
         :returns: dict with count of records successful and failed updates
         """
@@ -79,7 +75,7 @@ class Command(CSVBaseCommand):
             for row in reader:
                 batch.append(row)
                 if len(batch) >= batch_size:
-                    for row in batch:
+                    for row in batch:  # noqa: PLW2901
                         succeeded = self.process_row(row, **options)
                         result[succeeded] += 1
                     batch = []

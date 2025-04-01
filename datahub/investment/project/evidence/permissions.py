@@ -53,8 +53,7 @@ class InvestmentProjectEvidenceDocumentAssociationChecker(
     _EvidenceDocumentViewToActionMapping,
     InvestmentProjectAssociationCheckerBase,
 ):
-    """
-    Association checker for evidence documents, which checks association with the investment
+    """Association checker for evidence documents, which checks association with the investment
     project linked to the evidence document.
     """
 

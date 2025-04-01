@@ -1,6 +1,5 @@
 from unittest import mock
 
-
 from django.test import override_settings
 
 from datahub.core.boto3_client import get_s3_client

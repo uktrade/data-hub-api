@@ -17,19 +17,18 @@ from datahub.company.test.factories import (
     CompanyFactory,
 )
 from datahub.core.test_utils import random_obj_for_model
-from datahub.metadata.models import BusinessType, Country as CountryModel
+from datahub.metadata.models import BusinessType
+from datahub.metadata.models import Country as CountryModel
 
 pytestmark = pytest.mark.django_db
 
 
 class TestCompanyBusinessTypePostMigrate:
-    """
-    Tests for the `company_business_type_post_migrate` signal receiver.
+    """Tests for the `company_business_type_post_migrate` signal receiver.
     """
 
     def test_db_in_sync(self):
-        """
-        Test that business types have been correctly loaded.
+        """Test that business types have been correctly loaded.
         """
         loaded_business_types = {
             (obj.id, obj.name) for obj in BusinessType.objects.all()
@@ -42,21 +41,18 @@ class TestCompanyBusinessTypePostMigrate:
 
     @mock.patch('datahub.company.signals.load_constants_to_database')
     def test_only_called_once(self, mocked_load_constants_to_database):
-        """
-        Test that load_constants_to_database is only called once.
+        """Test that load_constants_to_database is only called once.
         """
         emit_post_migrate_signal(verbosity=1, interactive=False, db=DEFAULT_DB_ALIAS)
         mocked_load_constants_to_database.assert_called_once()
 
 
 class TestExportCountryHistoryCustomSignals:
-    """
-    Test the custom signals are triggered when export country is created, updated and deleted.
+    """Test the custom signals are triggered when export country is created, updated and deleted.
     """
 
     def test_company_export_country_history_create(self):
-        """
-        Test that creating new CompanyExportCountry record
+        """Test that creating new CompanyExportCountry record
         sets up a corresponding history record.
         """
         company = CompanyFactory()
@@ -79,8 +75,7 @@ class TestExportCountryHistoryCustomSignals:
         assert history[0].history_type == CompanyExportCountryHistory.HistoryType.INSERT
 
     def test_company_export_country_history_update(self):
-        """
-        Test that updating an existing CompanyExportCountry record
+        """Test that updating an existing CompanyExportCountry record
         sets up a corresponding history record.
         """
         company = CompanyFactory()
@@ -125,8 +120,7 @@ class TestExportCountryHistoryCustomSignals:
         assert history[1].history_type == CompanyExportCountryHistory.HistoryType.UPDATE
 
     def test_company_export_country_history_update_with_no_change(self):
-        """
-        Test that submitting an update for a CompanyExportCountry record
+        """Test that submitting an update for a CompanyExportCountry record
         that doesn't change any field (i.e status) does not create
         a history record.
         """
@@ -166,8 +160,7 @@ class TestExportCountryHistoryCustomSignals:
         assert history[0].history_type == CompanyExportCountryHistory.HistoryType.INSERT
 
     def test_company_export_country_history_delete(self):
-        """
-        Test that deleting an existing CompanyExportCountry record
+        """Test that deleting an existing CompanyExportCountry record
         sets up a corresponding history record.
         """
         company = CompanyFactory()
@@ -190,9 +183,8 @@ class TestExportCountryHistoryCustomSignals:
         assert history[0].history_type == CompanyExportCountryHistory.HistoryType.DELETE
 
     def test_delete_company_export_country_no_signal(self):
-        """
-        Test that attempting to delete an nonexisting CompanyExportCountry
-        record won't send a signal and won't track history
+        """Test that attempting to delete an nonexisting CompanyExportCountry
+        record won't send a signal and won't track history.
         """
         company = CompanyFactory()
         countries = CountryModel.objects.order_by('name')[:2]

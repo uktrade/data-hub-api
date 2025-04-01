@@ -1,12 +1,10 @@
 from unittest import mock
 
 import pytest
-
 from opensearchpy.exceptions import NotFoundError
 
 from datahub.search.task.apps import TaskSearchApp
 from datahub.task.test.factories import TaskFactory
-
 
 pytestmark = pytest.mark.django_db
 
@@ -30,10 +28,10 @@ def test_new_task_synced(opensearch_with_signals):
 
 
 @pytest.mark.parametrize(
-    'task_factory,expected_in_index,expected_to_call_delete',
-    (
+    ('task_factory', 'expected_in_index', 'expected_to_call_delete'),
+    [
         (TaskFactory, True, True),
-    ),
+    ],
 )
 def test_delete_from_opensearch(
     task_factory,
@@ -41,8 +39,7 @@ def test_delete_from_opensearch(
     expected_to_call_delete,
     opensearch_with_signals,
 ):
-    """
-    Test that when a task is deleted from db it is also
+    """Test that when a task is deleted from db it is also
     calls delete document to delete from OpenSearch.
     """
     task = task_factory()

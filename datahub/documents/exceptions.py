@@ -5,11 +5,11 @@ from rest_framework.exceptions import APIException
 from datahub.core.exceptions import DataHubError
 
 
-class VirusScanException(DataHubError):
+class VirusScanException(DataHubError):  # noqa: N818
     """Exceptions raised when scanning documents for viruses."""
 
 
-class DocumentDeleteException(DataHubError):
+class DocumentDeleteException(DataHubError):  # noqa: N818
     """Exceptions raised when deletion of document failed."""
 
 

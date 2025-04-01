@@ -7,21 +7,18 @@ from datahub.interaction import MAILBOX_NOTIFICATION_FEATURE_FLAG_NAME
 from datahub.notification.constants import NotifyServiceName
 from datahub.notification.notify import notify_adviser_by_email
 
-
 logger = logging.getLogger(__name__)
 
 
 def get_domain_label(domain):
-    """
-    "." is not a valid character in a prometheus label and the recommended
+    """"." is not a valid character in a prometheus label and the recommended
     practice is to replace it with an "_".
     """
     return domain.replace('.', '_')
 
 
 def notify_meeting_ingest_failure(adviser, errors, recipients):
-    """
-    Notify an adviser that a meeting ingest has failed - including error
+    """Notify an adviser that a meeting ingest has failed - including error
     details and intended recipients.
     """
     domain_label = get_domain_label(adviser.get_email_domain())
@@ -47,8 +44,7 @@ def notify_meeting_ingest_failure(adviser, errors, recipients):
 
 
 def notify_meeting_ingest_success(adviser, interaction, recipients):
-    """
-    Notify an adviser that a meeting ingest has succeeeded - including a link
+    """Notify an adviser that a meeting ingest has succeeeded - including a link
     to the interaction and intended recipients.
     """
     domain_label = get_domain_label(adviser.get_email_domain())

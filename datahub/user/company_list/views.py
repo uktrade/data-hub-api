@@ -42,8 +42,7 @@ CANT_DELETE_NON_ARCHIVED_PIPELINE_ITEM_MESSAGE = gettext_lazy(
 
 
 class CompanyListViewSet(CoreViewSet, DestroyModelMixin):
-    """
-    Views for managing the authenticated user's company lists.
+    """Views for managing the authenticated user's company lists.
 
     This covers:
 
@@ -67,8 +66,7 @@ class CompanyListViewSet(CoreViewSet, DestroyModelMixin):
         return super().get_queryset().filter(adviser=self.request.user)
 
     def get_additional_data(self, create):
-        """
-        Set additional data for when serializer.save() is called.
+        """Set additional data for when serializer.save() is called.
 
         This makes sure that adviser is set to self.request.user when a list is created
         (in the same way created_by and modified_by are).
@@ -123,8 +121,7 @@ class CompanyListItemViewSet(CoreViewSet):
     queryset = get_company_list_item_queryset()
 
     def initial(self, request, *args, **kwargs):
-        """
-        Raise an Http404 if user's company list specified in the URL path does not exist.
+        """Raise an Http404 if user's company list specified in the URL path does not exist.
         """
         super().initial(request, *args, **kwargs)
 
@@ -141,8 +138,7 @@ class CompanyListItemViewSet(CoreViewSet):
 
 
 class CompanyListItemAPIView(APIView):
-    """
-    A view for adding a company to a selected list of companies that belongs to a user.
+    """A view for adding a company to a selected list of companies that belongs to a user.
     """
 
     permission_classes = (CompanyListItemAPIPermissions,)
@@ -179,8 +175,7 @@ class CompanyListItemAPIView(APIView):
 
     @method_decorator(transaction.non_atomic_requests)
     def delete(self, request, company_list_pk, company_pk=None, format=None):
-        """
-        Delete a CompanyListItem for the selected list of authenticated user and
+        """Delete a CompanyListItem for the selected list of authenticated user and
         specified company if it exists.
         """
         company_list = get_object_or_404(CompanyList, pk=company_list_pk, adviser=request.user)
@@ -218,7 +213,7 @@ class PipelineItemViewSet(ArchivableViewSetMixin, CoreViewSet, DestroyModelMixin
         return super().get_queryset().filter(adviser=self.request.user)
 
     def perform_destroy(self, instance):
-        """Perform destroy validation ensuring that the instance is archived before deleting"""
+        """Perform destroy validation ensuring that the instance is archived before deleting."""
         if not instance.archived:
             errors = {
                 api_settings.NON_FIELD_ERRORS_KEY: CANT_DELETE_NON_ARCHIVED_PIPELINE_ITEM_MESSAGE,

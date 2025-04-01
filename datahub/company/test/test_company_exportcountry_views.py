@@ -25,11 +25,10 @@ from datahub.metadata.models import Country as CountryModel
 
 
 class TestCompaniesToCompanyExportCountryModel(APITestMixin):
-    """Tests for copying export countries from company model to CompanyExportCountry model"""
+    """Tests for copying export countries from company model to CompanyExportCountry model."""
 
     def test_get_company_with_export_countries(self):
-        """
-        Tests the company response has export countries that are
+        """Tests the company response has export countries that are
         in the new CompanyExportCountry model.
         """
         company = CompanyFactory()
@@ -47,7 +46,7 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
         response = api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.json().get('export_countries', []) is not []
+        assert response.json().get('export_countries', []) != []
         export_countries_response = response.json().get('export_countries')
         assert export_countries_response == [
             {
@@ -61,8 +60,7 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
 
     @staticmethod
     def update_company_export_country_model(*, self, new_countries, field, company, model_status):
-        """
-        Standard action for updating the model with
+        """Standard action for updating the model with
         the given data and returning the actual response
         :param self: current class scope
         :param new_countries: countries to be added to the model
@@ -73,7 +71,7 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
             'status_code': http response code type (200, 404 etc),
             'countries': countries recorded in the model against the current company,
             'country_ids': and their corresponding id's
-        }
+        }.
         """
         url = reverse('api-v4:company:item', kwargs={'pk': company.pk})
         response = self.api_client.patch(
@@ -114,15 +112,14 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
 
     @pytest.mark.parametrize(
         'permission_codenames',
-        (
+        [
             (),
             (CompanyPermission.change_company,),
             ('change_companyexportcountry',),
-        ),
+        ],
     )
     def test_returns_403_if_without_permission(self, permission_codenames):
-        """
-        Test that a 403 is returned if the user does not have all of the required
+        """Test that a 403 is returned if the user does not have all of the required
         permissions.
         """
         company = CompanyFactory()
@@ -135,8 +132,8 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
 
     @pytest.mark.django_db
     @pytest.mark.parametrize(
-        'data,expected_error',
-        (
+        ('data', 'expected_error'),
+        [
             # can't add duplicate countries with export_countries
             (
                 {
@@ -219,7 +216,7 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
                     ],
                 },
             ),
-        ),
+        ],
     )
     def test_validation_error_export_country_api(
         self,
@@ -236,7 +233,7 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
         assert response.json() == expected_error
 
     def _get_export_interest_status(self):
-        """Helper function to randomly select export status"""
+        """Helper function to randomly select export status."""
         export_interest_statuses = [
             CompanyExportCountry.Status.CURRENTLY_EXPORTING,
             CompanyExportCountry.Status.FUTURE_INTEREST,
@@ -245,8 +242,7 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
         return random.choice(export_interest_statuses)
 
     def test_update_company_with_export_countries(self):
-        """
-        Test company export countries update.
+        """Test company export countries update.
         """
         company = CompanyFactory()
 
@@ -276,8 +272,7 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
     def test_update_company_with_export_countries_sync_company_fields(
         self,
     ):
-        """
-        Test company export countries update
+        """Test company export countries update
         should sync to company fields, currently_exporting_to and future_interest_countries.
         """
         company = CompanyFactory()
@@ -331,8 +326,7 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
     def test_update_company_export_countries_with_pre_existing_company_fields_sync(
         self,
     ):
-        """
-        Test sync when company export_countries update, of a company with
+        """Test sync when company export_countries update, of a company with
         currently_exporting_to and future_interest_countries preset.
         """
         initial_countries = list(CountryModel.objects.order_by('id')[:5])
@@ -393,8 +387,7 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
     def test_update_company_export_countries_with_new_list_deletes_old_ones(
         self,
     ):
-        """
-        Test when updating company export countries with a new list
+        """Test when updating company export countries with a new list
         and make sure old ones are removed.
         """
         company = CompanyFactory()
@@ -441,8 +434,7 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
     def test_update_company_export_countries_with_empty_list_deletes_all(
         self,
     ):
-        """
-        Test when updating company export countries with an empty list
+        """Test when updating company export countries with an empty list
         and make sure all items are removed.
         """
         company = CompanyFactory()
@@ -476,8 +468,7 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
     def test_update_company_with_something_check_export_countries(
         self,
     ):
-        """
-        Test when updating company with something else other than export countries
+        """Test when updating company with something else other than export countries
         will not affect export countries.
         """
         company = CompanyFactory()
@@ -562,8 +553,7 @@ class TestCompaniesToCompanyExportCountryModel(APITestMixin):
         assert future_countries_request == future_countries_response
 
     def test_delete_company_export_countries_check_history_tracks_correct_user(self):
-        """
-        Check that history correctly tracks the user who deletes the export country
+        """Check that history correctly tracks the user who deletes the export country.
         """
         company = CompanyFactory()
         country = CountryModel.objects.order_by('name')[0]

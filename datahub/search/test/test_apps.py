@@ -16,8 +16,7 @@ class TestGetSearchApp:
     """Tests related to `get_search_app`."""
 
     def test_found(self, mocked_load_search_apps):
-        """
-        Test that get_search_app returns the right search app for the name passed in.
+        """Test that get_search_app returns the right search app for the name passed in.
         """
         search_app = mock.Mock()
 
@@ -28,8 +27,7 @@ class TestGetSearchApp:
         assert get_search_app('app2') == search_app
 
     def test_not_found(self, mocked_load_search_apps):
-        """
-        Test that get_search_app raises KeyError if it can't find the right
+        """Test that get_search_app raises KeyError if it can't find the right
         search app for the name passed in.
         """
         mocked_load_search_apps.return_value = {
@@ -44,8 +42,7 @@ class TestGetSearchAppByModel:
     """Tests related to `get_search_app_by_model`."""
 
     def test_found(self, mocked_load_search_apps):
-        """
-        Test that get_search_app_by_model returns the right
+        """Test that get_search_app_by_model returns the right
         search app for the model passed in.
         """
         model = mock.Mock()
@@ -58,8 +55,7 @@ class TestGetSearchAppByModel:
         assert get_search_app_by_model(model) == search_app
 
     def test_not_found(self, mocked_load_search_apps):
-        """
-        Test that get_search_app_by_model raises LookupError if it
+        """Test that get_search_app_by_model raises LookupError if it
         can't find the right search app for the model passed in.
         """
         mocked_load_search_apps.return_value = {
@@ -77,8 +73,7 @@ class TestGetSearchAppBySearchModel:
         assert get_search_app_by_search_model(SearchSimpleModel) is SimpleModelSearchApp
 
     def test_not_found(self):
-        """
-        Test that get_search_app_by_model raises LookupError if it
+        """Test that get_search_app_by_model raises LookupError if it
         can't find the right search app for the search model passed in.
         """
         with pytest.raises(LookupError):

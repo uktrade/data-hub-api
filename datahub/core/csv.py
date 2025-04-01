@@ -47,8 +47,7 @@ def create_csv_response(rows, field_titles, filename):
 
 
 def escape(payload):
-    """
-    Escape Potentially dangerous CSV payloads.
+    """Escape Potentially dangerous CSV payloads.
 
     This addresses a security issue identified here:
         https://owasp.org/www-community/attacks/CSV_Injection
@@ -59,11 +58,11 @@ def escape(payload):
         return ''
 
     def starts_dangerously(value):
-        """Checks if value starts with a potentially dangerous character"""
+        """Checks if value starts with a potentially dangerous character."""
         return str(value)[0] in ('@', '+', '-', '=', '|', '%')
 
     def is_number(value):
-        """Checks if value is a number"""
+        """Checks if value is a number."""
         return re.match('^-?[0-9,\\.]+$', str(value))
 
     if str(payload) and starts_dangerously(payload) and not is_number(payload):
@@ -78,8 +77,7 @@ def _transform_csv_row(row):
 
 
 def transform_csv_value(value):
-    """
-    Transforms values before they are written to a CSV file for better compatibility with Excel.
+    """Transforms values before they are written to a CSV file for better compatibility with Excel.
 
     In particular, datetimes are formatted in a way that results in better compatibility with
     Excel. Other values are passed through unchanged (the csv module automatically formats None

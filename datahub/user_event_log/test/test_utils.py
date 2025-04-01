@@ -14,8 +14,8 @@ class TestRecordUserEvent:
     """Test record_user_event()."""
 
     @pytest.mark.parametrize(
-        'data,expected_data',
-        (
+        ('data', 'expected_data'),
+        [
             (None, None),
             (
                 {'a': 'b'},
@@ -31,7 +31,7 @@ class TestRecordUserEvent:
             ),
             ('string', 'string'),
             ([0, 2, 3], [0, 2, 3]),
-        ),
+        ],
     )
     def test_records_data(self, data, expected_data):
         """Test various data values."""

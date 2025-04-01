@@ -9,14 +9,12 @@ from datahub.search.apps import get_search_app_by_model, get_search_apps
 from datahub.search.opensearch import bulk, get_client
 from datahub.search.signals import SignalReceiver
 
-
 BULK_DELETION_TIMEOUT_SECS = 300
 BULK_CHUNK_SIZE = 10000
 
 
 def delete_documents(index, docs):
-    """
-    Deletes `docs` from `index`.
+    """Deletes `docs` from `index`.
 
     :raises DataHubError: in case of non 404 errors
     """
@@ -48,8 +46,7 @@ def _create_delete_action(_index, _id):
 
 
 class Collector:
-    """
-    Collects all the deleted django objects so that they can be deleted from OpenSearch.
+    """Collects all the deleted django objects so that they can be deleted from OpenSearch.
 
     Most of the time you will want to use the context manager/decorator
     `update_opensearch_after_deletions` instead.
@@ -128,8 +125,7 @@ class Collector:
 
 @contextmanager
 def update_opensearch_after_deletions():
-    """
-    Returns a context manager that can be used to automatically delete from OpenSearch
+    """Returns a context manager that can be used to automatically delete from OpenSearch
     all the django objects deleted in the block.
     It can be used as a decorator as well.
 

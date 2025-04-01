@@ -1,5 +1,4 @@
 import logging
-
 import re
 
 from django.conf import settings
@@ -11,8 +10,7 @@ ALL_AUTH_METHODS = ('spf', 'dkim', 'dmarc', 'compauth')
 
 
 def _get_auth_headers(message):
-    """
-    When message passes through multiple servers, the authentication_results becomes an array
+    """When message passes through multiple servers, the authentication_results becomes an array.
     """
     authentication_results = message.authentication_results[0] if isinstance(
         message.authentication_results,
@@ -23,8 +21,7 @@ def _get_auth_headers(message):
 
 
 def _verify_authentication(message, auth_methods):
-    """
-    Verify the Authentication-Results header of a MailParser object.
+    """Verify the Authentication-Results header of a MailParser object.
 
     :param message: mailparse.MailParser object - the message to check
     :param auth_methods: An iterable of pairs of email authentication methods
@@ -68,8 +65,7 @@ def _log_unknown_domain(from_domain, message):
 
 
 def was_email_sent_by_dit(message):
-    """
-    Checks whether an email message was sent by a valid DIT address.
+    """Checks whether an email message was sent by a valid DIT address.
 
     :param message: mailparse.MailParser object - the message to check
 

@@ -11,16 +11,23 @@ from reversion.models import Version
 from datahub.company.test.factories import AdviserFactory, CompanyFactory
 from datahub.core.constants import UKRegion as UKRegionConstant
 from datahub.core.reversion import EXCLUDED_BASE_MODEL_FIELDS
-from datahub.core.test_utils import APITestMixin, create_test_user
-from datahub.core.test_utils import format_date_or_datetime
+from datahub.core.test_utils import APITestMixin, create_test_user, format_date_or_datetime
 from datahub.investment.investor_profile.constants import (
     RequiredChecksConducted as RequiredChecksConductedConstant,
 )
 from datahub.investment.investor_profile.test.constants import (
     AssetClassInterest as AssetClassInterestConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     ConstructionRisk as ConstructionRiskConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     LargeCapitalInvestmentTypes as LargeCapitalInvestmentTypesConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     ReturnRate as ReturnRateConstant,
+)
+from datahub.investment.investor_profile.test.constants import (
     TimeHorizon as TimeHorizonConstant,
 )
 from datahub.investment.opportunity.test.factories import LargeCapitalOpportunityFactory
@@ -34,14 +41,14 @@ def get_opportunity_for_search():
     opportunity = LargeCapitalOpportunityFactory(
         investment_projects=[InvestmentProjectFactory()],
     )
-    yield opportunity
+    return opportunity
 
 
 class TestCreateLargeCapitalOpportunityView(APITestMixin):
     """Test creating a large capital opportunity."""
 
     def test_large_capital_unauthorized_user(self, api_client):
-        """Should return 401"""
+        """Should return 401."""
         url = reverse('api-v4:large-capital-opportunity:collection')
         user = create_test_user()
         response = api_client.get(url, user=user)

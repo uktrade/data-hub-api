@@ -1,10 +1,11 @@
-from datahub.company.models import Contact as DBContact, ContactPermission
+from datahub.company.models import Contact as DBContact
+from datahub.company.models import ContactPermission
 from datahub.search.apps import SearchApp
 from datahub.search.contact.models import Contact
 
 
 class ContactSearchApp(SearchApp):
-    """SearchApp for contacts"""
+    """SearchApp for contacts."""
 
     name = 'contact'
     search_model = Contact

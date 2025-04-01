@@ -111,10 +111,14 @@ def test_sync_app_log_messages__logs__modified_on(caplog):
 
     # Assert 'modified_on' is shown for fields which have it.
     assert 'Processing Interaction records, using batch size 1' in caplog.text
-    assert f'Interaction rows processed: 1/2 50% modified_on: {interactions[1].modified_on}' \
+    assert (
+        f'Interaction rows processed: 1/2 50% modified_on: {interactions[1].modified_on}'
         in caplog.text
-    assert f'Interaction rows processed: 2/2 100% modified_on: {interactions[0].modified_on}' \
+    )
+    assert (
+        f'Interaction rows processed: 2/2 100% modified_on: {interactions[0].modified_on}'
         in caplog.text
+    )
 
 
 @pytest.mark.django_db
@@ -130,6 +134,6 @@ def test_sync_app_log_messages__does_not_log__modified_on(caplog):
 
     # Assert 'modified_on' is NOT shown for fields which don't have it.
     assert 'Processing Adviser records, using batch size 1' in caplog.text
-    assert 'Adviser rows processed: 1/2 50%'
+    assert 'Adviser rows processed: 1/2 50%' in caplog.text
     assert 'modified_on:' not in caplog.text
-    assert 'Adviser rows processed: 2/2 100%'
+    assert 'Adviser rows processed: 2/2 100%' in caplog.text

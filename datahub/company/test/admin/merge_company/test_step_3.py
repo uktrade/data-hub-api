@@ -44,7 +44,7 @@ class TestConfirmMergeViewGet(AdminTestMixin):
 
     @pytest.mark.parametrize(
         'data',
-        (
+        [
             {},
             {
                 'source_company': '12345',
@@ -65,11 +65,10 @@ class TestConfirmMergeViewGet(AdminTestMixin):
                 'source_company': '13495',
                 'target_company': lambda: str(CompanyFactory().pk),
             },
-        ),
+        ],
     )
     def test_returns_400_if_invalid_companies_passed(self, data):
-        """
-        Test that a 400 is returned when invalid values are passed in the query string.
+        """Test that a 400 is returned when invalid values are passed in the query string.
 
         This could only happen if the query string was manipulated, or one of the referenced
         companies was deleted.
@@ -107,25 +106,24 @@ class TestConfirmMergeViewPost(AdminTestMixin):
     """Tests form submission in the 'Confirm merge' view."""
 
     @pytest.mark.parametrize(
-        'factory_relation_kwarg,creates_contacts',
-        (
+        ('factory_relation_kwarg', 'creates_contacts'),
+        [
             ('num_company_list_items', False),
             ('num_contacts', True),
             ('num_interactions', True),
             ('num_investment_projects', False),
             ('num_orders', True),
             ('num_referrals', False),
-        ),
+        ],
     )
-    @pytest.mark.parametrize('num_related_objects', (0, 1, 3))
-    def test_merge_succeeds(
+    @pytest.mark.parametrize('num_related_objects', [0, 1, 3])
+    def test_merge_succeeds(  # noqa: PLR0915
         self,
         factory_relation_kwarg,
         creates_contacts,
         num_related_objects,
     ):
-        """
-        Test that the merge succeeds and the source company is marked as a duplicate when the
+        """Test that the merge succeeds and the source company is marked as a duplicate when the
         source company has various amounts of contacts, interactions, investment projects and
         orders.
         """
@@ -145,10 +143,13 @@ class TestConfirmMergeViewPost(AdminTestMixin):
 
         source_investment_projects_by_field = {
             investment_project_field: list(
-                InvestmentProject.objects.filter(**{
-                    investment_project_field: source_company,
-                }),
-            ) for investment_project_field in INVESTMENT_PROJECT_COMPANY_FIELDS
+                InvestmentProject.objects.filter(
+                    **{
+                        investment_project_field: source_company,
+                    },
+                ),
+            )
+            for investment_project_field in INVESTMENT_PROJECT_COMPANY_FIELDS
         }
 
         # Note that the interaction and order factories also create contacts
@@ -291,8 +292,8 @@ class TestConfirmMergeViewPost(AdminTestMixin):
         assert contact_1_versions[0].revision == reversion
 
     @pytest.mark.parametrize(
-        'source_company_factory, target_company_factory, disallowed_fields',
-        (
+        ('source_company_factory', 'target_company_factory', 'disallowed_fields'),
+        [
             (
                 CompanyFactory,
                 ArchivedCompanyFactory,
@@ -308,7 +309,7 @@ class TestConfirmMergeViewPost(AdminTestMixin):
                 CompanyFactory,
                 ['another_disallowed_field'],
             ),
-        ),
+        ],
     )
     @patch('datahub.company.merge.is_model_a_valid_merge_source')
     def test_merge_fails(
@@ -318,9 +319,7 @@ class TestConfirmMergeViewPost(AdminTestMixin):
         target_company_factory,
         disallowed_fields,
     ):
-        """
-        Test that the merge fails when the source company cannot be merged into the target company.
-        """
+        """Test that the merge fails when the source company cannot be merged into the target company."""
         source_company = source_company_factory()
         target_company = target_company_factory()
         source_interactions = list(source_company.interactions.all())
@@ -357,17 +356,15 @@ class TestConfirmMergeViewPost(AdminTestMixin):
 
 
 def _company_factory(
-        num_interactions=0,
-        num_contacts=0,
-        num_investment_projects=0,
-        num_orders=0,
-        num_referrals=0,
-        num_company_list_items=0,
-        num_pipeline_items=0,
+    num_interactions=0,
+    num_contacts=0,
+    num_investment_projects=0,
+    num_orders=0,
+    num_referrals=0,
+    num_company_list_items=0,
+    num_pipeline_items=0,
 ):
-    """
-    Factory for a company that has companies, interactions, investment projects and OMIS orders.
-    """
+    """Factory for a company that has companies, interactions, investment projects and OMIS orders."""
     company = CompanyFactory()
     ContactFactory.create_batch(num_contacts, company=company)
     CompanyInteractionFactory.create_batch(num_interactions, company=company)

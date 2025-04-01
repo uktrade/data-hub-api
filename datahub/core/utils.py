@@ -13,16 +13,14 @@ logger = getLogger(__name__)
 
 
 class StrEnum(str, Enum):
-    """
-    Enum subclass where members are also str instances.
+    """Enum subclass where members are also str instances.
 
     Defined as per https://docs.python.org/3.8/library/enum.html#others
     """
 
 
 class Echo:
-    """
-    Writer that echoes written data.
+    """Writer that echoes written data.
 
     Used for streaming large CSV files, defined as per
     https://docs.djangoproject.com/en/2.0/howto/outputting-csv/.
@@ -34,8 +32,7 @@ class Echo:
 
 
 class EchoUTF8:
-    """
-    Writer that echoes written data and encodes to utf-8 if necessary.
+    """Writer that echoes written data and encodes to utf-8 if necessary.
 
     Used for streaming large CSV files, defined as per
     https://docs.djangoproject.com/en/2.0/howto/outputting-csv/.
@@ -49,8 +46,7 @@ class EchoUTF8:
 
 
 def force_uuid(value):
-    """
-    Convert value to a UUID if it isn't already and isn't None.
+    """Convert value to a UUID if it isn't already and isn't None.
 
     Useful if you have a value that could be a UUID object or a UUID as a string, but
     want it to be a UUID in all cases.
@@ -73,8 +69,7 @@ def join_truthy_strings(*args, sep=' '):
 
 
 def upper_snake_case_to_sentence_case(strings, glue=' '):
-    """
-    Formats string or strings from UPPER_SNAKE_CASE to Sentence case
+    """Formats string or strings from UPPER_SNAKE_CASE to Sentence case.
     """
     if isinstance(strings, str):
         strings = [strings]
@@ -82,9 +77,8 @@ def upper_snake_case_to_sentence_case(strings, glue=' '):
 
 
 def format_currency(value, symbol='£'):
-    """
-    Formats currency according to Gov UK style guide
-    value: (str, int, float)
+    """Formats currency according to Gov UK style guide
+    value: (str, int, float).
 
     https://www.gov.uk/guidance/style-guide/a-to-z#money and others
     """
@@ -117,9 +111,8 @@ def format_currency(value, symbol='£'):
 
 
 def format_currency_range(values, separator=' to ', symbol='£'):
-    """
-    Formats a range of ammounts according to Gov UK style guide
-    values: [(str, float, int), ...]
+    """Formats a range of ammounts according to Gov UK style guide
+    values: [(str, float, int), ...].
     """
     return separator.join(list(map(lambda value: format_currency(value, symbol=symbol), values)))
 
@@ -131,8 +124,7 @@ def format_currency_range_string(
         smart_more_or_less=True,
         symbol='£',
 ):
-    """
-    Formats a range of ammounts according to Gov UK style guide.
+    """Formats a range of ammounts according to Gov UK style guide.
     Note only numbers in specific formats are formatted, it doesn't detect number values within
     a string of mixed numbers and text.
     string: (string) the string containing the range to convert
@@ -143,7 +135,7 @@ def format_currency_range_string(
         E.g. '100+' will return 'More than 100'
     smart_more_or_less: (boolean) when true and more_or_less is set it will add one to any
         upper range ending on a 9.
-        E.g. '0 - 9999' will return 'Less than 1000'
+        E.g. '0 - 9999' will return 'Less than 1000'.
     """
     try:
         prefix = ''
@@ -215,8 +207,7 @@ def load_constants_to_database(constants, model):
 
 
 def reverse_with_query_string(viewname, query_args, **kwargs):
-    """
-    Gets the URL for a view (like reverse()) but also takes a dict to be URL encoded in the
+    """Gets the URL for a view (like reverse()) but also takes a dict to be URL encoded in the
     query string.
     """
     query_string = urlencode(query_args, doseq=True)
@@ -240,8 +231,7 @@ def get_financial_year(date_obj):
 
 
 def log_to_sentry(message, extra=None, level='info'):
-    """
-    Log a message to sentry directly.  This will only normally be needed if there is a desire to
+    """Log a message to sentry directly.  This will only normally be needed if there is a desire to
     log info or warning-level messages to sentry; for error messages, a standard python logger can
     be used with the `extra` kwarg.
     """

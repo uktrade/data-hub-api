@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from datahub.core.admin import format_json_as_html, get_change_link, ViewOnlyAdmin
+from datahub.core.admin import ViewOnlyAdmin, format_json_as_html, get_change_link
 from datahub.user_event_log.models import UserEvent
 
 

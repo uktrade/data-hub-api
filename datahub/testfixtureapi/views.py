@@ -41,8 +41,7 @@ TEST_USER_TOKEN_TIMEOUT = 24 * 3600
 @permission_classes(())
 @schema(None)
 def reset_fixtures(request):
-    """
-    Reset db to a known state.
+    """Reset db to a known state.
 
     This view is to facilitate End to End testing. It has no authentication and should
     only be enabled to run tests and never in production!
@@ -86,8 +85,7 @@ def reset_fixtures(request):
 @permission_classes(())
 @schema(None)
 def create_user(request):
-    """
-    Create user
+    """Create user.
 
     This view is to facilitate End to End testing. It has no authentication and should
     only be enabled to run tests and never in production!
@@ -143,8 +141,7 @@ def create_user(request):
 @permission_classes(())
 @schema(None)
 def load_fixture(request):
-    """
-    Load fixture endpoint.
+    """Load fixture endpoint.
 
     This view is to facilitate End to End testing. It has no authentication and should
     only be enabled to run tests and never in production!

@@ -18,8 +18,7 @@ class TestDisableSignalsForModel:
         opensearch_with_signals,
         monkeypatch,
     ):
-        """
-        Test that signal receivers are active without the context manager being active.
+        """Test that signal receivers are active without the context manager being active.
         """
         callback_mock = Mock()
         monkeypatch.setattr(
@@ -36,8 +35,7 @@ class TestDisableSignalsForModel:
         opensearch_with_signals,
         monkeypatch,
     ):
-        """
-        Test that signal receivers are disabled for the specified model.
+        """Test that signal receivers are disabled for the specified model.
 
         Note: Model refers to the signal sender, not the search app model. Hence while signal
         receivers are disabled for SimpleModel, it is the relatedmodel app signal receivers that
@@ -76,8 +74,7 @@ class TestDisableSignalsForModel:
         opensearch_with_signals,
         monkeypatch,
     ):
-        """
-        Test that signal receivers are not disabled for other threads.
+        """Test that signal receivers are not disabled for other threads.
 
         This is important when using gevent (e.g. via WSGIServer).
 
@@ -122,8 +119,7 @@ class TestDisableSignalsForModel:
         )
 
     def test_reconnects_if_exception_raised(self, opensearch_with_signals):
-        """
-        Test that signal receivers are reconnected if an exception is raised while the
+        """Test that signal receivers are reconnected if an exception is raised while the
         context manager is active.
         """
         try:
@@ -140,8 +136,7 @@ class TestDisableSignalsForModel:
         )
 
     def test_does_not_reconnect_if_was_disconnected(self):
-        """
-        Test that signal receivers are not reconnected when not originally connected.
+        """Test that signal receivers are not reconnected when not originally connected.
         Signal receivers are not connected as the opensearch_with_signals fixture is not used.
         """
         with disable_search_signal_receivers(SimpleModel):

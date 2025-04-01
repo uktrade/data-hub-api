@@ -13,8 +13,7 @@ from datahub.core.query_utils import get_queryset_object
 
 
 def _match_contact(filter_criteria):
-    """
-    This default matching strategy function will attempt to get a single result
+    """Default matching strategy function will attempt to get a single result
     for the specified criteria.
     It will fail with an `unmatched` result if there are no matching contacts.
     It will fail with a `multiple_matches` result if there are multiple matches
@@ -33,21 +32,24 @@ def _match_contact(filter_criteria):
 
 
 def _match_contact_max_interactions(filter_criteria):
-    """
-    This matching strategy function is the same as the default strategy, except
+    """Matching strategy function is the same as the default strategy, except
     that it will prefer to return the contact with the most interactions in the
     case where there are multiple contacts that match the criteria.
     """
     contact = None
     try:
-        contact = Contact.objects.filter(
-            **filter_criteria,
-        ).annotate(
-            interactions_count=Count('interactions'),
-        ).order_by(
-            '-interactions_count',
-            'pk',
-        )[0]
+        contact = (
+            Contact.objects.filter(
+                **filter_criteria,
+            )
+            .annotate(
+                interactions_count=Count('interactions'),
+            )
+            .order_by(
+                '-interactions_count',
+                'pk',
+            )[0]
+        )
         contact_matching_status = ContactMatchingStatus.matched
     except IndexError:
         contact_matching_status = ContactMatchingStatus.unmatched
@@ -56,8 +58,7 @@ def _match_contact_max_interactions(filter_criteria):
 
 
 def _find_active_contact_using_field(value, lookup_field, match_strategy_func):
-    """
-    Looks up a contact by performing a case-insensitive search on a particular field.
+    """Looks up a contact by performing a case-insensitive search on a particular field.
 
     Only non-archived contacts are considered.
 
@@ -73,9 +74,7 @@ def _find_active_contact_using_field(value, lookup_field, match_strategy_func):
 
 
 class MatchStrategy(Enum):
-    """
-    Enum of contact match strategy functions.
-    """
+    """Enum of contact match strategy functions."""
 
     MAX_INTERACTIONS = _match_contact_max_interactions
     DEFAULT = _match_contact
@@ -93,8 +92,7 @@ def find_active_contact_by_email_address(
     email,
     match_strategy_func=MatchStrategy.DEFAULT,
 ) -> Tuple[Optional[Contact], ContactMatchingStatus]:
-    """
-    Attempts to find a contact by email address.  Returns a tuple consisting of
+    """Attempts to find a contact by email address.  Returns a tuple consisting of
     the Contact that was found (or None) and the ContactMatchingStatus.
 
     Used e.g. when importing interactions to match interactions to contacts using an

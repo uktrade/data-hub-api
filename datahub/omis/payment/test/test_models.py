@@ -6,7 +6,7 @@ from dateutil.parser import parse as dateutil_parse
 from datahub.omis.order.constants import OrderStatus
 from datahub.omis.order.test.factories import OrderWithAcceptedQuoteFactory
 from datahub.omis.payment.constants import PaymentGatewaySessionStatus, PaymentMethod
-from datahub.omis.payment.govukpay import govuk_url, GOVUKPayAPIException
+from datahub.omis.payment.govukpay import GOVUKPayAPIException, govuk_url
 from datahub.omis.payment.models import Payment, PaymentGatewaySession
 from datahub.omis.payment.test.factories import PaymentGatewaySessionFactory
 
@@ -15,8 +15,8 @@ class TestPaymentGatewaySessionIsFinished:
     """Tests for the `is_finished` method."""
 
     @pytest.mark.parametrize(
-        'status,finished',
-        (
+        ('status', 'finished'),
+        [
             (PaymentGatewaySessionStatus.CREATED, False),
             (PaymentGatewaySessionStatus.STARTED, False),
             (PaymentGatewaySessionStatus.SUBMITTED, False),
@@ -24,12 +24,10 @@ class TestPaymentGatewaySessionIsFinished:
             (PaymentGatewaySessionStatus.FAILED, True),
             (PaymentGatewaySessionStatus.CANCELLED, True),
             (PaymentGatewaySessionStatus.ERROR, True),
-        ),
+        ],
     )
     def test_value(self, status, finished):
-        """
-        Test the return value of `is_finished` with different values of session.status.
-        """
+        """Test the return value of `is_finished` with different values of session.status."""
         session = PaymentGatewaySession(status=status)
         assert session.is_finished() == finished
 
@@ -38,9 +36,7 @@ class TestPaymentGatewaySessionGetPaymentURL:
     """Tests for the `get_payment_url` method."""
 
     def test_with_value(self, requests_mock):
-        """
-        Test the value returned when the GOV.UK Pay response data includes next_url.
-        """
+        """Test the value returned when the GOV.UK Pay response data includes next_url."""
         govuk_payment_id = '123abc123abc123abc123abc12'
         next_url = 'https://payment.example.com/123abc'
         requests_mock.get(
@@ -62,8 +58,7 @@ class TestPaymentGatewaySessionGetPaymentURL:
         assert session.get_payment_url() == next_url
 
     def test_without_value(self, requests_mock):
-        """
-        Test that an empty string is returned when the GOV.UK Pay response data
+        """Test that an empty string is returned when the GOV.UK Pay response data
         doesn't include next_url.
         """
         govuk_payment_id = '123abc123abc123abc123abc12'
@@ -84,16 +79,15 @@ class TestPaymentGatewaySessionGetPaymentURL:
 
     @pytest.mark.parametrize(
         'session_status',
-        (
+        [
             PaymentGatewaySessionStatus.SUCCESS,
             PaymentGatewaySessionStatus.FAILED,
             PaymentGatewaySessionStatus.CANCELLED,
             PaymentGatewaySessionStatus.ERROR,
-        ),
+        ],
     )
     def test_doesnt_call_govuk_pay_if_finished(self, session_status, requests_mock):
-        """
-        Test that if the payment gateway session is finished, no call to GOV.UK Pay is made
+        """Test that if the payment gateway session is finished, no call to GOV.UK Pay is made
         and the method returns an empty string.
         """
         session = PaymentGatewaySession(
@@ -109,16 +103,16 @@ class TestPaymentGatewaySessionRefresh:
     """Tests for the `refresh_from_govuk_payment` method."""
 
     @pytest.mark.parametrize(
-        'status', (
+        'status',
+        [
             PaymentGatewaySessionStatus.SUCCESS,
             PaymentGatewaySessionStatus.FAILED,
             PaymentGatewaySessionStatus.CANCELLED,
             PaymentGatewaySessionStatus.ERROR,
-        ),
+        ],
     )
     def test_already_finished_doesnt_do_anything(self, status, requests_mock):
-        """
-        Test that if the payment gateway session is already finished, the system
+        """Test that if the payment gateway session is already finished, the system
         doesn't call GOV.UK Pay as it's already in its end state.
         """
         session = PaymentGatewaySession(status=status)
@@ -128,23 +122,26 @@ class TestPaymentGatewaySessionRefresh:
 
     @pytest.mark.parametrize(
         'status',
-        (
+        [
             PaymentGatewaySessionStatus.CREATED,
             PaymentGatewaySessionStatus.STARTED,
             PaymentGatewaySessionStatus.SUBMITTED,
-        ),
+        ],
     )
     def test_with_unchanged_govuk_payment_status_doesnt_change_anything(
-        self, status, requests_mock,
+        self,
+        status,
+        requests_mock,
     ):
-        """
-        Test that if the GOV.UK payment status is the same as the payment gateway session one,
+        """Test that if the GOV.UK payment status is the same as the payment gateway session one,
         (meaning that the payment gateway session is up-to-date), the record is not changed.
         """
         session = PaymentGatewaySession(status=status)
         url = govuk_url(f'payments/{session.govuk_payment_id}')
         requests_mock.get(
-            url, status_code=200, json={
+            url,
+            status_code=200,
+            json={
                 'state': {'status': status, 'finished': False},
             },
         )
@@ -158,13 +155,13 @@ class TestPaymentGatewaySessionRefresh:
     @pytest.mark.parametrize(
         'status',
         (
-            status[0] for status in PaymentGatewaySessionStatus
+            status[0]
+            for status in PaymentGatewaySessionStatus
             if status[0] != PaymentGatewaySessionStatus.SUCCESS
         ),
     )
     def test_with_different_govuk_payment_status_updates_session(self, status, requests_mock):
-        """
-        Test that if the GOV.UK payment status is not the same as the payment gateway session one,
+        """Test that if the GOV.UK payment status is not the same as the payment gateway session one,
         the record is updated.
         """
         # choose an initial status != from the govuk one to test the update
@@ -175,7 +172,9 @@ class TestPaymentGatewaySessionRefresh:
         session = PaymentGatewaySessionFactory(status=initial_status)
         url = govuk_url(f'payments/{session.govuk_payment_id}')
         requests_mock.get(
-            url, status_code=200, json={
+            url,
+            status_code=200,
+            json={
                 'state': {'status': status},
             },
         )
@@ -188,8 +187,7 @@ class TestPaymentGatewaySessionRefresh:
         assert requests_mock.call_count == 1
 
     def test_with_govuk_payment_success_updates_order(self, requests_mock):
-        """
-        Test that if the GOV.UK payment status is `success` and the payment gateway session is
+        """Test that if the GOV.UK payment status is `success` and the payment gateway session is
         out of date, the record is updated, the related order marked as `paid` and an OMIS
         `payment.Payment` record created from the GOV.UK response data one.
         """
@@ -252,9 +250,7 @@ class TestPaymentGatewaySessionRefresh:
         assert requests_mock.call_count == 1
 
     def test_atomicity_when_govuk_pay_errors(self, requests_mock):
-        """
-        Test that if GOV.UK Pay errors, none of the changes persists.
-        """
+        """Test that if GOV.UK Pay errors, none of the changes persists."""
         session = PaymentGatewaySessionFactory()
         original_session_status = session.status
 
@@ -270,20 +266,20 @@ class TestPaymentGatewaySessionRefresh:
         assert requests_mock.call_count == 1
 
     def test_atomicity_when_session_save_errors(self, requests_mock):
-        """
-        Test that if the PaymentGatewaySession.save() call fails, none of the changes persists.
-        """
+        """Test that if the PaymentGatewaySession.save() call fails, none of the changes persists."""
         session = PaymentGatewaySessionFactory()
         original_session_status = session.status
         url = govuk_url(f'payments/{session.govuk_payment_id}')
         requests_mock.get(
-            url, status_code=200, json={
+            url,
+            status_code=200,
+            json={
                 'state': {'status': 'success'},
             },
         )
         session.save = mock.MagicMock(side_effect=Exception())
 
-        with pytest.raises(Exception):
+        with pytest.raises(Exception):  # noqa: PT011
             session.refresh_from_govuk_payment()
 
         session.refresh_from_db()
@@ -292,20 +288,20 @@ class TestPaymentGatewaySessionRefresh:
         assert requests_mock.call_count == 1
 
     def test_atomicity_when_order_save_errors(self, requests_mock):
-        """
-        Test that if the order.mark_as_paid() call fails, non of the changes persists.
-        """
+        """Test that if the order.mark_as_paid() call fails, non of the changes persists."""
         session = PaymentGatewaySessionFactory()
         original_session_status = session.status
         url = govuk_url(f'payments/{session.govuk_payment_id}')
         requests_mock.get(
-            url, status_code=200, json={
+            url,
+            status_code=200,
+            json={
                 'state': {'status': 'success'},
             },
         )
         session.order.mark_as_paid = mock.MagicMock(side_effect=Exception())
 
-        with pytest.raises(Exception):
+        with pytest.raises(Exception):  # noqa: PT011
             session.refresh_from_govuk_payment()
 
         session.refresh_from_db()
@@ -319,8 +315,7 @@ class TestPaymentGatewaySessionCancel:
     """Tests for the `cancel` method."""
 
     def test_cancel_updates_session(self, requests_mock):
-        """
-        Test that if GOV.UK Pay cancels and acknowledges the change,
+        """Test that if GOV.UK Pay cancels and acknowledges the change,
         the session object is updated.
         """
         session = PaymentGatewaySessionFactory()
@@ -342,8 +337,7 @@ class TestPaymentGatewaySessionCancel:
         assert requests_mock.call_count == 2
 
     def test_with_govuk_pay_erroring_when_cancelling(self, requests_mock):
-        """
-        Test that if GOV.UK Pay errors when cancelling the payment,
+        """Test that if GOV.UK Pay errors when cancelling the payment,
         the session object is not updated.
         """
         session = PaymentGatewaySessionFactory()
@@ -362,8 +356,7 @@ class TestPaymentGatewaySessionCancel:
         assert requests_mock.call_count == 1
 
     def test_with_govuk_pay_erroring_when_refreshing(self, requests_mock):
-        """
-        Test that if GOV.UK Pay cancels the payment but errors when
+        """Test that if GOV.UK Pay cancels the payment but errors when
         refreshing the session, the session object is not updated
         (but the GOV.UK payment is still cancelled).
         This is okay as the session object will get refreshed at the next

@@ -6,10 +6,10 @@ from django.core.exceptions import ValidationError
 from datahub.core.fields import MultipleChoiceField
 
 
-@pytest.fixture()
+@pytest.fixture
 def field():
     """Instance of MultipleChoiceField with three choices."""
-    yield MultipleChoiceField(
+    return MultipleChoiceField(
         max_length=255,
         choices=(
             ('option1', 'Option 1'),
@@ -43,12 +43,12 @@ class TestMultipleChoiceField:
         assert excinfo.value.code == 'item_invalid'
 
     @pytest.mark.parametrize(
-        'value,display_value',
-        (
+        ('value', 'display_value'),
+        [
             (['option2', 'option1'], 'Option 2, Option 1'),
             ([], ''),
             (['option2'], 'Option 2'),
-        ),
+        ],
     )
     def test_contribute_to_class(self, field, value, display_value):
         """Test that a working get_{field_name}_display method is injected into the model."""

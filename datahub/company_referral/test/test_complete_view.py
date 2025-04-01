@@ -33,8 +33,7 @@ def _complete_url(pk):
 
 
 class TestCompleteCompanyReferral(APITestMixin):
-    """
-    Tests for the complete a company referral view.
+    """Tests for the complete a company referral view.
 
     There is some overlap between these and the tests for adding an interaction. However,
     these are subtly different, as the company field is not required here, and the referral
@@ -49,11 +48,11 @@ class TestCompleteCompanyReferral(APITestMixin):
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     @pytest.mark.parametrize(
-        'permission_codenames,expected_status',
-        (
+        ('permission_codenames', 'expected_status'),
+        [
             ([], status.HTTP_403_FORBIDDEN),
             (['change_companyreferral'], status.HTTP_201_CREATED),
-        ),
+        ],
     )
     def test_permission_checking(self, permission_codenames, expected_status, api_client):
         """Test that the expected status is returned depending on the permissions the user has."""
@@ -75,10 +74,10 @@ class TestCompleteCompanyReferral(APITestMixin):
 
     @pytest.mark.parametrize(
         'factory',
-        (
+        [
             ClosedCompanyReferralFactory,
             CompleteCompanyReferralFactory,
-        ),
+        ],
     )
     def test_fails_if_referral_not_outstanding(self, factory):
         """Test that a an error is returned if the referral is closed or already complete."""
@@ -96,8 +95,8 @@ class TestCompleteCompanyReferral(APITestMixin):
         }
 
     @pytest.mark.parametrize(
-        'request_data,expected_response_data',
-        (
+        ('request_data', 'expected_response_data'),
+        [
             pytest.param(
                 {},
                 {
@@ -219,7 +218,7 @@ class TestCompleteCompanyReferral(APITestMixin):
                 },
                 id='service-delivery-non-blank-fields',
             ),
-        ),
+        ],
     )
     def test_body_validation(self, request_data, expected_response_data):
         """Test validation of the request body in various cases."""
@@ -348,7 +347,7 @@ class TestCompleteCompanyReferral(APITestMixin):
 
     @pytest.mark.parametrize(
         'extra_data',
-        (
+        [
             pytest.param(
                 {
                     'kind': Interaction.Kind.INTERACTION,
@@ -374,7 +373,7 @@ class TestCompleteCompanyReferral(APITestMixin):
                 },
                 id='service-delivery',
             ),
-        ),
+        ],
     )
     def test_creates_an_interaction(self, extra_data):
         """Test that an interaction is created on success."""

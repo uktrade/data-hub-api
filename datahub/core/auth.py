@@ -13,12 +13,11 @@ PAAS_ADDED_X_FORWARDED_FOR_IPS = 2
 
 
 class TeamModelPermissionsBackend(ModelBackend):
-    """Extension of CDMSUserBackend to include a team based permissions for user"""
+    """Extension of CDMSUserBackend to include a team based permissions for user."""
 
     def _get_team_permissions(self, user_obj):
-        """
-        This method is called by the ModelBackend _get_permissions() dynamically
-        as part of aggregating user, group and team permissions
+        """Called by the ModelBackend _get_permissions() dynamically
+        as part of aggregating user, group and team permissions.
         """
         if user_obj.dit_team and user_obj.dit_team.role:
             groups = user_obj.dit_team.role.groups.all()
@@ -28,16 +27,14 @@ class TeamModelPermissionsBackend(ModelBackend):
         return Permission.objects.filter(group__in=groups)
 
     def get_team_permissions(self, user_obj, obj=None):
-        """
-        Returns a set of permission strings the user `user_obj` has from the
+        """Returns a set of permission strings the user `user_obj` has from the
         teams they belong to based on groups associated to team roles.
         """
         return self._get_permissions(user_obj, obj, 'team')
 
     def get_all_permissions(self, user_obj, obj=None):
-        """
-        Because of using cache in the parent class, its hard to extend using super()
-        so the code is slightly duplicated
+        """Because of using cache in the parent class, its hard to extend using super()
+        so the code is slightly duplicated.
         """
         if not user_obj.is_active or user_obj.is_anonymous or obj is not None:
             return set()
@@ -52,16 +49,14 @@ class PaaSIPAuthentication(BaseAuthentication):
     """DRF authentication class that checks client IP addresses."""
 
     def authenticate_header(self, request):
-        """
-        This is returned as the WWW-Authenticate header when
+        """Returned as the WWW-Authenticate header when
         AuthenticationFailed is raised. DRF also requires this
         to send a 401 (as opposed to 403).
         """
         return 'PaaS IP'
 
     def authenticate(self, request):
-        """
-        Blocks incoming connections based on IP in X-Forwarded-For.
+        """Blocks incoming connections based on IP in X-Forwarded-For.
 
         Ideally, this would be done at the network level. However, this is
         not possible in PaaS.

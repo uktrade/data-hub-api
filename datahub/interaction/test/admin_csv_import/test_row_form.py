@@ -17,12 +17,12 @@ from datahub.interaction.admin_csv_import.row_form import (
     ADVISER_2_IS_THE_SAME_AS_ADVISER_1,
     ADVISER_NOT_FOUND_MESSAGE,
     ADVISER_WITH_TEAM_NOT_FOUND_MESSAGE,
-    CSVRowError,
     DUPLICATE_OF_ANOTHER_ROW_MESSAGE,
     DUPLICATE_OF_EXISTING_INTERACTION_MESSAGE,
-    InteractionCSVRowForm,
     MULTIPLE_ADVISERS_FOUND_MESSAGE,
     OBJECT_DISABLED_MESSAGE,
+    CSVRowError,
+    InteractionCSVRowForm,
 )
 from datahub.interaction.models import Interaction
 from datahub.interaction.test.admin_csv_import.utils import random_communication_channel
@@ -55,11 +55,11 @@ class TestCSVRowError:
     """Tests for CSVRowError."""
 
     @pytest.mark.parametrize(
-        'field,expected_display_field',
-        (
+        ('field', 'expected_display_field'),
+        [
             ('a_field', 'a_field'),
             (NON_FIELD_ERRORS, ''),
-        ),
+        ],
     )
     def test_display_field(self, field, expected_display_field):
         """Tests the display_field property."""
@@ -67,11 +67,11 @@ class TestCSVRowError:
         assert csv_row_error.display_field == expected_display_field
 
     @pytest.mark.parametrize(
-        'source_row,expected_display_source_row',
-        (
+        ('source_row', 'expected_display_source_row'),
+        [
             (0, 2),
             (1, 3),
-        ),
+        ],
     )
     def test_display_source_row(self, source_row, expected_display_source_row):
         """Test the display_source_row property."""
@@ -84,8 +84,8 @@ class TestInteractionCSVRowFormValidation:
     """Tests for validation in InteractionCSVRowForm."""
 
     @pytest.mark.parametrize(
-        'data,errors',
-        (
+        ('data', 'errors'),
+        [
             pytest.param(
                 {'kind': ''},
                 {'kind': ['This field is required.']},
@@ -304,8 +304,7 @@ class TestInteractionCSVRowFormValidation:
                 {'event_id': '00000000-0000-0000-0000-000000000000'},
                 {
                     'event_id': [
-                        'Select a valid choice. That choice is not one of the available '
-                        'choices.',
+                        'Select a valid choice. That choice is not one of the available choices.',
                     ],
                 },
                 id='event_id non-existent',
@@ -385,7 +384,7 @@ class TestInteractionCSVRowFormValidation:
                 },
                 id="cannot select 'Other' as it is not supported",
             ),
-        ),
+        ],
     )
     def test_validation_errors(self, data, errors):
         """Test validation for various fields."""
@@ -402,15 +401,14 @@ class TestInteractionCSVRowFormValidation:
             'contact_email': contact.email,
             'service': service.name,
             'communication_channel': communication_channel.name,
-
             **resolve_data(data),
         }
         form = InteractionCSVRowForm(data=resolved_data)
         assert form.errors == errors
 
     @pytest.mark.parametrize(
-        'row_data,existing_objects_data,expected_errors',
-        (
+        ('row_data', 'existing_objects_data', 'expected_errors'),
+        [
             pytest.param(
                 {
                     'contact': lambda: ContactFactory(email='unique@company.com'),
@@ -487,7 +485,7 @@ class TestInteractionCSVRowFormValidation:
                 {},
                 id='with date different',
             ),
-        ),
+        ],
     )
     def test_fails_validation_if_is_duplicate_of_existing_interaction(
         self,
@@ -495,8 +493,7 @@ class TestInteractionCSVRowFormValidation:
         existing_objects_data,
         expected_errors,
     ):
-        """
-        Test that an error is returned if the interaction is a duplicate of an existing
+        """Test that an error is returned if the interaction is a duplicate of an existing
         record.
         """
         adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
@@ -504,10 +501,7 @@ class TestInteractionCSVRowFormValidation:
 
         resolved_row_data = resolve_data(row_data)
         resolved_existing_objects_data = [
-            {
-                key: value(resolved_row_data)
-                for key, value in duplicate_item.items()
-            }
+            {key: value(resolved_row_data) for key, value in duplicate_item.items()}
             for duplicate_item in existing_objects_data
         ]
 
@@ -526,7 +520,6 @@ class TestInteractionCSVRowFormValidation:
             'kind': Interaction.Kind.INTERACTION,
             'adviser_1': adviser.name,
             'communication_channel': communication_channel.name,
-
             'contact_email': resolved_row_data['contact'].email,
             'service': resolved_row_data['service'].name,
             'date': resolved_row_data['date'].strftime('%d/%m/%Y'),
@@ -536,8 +529,8 @@ class TestInteractionCSVRowFormValidation:
         assert form.errors == expected_errors
 
     @pytest.mark.parametrize(
-        'row_data,prior_rows,expected_errors',
-        (
+        ('row_data', 'prior_rows', 'expected_errors'),
+        [
             pytest.param(
                 {
                     'contact': lambda: ContactFactory(email='unique@company.com'),
@@ -614,7 +607,7 @@ class TestInteractionCSVRowFormValidation:
                 {},
                 id='with date different',
             ),
-        ),
+        ],
     )
     def test_fails_validation_if_is_duplicate_of_another_row(
         self,
@@ -622,8 +615,7 @@ class TestInteractionCSVRowFormValidation:
         prior_rows,
         expected_errors,
     ):
-        """
-        Test that an error is returned if the interaction is a duplicate of a row encountered
+        """Test that an error is returned if the interaction is a duplicate of a row encountered
         earlier in the file being imported.
         """
         adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
@@ -631,10 +623,7 @@ class TestInteractionCSVRowFormValidation:
 
         resolved_row_data = resolve_data(row_data)
         resolved_prior_rows = [
-            {
-                key: value(resolved_row_data)
-                for key, value in duplicate_item.items()
-            }
+            {key: value(resolved_row_data) for key, value in duplicate_item.items()}
             for duplicate_item in prior_rows
         ]
 
@@ -647,7 +636,6 @@ class TestInteractionCSVRowFormValidation:
             'kind': Interaction.Kind.INTERACTION,
             'adviser_1': adviser.name,
             'communication_channel': communication_channel.name,
-
             'contact_email': resolved_row_data['contact'].email,
             'service': resolved_row_data['service'].name,
             'date': resolved_row_data['date'].strftime('%d/%m/%Y'),
@@ -677,7 +665,6 @@ class TestInteractionCSVRowFormValidation:
             'adviser_1': adviser.name,
             'service': service.name,
             'communication_channel': communication_channel.name,
-
             'contact_email': '',
         }
         form = InteractionCSVRowForm(data=data)
@@ -689,17 +676,16 @@ class TestInteractionCSVRowFormValidation:
 
 @pytest.mark.django_db
 class TestInteractionCSVRowFormSerializerUsage:
-    """
-    Tests general logic of InteractionSerializer validators usage in InteractionCSVRowForm.
+    """Tests general logic of InteractionSerializer validators usage in InteractionCSVRowForm.
 
     (This excludes validation of specific fields which is part of the validation tests above.)
     """
 
     def test_serializer_error_for_invalid_form(self, monkeypatch):
-        """
-        Test that an unmapped error from the serializer validators is not added to
+        """Test that an unmapped error from the serializer validators is not added to
         NON_FIELD_ERRORS if the form was otherwise invalid.
         """
+
         def validator(_):
             raise serializers.ValidationError(
                 {'non_existent_field': 'test error'},
@@ -717,6 +703,7 @@ class TestInteractionCSVRowFormSerializerUsage:
 
     def test_serializer_errors_for_valid_form(self, monkeypatch):
         """Test that errors from the serializer validators are added to the form."""
+
         def validator(_):
             raise serializers.ValidationError(
                 {
@@ -756,15 +743,14 @@ class TestInteractionCSVRowFormSerializerUsage:
 
 @pytest.mark.django_db
 class TestInteractionCSVRowFormSuccessfulCleaning:
-    """
-    Tests for successful field cleaning in InteractionCSVRowForm.
+    """Tests for successful field cleaning in InteractionCSVRowForm.
 
     This includes looking up model objects and the transformation of values.
     """
 
     @pytest.mark.parametrize(
-        'field,input_value,expected_value',
-        (
+        ('field', 'input_value', 'expected_value'),
+        [
             pytest.param(
                 'date',
                 '1/2/2013',
@@ -795,7 +781,7 @@ class TestInteractionCSVRowFormSuccessfulCleaning:
                 'Notes with\nmultiple lines',
                 id='notes (trailing blank lines are stripped)',
             ),
-        ),
+        ],
     )
     def test_common_non_relations(self, field, input_value, expected_value):
         """Test the conversion and cleaning of various non-relationship fields."""
@@ -811,7 +797,6 @@ class TestInteractionCSVRowFormSuccessfulCleaning:
             'contact_email': 'person@company.com',
             'service': service.name,
             'communication_channel': communication_channel.name,
-
             field: input_value,
         }
 
@@ -821,11 +806,11 @@ class TestInteractionCSVRowFormSuccessfulCleaning:
 
     @pytest.mark.parametrize(
         'kind',
-        (Interaction.Kind.INTERACTION, Interaction.Kind.SERVICE_DELIVERY),
+        [Interaction.Kind.INTERACTION, Interaction.Kind.SERVICE_DELIVERY],
     )
     @pytest.mark.parametrize(
-        'field,object_creator,input_transformer',
-        (
+        ('field', 'object_creator', 'input_transformer'),
+        [
             pytest.param(
                 'adviser_1',
                 lambda: AdviserFactory(
@@ -880,11 +865,10 @@ class TestInteractionCSVRowFormSuccessfulCleaning:
                 lambda obj: obj.name.lower(),
                 id='service look-up (case-insensitive)',
             ),
-        ),
+        ],
     )
     def test_common_relation_fields(self, kind, field, object_creator, input_transformer):
-        """
-        Test the looking up of values for relationship fields common to interactions and
+        """Test the looking up of values for relationship fields common to interactions and
         service deliveries.
         """
         adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
@@ -900,7 +884,6 @@ class TestInteractionCSVRowFormSuccessfulCleaning:
             'contact_email': 'person@company.com',
             'service': service.name,
             'communication_channel': communication_channel.name,
-
             field: input_transformer(obj),
         }
 
@@ -909,8 +892,8 @@ class TestInteractionCSVRowFormSuccessfulCleaning:
         assert form.cleaned_data[field] == obj
 
     @pytest.mark.parametrize(
-        'field,object_creator,input_transformer',
-        (
+        ('field', 'object_creator', 'input_transformer'),
+        [
             pytest.param(
                 'communication_channel',
                 lambda: random_communication_channel(),
@@ -923,7 +906,7 @@ class TestInteractionCSVRowFormSuccessfulCleaning:
                 lambda obj: obj.name.upper(),
                 id='communication channel look-up (case-insensitive)',
             ),
-        ),
+        ],
     )
     def test_interaction_relation_fields(self, field, object_creator, input_transformer):
         """Test the looking up of values for relationship fields specific to interactions."""
@@ -939,7 +922,6 @@ class TestInteractionCSVRowFormSuccessfulCleaning:
             'adviser_1': adviser.name,
             'contact_email': contact.email,
             'service': service.name,
-
             field: input_transformer(obj),
         }
 
@@ -948,8 +930,8 @@ class TestInteractionCSVRowFormSuccessfulCleaning:
         assert form.cleaned_data[field] == obj
 
     @pytest.mark.parametrize(
-        'field,object_creator,input_transformer,expected_value_transformer',
-        (
+        ('field', 'object_creator', 'input_transformer', 'expected_value_transformer'),
+        [
             pytest.param(
                 'communication_channel',
                 lambda: random_communication_channel(),
@@ -971,7 +953,7 @@ class TestInteractionCSVRowFormSuccessfulCleaning:
                 lambda _: None,
                 id='event can be omitted',
             ),
-        ),
+        ],
     )
     def test_service_delivery_relation_fields(
         self,
@@ -993,7 +975,6 @@ class TestInteractionCSVRowFormSuccessfulCleaning:
             'adviser_1': adviser.name,
             'contact_email': contact.email,
             'service': service.name,
-
             field: input_transformer(obj),
         }
 
@@ -1003,7 +984,7 @@ class TestInteractionCSVRowFormSuccessfulCleaning:
 
     @pytest.mark.parametrize(
         'kind',
-        (Interaction.Kind.INTERACTION, Interaction.Kind.SERVICE_DELIVERY),
+        [Interaction.Kind.INTERACTION, Interaction.Kind.SERVICE_DELIVERY],
     )
     def test_subject_falls_back_to_service(self, kind):
         """Test that if subject is not specified, the name of the service is used instead."""
@@ -1027,19 +1008,18 @@ class TestInteractionCSVRowFormSuccessfulCleaning:
         assert form.cleaned_data['subject'] == service.name
 
     @pytest.mark.parametrize(
-        'input_email,matching_status',
-        (
+        ('input_email', 'matching_status'),
+        [
             # unique match of a contact on primary email
             ('unique1@primary.com', ContactMatchingStatus.matched),
             # no match of a contact
             ('UNIQUE@COMPANY.IO', ContactMatchingStatus.unmatched),
             # multiple matches of a contact
             ('duplicate@primary.com', ContactMatchingStatus.multiple_matches),
-        ),
+        ],
     )
     def test_contact_lookup(self, input_email, matching_status):
-        """
-        Test that various contact matching scenarios.
+        """Test that various contact matching scenarios.
 
         Note that the matching logic is tested more extensively in the company app.
         """
@@ -1058,7 +1038,6 @@ class TestInteractionCSVRowFormSuccessfulCleaning:
             'adviser_1': adviser.name,
             'service': service.name,
             'communication_channel': communication_channel.name,
-
             'contact_email': input_email,
         }
         form = InteractionCSVRowForm(data=data)
@@ -1077,11 +1056,10 @@ class TestInteractionCSVRowFormSuccessfulCleaning:
 
     @pytest.mark.parametrize(
         'service_answer_name',
-        ('Documents & Regulations', 'Markets & Sectors'),
+        ['Documents & Regulations', 'Markets & Sectors'],
     )
     def test_service_answer(self, service_answer_name):
-        """
-        Test that valid service answer will be transformed into service_answers dictionary
+        """Test that valid service answer will be transformed into service_answers dictionary
         and is not case sensitive.
         """
         adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
@@ -1276,8 +1254,7 @@ class TestInteractionCSVRowFormCleanedDataAsSerializerDict:
         }
 
     def test_cleaned_data_as_serializer_dict_for_export_interaction_without_barrier_types(self):
-        """
-        Test that cleaned_data_as_serializer_dict() transforms an export interaction
+        """Test that cleaned_data_as_serializer_dict() transforms an export interaction
         that has no export barrier types provided.
         """
         adviser = AdviserFactory(first_name='Neptune', last_name='Doris')
@@ -1519,7 +1496,7 @@ class TestInteractionCSVRowFormSaving:
 
         assert form.is_valid()
 
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError):  # noqa: PT011
             form.save(user, source=source)
 
         assert not Interaction.objects.exists()

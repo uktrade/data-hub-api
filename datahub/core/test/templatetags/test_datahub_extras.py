@@ -28,8 +28,7 @@ class TestAdminChangeLink:
         )
 
     def test_admin_change_link_target_blank(self):
-        """
-        Test that admin_change_url() returns an anchor tag with target="_blank" to the change
+        """Test that admin_change_url() returns an anchor tag with target="_blank" to the change
         page for an object.
         """
         book = BookFactory.build(pk=uuid4())
@@ -39,16 +38,15 @@ class TestAdminChangeLink:
 
 
 @pytest.mark.parametrize(
-    'count,expected_result',
-    (
+    ('count', 'expected_result'),
+    [
         (0, 'plural'),
         (1, 'singular'),
         (2, 'plural'),
-    ),
+    ],
 )
 def test_verbose_name_for_count(count, expected_result):
-    """
-    Test that verbose_name_for_count() returns the correct verbose name form for various counts.
+    """Test that verbose_name_for_count() returns the correct verbose name form for various counts.
     """
     mock_model_meta = Mock(
         verbose_name='singular',

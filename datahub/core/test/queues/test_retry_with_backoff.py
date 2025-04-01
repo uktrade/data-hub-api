@@ -1,4 +1,4 @@
-from unittest.mock import call, MagicMock, Mock
+from unittest.mock import MagicMock, Mock, call
 
 import pytest
 
@@ -12,7 +12,7 @@ def test_retry_with_backoff_and_then_error(monkeypatch):
     retries = 10
     original_call = 1
 
-    with pytest.raises(Exception):
+    with pytest.raises(Exception):  # noqa: PT011
         retry_with_backoff(
             fn=retry_mock,
             retries=retries,

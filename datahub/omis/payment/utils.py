@@ -4,8 +4,7 @@ from datahub.omis.payment.constants import PaymentMethod
 
 
 def trasform_govuk_payment_to_omis_payment_data(govuk_payment):
-    """
-    :returns: dict with `payment.Payment` data from a GOV.UK payment data
+    """:returns: dict with `payment.Payment` data from a GOV.UK payment data
 
     :param govuk_payment: GOV.UK payment data
     """

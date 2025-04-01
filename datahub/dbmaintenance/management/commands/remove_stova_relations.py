@@ -1,7 +1,6 @@
 from logging import getLogger
 
 import reversion
-
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.core.management.base import BaseCommand
 from django.db import transaction
@@ -10,13 +9,11 @@ from datahub.company.models import Company, Contact
 from datahub.company_activity.models import StovaAttendee, TempRelationStorage
 from datahub.interaction.models import Interaction
 
-
 logger = getLogger(__name__)
 
 
 class Command(BaseCommand):
-    """
-    Command to remove contacts, companies and interactions created from Stova.
+    """Command to remove contacts, companies and interactions created from Stova.
 
     Uses TempRelationStorage model to track object IDs which have been deleted. This will make it
     possible to restore them by their ID from reversion.
@@ -42,8 +39,7 @@ class Command(BaseCommand):
         parser.add_argument('batch_size', type=int, nargs='?', default=5000)
 
     def handle(self, *args, **options):
-        """
-        Process the CSV file and logs some additional logging to help with the company duns update.
+        """Process the CSV file and logs some additional logging to help with the company duns update.
         """
         is_simulation = options['simulate']
         batch_size = options['batch_size']
@@ -84,8 +80,7 @@ class Command(BaseCommand):
         )
 
     def delete_interactions(self, is_simulation: bool, batch_size: int) -> None:
-        """
-        Delete each Interaction one at a time to process signals and catch each deletion
+        """Delete each Interaction one at a time to process signals and catch each deletion
         fail individually.
 
         :param is_simulation: If True, does not perform deletions and only logs. If False deletes
@@ -152,8 +147,7 @@ class Command(BaseCommand):
                 continue
 
     def delete_contacts(self, is_simulation: bool, batch_size: int) -> None:
-        """
-        Delete each Contact one at a time to process signals and catch each deletion
+        """Delete each Contact one at a time to process signals and catch each deletion
         fail individually.
 
         :param is_simulation: If True, does not perform deletions and only logs. If False deletes
@@ -208,8 +202,7 @@ class Command(BaseCommand):
                 continue
 
     def delete_companies(self, is_simulation: bool, batch_size: int) -> None:
-        """
-        Delete each Company one at a time to process signals and catch each deletion
+        """Delete each Company one at a time to process signals and catch each deletion
         fail individually.
 
         :param is_simulation: If True, does not perform deletions and only logs. If False deletes

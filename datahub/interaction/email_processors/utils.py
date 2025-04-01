@@ -2,8 +2,7 @@ from datahub.company.models import Advisor
 
 
 def get_all_recipients(message):
-    """
-    Get all of the recipient emails from a MailParser message object.
+    """Get all of the recipient emails from a MailParser message object.
 
     :returns: a list of all recipient emails
     """
@@ -16,8 +15,7 @@ def get_all_recipients(message):
 
 
 def get_best_match_adviser_by_email(email):
-    """
-    Get the best-guess matching active adviser for a particular correspondence email
+    """Get the best-guess matching active adviser for a particular correspondence email
     address.
 
     This firstly attempts to get the oldest Advisor object with a (case insensitive) matching

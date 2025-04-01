@@ -29,8 +29,7 @@ def schedule_sync_investment_projects_of_subsidiary_companies(company, original_
 
 
 def sync_investment_projects_of_subsidiary_companies(company, original_modified_on):
-    """
-    When the one list account owner has changed this should be updated on all related
+    """When the one list account owner has changed this should be updated on all related
     investment projects for all subsidiary companies.
     """
     # Avoid race condition. Data currently in database should have been modified by save method

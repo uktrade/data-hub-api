@@ -1,12 +1,10 @@
 from importlib import import_module
 
 import pytest
-
 from django.apps import apps
 
 from datahub.export_win.constants import EXPORT_WINS_LEGACY_ID_START_VALUE
 from datahub.export_win.test.factories import BreakdownFactory, WinAdviserFactory
-
 
 pytestmark = pytest.mark.django_db
 
@@ -14,8 +12,8 @@ pytestmark = pytest.mark.django_db
 class TestLegacyIdMigrations():
 
     @pytest.mark.parametrize(
-        'factory,model',
-        (
+        ('factory', 'model'),
+        [
             (
                 WinAdviserFactory,
                 'WinAdviser',
@@ -24,7 +22,7 @@ class TestLegacyIdMigrations():
                 BreakdownFactory,
                 'Breakdown',
             ),
-        ),
+        ],
     )
     def test_legacy_id_forwards_func(self, factory, model):
         module = import_module('datahub.export_win.legacy_id_utils')

@@ -71,8 +71,8 @@ class TestBasicSearch(APITestMixin):
         assert [{'count': 2, 'entity': 'company'}] == response.data['aggregations']
 
     @pytest.mark.parametrize(
-        'name_term,matched_company_name',
-        (
+        ('name_term', 'matched_company_name'),
+        [
             # name
             ('whiskers', 'whiskers and tabby'),
             ('whi', 'whiskers and tabby'),
@@ -95,7 +95,7 @@ class TestBasicSearch(APITestMixin):
             ('tiger', None),
             ('panda', None),
             ('moine', None),
-        ),
+        ],
     )
     def test_search_in_name(self, opensearch_with_collector, name_term, matched_company_name):
         """Tests basic aggregate companies query."""
@@ -129,13 +129,13 @@ class TestBasicSearch(APITestMixin):
             assert len(response.data['results']) == 0
 
     @pytest.mark.parametrize(
-        'model_field,model_value,search_term,match_found',
-        (
+        ('model_field', 'model_value', 'search_term', 'match_found'),
+        [
             ('address_postcode', 'SW1A 1AA', 'SW1A 1AA', True),
             ('address_postcode', 'SW1A 1AA', 'SW1A 1AB', False),
             ('registered_address_postcode', 'SW1A 1AA', 'SW1A 1AA', True),
             ('registered_address_postcode', 'SW1A 1AA', 'SW1A 1AB', False),
-        ),
+        ],
     )
     def test_search_in_field(
         self,

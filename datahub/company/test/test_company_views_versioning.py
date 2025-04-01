@@ -18,8 +18,7 @@ from datahub.metadata.models import Sector
 
 
 class TestCompanyVersioning(APITestMixin):
-    """
-    Tests for versions created when interacting with the company endpoints.
+    """Tests for versions created when interacting with the company endpoints.
     """
 
     def test_add_creates_a_new_version(self):

@@ -35,12 +35,11 @@ from datahub.dataset.export_wins.utils import (
     create_columns_with_index,
     use_nulls_on_empty_string_fields,
 )
-
 from datahub.export_win.constants import EXPORT_WINS_LEGACY_ID_START_VALUE
 from datahub.export_win.models import (
+    HVC,
     AssociatedProgramme,
     Breakdown,
-    HVC,
     SupportType,
     Win,
     WinAdviser,
@@ -50,8 +49,7 @@ from datahub.metadata.query_utils import get_sector_name_subquery
 
 
 class ExportWinsAdvisersDatasetView(BaseDatasetView):
-    """
-    A GET API view to return export win advisers.
+    """A GET API view to return export win advisers.
     """
 
     allow_legacy_data = False
@@ -108,8 +106,7 @@ class ExportWinsAdvisersDatasetView(BaseDatasetView):
 
 
 class ExportWinsBreakdownsDatasetView(BaseDatasetView):
-    """
-    A GET API view to return export win breakdowns.
+    """A GET API view to return export win breakdowns.
     """
 
     allow_legacy_data = False
@@ -169,8 +166,7 @@ class ExportWinsBreakdownsDatasetView(BaseDatasetView):
 
 
 class ExportWinsHVCDatasetView(BaseFilterDatasetView):
-    """
-    A GET API view to return export win HVCs.
+    """A GET API view to return export win HVCs.
     """
 
     pagination_class = HVCDatasetViewCursorPagination
@@ -195,8 +191,7 @@ class ExportWinsHVCDatasetView(BaseFilterDatasetView):
 
 
 class ExportWinsWinDatasetView(BaseDatasetView):
-    """
-    A GET API view to return export win wins.
+    """A GET API view to return export win wins.
     """
 
     allow_legacy_data = False

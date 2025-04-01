@@ -1,5 +1,6 @@
 from django.conf import settings
-from django.contrib import admin, messages as django_messages
+from django.contrib import admin
+from django.contrib import messages as django_messages
 from django.contrib.admin import site
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponseRedirect
@@ -20,8 +21,7 @@ SUCCESS_MESSAGE_TEMPLATE = gettext_lazy(
 
 @csrf_protect
 def add_access_token_view(request):
-    """
-    View for adding an an access token.
+    """View for adding an an access token.
 
     Requires superuser access.
     """

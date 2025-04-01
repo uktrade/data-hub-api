@@ -28,14 +28,12 @@ from datahub.company.models import (
     OneListCoreTeamMember,
     OneListTier,
 )
-
 from datahub.company.validators import (
     has_no_invalid_company_number_characters,
     has_uk_establishment_number_prefix,
     validate_team_member_max_count,
 )
-from datahub.core.constants import Country
-from datahub.core.constants import HeadquarterType
+from datahub.core.constants import Country, HeadquarterType
 from datahub.core.serializers import (
     AddressSerializer,
     NestedRelatedField,
@@ -180,8 +178,7 @@ class ContactSerializer(PermittedFieldsModelSerializer):
         )
 
     def validate_email(self, value):
-        """
-        Validate that email is unique at this company.
+        """Validate that email is unique at this company.
 
         If a valid company id is provided, check that this email is unique there, otherwise
         validate that this email is unique for the company stored in the database.
@@ -288,8 +285,7 @@ class ContactV4Serializer(ContactSerializer):
 
 
 class CompanyExportCountrySerializer(serializers.ModelSerializer):
-    """
-    Export country serializer holding `Country` and its status.
+    """Export country serializer holding `Country` and its status.
     """
 
     country = NestedRelatedField(meta_models.Country)
@@ -300,8 +296,7 @@ class CompanyExportCountrySerializer(serializers.ModelSerializer):
 
 
 class CompanySerializer(PermittedFieldsModelSerializer):
-    """
-    Base Company read/write serializer
+    """Base Company read/write serializer
     Note that there is special validation for company number for UK establishments. This is
     because we don't get UK establishments in our Companies House data file at present, so users
     have to enter company numbers for UK establishments manually.
@@ -410,8 +405,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
     is_in_adviser_list = serializers.BooleanField(read_only=True)
 
     def __init__(self, *args, **kwargs):
-        """
-        Make some of the fields read_only if the instance has a duns_number set.
+        """Make some of the fields read_only if the instance has a duns_number set.
         This is because those values come from an external source
         and we don't want users to override them.
         """
@@ -421,8 +415,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
                 self.fields[field].read_only = True
 
     def validate(self, data):
-        """
-        Performs cross-field validation and adds extra fields to data.
+        """Performs cross-field validation and adds extra fields to data.
         """
         combiner = DataCombiner(self.instance, data)
 
@@ -464,8 +457,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         return headquarter_type
 
     def validate_global_headquarters(self, global_headquarters):
-        """
-        Ensure that global headquarters is global headquarters and it is not pointing
+        """Ensure that global headquarters is global headquarters and it is not pointing
         at the model itself.
         """
         if global_headquarters:
@@ -484,8 +476,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         return global_headquarters
 
     def get_one_list_group_tier(self, obj):
-        """
-        :returns: the One List Tier for the group that company `obj` is part of.
+        """:returns: the One List Tier for the group that company `obj` is part of.
         """
         one_list_tier = obj.get_one_list_group_tier()
 
@@ -493,8 +484,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         return field.to_representation(one_list_tier)
 
     def get_one_list_group_global_account_manager(self, obj):
-        """
-        :returns: the One List Global Account Manager for the group that company `obj` is part of.
+        """:returns: the One List Global Account Manager for the group that company `obj` is part of.
         """
         global_account_manager = obj.get_one_list_group_global_account_manager()
 
@@ -502,8 +492,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
         return field.to_representation(global_account_manager)
 
     def get_turnover_gbp(self, obj) -> Optional[float]:
-        """
-        :returns: Turnover value in GBP if turnover is not None, otherwise return None
+        """:returns: Turnover value in GBP if turnover is not None, otherwise return None
         """
         if obj.turnover is not None:
             return convert_usd_to_gbp(obj.turnover)
@@ -511,8 +500,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
             return None
 
     def create(self, validated_data):
-        """
-        Override create method to ensure that all Company objects created through this serializer
+        """Override create method to ensure that all Company objects created through this serializer
         have pending_dnb_investigation=True. This ensures that we always mark Company records based
         on untrusted data in a consistent way.
         """
@@ -671,8 +659,7 @@ class CompanySerializer(PermittedFieldsModelSerializer):
 
 
 class AssignRegionalAccountManagerSerializer(serializers.Serializer):
-    """
-    Serialiser for assigning an international trade adviser as the account manager of a
+    """Serialiser for assigning an international trade adviser as the account manager of a
     company.
     """
 
@@ -717,8 +704,7 @@ class AssignRegionalAccountManagerSerializer(serializers.Serializer):
 
 
 class SelfAssignAccountManagerSerializer(serializers.Serializer):
-    """
-    Serialiser for assigning an international trade adviser as the account manager of a
+    """Serialiser for assigning an international trade adviser as the account manager of a
     company.
     """
 
@@ -762,8 +748,7 @@ class SelfAssignAccountManagerSerializer(serializers.Serializer):
 
 
 class _RemoveCompanyFromOneListSerializer(serializers.Serializer):
-    """
-    Serialiser for removing company from One list.
+    """Serialiser for removing company from One list.
     """
 
     def save(self, by):
@@ -773,8 +758,7 @@ class _RemoveCompanyFromOneListSerializer(serializers.Serializer):
 
 
 class RemoveAccountManagerSerializer(_RemoveCompanyFromOneListSerializer):
-    """
-    Serialiser for removing an international trade adviser as the account manager of a
+    """Serialiser for removing an international trade adviser as the account manager of a
     company.
     """
 
@@ -823,8 +807,7 @@ class RemoveCompanyFromOneListSerializer(_RemoveCompanyFromOneListSerializer):
 
 
 class AssignOneListTierAndGlobalAccountManagerSerializer(serializers.Serializer):
-    """
-    Serializer for assigning One List tier and global account manager to a company.
+    """Serializer for assigning One List tier and global account manager to a company.
     """
 
     excluded_one_list_tier_id = OneListTierID.tier_d_international_trade_advisers.value
@@ -854,8 +837,7 @@ class AssignOneListTierAndGlobalAccountManagerSerializer(serializers.Serializer)
         return one_list_tier
 
     def validate(self, attrs):
-        """
-        Validate that given one list tier and global account manager can be assigned to a company.
+        """Validate that given one list tier and global account manager can be assigned to a company.
         """
         attrs = super().validate(attrs)
 
@@ -885,8 +867,7 @@ class AssignOneListTierAndGlobalAccountManagerSerializer(serializers.Serializer)
 
 
 class UpdateExportDetailsSerializer(serializers.Serializer):
-    """
-    Serializer for updating export related information of a company.
+    """Serializer for updating export related information of a company.
     For now this updates export countries along with repective status.
     """
 
@@ -899,8 +880,7 @@ class UpdateExportDetailsSerializer(serializers.Serializer):
     export_countries = CompanyExportCountrySerializer(many=True, required=True)
 
     def validate(self, data):
-        """
-        Validate export countries.
+        """Validate export countries.
         Updating export countries is not valid when feature flag is ON.
         And same country can't be added twice.
         """
@@ -916,13 +896,12 @@ class UpdateExportDetailsSerializer(serializers.Serializer):
 
     @transaction.atomic
     def save(self, adviser):
-        """Save it"""
+        """Save it."""
         export_countries = self.validated_data.pop('export_countries', [])
         self._update_export_countries_model(self.instance, export_countries, adviser)
 
     def _update_export_countries_model(self, company, validated_export_countries, adviser):
-        """
-        Adds/updates export countries related to a company within validated_export_countries.
+        """Adds/updates export countries related to a company within validated_export_countries.
         And removes existing ones that are not in the list.
         """
         for item in validated_export_countries:
@@ -946,8 +925,7 @@ class UpdateExportDetailsSerializer(serializers.Serializer):
         self._sync_to_company_export_country_fields(company, adviser)
 
     def _sync_to_company_export_country_fields(self, company, adviser):
-        """
-        Helper function to sync data from `ComapnyExportCountry` model back
+        """Helper function to sync data from `ComapnyExportCountry` model back
         into `Company` export country fields: `exporting_to_countries` and
         `future_interest_countries`.
         """
@@ -970,8 +948,7 @@ class UpdateExportDetailsSerializer(serializers.Serializer):
 
 
 class PublicCompanySerializer(CompanySerializer):
-    """
-    Read-only serialiser for the Hawk-authenticated company view.
+    """Read-only serialiser for the Hawk-authenticated company view.
 
     This is a slightly stripped down read-only version of the v4 company serialiser. Some fields
     containing personal data are deliberately omitted.
@@ -1032,8 +1009,7 @@ class AdviserListSerializer(serializers.ListSerializer):
     }
 
     def run_validation(self, data=serializers.empty):
-        """
-        Validates that there are no duplicate advisers.
+        """Validates that there are no duplicate advisers.
 
         Unfortunately, overriding validate() results in a error dict being returned and the errors
         being placed in non_field_errors. Hence, run_validation() is overridden instead (to get
@@ -1089,8 +1065,7 @@ class OneListCoreTeamMemberModelSerializer(UniqueAdvisersBaseSerializer):
 
 
 class UpdateOneListCoreTeamMembersSerializer(serializers.Serializer):
-    """
-    One List Core Team Members update serialier.
+    """One List Core Team Members update serialier.
 
     This serialiser is being used by the core team update view.
     """
@@ -1099,13 +1074,12 @@ class UpdateOneListCoreTeamMembersSerializer(serializers.Serializer):
 
     @transaction.atomic
     def save(self, adviser):
-        """Save it"""
+        """Save it."""
         core_team_members = self.validated_data.pop('core_team_members', [])
         self._update_core_team_members(self.instance, core_team_members, adviser)
 
     def _update_core_team_members(self, company, validated_core_team_members, adviser):
-        """
-        Adds/updates core team members of a company within validated_core_team_members.
+        """Adds/updates core team members of a company within validated_core_team_members.
         And removes existing ones that are not in the list.
         """
         for item in validated_core_team_members:
@@ -1131,7 +1105,7 @@ class OneListCoreTeamMemberSerializer(serializers.Serializer):
 
 
 class CompanyExportSerializer(serializers.ModelSerializer):
-    """Company Export serializer"""
+    """Company Export serializer."""
 
     company = NestedRelatedField(Company)
     owner = NestedAdviserWithTeamField()
@@ -1160,7 +1134,7 @@ class CompanyExportSerializer(serializers.ModelSerializer):
     export_potential = serializers.CharField()
 
     def validate_team_members(self, value):
-        """Validate the value provided for the team_members field"""
+        """Validate the value provided for the team_members field."""
         validate_team_member_max_count(value, serializers.ValidationError)
         return value
 

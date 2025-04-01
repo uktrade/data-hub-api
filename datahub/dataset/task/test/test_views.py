@@ -15,7 +15,7 @@ from datahub.task.test.factories import TaskFactory
 
 
 def get_expected_data_from_task(task):
-    """Returns task data as a dictionary"""
+    """Returns task data as a dictionary."""
     data = {
         'created_on': format_date_or_datetime(task.created_on),
         'created_by_id': str(task.created_by_id),
@@ -47,8 +47,7 @@ def get_expected_data_from_task(task):
 
 @pytest.mark.django_db
 class TestTasksDatasetViewSet(BaseDatasetViewTest):
-    """
-    Tests for TasksDatasetView
+    """Tests for TasksDatasetView.
     """
 
     view_url = reverse('api-v4:dataset:tasks-dataset')

@@ -19,7 +19,7 @@ def public_company_api_client(hawk_api_client):
         'public-company-id',
         'public-company-key',
     )
-    yield hawk_api_client
+    return hawk_api_client
 
 
 @pytest.mark.django_db
@@ -56,7 +56,7 @@ class TestPublicCompanyViewSet:
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    @pytest.mark.parametrize('method', ('delete', 'patch', 'post', 'put'))
+    @pytest.mark.parametrize('method', ['delete', 'patch', 'post', 'put'])
     def test_other_methods_not_allowed(self, method, public_company_api_client):
         """Test that various HTTP methods are not allowed."""
         company = CompanyFactory()
@@ -184,8 +184,7 @@ class TestPublicCompanyViewSet:
         }
 
     def test_get_company_without_country(self, public_company_api_client):
-        """
-        Tests the company item view for a company without a country.
+        """Tests the company item view for a company without a country.
 
         Checks that the endpoint returns 200 and the uk_based attribute is
         set to None.
@@ -201,14 +200,14 @@ class TestPublicCompanyViewSet:
         assert response.json()['uk_based'] is None
 
     @pytest.mark.parametrize(
-        'input_website,expected_website',
-        (
+        ('input_website', 'expected_website'),
+        [
             ('www.google.com', 'http://www.google.com'),
             ('http://www.google.com', 'http://www.google.com'),
             ('https://www.google.com', 'https://www.google.com'),
             ('', ''),
             (None, None),
-        ),
+        ],
     )
     def test_get_company_with_website(
         self,
@@ -216,8 +215,7 @@ class TestPublicCompanyViewSet:
         expected_website,
         public_company_api_client,
     ):
-        """
-        Test that if the website field on a company doesn't have any scheme
+        """Test that if the website field on a company doesn't have any scheme
         specified, the endpoint adds it automatically.
         """
         company = CompanyFactory(
@@ -231,7 +229,7 @@ class TestPublicCompanyViewSet:
 
     @pytest.mark.parametrize(
         'build_company',
-        (
+        [
             # subsidiary with Global Headquarters on the One List
             lambda one_list_tier: CompanyFactory(
                 one_list_tier=None,
@@ -252,7 +250,7 @@ class TestPublicCompanyViewSet:
                 one_list_tier=None,
                 global_headquarters=None,
             ),
-        ),
+        ],
         ids=(
             'as_subsidiary_of_one_list_company',
             'as_subsidiary_of_non_one_list_company',
@@ -261,8 +259,7 @@ class TestPublicCompanyViewSet:
         ),
     )
     def test_one_list_group_tier(self, build_company, public_company_api_client):
-        """
-        Test that the endpoint includes the One List Tier
+        """Test that the endpoint includes the One List Tier
         of the Global Headquarters in the group.
         """
         one_list_tier = OneListTier.objects.first()

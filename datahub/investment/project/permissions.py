@@ -2,10 +2,10 @@ from django.db.models.query_utils import Q
 from rest_framework.filters import BaseFilterBackend
 
 from datahub.core.permissions import (
-    get_model_action_for_view_action,
     IsAssociatedToObjectPermission,
     ObjectAssociationCheckerBase,
     ViewBasedModelPermissions,
+    get_model_action_for_view_action,
 )
 from datahub.core.utils import StrEnum
 from datahub.investment.project.models import InvestmentProject
@@ -21,8 +21,7 @@ class _PermissionTemplate(StrEnum):
 
 
 class InvestmentProjectModelPermissions(ViewBasedModelPermissions):
-    """
-    Custom permissions class for investment views.
+    """Custom permissions class for investment views.
 
     This differs from the standard DjangoModelPermissions class in that:
     - the permissions mapping is based on view/model actions rather than HTTP methods
@@ -34,9 +33,7 @@ class InvestmentProjectModelPermissions(ViewBasedModelPermissions):
     model = InvestmentProject
 
     permission_mapping = {
-        'add': (
-            _PermissionTemplate.standard,
-        ),
+        'add': (_PermissionTemplate.standard,),
         'view': (
             _PermissionTemplate.all,
             _PermissionTemplate.associated,
@@ -46,16 +43,12 @@ class InvestmentProjectModelPermissions(ViewBasedModelPermissions):
             _PermissionTemplate.associated,
             _PermissionTemplate.stage_to_won,
         ),
-        'delete': (
-            _PermissionTemplate.standard,
-        ),
+        'delete': (_PermissionTemplate.standard,),
     }
 
 
 class InvestmentProjectAssociationCheckerBase(ObjectAssociationCheckerBase):
-    """
-    Base class for investment project association checkers.
-    """
+    """Base class for investment project association checkers."""
 
     many_to_many = False
     restricted_actions = None
@@ -70,8 +63,9 @@ class InvestmentProjectAssociationCheckerBase(ObjectAssociationCheckerBase):
         if self.should_exclude_all(request):
             return False
 
-        return any(request.user.dit_team_id == user.dit_team_id
-                   for user in obj.get_associated_advisers())
+        return any(
+            request.user.dit_team_id == user.dit_team_id for user in obj.get_associated_advisers()
+        )
 
     def should_apply_restrictions(self, request, view_action):
         """Check if restrictions should be applied."""
@@ -105,8 +99,7 @@ class InvestmentProjectAssociationCheckerBase(ObjectAssociationCheckerBase):
 
 
 class InvestmentProjectAssociationChecker(InvestmentProjectAssociationCheckerBase):
-    """
-    Association check class for checking connection of user and
+    """Association check class for checking connection of user and
     InvestmentProject through the user's team.
     """
 
@@ -124,8 +117,7 @@ class IsAssociatedToInvestmentProjectPermission(IsAssociatedToObjectPermission):
 
 
 class IsAssociatedToInvestmentProjectPermissionMixin:
-    """
-    This checks if user has permission to access a view attached to Investment Project.
+    """Checks if user has permission to access a view attached to Investment Project.
 
     It is meant to be used with IsAssociatedToObjectPermission.
     """
@@ -173,8 +165,9 @@ class IsAssociatedToInvestmentProjectFilter(BaseFilterBackend):
             query |= Q(**{full_field_name: value})
 
         for field, value in to_many_filters:
-            full_field_name = (f'{field_prefix}{field.field_name}__'
-                               f'{field.subfield_name}__dit_team_id')
+            full_field_name = (
+                f'{field_prefix}{field.field_name}__{field.subfield_name}__dit_team_id'
+            )
             query |= Q(**{full_field_name: value})
         return queryset.filter(query).distinct()
 
@@ -183,8 +176,7 @@ class IsAssociatedToInvestmentProjectFilter(BaseFilterBackend):
 
 
 class InvestmentProjectTeamMemberModelPermissions(InvestmentProjectModelPermissions):
-    """
-    Custom permissions class for team member views.
+    """Custom permissions class for team member views.
 
     Uses InvestmentProject model permissions.
     """
@@ -193,8 +185,7 @@ class InvestmentProjectTeamMemberModelPermissions(InvestmentProjectModelPermissi
 
 
 class InvestmentProjectTeamMemberAssociationChecker(InvestmentProjectAssociationCheckerBase):
-    """
-    Association checker for checking association of a user with an investment project,
+    """Association checker for checking association of a user with an investment project,
     via a team member object.
     """
 
@@ -220,8 +211,7 @@ class IsAssociatedToInvestmentProjectTeamMemberPermission(IsAssociatedToObjectPe
 
 
 def get_association_filters(dit_team_id):
-    """
-    Gets a list of rules that can be used to restrict a query set to associated projects.
+    """Gets a list of rules that can be used to restrict a query set to associated projects.
 
     Two lists of rules are returned – one for to-one fields, one for to-many fields.
 

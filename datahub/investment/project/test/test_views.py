@@ -35,7 +35,6 @@ from datahub.investment.project.constants import (
     ProjectManagerRequestStatus,
     SpecificProgramme,
 )
-
 from datahub.investment.project.models import (
     InvestmentActivity,
     InvestmentDeliveryPartner,
@@ -57,14 +56,13 @@ from datahub.metadata.test.factories import TeamFactory
 
 
 class TestListView(APITestMixin):
-    """
-    Tests for the investment project list view.
+    """Tests for the investment project list view.
 
     These cover GET /v3/investment
     """
 
     def test_investments_no_permissions(self):
-        """Should return 403"""
+        """Should return 403."""
         user = create_test_user(dit_team=TeamFactory())
         url = reverse('api-v3:investment:investment-collection')
         api_client = self.create_api_client(user=user)
@@ -272,10 +270,10 @@ class TestListView(APITestMixin):
 
     @pytest.mark.parametrize(
         'permissions',
-        (
+        [
             (InvestmentProjectPermission.view_all,),
             (InvestmentProjectPermission.view_associated, InvestmentProjectPermission.view_all),
-        ),
+        ],
     )
     def test_non_restricted_user_can_see_all_projects(self, permissions):
         """Test that normal users can see all projects."""
@@ -344,8 +342,7 @@ class TestListView(APITestMixin):
         assert {result['id'] for result in results} == expected_ids
 
     def test_restricted_user_with_no_team_cannot_see_projects(self):
-        """
-        Checks that a restricted user that doesn't have a team cannot view any projects (in
+        """Checks that a restricted user that doesn't have a team cannot view any projects (in
         particular projects associated with other advisers that don't have teams).
         """
         adviser_other = AdviserFactory(dit_team_id=None)
@@ -365,7 +362,7 @@ class TestListView(APITestMixin):
         assert response_data['count'] == 0
 
     def test_autocomplete_with_only_name(self):
-        """Test the autocomplete with only a name includes projects from all investor companies"""
+        """Test the autocomplete with only a name includes projects from all investor companies."""
         project_1 = InvestmentProjectFactory(name='a1')
         project_2 = InvestmentProjectFactory(name='a2')
         InvestmentProjectFactory(name='b1')
@@ -383,9 +380,8 @@ class TestListView(APITestMixin):
         assert {result['id'] for result in results} == expected_ids
 
     def test_autocomplete_with_only_investor_company(self):
-        """
-        Test the autocomplete with only an investor company only returns projects matching the
-        investor company requested
+        """Test the autocomplete with only an investor company only returns projects matching the
+        investor company requested.
         """
         investor_company_1 = CompanyFactory()
         investor_company_2 = CompanyFactory()
@@ -406,9 +402,8 @@ class TestListView(APITestMixin):
         assert {result['id'] for result in results} == expected_ids
 
     def test_autocomplete_with_name_and_investor_company(self):
-        """
-        Test the autocomplete with a name and an investor company only returns projects matching
-        both the name and investor company
+        """Test the autocomplete with a name and an investor company only returns projects matching
+        both the name and investor company.
         """
         investor_company_1 = CompanyFactory()
         investor_company_2 = CompanyFactory()
@@ -431,8 +426,7 @@ class TestListView(APITestMixin):
 
 
 class TestCreateView(APITestMixin):
-    """
-    Tests for the investment project create view.
+    """Tests for the investment project create view.
 
     These cover POST /v3/investment
     """
@@ -558,9 +552,9 @@ class TestCreateView(APITestMixin):
         assert response_data['country_investment_originates_from']['id'] == str(
             investor_company.address_country.id,
         )
-        assert sorted(
-            eyb_lead_m2m['id'] for eyb_lead_m2m in response_data['eyb_leads']
-        ) == sorted([str(eyb_lead.id)])
+        assert sorted(eyb_lead_m2m['id'] for eyb_lead_m2m in response_data['eyb_leads']) == sorted(
+            [str(eyb_lead.id)],
+        )
 
     def test_create_project_fail(self):
         """Test creating a project with missing required values."""
@@ -716,8 +710,7 @@ class TestCreateView(APITestMixin):
 
 
 class TestRetrieveView(APITestMixin):
-    """
-    Tests for the investment project retrieve view.
+    """Tests for the investment project retrieve view.
 
     These cover GET /v3/investment/<id>
     """
@@ -779,9 +772,7 @@ class TestRetrieveView(APITestMixin):
         }
 
     def test_get_project_no_investor_and_crm(self):
-        """
-        Test getting a company when investor_company and client_relationship_manager are None.
-        """
+        """Test getting a company when investor_company and client_relationship_manager are None."""
         project = InvestmentProjectFactory(
             investor_company=None,
             client_relationship_manager=None,
@@ -1024,10 +1015,10 @@ class TestRetrieveView(APITestMixin):
 
     @pytest.mark.parametrize(
         'permissions',
-        (
+        [
             (InvestmentProjectPermission.view_all,),
             (InvestmentProjectPermission.view_associated, InvestmentProjectPermission.view_all),
-        ),
+        ],
     )
     def test_non_restricted_user_can_see_project_if_not_associated(self, permissions):
         """Tests that non-restricted users can access projects they aren't associated with."""
@@ -1065,12 +1056,12 @@ class TestRetrieveView(APITestMixin):
 
     @pytest.mark.parametrize(
         'field',
-        (
+        [
             'created_by',
             'client_relationship_manager',
             'project_assurance_adviser',
             'project_manager',
-        ),
+        ],
     )
     def test_restricted_user_can_see_project_if_associated_via_field(self, field):
         """Tests that restricted users can see a project when in the team of the creator."""
@@ -1091,8 +1082,7 @@ class TestRetrieveView(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
 
     def test_restricted_user_with_no_team_cannot_view_project(self):
-        """
-        Checks that a restricted user that doesn't have a team cannot view a project created by
+        """Checks that a restricted user that doesn't have a team cannot view a project created by
         another user without a team.
         """
         adviser_other = AdviserFactory(dit_team_id=None)
@@ -1109,8 +1099,7 @@ class TestRetrieveView(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_get_project_without_view_document_permission(self):
-        """
-        Tests that the archived documents path is not returned for users without the view document
+        """Tests that the archived documents path is not returned for users without the view document
         permission.
         """
         project = InvestmentProjectFactory(
@@ -1128,8 +1117,7 @@ class TestRetrieveView(APITestMixin):
         assert 'archived_documents_url_path' not in response.json()
 
     def test_get_project_with_read_document_permission(self):
-        """
-        Tests that the archived documents path is returned for users without the view document
+        """Tests that the archived documents path is returned for users without the view document
         permission.
         """
         project = InvestmentProjectFactory(
@@ -1153,18 +1141,17 @@ class TestRetrieveView(APITestMixin):
 
 
 class TestPartialUpdateView(APITestMixin):
-    """
-    Tests for the investment project partial update view.
+    """Tests for the investment project partial update view.
 
     These cover PATCH /v3/investment/<id>
     """
 
     @pytest.mark.parametrize(
-        'foreign_equity_investment,expected_gross_value_added,expected_multiplier_value',
-        (
+        ('foreign_equity_investment', 'expected_gross_value_added', 'expected_multiplier_value'),
+        [
             (20000, '4193', '0.209650945'),
             (None, None, '0.209650945'),
-        ),
+        ],
     )
     def test_change_foreign_equity_investment_updates_gross_value_added(
         self,
@@ -1204,14 +1191,14 @@ class TestPartialUpdateView(APITestMixin):
             assert not project.gva_multiplier
 
     @pytest.mark.parametrize(
-        'business_activity,expected_gross_value_added',
-        (
+        ('business_activity', 'expected_gross_value_added'),
+        [
             # GVA Multiplier for Consumer and retail - 2022 - 51983.51403
             (constants.InvestmentBusinessActivity.retail.value.id, '1039670'),
             (constants.InvestmentBusinessActivity.sales.value.id, '1039670'),
             # No change - GVA Multiplier for Aircraft - 2022 - 0.209650945
             (constants.InvestmentBusinessActivity.other.value.id, '210'),
-        ),
+        ],
     )
     def test_change_business_activity_to_retail_updated_gross_value_added(
         self,
@@ -1333,8 +1320,7 @@ class TestPartialUpdateView(APITestMixin):
         assert response_data['proposal_deadline'] == request_data['proposal_deadline']
 
     def test_patch_estimated_land_date_legacy_project(self):
-        """
-        Test the validation of estimated_land_date for projects with
+        """Test the validation of estimated_land_date for projects with
         allow_blank_estimated_land_date=True.
         """
         project = VerifyWinInvestmentProjectFactory(
@@ -1399,8 +1385,8 @@ class TestPartialUpdateView(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
 
     @pytest.mark.parametrize(
-        'request_status,requested_on',
-        (
+        ('request_status', 'requested_on'),
+        [
             (
                 ProjectManagerRequestStatus.requested,
                 datetime(2017, 4, 28, 17, 35).strftime('%Y-%m-%dT%H:%M:%SZ'),
@@ -1421,12 +1407,11 @@ class TestPartialUpdateView(APITestMixin):
                 ProjectManagerRequestStatus.self_assigned,
                 None,
             ),
-        ),
+        ],
     )
     @freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=timezone.utc))
     def test_update_project_manager_request_status(self, request_status, requested_on):
-        """
-        Test updating the project manager request status, if the request type
+        """Test updating the project manager request status, if the request type
         is requested then the project manager requested on date field should also be set.
 
         """
@@ -1551,7 +1536,7 @@ class TestPartialUpdateView(APITestMixin):
 
     @pytest.mark.parametrize(
         'field',
-        ('project_manager', 'project_assurance_adviser'),
+        ['project_manager', 'project_assurance_adviser'],
     )
     def test_change_stage_verify_win_success(self, field):
         """Tests moving a complete project to the 'Verify win' stage."""
@@ -1592,7 +1577,7 @@ class TestPartialUpdateView(APITestMixin):
             ),
             investor_type_id=InvestorType.new_investor.value.id,
             level_of_involvement_id=Involvement.no_involvement.value.id,
-            ** extra,
+            **extra,
         )
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
@@ -1604,8 +1589,7 @@ class TestPartialUpdateView(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
 
     def test_cannot_change_stage_verify_win_if_not_pm_or_paa(self):
-        """
-        Tests user other than pm or paa cannot move a complete project
+        """Tests user other than pm or paa cannot move a complete project
         to the 'Verify win' stage.
         """
         project = VerifyWinInvestmentProjectFactory(
@@ -1627,8 +1611,7 @@ class TestPartialUpdateView(APITestMixin):
         }
 
     def test_change_stage_to_won(self):
-        """
-        Tests moving a complete project to the 'Won' stage, when all required fields are
+        """Tests moving a complete project to the 'Won' stage, when all required fields are
         complete.
         """
         project = VerifyWinInvestmentProjectFactory()
@@ -1658,9 +1641,7 @@ class TestPartialUpdateView(APITestMixin):
         assert response_data['status'] == InvestmentProject.Status.WON
 
     def test_change_stage_to_won_by_unauthorised_user(self):
-        """
-        Tests moving a complete project to the 'Won' stage by unauthorised user.
-        """
+        """Tests moving a complete project to the 'Won' stage by unauthorised user."""
         project = VerifyWinInvestmentProjectFactory()
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         request_data = {
@@ -1679,8 +1660,7 @@ class TestPartialUpdateView(APITestMixin):
         }
 
     def test_change_stage_to_won_failure(self):
-        """
-        Tests moving a project to the 'Won' stage, when required field for that transition
+        """Tests moving a project to the 'Won' stage, when required field for that transition
         are missing.
         """
         project = VerifyWinInvestmentProjectFactory()
@@ -1727,8 +1707,7 @@ class TestPartialUpdateView(APITestMixin):
         assert response_data['status'] == InvestmentProject.Status.ONGOING
 
     def test_move_project_between_non_consecutive_stages_by_unauthorised_user(self):
-        """
-        Tests moving a project back a stage, from active to prospect, by
+        """Tests moving a project back a stage, from active to prospect, by
         an unauthorised user.
         """
         project = ActiveInvestmentProjectFactory()
@@ -1742,8 +1721,7 @@ class TestPartialUpdateView(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_move_project_between_non_consecutive_stages_by_unauthenticated_user(self, api_client):
-        """
-        Test that a 401 is returned if an unauthenticated user makes
+        """Test that a 401 is returned if an unauthenticated user makes
         a request to the update-stage endpoint.
         """
         project = ActiveInvestmentProjectFactory()
@@ -1757,8 +1735,8 @@ class TestPartialUpdateView(APITestMixin):
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     @pytest.mark.parametrize(
-        'project_factory,new_stage,expected_status',
-        (
+        ('project_factory', 'new_stage', 'expected_status'),
+        [
             (
                 ActiveInvestmentProjectFactory,
                 constants.InvestmentProjectStage.prospect.value,
@@ -1769,7 +1747,7 @@ class TestPartialUpdateView(APITestMixin):
                 constants.InvestmentProjectStage.won.value,
                 InvestmentProject.Status.WON,
             ),
-        ),
+        ],
     )
     def test_move_project_between_non_consecutive_stages(
         self,
@@ -1777,9 +1755,7 @@ class TestPartialUpdateView(APITestMixin):
         new_stage,
         expected_status,
     ):
-        """
-        Tests moving a project back a stage or forward multiple stages.
-        """
+        """Tests moving a project back a stage or forward multiple stages."""
         project = project_factory()
         url = reverse('api-v3:investment:update-stage-of-item', kwargs={'pk': project.pk})
         request_data = {
@@ -1984,8 +1960,7 @@ class TestPartialUpdateView(APITestMixin):
         assert response_data['address_2'] == 'address 2 new'
 
     def test_patch_possible_regions_legacy_project(self):
-        """
-        Test the validation of uk_regions_locations for projects with
+        """Test the validation of uk_regions_locations for projects with
         allow_blank_possible_uk_regions=True.
         """
         project = VerifyWinInvestmentProjectFactory(
@@ -2003,8 +1978,7 @@ class TestPartialUpdateView(APITestMixin):
         assert response.status_code == status.HTTP_200_OK
 
     def test_patch_investor_company_updates_country_investment_originates_from(self):
-        """
-        Test that update of investor company will update country investment originates from
+        """Test that update of investor company will update country investment originates from
         if project isn't won.
         """
         investor_company = CompanyFactory(
@@ -2038,8 +2012,7 @@ class TestPartialUpdateView(APITestMixin):
         )
 
     def test_patch_won_project_investor_company_doesnt_update_country_of_origin(self):
-        """
-        Test that updating investor company of won project, will not update
+        """Test that updating investor company of won project, will not update
         country investment originates from.
         """
         investor_company = CompanyFactory(
@@ -2128,8 +2101,7 @@ class TestPartialUpdateView(APITestMixin):
 
     @freeze_time(datetime(2017, 4, 28, 17, 35, tzinfo=timezone.utc))
     def test_assigning_project_manager_first_time_sets_date_and_assigner(self):
-        """
-        Test that when project manager is first time assigned, a date
+        """Test that when project manager is first time assigned, a date
         and who assigned is being recorded.
         """
         crm_team = constants.Team.crm.value
@@ -2231,13 +2203,13 @@ class TestPartialUpdateView(APITestMixin):
 
     @pytest.mark.parametrize(
         'permissions',
-        (
+        [
             (InvestmentProjectPermission.change_all,),
             (
                 InvestmentProjectPermission.change_all,
                 InvestmentProjectPermission.change_associated,
             ),
-        ),
+        ],
     )
     def test_non_restricted_user_can_update_project_if_not_associated(self, permissions):
         """Tests that non-restricted users can update projects they aren't associated with."""
@@ -2263,9 +2235,7 @@ class TestPartialUpdateView(APITestMixin):
         assert response_data['name'] == 'new name'
 
     def test_restricted_user_can_update_project_if_associated_via_team_member(self):
-        """
-        Tests that restricted users can update a project associated to them via a team member.
-        """
+        """Tests that restricted users can update a project associated to them via a team member."""
         team = TeamFactory()
         adviser = AdviserFactory(dit_team_id=team.id)
         _, api_client = _create_user_and_api_client(
@@ -2291,12 +2261,12 @@ class TestPartialUpdateView(APITestMixin):
 
     @pytest.mark.parametrize(
         'field',
-        (
+        [
             'created_by',
             'client_relationship_manager',
             'project_assurance_adviser',
             'project_manager',
-        ),
+        ],
     )
     def test_restricted_user_can_update_project_if_associated_via_field(self, field):
         """Tests that restricted users can update a project when in the team of the creator."""
@@ -2376,7 +2346,7 @@ class TestInvestmentProjectActivities(APITestMixin):
         assert str(activity.activity_type_id) == InvestmentActivityType.change.value.id
 
     def test_patch_project_with_a_risk(self):
-        """Test successfully adding a note to a project"""
+        """Test successfully adding a note to a project."""
         project = InvestmentProjectFactory()
         url = reverse('api-v3:investment:investment-item', kwargs={'pk': project.pk})
         risk_activity_type_id = InvestmentActivityType.risk.value.id
@@ -2400,8 +2370,7 @@ class TestInvestmentProjectActivities(APITestMixin):
         assert str(activity.activity_type.id) == risk_activity_type_id
 
     def test_patch_project_with_a_note_fails_when_project_does_not_save(self):
-        """
-        Test that if there's a problem when saving a problem, the note is not saved
+        """Test that if there's a problem when saving a problem, the note is not saved
         either so that we keep db integrity.
         """
         project = InvestmentProjectFactory()
@@ -2419,15 +2388,15 @@ class TestInvestmentProjectActivities(APITestMixin):
         with mock.patch.object(InvestmentProject, 'save') as mocked_save:
             mocked_save.side_effect = Exception()
 
-            with pytest.raises(Exception):
+            with pytest.raises(Exception):  # noqa: PT011
                 self.api_client.patch(url, data=request_data)
 
         project.refresh_from_db()
         assert project.activities.count() == 0
 
     @pytest.mark.parametrize(
-        'note_request,expected_field_error,expected_error_message',
-        (
+        ('note_request', 'expected_field_error', 'expected_error_message'),
+        [
             (None, None, 'This field may not be null.'),
             ('hello', 'non_field_errors', 'Invalid data. Expected a dictionary'),
             (
@@ -2440,7 +2409,7 @@ class TestInvestmentProjectActivities(APITestMixin):
                 'text',
                 'This field is required.',
             ),
-        ),
+        ],
     )
     def test_patch_project_with_a_note_failures_returns_400(
         self,
@@ -2467,9 +2436,7 @@ class TestInvestmentProjectActivities(APITestMixin):
 
 
 class TestInvestmentProjectVersioning(APITestMixin):
-    """
-    Tests for versions created when interacting with the investment project endpoints.
-    """
+    """Tests for versions created when interacting with the investment project endpoints."""
 
     def test_add_creates_a_new_version(self):
         """Test that creating an investment project creates a new version."""
@@ -2702,13 +2669,13 @@ class TestAddTeamMemberView(APITestMixin):
 
     @pytest.mark.parametrize(
         'permissions',
-        (
+        [
             (InvestmentProjectPermission.change_all,),
             (
                 InvestmentProjectPermission.change_associated,
                 InvestmentProjectPermission.change_all,
             ),
-        ),
+        ],
     )
     def test_non_restricted_user_can_add_team_member(self, permissions):
         """Test that a non-restricted user can add a team member to a project."""
@@ -2817,9 +2784,7 @@ class TestReplaceAllTeamMembersView(APITestMixin):
     """Tests for the replace all team members view."""
 
     def test_replace_all_team_members(self):
-        """
-        Test that replacing all team members removes existing team members and adds the new ones.
-        """
+        """Test that replacing all team members removes existing team members and adds the new ones."""
         project = InvestmentProjectFactory()
         advisers = AdviserFactory.create_batch(2)
         advisers.sort(key=attrgetter('id'))
@@ -2913,13 +2878,13 @@ class TestReplaceAllTeamMembersView(APITestMixin):
 
     @pytest.mark.parametrize(
         'permissions',
-        (
+        [
             (InvestmentProjectPermission.change_all,),
             (
                 InvestmentProjectPermission.change_associated,
                 InvestmentProjectPermission.change_all,
             ),
-        ),
+        ],
     )
     def test_non_restricted_user_can_replace_team_members(self, permissions):
         """Test that a non-restricted user can replace team members of a project."""
@@ -3143,13 +3108,13 @@ class TestDeleteAllTeamMembersView(APITestMixin):
 
     @pytest.mark.parametrize(
         'permissions',
-        (
+        [
             (InvestmentProjectPermission.change_all,),
             (
                 InvestmentProjectPermission.change_associated,
                 InvestmentProjectPermission.change_all,
             ),
-        ),
+        ],
     )
     def test_non_restricted_user_can_delete_all_team_members(self, permissions):
         """Test that a non-restricted user can remove all team members from a project."""
@@ -3176,9 +3141,7 @@ class TestDeleteAllTeamMembersView(APITestMixin):
         assert InvestmentProjectTeamMember.objects.all().exists()
 
     def test_restricted_user_cannot_delete_all_team_members_of_non_associated_project(self):
-        """
-        Test that a restricted user cannot remove all team members from a non-associated project.
-        """
+        """Test that a restricted user cannot remove all team members from a non-associated project."""
         project = InvestmentProjectFactory()
         team_members = InvestmentProjectTeamMemberFactory.create_batch(
             2,
@@ -3204,9 +3167,7 @@ class TestDeleteAllTeamMembersView(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_restricted_user_can_delete_all_team_members_of_associated_project(self):
-        """
-        Test that a restricted user can remove all team members from an associated project.
-        """
+        """Test that a restricted user can remove all team members from an associated project."""
         creator = AdviserFactory()
         project = InvestmentProjectFactory(created_by=creator)
         team_members = InvestmentProjectTeamMemberFactory.create_batch(
@@ -3239,10 +3200,10 @@ class TestGetTeamMemberView(APITestMixin):
 
     @pytest.mark.parametrize(
         'permissions',
-        (
+        [
             (InvestmentProjectPermission.view_all,),
             (InvestmentProjectPermission.view_associated, InvestmentProjectPermission.view_all),
-        ),
+        ],
     )
     def test_non_restricted_user_can_get_team_member(self, permissions):
         """Test that a non-restricted user can get a team member."""
@@ -3339,13 +3300,13 @@ class TestUpdateTeamMemberView(APITestMixin):
 
     @pytest.mark.parametrize(
         'permissions',
-        (
+        [
             (InvestmentProjectPermission.change_all,),
             (
                 InvestmentProjectPermission.change_associated,
                 InvestmentProjectPermission.change_all,
             ),
-        ),
+        ],
     )
     def test_non_restricted_user_can_patch_team_member(self, permissions):
         """Test that a non-restricted user can update a team member."""
@@ -3423,13 +3384,13 @@ class TestDeleteTeamMemberView(APITestMixin):
 
     @pytest.mark.parametrize(
         'permissions',
-        (
+        [
             (InvestmentProjectPermission.change_all,),
             (
                 InvestmentProjectPermission.change_associated,
                 InvestmentProjectPermission.change_all,
             ),
-        ),
+        ],
     )
     def test_non_restricted_user_can_delete_team_member(self, permissions):
         """Test that a non-restricted user can remove a team member from a project."""
@@ -3455,8 +3416,7 @@ class TestDeleteTeamMemberView(APITestMixin):
         assert new_team_members[0].adviser.pk == team_members[1].adviser.pk
 
     def test_restricted_user_cannot_delete_team_member_of_non_associated_project(self):
-        """
-        Test that a restricted user cannot remove a team member from a project from a
+        """Test that a restricted user cannot remove a team member from a project from a
         non-associated project.
         """
         project = InvestmentProjectFactory()
@@ -3482,8 +3442,7 @@ class TestDeleteTeamMemberView(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_restricted_user_can_delete_team_member_of_associated_project(self):
-        """
-        Test that a restricted user can remove a team member from a project from an
+        """Test that a restricted user can remove a team member from a project from an
         associated project.
         """
         creator = AdviserFactory()
@@ -3513,9 +3472,7 @@ class TestDeleteTeamMemberView(APITestMixin):
 
 
 class TestTeamMemberVersioning(APITestMixin):
-    """
-    Tests for versions created when interacting with the investment team member endpoints.
-    """
+    """Tests for versions created when interacting with the investment team member endpoints."""
 
     def test_add_creates_a_new_version(self):
         """Test that adding a team member creates a new version."""
@@ -3768,17 +3725,17 @@ class TestAuditLogView(APITestMixin):
 
     @pytest.mark.parametrize(
         'permissions',
-        (
+        [
             (InvestmentProjectPermission.view_all,),
             (InvestmentProjectPermission.view_associated, InvestmentProjectPermission.view_all),
-        ),
+        ],
     )
     @pytest.mark.parametrize(
         'expected_note_text',
-        (
+        [
             'Hello',
             None,
-        ),
+        ],
     )
     def test_audit_log_with_notes_for_a_non_restricted_user(self, permissions, expected_note_text):
         """Test retrieval of audit log for a non-restricted user."""
@@ -3922,13 +3879,13 @@ class TestArchiveViews(APITestMixin):
 
     @pytest.mark.parametrize(
         'permissions',
-        (
+        [
             (InvestmentProjectPermission.change_all,),
             (
                 InvestmentProjectPermission.change_associated,
                 InvestmentProjectPermission.change_all,
             ),
-        ),
+        ],
     )
     def test_archive_project_non_restricted_user(self, permissions):
         """Tests archiving a project for a non-restricted user."""
@@ -4058,13 +4015,13 @@ class TestArchiveViews(APITestMixin):
 
     @pytest.mark.parametrize(
         'permissions',
-        (
+        [
             (InvestmentProjectPermission.change_all,),
             (
                 InvestmentProjectPermission.change_associated,
                 InvestmentProjectPermission.change_all,
             ),
-        ),
+        ],
     )
     def test_unarchive_project_non_restricted_user(self, permissions):
         """Tests unarchiving a project for a non-restricted user."""
@@ -4137,7 +4094,7 @@ class TestArchiveViews(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
-@pytest.mark.parametrize('view_set', (views.IProjectAuditViewSet,))
+@pytest.mark.parametrize('view_set', [views.IProjectAuditViewSet])
 def test_view_set_name(view_set):
     """Test that the view name is a string."""
     assert isinstance(view_set().get_view_name(), str)

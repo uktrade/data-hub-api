@@ -1,7 +1,5 @@
 import pytest
-
 from rest_framework import status
-
 from rest_framework.reverse import reverse
 
 from datahub.core.test_utils import format_date_or_datetime
@@ -11,7 +9,7 @@ from datahub.metadata.test.factories import TeamFactory
 
 
 def get_expected_data_from_team(team):
-    """Returns team data as a dictionary"""
+    """Returns team data as a dictionary."""
     return {
         'country__name': team.country.name,
         'disabled_on': format_date_or_datetime(team.disabled_on),
@@ -24,15 +22,14 @@ def get_expected_data_from_team(team):
 
 @pytest.mark.django_db
 class TestTeamDatasetViewSet(BaseDatasetViewTest):
-    """
-    Tests for the teams data-flow export endpoint
+    """Tests for the teams data-flow export endpoint.
     """
 
     view_url = reverse('api-v4:dataset:teams-dataset')
     factory = TeamFactory
 
     def test_success(self, data_flow_api_client):
-        """Test that endpoint returns with expected data for a single company"""
+        """Test that endpoint returns with expected data for a single company."""
         response = data_flow_api_client.get(self.view_url)
 
         assert response.status_code == status.HTTP_200_OK
@@ -43,7 +40,7 @@ class TestTeamDatasetViewSet(BaseDatasetViewTest):
         assert response_team == get_expected_data_from_team(team)
 
     def test_results_are_sorted(self, data_flow_api_client):
-        """Test that endpoint returns correct order of records"""
+        """Test that endpoint returns correct order of records."""
         response = data_flow_api_client.get(self.view_url)
         assert response.status_code == status.HTTP_200_OK
 

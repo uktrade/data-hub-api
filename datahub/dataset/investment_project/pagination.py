@@ -1,5 +1,4 @@
-"""
-Pagination serializers determine the structure of the output that should
+"""Pagination serializers determine the structure of the output that should
 be used for paginated responses.
 """
 

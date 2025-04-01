@@ -5,8 +5,7 @@ from datahub.dbmaintenance.utils import parse_uuid
 
 
 class Command(CSVBaseCommand):
-    """
-    Command to rollback company merges.
+    """Command to rollback company merges.
     """
 
     help = """

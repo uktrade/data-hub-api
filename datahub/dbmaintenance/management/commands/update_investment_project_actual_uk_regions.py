@@ -6,7 +6,6 @@ from datahub.dbmaintenance.management.base import CSVBaseCommand
 from datahub.dbmaintenance.utils import parse_uuid, parse_uuid_list
 from datahub.investment.project.models import InvestmentProject
 
-
 logger = getLogger(__name__)
 
 

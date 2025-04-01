@@ -6,13 +6,11 @@ from datahub.dbmaintenance.management.base import CSVBaseCommand
 from datahub.dbmaintenance.utils import parse_bool, parse_date, parse_uuid
 from datahub.investment.project.models import InvestmentProject
 
-
 logger = getLogger(__name__)
 
 
 class Command(CSVBaseCommand):
-    """
-    Command to update investment_project.estimated_land_date and
+    """Command to update investment_project.estimated_land_date and
     investment_project.allow_blank_estimated_land_date.
     """
 

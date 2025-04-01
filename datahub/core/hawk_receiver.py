@@ -2,7 +2,6 @@ import logging
 from functools import partial
 
 import environ
-
 from django.conf import settings
 from django.core.cache import cache
 from mohawk import Receiver
@@ -24,14 +23,14 @@ class HawkAuthentication(BaseAuthentication):
     """DRF authentication class that uses Hawk authentication."""
 
     def authenticate_header(self, request):
-        """This is returned as the WWW-Authenticate header when
+        """Returned as the WWW-Authenticate header when
         AuthenticationFailed is raised. DRF also requires this
-        to send a 401 (as opposed to 403)
+        to send a 401 (as opposed to 403).
         """
         return 'Hawk'
 
     def authenticate(self, request):
-        """Authenticates a request using Hawk signature in the Authorization header
+        """Authenticates a request using Hawk signature in the Authorization header.
 
         If we cannot authenticate, AuthenticationFailed is raised, as required
         in the DRF authentication flow
@@ -49,16 +48,14 @@ class HawkAuthentication(BaseAuthentication):
 
 
 class HawkResponseSigningMixin:
-    """
-    DRF view mixin to add the Server-Authorization header to responses, so the originator
+    """DRF view mixin to add the Server-Authorization header to responses, so the originator
     of the request can authenticate the response.
 
     Must be first in the base class list so that the APIView method is overridden.
     """
 
     def finalize_response(self, request, response, *args, **kwargs):
-        """
-        Add callback to sign Hawk responses.
+        """Add callback to sign Hawk responses.
 
         If the request was authenticated using Hawk, this adds a post-render callback to the
         response which sets the Server-Authorization header, so that the originator of the
@@ -71,8 +68,7 @@ class HawkResponseSigningMixin:
 
 
 class HawkScopePermission(BasePermission):
-    """
-    Permission class to authorise Hawk requests using the allowed scope of the client.
+    """Permission class to authorise Hawk requests using the allowed scope of the client.
 
     If the request was not authenticated using Hawk, access is denied.
     """
@@ -106,7 +102,7 @@ def _lookup_credentials(access_key_id):
 
 def _seen_nonce(access_key_id, nonce, _):
     """Returns if the passed access_key_id/nonce combination has been
-    used within settings.HAWK_RECEIVER_NONCE_EXPIRY_SECONDS
+    used within settings.HAWK_RECEIVER_NONCE_EXPIRY_SECONDS.
     """
     cache_key = f'hawk:{access_key_id}:{nonce}'
 
@@ -124,7 +120,7 @@ def _seen_nonce(access_key_id, nonce, _):
 
 
 def _authorise(request):
-    """Raises a HawkFail if the passed request cannot be authenticated"""
+    """Raises a HawkFail if the passed request cannot be authenticated."""
     return Receiver(
         _lookup_credentials,
         request.headers['authorization'],

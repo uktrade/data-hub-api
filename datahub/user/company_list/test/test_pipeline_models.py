@@ -7,7 +7,7 @@ pytestmark = pytest.mark.django_db
 
 
 class TestPipelineItem:
-    """Tests Pipeline item model"""
+    """Tests Pipeline item model."""
 
     def test_str(self):
         """Test the human friendly string representation of the object."""

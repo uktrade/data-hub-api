@@ -1,0 +1,95 @@
+# See https://docs.astral.sh/ruff/settings/ for a full list of settings.
+
+# Extend the list of excluded directories.
+# See https://docs.astral.sh/ruff/settings/#exclude for the default list.
+extend-exclude = [
+    '__pycache__',
+    '*/migrations/*',
+    'manage.py',
+    'config/settings/*',
+]
+
+# Set Python version
+target-version = 'py310'
+
+line-length = 99
+indent-width = 4
+
+# Group violations by containing file.
+output-format = 'grouped'
+
+[lint]
+# Rulesets to enable and ignore.
+# See https://docs.astral.sh/ruff/rules/ for a full list of rules.
+select = [
+    'B',   # flake8-bugbear
+    'COM', # flake8-commas
+    'C90', # mccabe
+    'D',   # pydocstyle
+    'DJ',  # flake8-django
+    'F',   # flake8
+    'G',   # flake8-logging-format
+    'I',   # isort
+    'N',   # pep8-naming
+    'PL',  # pylint
+    'PT',  # flake8-pytest-style
+    'T10', # flake8-debugger
+    'T20', # flake8-print
+]
+ignore = [
+    'B017',    # Do not assert blind exception: {exception}
+    'B019',    # Use of functools.lru_cache or functools.cache on methods can lead to memory leaks
+    'B026',    # Star-arg unpacking after a keyword argument is strongly discouraged
+    'B904',    # Within an except* clause, raise exceptions with raise ... from err or raise ... from None to distinguish them from errors in exception handling
+    'D100',    # Missing docstring in public module 
+    'D101',    # Missing docstring in public class
+    'D102',    # Missing docstring in public method
+    'D103',    # Missing docstring in public function
+    'D104',    # Missing docstring in public package
+    'D105',    # Missing docstring in magic method
+    'D106',    # Missing docstring in public nested class
+    'D107',    # Missing docstring in __init__
+    'D200',    # One-line docstring should fit on one line
+    'D203',    # 1 blank line required before class docstring
+    'D205',    # 1 blank line required between summary line and description
+    'D213',    # Multi-line docstring summary should start at the second line (incompatible with D212)
+    'D400',    # First line should end with a period
+    'D401',    # First line of docstring should be in imperative mood: "{first_line}"
+    'E402',    # Module level import not at top of cell
+    'FIX002',  # Line contains TODO, consider resolving the issue
+    'G004',    # Logging statement uses f-string
+    'N811',    # Constant {name} imported as non-constant {asname}
+    'PLR2004', # Magic value used in comparison, consider replacing {value} with a constant variable
+    'Q000',    # Single quotes found but double quotes preferred
+    'S101',    # Use of assert detected
+]
+
+# Allow fix for all enabled rules (when `--fix`) is provided.
+fixable = ['ALL']
+unfixable = []
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = '^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$'
+
+[lint.mccabe]
+max-complexity = 10
+
+[lint.pylint]
+max-args = 10
+
+[lint.isort]
+known-first-party = ['datahub', 'config']
+
+[format]
+quote-style = 'single'
+indent-style = 'space'
+line-ending = 'lf'
+
+# Respect existing trailing commas as an indication that short lines should not be collapsed.
+skip-magic-trailing-comma = false
+
+# Enable auto-formatting of code examples in docstrings.
+docstring-code-format = true
+# Set the line length used when formatting code snippets in docstrings.
+# 'dynamic' takes indentation into consideration and adheres to global line length limit.
+docstring-code-line-length = 'dynamic'

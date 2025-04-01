@@ -7,7 +7,6 @@ from datahub.omis.invoice import constants
 from datahub.omis.invoice.models import Invoice
 from datahub.omis.order.test.factories import OrderFactory
 
-
 # mark the whole module for db use
 pytestmark = pytest.mark.django_db
 

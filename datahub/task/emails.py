@@ -55,7 +55,7 @@ class EmailTemplate(ABC):
         return self.UTM_URL_BASE.format(self.UTM_CAMPAIGN)
 
     def get_task_fields(self) -> str:
-        """Return a list of all the fields to include, separated by new line"""
+        """Return a list of all the fields to include, separated by new line."""
         return '\n'.join(list(filter(lambda item: item is not None, self.fields_to_include)))
 
     def get_task_subject(self) -> str:

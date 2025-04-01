@@ -3,10 +3,9 @@ import logging
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
 
-from datahub.company.models import Advisor as Adviser, Company
-from datahub.company.models import Contact
-from datahub.company_activity.models import StovaAttendee
-from datahub.company_activity.models import StovaEvent
+from datahub.company.models import Advisor as Adviser
+from datahub.company.models import Company, Contact
+from datahub.company_activity.models import StovaAttendee, StovaEvent
 from datahub.company_activity.tasks.constants import STOVA_ATTENDEE_PREFIX
 from datahub.core.queues.constants import THIRTY_MINUTES_IN_SECONDS
 from datahub.event.models import Event
@@ -14,13 +13,12 @@ from datahub.ingest.boto3 import S3ObjectProcessor
 from datahub.ingest.tasks import BaseObjectIdentificationTask, BaseObjectIngestionTask
 from datahub.interaction.models import Interaction, InteractionDITParticipant
 
-
 logger = logging.getLogger(__name__)
 DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
 
 
 def stova_attendee_identification_task() -> None:
-    """Identifies the most recent file to be ingested and schedules a task to ingest it"""
+    """Identifies the most recent file to be ingested and schedules a task to ingest it."""
     logger.info('Stova attendee identification task started.')
     identification_task = StovaAttendeeIdentificationTask(
         prefix=STOVA_ATTENDEE_PREFIX,
@@ -31,7 +29,7 @@ def stova_attendee_identification_task() -> None:
 
 
 def stova_attendee_ingestion_task(object_key: str) -> None:
-    """Ingest the given key (file) from S3"""
+    """Ingest the given key (file) from S3."""
     logger.info(f'Stova attendee ingestion task started for file {object_key}.')
     ingestion_task = StovaAttendeeIngestionTask(
         object_key=object_key,
@@ -59,8 +57,7 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
         return True
 
     def ingest_object(self) -> None:
-        """
-        Overriden to run queries only required once per ingestion rather than per record inside
+        """Overriden to run queries only required once per ingestion rather than per record inside
         the ingestion.
         """
         if not self.existing_ids:
@@ -72,8 +69,7 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
 
     @staticmethod
     def _required_fields() -> list:
-        """
-        Returns a list of fields required for to make a StovaAttendee a Data Hub Contact.
+        """Returns a list of fields required for to make a StovaAttendee a Data Hub Contact.
         Any fields listed here but not provided by Stova will be rejected from ingestion.
 
         :return: Required fields to save a StovaAttendee.
@@ -89,8 +85,7 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
 
     @transaction.atomic
     def _process_record(self, record: dict) -> None:
-        """
-        Processes a single stova attendee from the S3 Bucket and saves it to the `StovaAttendee`
+        """Processes a single stova attendee from the S3 Bucket and saves it to the `StovaAttendee`
         model. It also attempts to match the contact and company from the given fields and if no
         match is found it creates them.
 
@@ -160,8 +155,7 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
         contact: Contact,
         event: StovaEvent,
     ) -> None:
-        """
-        Creates the Stova Assignee only if it matches a Stova Event.
+        """Creates the Stova Assignee only if it matches a Stova Event.
 
         :param values: A dictionary of cleaned values from an ingested stova attendee record.
         :param company: `Company` object which the assignee belongs to.
@@ -202,8 +196,7 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
 
     @staticmethod
     def get_or_create_company(values: dict, stova_event: StovaEvent) -> Company | None:
-        """
-        Attempts to find an existing `Company` from the attendees company name, if one does not
+        """Attempts to find an existing `Company` from the attendees company name, if one does not
         exist create a new one.
 
         Attendees from Stova do not have a country associated with them. Attendees can create
@@ -250,8 +243,7 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
 
     @staticmethod
     def get_or_create_contact(values: dict, company: Company) -> Contact | None:
-        """
-        Attempts to find an existing `Contact` from the attendees email and company, if one does
+        """Attempts to find an existing `Contact` from the attendees email and company, if one does
         not exist create a new one.
 
         :param values: A dictionary of cleaned values from an ingested stova attendee record.
@@ -280,8 +272,7 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
 
     @staticmethod
     def get_or_create_default_stova_adviser() -> Adviser:
-        """
-        Get or create a default fake Adviser in order to create interactions for Stova Attendees.
+        """Get or create a default fake Adviser in order to create interactions for Stova Attendees.
         """
         adviser, _ = Adviser.objects.get_or_create(
             email='stova_default@businessandtrade.gov.uk',
@@ -299,8 +290,7 @@ class StovaAttendeeIngestionTask(BaseObjectIngestionTask):
         datahub_event: Event,
         adviser: Adviser,
     ) -> Interaction | None:
-        """
-        Creates an `Interaction` for the contact, company and event.
+        """Creates an `Interaction` for the contact, company and event.
 
         Business Logic:
         To show as an attendee of an `Event` on Data Hub, you must be a `Contact` and be listed as

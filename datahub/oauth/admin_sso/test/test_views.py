@@ -19,7 +19,7 @@ pytestmark = pytest.mark.django_db
 
 
 @patch('datahub.oauth.admin_sso.views.token_urlsafe')
-def test_login_view_redirects_to_sso_auth_url(_token_urlsafe):
+def test_login_view_redirects_to_sso_auth_url(_token_urlsafe):  # noqa: PT019
     """Tests that login view redirects to Staff SSO Auth URL."""
     _token_urlsafe.return_value = 'aZFsiJfbDLF9bwve8f2HTBeC1rCnhFUn4K6c_iq-wLo'
 
@@ -56,10 +56,10 @@ def test_login_view_redirects_with_next_url():
 
 @pytest.mark.parametrize(
     'dangerous_redirect',
-    (
+    [
         'https://external-dangerous-website/protected-area',
         'javascript:alert("Meow!")',
-    ),
+    ],
 )
 def test_login_view_validates_next_url(dangerous_redirect):
     """Tests that login view checks redirect URLs for safety."""
@@ -101,9 +101,7 @@ def test_callback_without_state():
 
 
 def test_callback_without_state_includes_next_url():
-    """
-    Test that a callback without provided state will restart login process including next URL.
-    """
+    """Test that a callback without provided state will restart login process including next URL."""
     request = get_request_with_session('/oauth/callback/?next=/protected-area')
 
     response = callback(request)
@@ -170,11 +168,11 @@ def test_callback_requests_sso_profile_no_user(get_sso_user_profile, get_access_
 @patch('datahub.oauth.admin_sso.views.get_sso_user_profile')
 @pytest.mark.parametrize(
     'flags',
-    (
+    [
         {'is_staff': False, 'is_active': True},
         {'is_staff': True, 'is_active': False},
         {'is_staff': False, 'is_active': False},
-    ),
+    ],
 )
 def test_callback_requests_sso_profile_valid_non_staff_user(
     get_sso_user_profile,
@@ -182,8 +180,7 @@ def test_callback_requests_sso_profile_valid_non_staff_user(
     flags,
     caplog,
 ):
-    """
-    Test that if SSO user has a matching SSO email user ID,
+    """Test that if SSO user has a matching SSO email user ID,
     but Data Hub user has `is_staff` or `is_active`
     flag not set, then the access is forbidden.
     """
@@ -208,8 +205,7 @@ def test_callback_requests_sso_profile_valid_non_staff_user(
 @patch('datahub.oauth.admin_sso.views.get_access_token')
 @patch('datahub.oauth.admin_sso.views.get_sso_user_profile')
 def test_callback_requests_valid_sso_profile(get_sso_user_profile, get_access_token):
-    """
-    Test that if SSO user has a matching SSO email user id (and relevant flags),
+    """Test that if SSO user has a matching SSO email user id (and relevant flags),
     then the access is granted.
     """
     fake_state_id = token_urlsafe(settings.ADMIN_OAUTH2_TOKEN_BYTE_LENGTH)
@@ -256,10 +252,10 @@ def test_callback_redirects_to_next_url(get_sso_user_profile, get_access_token):
 @patch('datahub.oauth.admin_sso.views.get_sso_user_profile')
 @pytest.mark.parametrize(
     'dangerous_redirect',
-    (
+    [
         'https://external-dangerous-website/protected-area',
         'javascript:alert("Meow!")',
-    ),
+    ],
 )
 def test_callback_validates_next_url(get_sso_user_profile, get_access_token, dangerous_redirect):
     """Test that successful login redirects user to `next_url`."""

@@ -36,7 +36,7 @@ class TestAddServiceDelivery(APITestMixin):
     @freeze_time('2017-04-18 13:25:30.986208')
     @pytest.mark.parametrize(
         'extra_data',
-        (
+        [
             # non-event service delivery
             {
                 'is_event': False,
@@ -76,7 +76,7 @@ class TestAddServiceDelivery(APITestMixin):
                 'is_event': False,
                 'status': Interaction.Status.DRAFT,
             },
-        ),
+        ],
     )
     def test_add(self, extra_data):
         """Test add a new service delivery."""
@@ -193,8 +193,8 @@ class TestAddServiceDelivery(APITestMixin):
         }
 
     @pytest.mark.parametrize(
-        'data,errors',
-        (
+        ('data', 'errors'),
+        [
             # required fields
             (
                 {
@@ -506,7 +506,7 @@ class TestAddServiceDelivery(APITestMixin):
                     ],
                 },
             ),
-        ),
+        ],
     )
     def test_validation(self, data, errors):
         """Test validation errors."""

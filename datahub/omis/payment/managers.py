@@ -14,8 +14,7 @@ class BasePaymentGatewaySessionManager(models.Manager):
     """Custom Payment Gateway Session Manager."""
 
     def create_from_order(self, order, attrs=None):
-        """
-        :param order: Order instance for this payment gateway session
+        """:param order: Order instance for this payment gateway session
         :param attrs: dict with any extra property to be set on the object
 
         :returns: Payment Gateway Session instance created
@@ -70,8 +69,7 @@ class PaymentGatewaySessionQuerySet(models.QuerySet):
     """Custom Payment Gateway Session QuerySet."""
 
     def ongoing(self):
-        """
-        :returns: only non-finished sessions
+        """:returns: only non-finished sessions
         """
         return self.filter(
             status__in=[
@@ -92,8 +90,7 @@ class PaymentManager(models.Manager):
     """Custom Payment Manager."""
 
     def create_from_order(self, order, by, attrs):
-        """
-        :param order: Order instance for this payment
+        """:param order: Order instance for this payment
         :param by: the Advisor who made the action
         :param attrs: attributes for the payment
 

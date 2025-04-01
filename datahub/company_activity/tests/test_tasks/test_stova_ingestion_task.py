@@ -1,13 +1,11 @@
 import gzip
 import json
 import logging
-
 from datetime import datetime
 from unittest import mock
 
 import boto3
 import pytest
-
 from django.test import override_settings
 from moto import mock_aws
 from sentry_sdk import init
@@ -16,9 +14,9 @@ from sentry_sdk.transport import Transport
 from datahub.company_activity.models import StovaEvent
 from datahub.company_activity.tasks.constants import BUCKET, REGION, STOVA_EVENT_PREFIX
 from datahub.company_activity.tasks.ingest_stova_events import (
+    StovaEventIngestionTask,
     stova_event_identification_task,
     stova_event_ingestion_task,
-    StovaEventIngestionTask,
 )
 from datahub.company_activity.tests.factories import (
     StovaEventFactory,
@@ -28,9 +26,7 @@ from datahub.ingest.models import IngestedObject
 
 @pytest.fixture
 def test_file():
-    filepath = (
-        'datahub/company_activity/tests/test_tasks/fixtures/stova/stovaEventFake2.jsonl.gz'
-    )
+    filepath = 'datahub/company_activity/tests/test_tasks/fixtures/stova/stovaEventFake2.jsonl.gz'
     return open(filepath, 'rb')
 
 
@@ -111,13 +107,11 @@ class MockSentryTransport(Transport):
 
 @pytest.mark.django_db
 class TestStovaIngestionTasks:
-
     @mock_aws
     @override_settings(S3_LOCAL_ENDPOINT_URL=None)
     def test_stova_data_file_ingestion(self, caplog, test_file, test_file_path):
-        """
-        Test that a Aventri/Stova data file is ingested correctly and the ingested file
-        is added to the IngestedObject table
+        """Test that a Aventri/Stova data file is ingested correctly and the ingested file
+        is added to the IngestedObject table.
         """
         initial_stova_activity_count = StovaEvent.objects.count()
         initial_ingested_count = IngestedObject.objects.count()
@@ -135,9 +129,7 @@ class TestStovaIngestionTasks:
     @mock_aws
     @override_settings(S3_LOCAL_ENDPOINT_URL=None)
     def test_skip_previously_ingested_records(self, test_file_path, test_base_stova_event):
-        """
-        Test that we skip updating records that have already been ingested
-        """
+        """Test that we skip updating records that have already been ingested."""
         StovaEventFactory(stova_event_id=123456789)
         data = test_base_stova_event
         data['id'] = 123456789
@@ -154,23 +146,19 @@ class TestStovaIngestionTasks:
     @mock_aws
     @override_settings(S3_LOCAL_ENDPOINT_URL=None)
     def test_invalid_file(self, test_file_path):
-        """
-        Test that an exception is raised when the file is not valid
-        """
+        """Test that an exception is raised when the file is not valid."""
         mock_transport = MockSentryTransport()
         init(transport=mock_transport)
         setup_s3_bucket(BUCKET)
-        with pytest.raises(Exception) as e:
+        with pytest.raises(Exception) as e:  # noqa: PT011
             stova_event_ingestion_task(test_file_path)
         exception = e.value.args[0]
         assert 'The specified key does not exist' in exception
-        expected = "key: 'data-flow/exports/ExportAventriEvents/" 'stovaEventFake2.jsonl.gz'
+        expected = "key: 'data-flow/exports/ExportAventriEvents/stovaEventFake2.jsonl.gz"
         assert expected in exception
 
     def test_stova_event_fields_are_saved(self, test_base_stova_event):
-        """
-        Test that the ingested stova event fields are saved to the StovaEvent model.
-        """
+        """Test that the ingested stova event fields are saved to the StovaEvent model."""
         s3_processor_mock = mock.Mock()
         task = StovaEventIngestionTask('dummy-prefix', s3_processor_mock)
         data = test_base_stova_event
@@ -188,7 +176,9 @@ class TestStovaIngestionTasks:
             assert model_value == file_value
 
     def test_stova_event_fields_with_duplicate_attendee_ids_in_db(
-        self, caplog, test_base_stova_event,
+        self,
+        caplog,
+        test_base_stova_event,
     ):
         """Test already ingested records to do pass the `_should_process_record` check."""
         s3_processor_mock = mock.Mock()
@@ -205,11 +195,11 @@ class TestStovaIngestionTasks:
             ) in caplog.text
 
     def test_stova_event_fields_with_duplicate_attendee_ids_in_json(
-        self, caplog, test_base_stova_event,
+        self,
+        caplog,
+        test_base_stova_event,
     ):
-        """
-        Tests records which have duplicate IDs should have errors logged.
-        """
+        """Tests records which have duplicate IDs should have errors logged."""
         s3_processor_mock = mock.Mock()
         task = StovaEventIngestionTask('dummy-prefix', s3_processor_mock)
 
@@ -225,8 +215,7 @@ class TestStovaIngestionTasks:
             )
 
     def test_stova_event_ingestion_handles_unexpected_fields(self, caplog, test_base_stova_event):
-        """
-        Test that if they rows from stova contain data in an unexpected data type these are handled
+        """Test that if they rows from stova contain data in an unexpected data type these are handled
         and logged.
         Also assert the errored field is displayed.
         """
@@ -250,18 +239,20 @@ class TestStovaIngestionTasks:
 
     @pytest.mark.parametrize(
         'required_field',
-        (
+        [
             'id',
             'name',
             'location_address1',
             'location_city',
-        ),
+        ],
     )
     def test_stova_event_ingestion_rejects_event_if_missing_required_fields(
-        self, caplog, test_base_stova_event, required_field,
+        self,
+        caplog,
+        test_base_stova_event,
+        required_field,
     ):
-        """
-        Some fields are required by Data Hub events, if a Stova Event does not provide these fields
+        """Some fields are required by Data Hub events, if a Stova Event does not provide these fields
         the stova event will not be ingested.
         """
         s3_processor_mock = mock.Mock()
@@ -283,19 +274,20 @@ class TestStovaIngestionTasks:
 
     @pytest.mark.parametrize(
         'null_field',
-        (
+        [
             'location_address2',
             'location_address3',
             'location_state',
             'location_postcode',
             'description',
-        ),
+        ],
     )
     def test_stova_event_ingestion_converts_null_fields_to_empty_string(
-        self, test_base_stova_event, null_field,
+        self,
+        test_base_stova_event,
+        null_field,
     ):
-        """
-        Some fields are required to be an empty string by Data Hub Events, they do not accept
+        """Some fields are required to be an empty string by Data Hub Events, they do not accept
         null values.
         """
         s3_processor_mock = mock.Mock()

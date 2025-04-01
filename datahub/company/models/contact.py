@@ -6,7 +6,7 @@ from django.utils.timezone import now
 
 from datahub.core import reversion
 from datahub.core.models import ArchivableModel, BaseModel
-from datahub.core.utils import get_front_end_url, join_truthy_strings, StrEnum
+from datahub.core.utils import StrEnum, get_front_end_url, join_truthy_strings
 from datahub.core.validators import (
     InternationalTelephoneValidator,
 )
@@ -25,13 +25,10 @@ class ContactPermission(StrEnum):
 
 @reversion.register_base_model()
 class Contact(ArchivableModel, BaseModel):
-    """
-    Contact (a person at a company that DIT has had contact with).
-    """
+    """Contact (a person at a company that DIT has had contact with)."""
 
     class Source(models.TextChoices):
-        """
-        Where the Contact was created from. Whether it was created on Data Hub or through
+        """Where the Contact was created from. Whether it was created on Data Hub or through
         ingestion tasks from sources such as Great, Stova etc.
         """
 
@@ -62,7 +59,7 @@ class Contact(ArchivableModel, BaseModel):
     )
     first_name = models.CharField(max_length=MAX_LENGTH)
     last_name = models.CharField(max_length=MAX_LENGTH)
-    job_title = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    job_title = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)  # noqa: DJ001
     company = models.ForeignKey(
         'Company',
         related_name='contacts',
@@ -86,10 +83,10 @@ class Contact(ArchivableModel, BaseModel):
     )
     email = models.EmailField()
     address_same_as_company = models.BooleanField(default=False)
-    address_1 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
-    address_2 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
-    address_town = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
-    address_county = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+    address_1 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)  # noqa: DJ001
+    address_2 = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)  # noqa: DJ001
+    address_town = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)  # noqa: DJ001
+    address_county = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)  # noqa: DJ001
     address_country = models.ForeignKey(
         metadata_models.Country,
         null=True,
@@ -103,8 +100,8 @@ class Contact(ArchivableModel, BaseModel):
         null=True,
         on_delete=models.SET_NULL,
     )
-    address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
-    notes = models.TextField(null=True, blank=True)
+    address_postcode = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)  # noqa: DJ001
+    notes = models.TextField(null=True, blank=True)  # noqa: DJ001
     archived_documents_url_path = models.CharField(
         max_length=MAX_LENGTH,
         blank=True,
@@ -119,7 +116,7 @@ class Contact(ArchivableModel, BaseModel):
         related_name='transferred_from',
         help_text='Where data about this contact was transferred to.',
     )
-    transfer_reason = models.CharField(
+    transfer_reason = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         blank=True,
         null=True,
@@ -183,8 +180,7 @@ class Contact(ArchivableModel, BaseModel):
         return join_truthy_strings(getattr(self.title, 'name', None), self.name)
 
     def mark_as_transferred(self, to, reason, user):
-        """
-        Marks a contact record as having been transferred to another contact record.
+        """Marks a contact record as having been transferred to another contact record.
         This is used, for example, for marking a contact as a duplicate record.
         """
         self.modified_by = user

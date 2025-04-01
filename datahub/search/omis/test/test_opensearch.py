@@ -485,13 +485,13 @@ def test_mapping(opensearch):
 
 @pytest.mark.parametrize(
     'order_factory',
-    (
+    [
         OrderFactory,
         OrderWithAcceptedQuoteFactory,
         OrderCancelledFactory,
         OrderCompleteFactory,
         OrderPaidFactory,
-    ),
+    ],
 )
 def test_indexed_doc(order_factory, opensearch):
     """Test the OpenSearch data of an indexed order."""

@@ -1,6 +1,7 @@
 from django.db.models import Max
 
-from datahub.company.models import Company as DBCompany, CompanyPermission
+from datahub.company.models import Company as DBCompany
+from datahub.company.models import CompanyPermission
 from datahub.core.query_utils import get_aggregate_subquery
 from datahub.search.apps import SearchApp
 from datahub.search.company.models import Company

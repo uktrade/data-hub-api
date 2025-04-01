@@ -32,7 +32,6 @@ from datahub.interaction.serializers import InteractionSerializer
 from datahub.metadata.models import ExportBarrierType, Service, Team
 from datahub.metadata.query_utils import get_service_name_subquery
 
-
 OBJECT_DISABLED_MESSAGE = gettext_lazy('This option is disabled.')
 ADVISER_NOT_FOUND_MESSAGE = gettext_lazy(
     'An active adviser could not be found with the specified name.',
@@ -85,8 +84,7 @@ class CSVRowError(NamedTuple):
 
     @property
     def display_source_row(self):
-        """
-        Returns the source row number for displaying to the user.
+        """Returns the source row number for displaying to the user.
 
         This adds 2 to source_row:
 
@@ -229,8 +227,7 @@ class InteractionCSVRowForm(forms.Form):
         return self.is_valid() and self.is_matched()
 
     def is_matched(self):
-        """
-        Returns whether the interaction was matched to a contact.
+        """Returns whether the interaction was matched to a contact.
 
         Can only be called post-cleaning.
         """
@@ -282,8 +279,7 @@ class InteractionCSVRowForm(forms.Form):
         return data
 
     def full_clean(self):
-        """
-        Performs full validation, additionally performing validation using the validators
+        """Performs full validation, additionally performing validation using the validators
         from InteractionSerializer if the interaction was matched to a contact.
 
         Errors are mapped to CSV fields where possible. If not possible, they are
@@ -464,8 +460,7 @@ class InteractionCSVRowForm(forms.Form):
             )
 
     def cleaned_data_as_serializer_dict(self):
-        """
-        Transforms cleaned data into a dict suitable for use with the validators from
+        """Transforms cleaned data into a dict suitable for use with the validators from
         InteractionSerializer.
         """
         data = self.cleaned_data

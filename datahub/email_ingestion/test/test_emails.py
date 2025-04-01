@@ -16,28 +16,22 @@ CONTENT = 'aaaaaaa'
 TOKEN = 'token'
 
 
-@pytest.fixture()
+@pytest.fixture
 def mailbox_ingestion_feature_flag():
-    """
-    Creates the email ingestion feature flag.
-    """
-    yield FeatureFlagFactory(code=MAILBOX_INGESTION_FEATURE_FLAG_NAME)
+    """Creates the email ingestion feature flag."""
+    return FeatureFlagFactory(code=MAILBOX_INGESTION_FEATURE_FLAG_NAME)
 
 
 @pytest.mark.django_db
 class TestMailbox:
-    """
-    Test the mailbox module.
-    """
+    """Test the mailbox module."""
 
     @override_settings(
         MAILBOX_INGESTION_TENANT_ID='tenant',
         MAILBOX_INGESTION_EMAIL='test@email',
     )
     def test_mailbox_process_ingestion_emails(self, requests_mock, monkeypatch):
-        """
-        Tests processing of emails.
-        """
+        """Tests processing of emails."""
         tenant_id = settings.MAILBOX_INGESTION_TENANT_ID
         token_mock = requests_mock.post(
             f'https://login.microsoftonline.com/{tenant_id}/oauth2/v2.0/token',
@@ -87,9 +81,7 @@ class TestMailbox:
         assert log[0].interaction_id == interaction.id
 
     def test_mailbox_process_ingestion_emails_fails_processing(self, monkeypatch):
-        """
-        Tests processing of emails.
-        """
+        """Tests processing of emails."""
         mock_token = mock.Mock(return_value=TOKEN)
         mock_query = mock.Mock(return_value=MESSAGES)
         mock_content = mock.Mock(return_value=CONTENT)
@@ -122,9 +114,7 @@ class TestMailbox:
         assert log[0].interaction is None
 
     def test_mailbox_process_ingestion_emails_exception_when_processing(self, monkeypatch):
-        """
-        Tests processing of emails when exception happens.
-        """
+        """Tests processing of emails when exception happens."""
         mock_token = mock.Mock(return_value=TOKEN)
         mock_query = mock.Mock(return_value=MESSAGES)
         mock_content = mock.Mock(return_value=CONTENT)
@@ -166,9 +156,7 @@ class TestMailbox:
         monkeypatch,
         caplog,
     ):
-        """
-        Tests processing of emails when delete fails.
-        """
+        """Tests processing of emails when delete fails."""
         caplog.set_level('ERROR')
         tenant_id = settings.MAILBOX_INGESTION_TENANT_ID
         token_mock = requests_mock.post(
@@ -205,7 +193,7 @@ class TestMailbox:
         assert delete_mock.called_once
         assert content_mock.called_once
         assert token_mock.called_once
-        mock_process.assert_not_called
+        mock_process.assert_not_called()
 
         log = MailboxLogging.objects.all()
         assert not log.exists()
@@ -217,9 +205,7 @@ class TestMailbox:
         MAILBOX_INGESTION_EMAIL='test@email',
     )
     def test_mailbox_process_ingestion_emails_no_message(self, requests_mock, monkeypatch, caplog):
-        """
-        Tests processing of emails and fail to fetch message.
-        """
+        """Tests processing of emails and fail to fetch message."""
         tenant_id = settings.MAILBOX_INGESTION_TENANT_ID
         token_mock = requests_mock.post(
             f'https://login.microsoftonline.com/{tenant_id}/oauth2/v2.0/token',
@@ -253,7 +239,7 @@ class TestMailbox:
         )
 
         emails.process_ingestion_emails()
-        mock_process.assert_not_called
+        mock_process.assert_not_called()
 
         assert messages_mock.called_once
         assert delete_mock.call_count == 0

@@ -1,7 +1,7 @@
 from logging import getLogger
 
 from django.apps import apps
-from django.db.models import Exists, NOT_PROVIDED, OuterRef, Subquery
+from django.db.models import NOT_PROVIDED, Exists, OuterRef, Subquery
 from django.db.transaction import atomic
 from django_pglocks import advisory_lock
 
@@ -12,8 +12,7 @@ logger = getLogger(__name__)
 
 
 def replace_null_with_default(model_label, field_name, default=None, batch_size=5000):
-    """
-    Task that replaces NULL values for a model field with the default argument if specified
+    """Task that replaces NULL values for a model field with the default argument if specified
     or the field's default value otherwise.
 
     This is designed to perform updates in small batches to avoid lengthy locks on a large
@@ -72,8 +71,7 @@ def copy_foreign_key_to_m2m_field(
     target_m2m_field_name,
     batch_size=5000,
 ):
-    """
-    Task that copies non-null values from a foreign key to a to-many field (for objects where the
+    """Task that copies non-null values from a foreign key to a to-many field (for objects where the
     to-many field is empty).
 
     Usage example:
@@ -129,8 +127,7 @@ def _copy_foreign_key_to_m2m_field(
     target_m2m_field_name,
     batch_size=5000,
 ):
-    """
-    The main logic for the copy_foreign_key_to_m2m_field task.
+    """The main logic for the copy_foreign_key_to_m2m_field task.
 
     Processes a single batch in a transaction.
     """
@@ -182,8 +179,7 @@ def copy_export_countries_to_company_export_country_model(
     status,
     batch_size=5000,
 ):
-    """
-    Task that copies all export countries from Company model to CompanyExportCountry
+    """Task that copies all export countries from Company model to CompanyExportCountry.
     """
     key_switch = {
         'future_interest': 'future_interest_countries',
@@ -208,9 +204,8 @@ def copy_export_countries_to_company_export_country_model(
 
 @atomic
 def _copy_export_countries(key, status, batch_size):
-    """
-    Main logic for copying export companies from Company model to
-    CompanyExportCountry one
+    """Main logic for copying export companies from Company model to
+    CompanyExportCountry one.
     """
     export_countries = _get_company_countries(key, status, batch_size)
     num_updated = _copy_company_countries(

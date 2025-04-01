@@ -20,8 +20,7 @@ def shut_down_thread_pool():
 
 
 def _submit_to_thread_pool(fn, *args, **kwargs):
-    """
-    Implementation of submit_to_thread_pool().
+    """Implementation of submit_to_thread_pool().
 
     Gives tests a centralised place to patch task submission for synchronous execution.
     """
@@ -29,8 +28,7 @@ def _submit_to_thread_pool(fn, *args, **kwargs):
 
 
 def _make_thread_pool_task(fn, *args, **kwargs):
-    """
-    Wraps a task with exception handling and old- and broken-connection clean-up.
+    """Wraps a task with exception handling and old- and broken-connection clean-up.
 
     close_old_connections() is called both before and after the execution of the task to mimic
     what Django does with requests.

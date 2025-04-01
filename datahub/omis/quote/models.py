@@ -9,8 +9,7 @@ from datahub.omis.quote.managers import QuoteManager
 
 
 class TermsAndConditions(models.Model):
-    """
-    Terms an conditions for the quote.
+    """Terms an conditions for the quote.
 
     When a quote is created, the latest (-created_on:first) version of
     terms and conditions should be used.
@@ -39,7 +38,7 @@ class TermsAndConditions(models.Model):
         verbose_name_plural = 'terms and conditions'
 
     def __str__(self):
-        """Human-readable representation"""
+        """Human-readable representation."""
         return self.name
 
 
@@ -80,8 +79,7 @@ class Quote(BaseModel):
         db_table = 'omis-quote_quote'
 
     def cancel(self, by):
-        """
-        Cancel the current quote.
+        """Cancel the current quote.
 
         :param by: the adviser who is cancelling the quote
         """
@@ -93,8 +91,7 @@ class Quote(BaseModel):
         self.save()
 
     def accept(self, by):
-        """
-        Accepts the current quote.
+        """Accepts the current quote.
 
         :param by: the contact who is accepting the quote
         """
@@ -108,17 +105,15 @@ class Quote(BaseModel):
         self.save()
 
     def is_cancelled(self):
-        """
-        :returns: True if this quote is cancelled, False otherwise.
+        """:returns: True if this quote is cancelled, False otherwise.
         """
         return self.cancelled_on
 
     def is_accepted(self):
-        """
-        :returns: True if this quote has been accepted, False otherwise.
+        """:returns: True if this quote has been accepted, False otherwise.
         """
         return self.accepted_on
 
     def __str__(self):
-        """Human-readable representation"""
+        """Human-readable representation."""
         return self.reference

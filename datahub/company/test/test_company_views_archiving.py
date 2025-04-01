@@ -35,8 +35,7 @@ class TestArchiveCompany(APITestMixin):
         assert response_data['id'] == str(company.id)
 
     def test_archive_company_invalid_address(self):
-        """
-        Test archiving a company when the company has an invalid address and a
+        """Test archiving a company when the company has an invalid address and a
         missing UK region.
         """
         company = CompanyFactory(
@@ -57,8 +56,7 @@ class TestUnarchiveCompany(APITestMixin):
     """Unarchive company tests."""
 
     def test_unarchive_company_invalid_address(self):
-        """
-        Test unarchiving a company when the company has an invalid address and
+        """Test unarchiving a company when the company has an invalid address and
         a missing UK region.
         """
         company = CompanyFactory(

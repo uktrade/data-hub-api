@@ -72,8 +72,7 @@ class BaseSubscriptionViewset(
     permission_classes = ()
 
     def get_object(self):
-        """
-        Gets subscription settings instance for current user.
+        """Gets subscription settings instance for current user.
 
         If settings have not been created yet, add them.
         """
@@ -138,8 +137,7 @@ def reminder_subscription_summary_view(request):
     """Returns the reminder subscription summary."""
 
     def get_object(queryset):
-        """
-        Gets subscription settings instance for current user.
+        """Gets subscription settings instance for current user.
 
         If settings have not been created yet, add them.
         """

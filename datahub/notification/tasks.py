@@ -3,7 +3,6 @@ from rq import get_current_job
 
 from datahub.core.queues.job_scheduler import job_scheduler
 from datahub.core.queues.scheduler import LONG_RUNNING_QUEUE
-
 from datahub.notification.core import notify_gateway
 
 
@@ -15,8 +14,7 @@ def schedule_send_email_notification(
     *args,
     **kwargs,
 ):
-    """
-    Task to schedule send_email_notification with RQ.
+    """Task to schedule send_email_notification with RQ.
     """
     job = job_scheduler(
         queue_name=LONG_RUNNING_QUEUE,
@@ -38,10 +36,9 @@ def send_email_notification(
     context=None,
     notify_service_name=None,
 ):
-    """
-    Call the notify API to send a templated email notification
+    """Call the notify API to send a templated email notification
     to an email address.
-    To schedule with RQ call schedule_send_email_notification(...)
+    To schedule with RQ call schedule_send_email_notification(...).
     """
     try:
         response = notify_gateway.send_email_notification(

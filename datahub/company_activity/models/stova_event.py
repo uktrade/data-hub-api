@@ -9,9 +9,8 @@ from datahub.metadata.utils import get_country_by_country_name
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
-class StovaEvent(models.Model):
-    """
-    Stova can also be known as Aventri.
+class StovaEvent(models.Model):  # noqa: DJ008
+    """Stova can also be known as Aventri.
 
     This model is filled and based off data from the S3 bucket: ExportAventriEvents
     """
@@ -27,13 +26,13 @@ class StovaEvent(models.Model):
     modified_by = models.CharField(max_length=MAX_LENGTH, blank=True, default='')
 
     client_contact = models.CharField(max_length=MAX_LENGTH, blank=True, default='')
-    contact_info = models.TextField(blank=True, default='', null=True)
+    contact_info = models.TextField(blank=True, default='', null=True)  # noqa: DJ001
 
-    country = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
-    city = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
-    state = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
-    timezone = models.CharField(max_length=MAX_LENGTH, blank=True, null=True, default='')
-    url = models.TextField(blank=True, null=True)
+    country = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)  # noqa: DJ001
+    city = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)  # noqa: DJ001
+    state = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)  # noqa: DJ001
+    timezone = models.CharField(max_length=MAX_LENGTH, blank=True, null=True, default='')  # noqa: DJ001
+    url = models.TextField(blank=True, null=True)  # noqa: DJ001
     max_reg = models.IntegerField(null=True, blank=True)
 
     created_date = models.DateTimeField()
@@ -44,12 +43,12 @@ class StovaEvent(models.Model):
     end_date = models.DateTimeField(null=True, blank=True)
 
     location_state = models.CharField(max_length=MAX_LENGTH, blank=True)
-    location_country = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)
+    location_country = models.CharField(max_length=MAX_LENGTH, blank=True, null=True)  # noqa: DJ001
     location_address1 = models.CharField(max_length=MAX_LENGTH)
     location_address2 = models.CharField(max_length=MAX_LENGTH, blank=True)
     location_address3 = models.CharField(max_length=MAX_LENGTH, blank=True)
     location_city = models.CharField(max_length=MAX_LENGTH)
-    location_name = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)
+    location_name = models.CharField(max_length=MAX_LENGTH, null=True, blank=True)  # noqa: DJ001
     location_postcode = models.CharField(max_length=MAX_LENGTH, blank=True)
 
     approval_required = models.BooleanField()
@@ -90,8 +89,7 @@ class StovaEvent(models.Model):
 
     @staticmethod
     def get_stova_event_service_id() -> str:
-        """
-        The frontend expects a service which we don't get from Stova. This service is created for
+        """The frontend expects a service which we don't get from Stova. This service is created for
         ingested stova events called "Stova Event Service". These service are metadata created in
         migrations files so we can guarantee it exists before the application is run.
 
@@ -101,8 +99,7 @@ class StovaEvent(models.Model):
 
     @staticmethod
     def get_or_create_stova_event_type() -> EventType:
-        """
-        Returns or creates an `EventType`.
+        """Returns or creates an `EventType`.
 
         DataHub events require an event type which is not provided by Stova. Therefore, all events
         ingested from Stova will be given the below event type by default.

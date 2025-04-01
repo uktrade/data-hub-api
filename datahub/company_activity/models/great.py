@@ -3,7 +3,6 @@ import uuid
 from django.conf import settings
 from django.db import models, transaction
 
-
 from datahub.company.models.company import Company
 from datahub.company.models.contact import Contact
 from datahub.company_activity.models import CompanyActivity
@@ -14,9 +13,8 @@ MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
 @reversion.register_base_model()
-class GreatExportEnquiry(models.Model):
-    """
-    GreatGovUkForms Export Enquiry data model
+class GreatExportEnquiry(models.Model):  # noqa: DJ008
+    """GreatGovUkForms Export Enquiry data model.
 
     In Data Workspace these are saved as 3 JSON objects in Postgres (Meta, Data, Actor).
     For the most part we don't validate values as they could be changed without us knowing
@@ -103,11 +101,11 @@ class GreatExportEnquiry(models.Model):
     data_help_us_improve = models.CharField(max_length=MAX_LENGTH)
 
     actor_id = models.IntegerField(null=True)
-    actor_type = models.CharField(max_length=MAX_LENGTH, null=True)
-    actor_dit_email_address = models.CharField(max_length=MAX_LENGTH, null=True)
+    actor_type = models.CharField(max_length=MAX_LENGTH, null=True)  # noqa: DJ001
+    actor_dit_email_address = models.CharField(max_length=MAX_LENGTH, null=True)  # noqa: DJ001
     actor_dit_is_blacklisted = models.BooleanField(null=True)
     actor_dit_is_whitelisted = models.BooleanField(null=True)
-    actor_dit_blacklisted_reason = models.CharField(max_length=MAX_LENGTH, null=True)
+    actor_dit_blacklisted_reason = models.CharField(max_length=MAX_LENGTH, null=True)  # noqa: DJ001
 
     form_created_at = models.DateTimeField()
     actor_email = models.CharField(max_length=MAX_LENGTH)

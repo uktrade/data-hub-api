@@ -2,14 +2,16 @@ from unittest.mock import Mock
 
 import pytest
 import reversion
-
 from reversion.models import Version
 
 from datahub.company.test.factories import CompanyFactory
 from datahub.core.constants import (
     Country as CountryConstant,
+)
+from datahub.core.constants import (
     InvestmentProjectStage as InvestmentProjectStageConstant,
 )
+
 # from core.models import Country
 from datahub.core.test_utils import random_obj_for_model
 from datahub.investment.project.test.factories import InvestmentProjectFactory
@@ -18,14 +20,12 @@ from datahub.metadata.models import InvestmentBusinessActivity
 
 @pytest.mark.django_db
 class TestUpdateGVAOnBusinessActivitiesM2MChanged:
-    """
-    Tests for the update_gross_value_added_on_project_business_activities_m2m_changed
+    """Tests for the update_gross_value_added_on_project_business_activities_m2m_changed
     signal receiver.
     """
 
     def test_add(self, monkeypatch):
-        """
-        Test that the GVA of a project is updated when a business activity is added to the
+        """Test that the GVA of a project is updated when a business activity is added to the
         project.
         """
         project = InvestmentProjectFactory()
@@ -42,8 +42,7 @@ class TestUpdateGVAOnBusinessActivitiesM2MChanged:
         set_gross_value_added_for_investment_project_mock.assert_called_once_with(project)
 
     def test_remove(self, monkeypatch):
-        """
-        Test that the GVA of a project is updated when a business activity is removed from
+        """Test that the GVA of a project is updated when a business activity is removed from
         the project.
         """
         business_activity = random_obj_for_model(InvestmentBusinessActivity)
@@ -77,13 +76,11 @@ class TestUpdateGVAOnBusinessActivitiesM2MChanged:
 
 @pytest.mark.django_db
 class TestInvestorCompanyUpdate:
-    """
-    Tests for the update_country_investment_originates_from_post_save signal receiver.
+    """Tests for the update_country_investment_originates_from_post_save signal receiver.
     """
 
     def test_update_investor_company_updates_country_of_origin_for_in_progress_project(self):
-        """
-        Test that in progress investment projects' country investment originates from field
+        """Test that in progress investment projects' country investment originates from field
         is updated when corresponding investor company address country is updated.
         """
         investor_company = CompanyFactory(
@@ -112,8 +109,7 @@ class TestInvestorCompanyUpdate:
             )
 
     def test_update_investor_company_doesnt_update_country_of_origin_for_won_project(self):
-        """
-        Test that won investment projects' country investment originates from field
+        """Test that won investment projects' country investment originates from field
         is not updated when corresponding investor company address country is updated.
         """
         investor_company = CompanyFactory(

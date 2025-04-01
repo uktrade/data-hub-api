@@ -23,7 +23,7 @@ from datahub.core.templatetags.datahub_extras import admin_change_link
 
 
 class OneListCoreTeamMemberInline(admin.TabularInline):
-    """Inline admin for OneListCoreTeamMember"""
+    """Inline admin for OneListCoreTeamMember."""
 
     model = OneListCoreTeamMember
     fields = ('id', 'adviser')
@@ -53,10 +53,9 @@ class CompanyAdminForm(forms.ModelForm):
         self.set_trading_names_field_size()
 
     def set_trading_names_field_size(self):
-        """
-        Sets the size of the form field trading_names using the following logic:
+        """Sets the size of the form field trading_names using the following logic.
 
-        given TRADING_NAMES_DEFAULT_FIELD_SIZE as default size
+        Given TRADING_NAMES_DEFAULT_FIELD_SIZE as default size
         the actual array field size for the specific self.instance is:
             n = max(
                 TRADING_NAMES_DEFAULT_FIELD_SIZE,
@@ -79,7 +78,8 @@ class CompanyAdminForm(forms.ModelForm):
 
     class Meta:
         model = Company
-        exclude = []  # fields are specified in CompanyAdmin
+        # fields are specified in CompanyAdmin
+        exclude = []  # noqa: DJ006
 
 
 @admin.register(Company)
@@ -235,8 +235,7 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
     }
 
     def get_form(self, request, obj=None, **kwargs):
-        """
-        Gets the model form used for add and change views.
+        """Gets the model form used for add and change views.
 
         Overridden here to add help text for read-only method fields.
         """
@@ -250,8 +249,7 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
             path(
                 'merge/step-1-select-other-company/',
                 self.admin_site.admin_view(partial(merge_select_other_company, self)),
-                name=f'{model_meta.app_label}_'
-                f'{model_meta.model_name}_merge-select-other-company',
+                name=f'{model_meta.app_label}_{model_meta.model_name}_merge-select-other-company',
             ),
             path(
                 'merge/step-2-select-primary-company/',
@@ -262,27 +260,27 @@ class CompanyAdmin(BaseModelAdminMixin, VersionAdmin):
             path(
                 'merge/step-3-confirm/',
                 self.admin_site.admin_view(partial(confirm_merge_companies, self)),
-                name=f'{model_meta.app_label}_' f'{model_meta.model_name}_merge-confirm',
+                name=f'{model_meta.app_label}_{model_meta.model_name}_merge-confirm',
             ),
             path(
                 'archiving/unarchive-company/',
                 self.admin_site.admin_view(partial(unarchive_company, self)),
-                name=f'{model_meta.app_label}_' f'{model_meta.model_name}_unarchive-company',
+                name=f'{model_meta.app_label}_{model_meta.model_name}_unarchive-company',
             ),
             path(
                 '<path:object_id>/update-from-dnb/',
                 self.admin_site.admin_view(partial(update_from_dnb, self)),
-                name=f'{model_meta.app_label}_' f'{model_meta.model_name}_update-from-dnb',
+                name=f'{model_meta.app_label}_{model_meta.model_name}_update-from-dnb',
             ),
             path(
                 'dnb-link/step-1-select-ids/',
                 self.admin_site.admin_view(partial(dnb_link_select_ids, self)),
-                name=f'{model_meta.app_label}_' f'{model_meta.model_name}_dnb-link-select-ids',
+                name=f'{model_meta.app_label}_{model_meta.model_name}_dnb-link-select-ids',
             ),
             path(
                 'dnb-link/step-2-review-changes/',
                 self.admin_site.admin_view(partial(dnb_link_review_changes, self)),
-                name=f'{model_meta.app_label}_' f'{model_meta.model_name}_dnb-link-review-changes',
+                name=f'{model_meta.app_label}_{model_meta.model_name}_dnb-link-review-changes',
             ),
             *super().get_urls(),
         ]

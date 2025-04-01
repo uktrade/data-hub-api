@@ -6,7 +6,6 @@ from datetime import (
 from unittest import mock
 
 import pytest
-
 from botocore.exceptions import ClientError
 from django.test import override_settings
 from freezegun import freeze_time
@@ -23,7 +22,6 @@ from datahub.ingest.utils import (
     compressed_json_faker,
     upload_objects_to_s3,
 )
-
 
 pytestmark = pytest.mark.django_db
 

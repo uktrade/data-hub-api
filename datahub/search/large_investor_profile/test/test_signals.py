@@ -35,10 +35,10 @@ def test_updated_large_investor_profile_synced(
 
 
 @pytest.mark.parametrize(
-    'investor_profile_factory,expected_in_index,expected_to_call_delete',
-    (
+    ('investor_profile_factory', 'expected_in_index', 'expected_to_call_delete'),
+    [
         (LargeCapitalInvestorProfileFactory, True, True),
-    ),
+    ],
 )
 def test_delete_from_opensearch(
     investor_profile_factory,
@@ -46,8 +46,7 @@ def test_delete_from_opensearch(
     expected_to_call_delete,
     opensearch_with_signals,
 ):
-    """
-    Test that when an large investor profile is deleted from db it is also
+    """Test that when an large investor profile is deleted from db it is also
     calls delete document to delete from OpenSearch.
     """
     investor_profile = investor_profile_factory()

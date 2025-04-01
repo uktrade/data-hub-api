@@ -2,9 +2,9 @@ import uuid
 
 from django.contrib.postgres.fields import ArrayField
 from django.core.validators import (
-    integer_validator,
     MaxLengthValidator,
     MinLengthValidator,
+    integer_validator,
 )
 from django.db import models, transaction
 from mptt.fields import TreeForeignKey
@@ -12,7 +12,6 @@ from mptt.fields import TreeForeignKey
 from datahub.company_activity.models import CompanyActivity
 from datahub.core import reversion
 from datahub.core.models import ArchivableModel
-
 
 CHAR_FIELD_MAX_LENGTH = 256
 
@@ -73,14 +72,20 @@ class EYBLead(InvestmentLead):
         on_delete=models.SET_NULL,
     )
     proposed_investment_city = models.CharField(
-        max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True,
+        max_length=CHAR_FIELD_MAX_LENGTH,
+        default='',
+        blank=True,
     )
     proposed_investment_location_none = models.BooleanField(default=None, null=True, blank=True)
     hiring = models.CharField(
-        max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True,
+        max_length=CHAR_FIELD_MAX_LENGTH,
+        default='',
+        blank=True,
     )
     spend = models.CharField(
-        max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True,
+        max_length=CHAR_FIELD_MAX_LENGTH,
+        default='',
+        blank=True,
     )
     spend_other = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True)
     is_high_value = models.BooleanField(default=None, null=True)
@@ -90,7 +95,7 @@ class EYBLead(InvestmentLead):
     user_created = models.DateTimeField(null=True, blank=True)
     user_modified = models.DateTimeField(null=True, blank=True)
     company_name = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True)
-    duns_number = models.CharField(
+    duns_number = models.CharField(  # noqa: DJ001
         blank=True,
         null=True,
         help_text='Dun & Bradstreet unique identifier. Nine-digit number with leading zeros.',
@@ -114,7 +119,9 @@ class EYBLead(InvestmentLead):
     )
     address_postcode = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True)
     company_website = models.CharField(
-        max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True,
+        max_length=CHAR_FIELD_MAX_LENGTH,
+        default='',
+        blank=True,
     )
     full_name = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True)
     role = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True)
@@ -147,7 +154,9 @@ class EYBLead(InvestmentLead):
 
     # EYB marketing fields
     marketing_hashed_uuid = models.CharField(
-        max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True,
+        max_length=CHAR_FIELD_MAX_LENGTH,
+        default='',
+        blank=True,
     )
     utm_name = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True)
     utm_source = models.CharField(max_length=CHAR_FIELD_MAX_LENGTH, default='', blank=True)
@@ -167,9 +176,7 @@ class EYBLead(InvestmentLead):
         return f'EYB Lead ({shortened_pk}...)'
 
     def save(self, *args, **kwargs):
-        """
-        Creates a CompanyActivity when a EYB Lead is saved
-        """
+        """Creates a CompanyActivity when a EYB Lead is saved."""
         with transaction.atomic():
             super().save(*args, **kwargs)
             if not self.company:
@@ -178,7 +185,8 @@ class EYBLead(InvestmentLead):
                 eyb_lead_id=self.id,
                 activity_source=CompanyActivity.ActivitySource.eyb_lead,
                 defaults={
-                    'date': self.triage_created if self.triage_created is not None
+                    'date': self.triage_created
+                    if self.triage_created is not None
                     else self.created_on,
                     'company_id': self.company_id,
                 },

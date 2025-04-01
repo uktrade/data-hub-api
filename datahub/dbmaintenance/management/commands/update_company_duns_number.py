@@ -6,13 +6,11 @@ from datahub.company.models import Company
 from datahub.dbmaintenance.management.base import CSVBaseCommand
 from datahub.dbmaintenance.utils import parse_limited_string, parse_uuid
 
-
 logger = getLogger(__name__)
 
 
 class Command(CSVBaseCommand):
-    """
-    Command to update Company.duns_number.
+    """Command to update Company.duns_number.
 
     Adds additional logging to show where the duns number update would fail. The duns number is
     unique on the Company model.
@@ -66,8 +64,7 @@ class Command(CSVBaseCommand):
     def is_duns_already_assigned_to_another_company(
         self, company: Company, duns_number: str,
     ) -> bool:
-        """
-        If another company exists with the target duns, this is an issue as duns numbers are
+        """If another company exists with the target duns, this is an issue as duns numbers are
         unique. These are logged individually.
 
         :param company: The source company we want to update.
@@ -107,8 +104,7 @@ class Command(CSVBaseCommand):
         company: Company,
         target_company: Company,
     ) -> bool:
-        """
-        Checks if the source has already been merged into another company with the target duns
+        """Checks if the source has already been merged into another company with the target duns
         number. These companies should not have the duns number updated as they have been marked
         as a duplicate and merged into another company with that company having the correct duns
         number.
@@ -123,8 +119,7 @@ class Command(CSVBaseCommand):
         return False
 
     def is_source_already_merged(self, company: Company) -> bool:
-        """
-        Checks if the source has already been merged into another company. These companies should
+        """Checks if the source has already been merged into another company. These companies should
         not have the duns number updated as they have been marked as a duplicate and merged into
         another company.
 
@@ -137,8 +132,7 @@ class Command(CSVBaseCommand):
         return False
 
     def handle(self, *args, **options):
-        """
-        Process the CSV file and logs some additional logging to help with the company duns update.
+        """Process the CSV file and logs some additional logging to help with the company duns update.
         """
         super().handle(*args, **options)
         logger.info('Errors:')

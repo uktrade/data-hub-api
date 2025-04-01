@@ -1,5 +1,4 @@
 import uuid
-
 from datetime import datetime, timedelta, timezone
 
 import pytest
@@ -15,7 +14,6 @@ from datahub.investment_lead.test.utils import assert_retrieved_eyb_lead_data
 from datahub.investment_lead.views import EYBLeadAuditViewSet
 from datahub.metadata.models import Country, Sector
 
-
 DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
 EYB_LEAD_COLLECTION_URL = reverse('api-v4:investment-lead:eyb-lead-collection')
 
@@ -25,7 +23,7 @@ def eyb_lead_item_url(pk: uuid.uuid4) -> str:
 
 
 class TestEYBLeadRetrieveAPI(APITestMixin):
-    """Tests for retrieve EYB lead view (via GET request)"""
+    """Tests for retrieve EYB lead view (via GET request)."""
 
     def test_retrieve_eyb_lead(self, test_user_with_view_permissions, eyb_lead_instance_from_db):
         api_client = self.create_api_client(user=test_user_with_view_permissions)
@@ -43,7 +41,7 @@ class TestEYBLeadRetrieveAPI(APITestMixin):
 
 
 class TestEYBLeadListAPI(APITestMixin):
-    """Tests for list EYB lead view (via GET request)"""
+    """Tests for list EYB lead view (via GET request)."""
 
     def test_list_eyb_leads(self, test_user_with_view_permissions, eyb_lead_instance_from_db):
         api_client = self.create_api_client(user=test_user_with_view_permissions)
@@ -54,7 +52,7 @@ class TestEYBLeadListAPI(APITestMixin):
             eyb_lead_instance_from_db, response.data['results'][0])
 
     def test_list_no_eyb_leads(self, test_user_with_view_permissions):
-        """Tests that an empty list is returned if there are no EYB leads"""
+        """Tests that an empty list is returned if there are no EYB leads."""
         EYBLead.objects.all().delete()
         assert EYBLead.objects.count() == 0
         api_client = self.create_api_client(user=test_user_with_view_permissions)
@@ -78,7 +76,7 @@ class TestEYBLeadListAPI(APITestMixin):
         assert {str(lead_without_triage.pk), str(lead_without_user.pk)} not in result_ids
 
     def test_pagination(self, test_user_with_view_permissions):
-        """Test that LimitOffsetPagination is enabled for this view"""
+        """Test that LimitOffsetPagination is enabled for this view."""
         number_of_leads = 3
         pagination_limit = 2
         EYBLeadFactory.create_batch(number_of_leads)
@@ -259,7 +257,7 @@ class TestEYBLeadListAPI(APITestMixin):
         assert response.data['count'] == 0
 
     def test_filter_by_is_high_value(self, test_user_with_view_permissions):
-        """Test filtering EYB leads by is high value status"""
+        """Test filtering EYB leads by is high value status."""
         EYBLeadFactory(is_high_value=True)
         EYBLeadFactory(is_high_value=False)
         EYBLeadFactory(is_high_value=None)
@@ -275,7 +273,7 @@ class TestEYBLeadListAPI(APITestMixin):
         assert response.data['results'][0]['is_high_value'] is True
 
     def test_filter_by_is_low_value(self, test_user_with_view_permissions):
-        """Test filtering EYB leads by is low value status"""
+        """Test filtering EYB leads by is low value status."""
         EYBLeadFactory(is_high_value=True)
         EYBLeadFactory(is_high_value=False)
         EYBLeadFactory(is_high_value=None)
@@ -307,7 +305,7 @@ class TestEYBLeadListAPI(APITestMixin):
         assert response.data['results'][0]['is_high_value'] is None
 
     def test_filter_by_is_all_values(self, test_user_with_view_permissions):
-        """Test filtering EYB leads by multiple values"""
+        """Test filtering EYB leads by multiple values."""
         EYBLeadFactory(is_high_value=True)
         EYBLeadFactory(is_high_value=False)
         EYBLeadFactory(is_high_value=None)
@@ -324,7 +322,7 @@ class TestEYBLeadListAPI(APITestMixin):
         assert response.data['count'] == 3
 
     def test_filter_by_invalid_value(self, test_user_with_view_permissions):
-        """Test filtering EYB leads by an invalid value returns no leads"""
+        """Test filtering EYB leads by an invalid value returns no leads."""
         EYBLeadFactory(is_high_value=True)
         EYBLeadFactory(is_high_value=False)
         EYBLeadFactory(is_high_value=None)
@@ -424,8 +422,7 @@ class TestEYBLeadListAPI(APITestMixin):
         assert newest_timestamp > oldest_timestamp
 
     def test_filter_by_hmtc_region(self, test_user_with_view_permissions):
-        """
-        Test filtering EYB leads by one hmtc region.
+        """Test filtering EYB leads by one hmtc region.
 
         note: we test through Country rather than OverseasRegion because
         the region is not exposed via API
@@ -456,8 +453,7 @@ class TestEYBLeadListAPI(APITestMixin):
         assert response_country.overseas_region_id == default_overseas_region
 
     def test_filter_by_multiple_hmtc_regions(self, test_user_with_view_permissions):
-        """
-        Test filtering EYB leads by multiple hmtc regions.
+        """Test filtering EYB leads by multiple hmtc regions.
 
         note: we test through Country rather than OverseasRegion because
         the region is not exposed via API
@@ -501,8 +497,7 @@ class TestEYBLeadListAPI(APITestMixin):
         } == country_ids_in_results
 
     def test_filter_by_non_existing_hmtc_region(self, test_user_with_view_permissions):
-        """
-        Test filtering EYB leads by non existent hmtc region is handled without error.
+        """Test filtering EYB leads by non existent hmtc region is handled without error.
 
         note: we test through Country rather than OverseasRegion because
         the region is not exposed via API
@@ -525,7 +520,7 @@ class TestEYBLeadListAPI(APITestMixin):
 
 
 class TestEYBLeadAuditAPI(APITestMixin):
-    @pytest.mark.parametrize('view_set', (EYBLeadAuditViewSet,))
+    @pytest.mark.parametrize('view_set', [EYBLeadAuditViewSet])
     def test_view_set_name(self, view_set):
         """Test that the view name is a string."""
         assert isinstance(view_set().get_view_name(), str)

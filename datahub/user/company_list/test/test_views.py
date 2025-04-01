@@ -18,8 +18,7 @@ from datahub.interaction.test.factories import (
     InteractionDITParticipantFactory,
 )
 from datahub.metadata.test.factories import TeamFactory
-from datahub.user.company_list.models import CompanyList
-from datahub.user.company_list.models import CompanyListItem
+from datahub.user.company_list.models import CompanyList, CompanyListItem
 from datahub.user.company_list.test.factories import CompanyListFactory, CompanyListItemFactory
 from datahub.user.company_list.views import (
     CANT_ADD_ARCHIVED_COMPANY_MESSAGE,
@@ -56,11 +55,11 @@ class TestListCompanyListsView(APITestMixin):
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     @pytest.mark.parametrize(
-        'permission_codenames,expected_status',
-        (
+        ('permission_codenames', 'expected_status'),
+        [
             ([], status.HTTP_403_FORBIDDEN),
             (['view_companylist'], status.HTTP_200_OK),
-        ),
+        ],
     )
     def test_permission_checking(self, permission_codenames, expected_status, api_client):
         """Test that the expected status is returned for various user permissions."""
@@ -104,7 +103,7 @@ class TestListCompanyListsView(APITestMixin):
             'created_on': format_date_or_datetime(company_list.created_on),
         }
 
-    @pytest.mark.parametrize('num_items', (0, 5, 10))
+    @pytest.mark.parametrize('num_items', [0, 5, 10])
     def test_includes_accurate_item_count(self, num_items):
         """Test that the correct item count is returned."""
         company_list = CompanyListFactory(adviser=self.user)
@@ -140,8 +139,7 @@ class TestListCompanyListsView(APITestMixin):
         assert actual_list_names == expected_list_names
 
     def test_filter_by_invalid_company_id(self):
-        """
-        Test that an error is returned when trying to filter by a company ID that is not a
+        """Test that an error is returned when trying to filter by a company ID that is not a
         valid UUID.
         """
         response = self.api_client.get(
@@ -186,8 +184,7 @@ class TestListCompanyListsView(APITestMixin):
         assert actual_list_ids == expected_list_ids
 
     def test_returns_no_lists_if_filtered_by_company_not_on_a_list(self):
-        """
-        Test that no lists are returned when filtering lists by a company not on any of the
+        """Test that no lists are returned when filtering lists by a company not on any of the
         authenticated user's lists.
         """
         # Create some lists and list items for the user
@@ -229,11 +226,11 @@ class TestGetCompanyListView(APITestMixin):
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     @pytest.mark.parametrize(
-        'permission_codenames,expected_status',
-        (
+        ('permission_codenames', 'expected_status'),
+        [
             ([], status.HTTP_403_FORBIDDEN),
             (['view_companylist'], status.HTTP_200_OK),
-        ),
+        ],
     )
     def test_permission_checking(self, permission_codenames, expected_status, api_client):
         """Test that the expected status is returned for various user permissions."""
@@ -285,11 +282,11 @@ class TestAddCompanyListView(APITestMixin):
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     @pytest.mark.parametrize(
-        'permission_codenames,expected_status',
-        (
+        ('permission_codenames', 'expected_status'),
+        [
             ([], status.HTTP_403_FORBIDDEN),
             (['add_companylist'], status.HTTP_201_CREATED),
-        ),
+        ],
     )
     def test_permission_checking(self, permission_codenames, expected_status, api_client):
         """Test that the expected status is returned for various user permissions."""
@@ -304,8 +301,8 @@ class TestAddCompanyListView(APITestMixin):
         assert response.status_code == expected_status
 
     @pytest.mark.parametrize(
-        'request_data,expected_errors',
-        (
+        ('request_data', 'expected_errors'),
+        [
             pytest.param(
                 {},
                 {
@@ -331,7 +328,7 @@ class TestAddCompanyListView(APITestMixin):
                 },
                 id='name is empty string',
             ),
-        ),
+        ],
     )
     def test_validation(self, request_data, expected_errors):
         """Test validation."""
@@ -379,11 +376,11 @@ class TestUpdateCompanyListView(APITestMixin):
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     @pytest.mark.parametrize(
-        'permission_codenames,expected_status',
-        (
+        ('permission_codenames', 'expected_status'),
+        [
             ([], status.HTTP_403_FORBIDDEN),
             (['change_companylist'], status.HTTP_200_OK),
-        ),
+        ],
     )
     def test_permission_checking(self, permission_codenames, expected_status, api_client):
         """Test that the expected status is returned for various user permissions."""
@@ -401,8 +398,8 @@ class TestUpdateCompanyListView(APITestMixin):
         assert response.status_code == expected_status
 
     @pytest.mark.parametrize(
-        'request_data,expected_errors',
-        (
+        ('request_data', 'expected_errors'),
+        [
             pytest.param(
                 {
                     'name': None,
@@ -421,7 +418,7 @@ class TestUpdateCompanyListView(APITestMixin):
                 },
                 id='name is empty string',
             ),
-        ),
+        ],
     )
     def test_validation(self, request_data, expected_errors):
         """Test validation."""
@@ -485,11 +482,11 @@ class TestDeleteCompanyListView(APITestMixin):
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     @pytest.mark.parametrize(
-        'permission_codenames,expected_status',
-        (
+        ('permission_codenames', 'expected_status'),
+        [
             ([], status.HTTP_403_FORBIDDEN),
             (['delete_companylist'], status.HTTP_204_NO_CONTENT),
-        ),
+        ],
     )
     def test_permission_checking(self, permission_codenames, expected_status, api_client):
         """Test that the expected status is returned for various user permissions."""
@@ -549,7 +546,7 @@ class TestDeleteCompanyListView(APITestMixin):
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
-@pytest.mark.parametrize('http_method', ('delete', 'put'))
+@pytest.mark.parametrize('http_method', ['delete', 'put'])
 class TestCompanyListItemAuth(APITestMixin):
     """Tests authentication and authorisation for the company list item views."""
 
@@ -654,8 +651,7 @@ class TestCreateOrUpdateCompanyListItemAPIView(APITestMixin):
         ).count() == 2
 
     def test_with_existing_item(self):
-        """
-        Test that no error is returned if the specified company is already on the
+        """Test that no error is returned if the specified company is already on the
         authenticated user's list.
         """
         creation_date = datetime(2018, 1, 2, tzinfo=timezone.utc)
@@ -746,8 +742,7 @@ class TestCompanyListItemViewSet(APITestMixin):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_with_no_list_items(self):
-        """
-        Test that an empty list is returned if the user does not have any companies on the
+        """Test that an empty list is returned if the user does not have any companies on the
         selected list.
         """
         company_list = CompanyListFactory(adviser=self.user)
@@ -775,8 +770,7 @@ class TestCompanyListItemViewSet(APITestMixin):
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     def test_with_only_items_on_other_users_lists(self):
-        """
-        Test that an empty list is returned if the user has no companies on their selected list,
+        """Test that an empty list is returned if the user has no companies on their selected list,
         but other users have companies on theirs.
         """
         CompanyListItemFactory.create_batch(5)
@@ -822,7 +816,7 @@ class TestCompanyListItemViewSet(APITestMixin):
 
     @pytest.mark.parametrize(
         'company_factory',
-        (
+        [
             CompanyFactory,
             ArchivedCompanyFactory,
             partial(company_with_interactions_factory, 1),
@@ -839,7 +833,7 @@ class TestCompanyListItemViewSet(APITestMixin):
             ),
             # Interaction with no participants
             partial(company_with_interactions_factory, 1, dit_participants=[]),
-        ),
+        ],
     )
     def test_with_item(self, company_factory):
         """Test serialisation of various companies."""
@@ -885,8 +879,7 @@ class TestCompanyListItemViewSet(APITestMixin):
         ]
 
     def test_sorting(self):
-        """
-        Test that list items are sorted in reverse order of the date of the latest
+        """Test that list items are sorted in reverse order of the date of the latest
         interaction with the company.
         Note that we want companies without any interactions to be sorted last.
         """
@@ -902,7 +895,7 @@ class TestCompanyListItemViewSet(APITestMixin):
         company_list = CompanyListFactory(adviser=self.user)
         list_items = CompanyListItemFactory.create_batch(len(interaction_dates), list=company_list)
 
-        for interaction_date, list_item in zip(shuffled_dates, list_items):
+        for interaction_date, list_item in zip(shuffled_dates, list_items, strict=False):
             if interaction_date:
                 CompanyInteractionFactory(date=interaction_date, company=list_item.company)
 
@@ -947,8 +940,7 @@ class TestDeleteCompanyListItemAPIView(APITestMixin):
         assert not CompanyListItem.objects.filter(list=company_list, company=company).exists()
 
     def test_with_company_not_on_the_list(self):
-        """
-        Test that 204 status is returned if company is not on the authenticated user's
+        """Test that 204 status is returned if company is not on the authenticated user's
         selected list.
         """
         company = CompanyFactory()
@@ -985,8 +977,7 @@ class TestDeleteCompanyListItemAPIView(APITestMixin):
         assert not CompanyListItem.objects.filter(list=company_list, company=company).exists()
 
     def test_that_actual_company_is_not_deleted(self):
-        """
-        Test that a company is not removed from database after removing from user's selected list.
+        """Test that a company is not removed from database after removing from user's selected list.
         """
         company = CompanyFactory()
         company_list = CompanyListFactory(adviser=self.user)

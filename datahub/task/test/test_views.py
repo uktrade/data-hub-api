@@ -1,19 +1,12 @@
 import datetime
-
 from operator import attrgetter
-
 from unittest.mock import patch
-
 from uuid import uuid4
 
 import factory
-
 import pytest
-
 from django.utils.timezone import now
-
 from faker import Faker
-
 from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
@@ -31,7 +24,7 @@ from datahub.task.test.utils import BaseEditTaskTests, BaseListTaskTests, BaseTa
 
 
 class TestListTask(BaseListTaskTests):
-    """Test the LIST task endpoint"""
+    """Test the LIST task endpoint."""
 
     reverse_url = 'api-v4:task:collection'
 
@@ -78,7 +71,7 @@ class TestListTask(BaseListTaskTests):
 
 
 class TestGetGenericTask(APITestMixin):
-    """Test the GET task endpoint"""
+    """Test the GET task endpoint."""
 
     def test_get_task_return_404_when_task_id_unknown(self):
         TaskFactory()
@@ -140,7 +133,7 @@ class TestGetGenericTask(APITestMixin):
 
 
 class TestAddGenericTask(APITestMixin):
-    """Test the POST task endpoint"""
+    """Test the POST task endpoint."""
 
     def test_create_task_with_missing_mandatory_fields_returns_bad_request(self):
         url = reverse('api-v4:task:collection')
@@ -326,7 +319,7 @@ class TestEditGenericTask(BaseEditTaskTests):
 
 
 class TestTaskForInvestmentProject(APITestMixin):
-    @pytest.mark.parametrize('investment_project_id', ('abc', uuid4()))
+    @pytest.mark.parametrize('investment_project_id', ['abc', uuid4()])
     def test_create_task_with_invalid_investment_project_id_returns_bad_request(
         self,
         investment_project_id,
@@ -428,7 +421,7 @@ class TestTaskForInvestmentProject(APITestMixin):
 
 
 class TestTaskForCompany(APITestMixin):
-    @pytest.mark.parametrize('company_id', ('abc', uuid4()))
+    @pytest.mark.parametrize('company_id', ['abc', uuid4()])
     def test_create_task_with_invalid_company_id_returns_bad_request(
         self,
         company_id,
@@ -522,7 +515,7 @@ class TestTaskForCompany(APITestMixin):
 
 
 class TestTaskForInteraction(APITestMixin):
-    @pytest.mark.parametrize('interaction_id', ('abc', uuid4()))
+    @pytest.mark.parametrize('interaction_id', ['abc', uuid4()])
     def test_create_task_with_invalid_interaction_id_returns_bad_request(
         self,
         interaction_id,
@@ -616,7 +609,7 @@ class TestTaskForInteraction(APITestMixin):
 
 
 class TestArchiveTask(BaseTaskTests):
-    """Test the archive POST endpoint for task"""
+    """Test the archive POST endpoint for task."""
 
     def test_archive_task_without_reason_returns_bad_request(self):
         adviser = AdviserFactory()
@@ -692,7 +685,7 @@ class TestArchiveTask(BaseTaskTests):
 
 
 class TestStatusCompleteTask(BaseTaskTests):
-    """Test the status_complete and status_active POST endpoints for task"""
+    """Test the status_complete and status_active POST endpoints for task."""
 
     @pytest.mark.parametrize('action', ['task_status_complete', 'task_status_active'])
     def test_status_task_calls_returns_unauthorized_when_user_not_authenticated(self, action):
@@ -722,7 +715,7 @@ class TestStatusCompleteTask(BaseTaskTests):
 
 
 class TestAssociatedCompanyAndProject(APITestMixin):
-    """Test the GET companies-and-projects endpoint for task"""
+    """Test the GET companies-and-projects endpoint for task."""
 
     url = reverse('api-v4:task:companies-and-projects')
 

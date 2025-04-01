@@ -9,16 +9,15 @@ from django.forms import BaseInlineFormSet, ModelForm, ValidationError
 from django.urls import reverse
 from reversion.admin import VersionAdmin
 
-from datahub.core.admin import BaseModelAdminMixin, EXPORT_WIN_GROUP_NAME
-
+from datahub.core.admin import EXPORT_WIN_GROUP_NAME, BaseModelAdminMixin
 from datahub.export_win.models import (
     AnonymousWin,
     Breakdown,
     CustomerResponse,
     DeletedWin,
     Win,
-    WinAdviser)
-
+    WinAdviser,
+)
 from datahub.export_win.tasks import (
     create_token_for_contact,
     get_all_fields_for_client_email_receipt,
@@ -36,10 +35,10 @@ class BaseTabularInline(admin.TabularInline):
 
 
 class RequiredInLineFormSet(BaseInlineFormSet):
-    """Generates an inline formset that is required"""
+    """Generates an inline formset that is required."""
 
     def clean(self):
-        """Clean and sanitise form array"""
+        """Clean and sanitise form array."""
         super().clean()
         if any(self.errors):
             return
@@ -56,7 +55,7 @@ class BreakdownInlineForm(ModelForm):
 
     class Meta:
         model = Breakdown
-        fields = '__all__'
+        fields = '__all__'  # noqa: DJ007
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -78,7 +77,7 @@ class AdvisorInlineForm(ModelForm):
 
     class Meta:
         model = WinAdviser
-        fields = '__all__'
+        fields = '__all__'  # noqa: DJ007
         labels = {
             'adviser': 'Contributing Adviser',
         }
@@ -90,9 +89,7 @@ class AdvisorInlineForm(ModelForm):
 class AdvisorInline(BaseTabularInline):
     """Advisor model."""
 
-    autocomplete_fields = (
-        'adviser',
-    )
+    autocomplete_fields = ('adviser',)
     can_delete = True
     model = WinAdviser
     form = AdvisorInlineForm
@@ -111,14 +108,13 @@ class BaseStackedInline(admin.StackedInline):
 
 
 class CustomerResponseInlineForm(ModelForm):
-    """
-    Customer Response in line form.
-    Field name is not required and field id should be read-only
+    """Customer Response in line form.
+    Field name is not required and field id should be read-only.
     """
 
     class Meta:
         model = CustomerResponse
-        fields = '__all__'
+        fields = '__all__'  # noqa: DJ007
 
     def __init__(self, *args, obj=None, **kwargs):
         super().__init__(*args, **kwargs)
@@ -156,7 +152,7 @@ class WinAdminForm(ModelForm):
 
     class Meta:
         model = Win
-        fields = '__all__'
+        fields = '__all__'  # noqa: DJ007
         labels = {
             'adviser': 'Creator',
             'company_contacts': 'Contact names',
@@ -201,9 +197,7 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
         'get_date_confirmed',
         'created_on',
     )
-    list_filter = (
-        ('created_on', DateFieldListFilter),
-    )
+    list_filter = (('created_on', DateFieldListFilter),)
     autocomplete_fields = (
         'company',
         'company_contacts',
@@ -236,49 +230,74 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
         'created_on',
     )
     fieldsets = (
-        ('Overview', {'fields': (
-            'id',
-            'adviser',
-            'company',
-            'company_contacts',
-            'created_on',
-            'modified_on',
-            'audit',
-            'total_expected_export_value',
-            'total_expected_non_export_value',
-            'total_expected_odi_value',
-        )}),
-        ('Win details', {'fields': (
-            'country',
-            'date',
-            'description',
-            'name_of_customer',
-            'goods_vs_services',
-            'name_of_export',
-            'sector',
-            'hvc',
-        )}),
-        ('Customer details', {'fields': (
-            'cdms_reference',  # Legacy field
-            'customer_email_address',  # Legacy field
-            'customer_job_title',  # Legacy field
-            'customer_location',
-            'business_potential',
-            'export_experience',
-        )}),
-        ('DBT Officer', {'fields': (
-            'lead_officer',
-            'team_type',
-            'team_members',
-            'hq_team',
-            'line_manager_name',  # Legacy field
-            'lead_officer_email_address',  # Legacy field
-            'other_official_email_address',  # Legacy field
-        )}),
-        ('DBT Support', {'fields': (
-            'type_of_support',
-            'associated_programme',
-        )}),
+        (
+            'Overview',
+            {
+                'fields': (
+                    'id',
+                    'adviser',
+                    'company',
+                    'company_contacts',
+                    'created_on',
+                    'modified_on',
+                    'audit',
+                    'total_expected_export_value',
+                    'total_expected_non_export_value',
+                    'total_expected_odi_value',
+                ),
+            },
+        ),
+        (
+            'Win details',
+            {
+                'fields': (
+                    'country',
+                    'date',
+                    'description',
+                    'name_of_customer',
+                    'goods_vs_services',
+                    'name_of_export',
+                    'sector',
+                    'hvc',
+                ),
+            },
+        ),
+        (
+            'Customer details',
+            {
+                'fields': (
+                    'cdms_reference',  # Legacy field
+                    'customer_email_address',  # Legacy field
+                    'customer_job_title',  # Legacy field
+                    'customer_location',
+                    'business_potential',
+                    'export_experience',
+                ),
+            },
+        ),
+        (
+            'DBT Officer',
+            {
+                'fields': (
+                    'lead_officer',
+                    'team_type',
+                    'team_members',
+                    'hq_team',
+                    'line_manager_name',  # Legacy field
+                    'lead_officer_email_address',  # Legacy field
+                    'other_official_email_address',  # Legacy field
+                ),
+            },
+        ),
+        (
+            'DBT Support',
+            {
+                'fields': (
+                    'type_of_support',
+                    'associated_programme',
+                ),
+            },
+        ),
     )
     inlines = [
         BreakdownInline,
@@ -291,8 +310,11 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
     )
     def get_adviser(self, obj):
         """Return adviser as user with email."""
-        return f'{obj.adviser} <{obj.adviser.email}>' if obj.adviser else \
-            f'{obj.adviser_name} <{obj.adviser_email_address}>'
+        return (
+            f'{obj.adviser} <{obj.adviser.email}>'
+            if obj.adviser
+            else f'{obj.adviser_name} <{obj.adviser_email_address}>'
+        )
 
     @admin.display(
         description='Company name',
@@ -342,13 +364,19 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
         if search_term:
             queryset = queryset.annotate(
                 computed_adviser_name=Concat(
-                    'adviser__first_name', Value(' '), 'adviser__last_name',
+                    'adviser__first_name',
+                    Value(' '),
+                    'adviser__last_name',
                 ),
                 lead_officer_adviser_name=Concat(
-                    'lead_officer__first_name', Value(' '), 'lead_officer__last_name',
+                    'lead_officer__first_name',
+                    Value(' '),
+                    'lead_officer__last_name',
                 ),
                 contact_name=Concat(
-                    'company_contacts__first_name', Value(' '), 'company_contacts__last_name',
+                    'company_contacts__first_name',
+                    Value(' '),
+                    'company_contacts__last_name',
                 ),
             )
 
@@ -360,11 +388,11 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
 
 
 class WinSoftDeletedAdminForm(ModelForm):
-    """Win soft deleted admin form"""
+    """Win soft deleted admin form."""
 
     class Meta:
         model = DeletedWin
-        fields = '__all__'
+        fields = '__all__'  # noqa: DJ007
         labels = {
             'adviser': 'Creator',
             'company_contacts': 'Contact names',
@@ -388,7 +416,7 @@ class DeletedWinAdmin(WinAdmin):
         return self.model.objects.soft_deleted()
 
     def undelete(self, request, queryset):
-        """Perform undelete action in django admin"""
+        """Perform undelete action in django admin."""
         for win in queryset.all():
             with reversion.create_revision():
                 win.is_deleted = False
@@ -403,11 +431,15 @@ class DeletedWinAdmin(WinAdmin):
         return False
 
     def has_view_permission(self, request, obj=None):
-        """Set the desired user group to access view deleted win"""
-        return True if (
-            request.user.is_superuser
-            or request.user.groups.filter(name=EXPORT_WIN_GROUP_NAME).exists()
-        ) else False
+        """Set the desired user group to access view deleted win."""
+        return (
+            True
+            if (
+                request.user.is_superuser
+                or request.user.groups.filter(name=EXPORT_WIN_GROUP_NAME).exists()
+            )
+            else False
+        )
 
     def has_change_permission(self, request, obj=None):
         return False
@@ -418,7 +450,7 @@ class AnonymousWinAdminForm(ModelForm):
 
     class Meta:
         model = AnonymousWin
-        fields = '__all__'
+        fields = '__all__'  # noqa: DJ007
         labels = {
             'adviser': 'Creator',
             'company': 'Company (leave blank for an anonymous win)',
@@ -495,17 +527,21 @@ class AnonymousWinAdmin(WinAdmin):
         return False
 
     def has_view_permission(self, request, obj=None):
-        """Set the desired user group to access view anonymous win"""
-        return True if (
-            request.user.is_superuser
-            or request.user.groups.filter(name=EXPORT_WIN_GROUP_NAME).exists()
-        ) else False
+        """Set the desired user group to access view anonymous win."""
+        return (
+            True
+            if (
+                request.user.is_superuser
+                or request.user.groups.filter(name=EXPORT_WIN_GROUP_NAME).exists()
+            )
+            else False
+        )
 
     def has_change_permission(self, request, obj=None):
         return True
 
     def notify_anonymous_wins_adviser_as_contact(self, adviser, customer_response):
-        """Notify anonymous wins adviser as contact"""
+        """Notify anonymous wins adviser as contact."""
         token = create_token_for_contact(
             None,
             customer_response,
@@ -533,23 +569,31 @@ class WinAdviserAdmin(BaseModelAdminMixin):
     search_fields = ('win__id',)
 
     fieldsets = (
-        ('Overview', {'fields': (
-            'id',
-            'win',
-            'adviser',
-            'team_type',
-            'hq_team',
-            'location',
-        )}),
-        ('Legacy Fields', {'fields': (
-            'name',
-            'legacy_id',
-        )}),
+        (
+            'Overview',
+            {
+                'fields': (
+                    'id',
+                    'win',
+                    'adviser',
+                    'team_type',
+                    'hq_team',
+                    'location',
+                ),
+            },
+        ),
+        (
+            'Legacy Fields',
+            {
+                'fields': (
+                    'name',
+                    'legacy_id',
+                ),
+            },
+        ),
     )
 
-    autocomplete_fields = (
-        'adviser',
-    )
+    autocomplete_fields = ('adviser',)
 
     def get_queryset(self, request):
         """Return winadviser queryset only for undeleted win."""
@@ -564,9 +608,7 @@ class WinAdviserAdmin(BaseModelAdminMixin):
         return obj.adviser.name if obj.adviser else obj.name
 
     def delete_view(self, request, object_id, extra_context=None):
-        """
-        Redirect to the winadviser list view after successful deletion.
-        """
+        """Redirect to the winadviser list view after successful deletion."""
         response = super().delete_view(request, object_id, extra_context=extra_context)
         if response.status_code == 302:  # Redirect status code
             response['Location'] = reverse('admin:export_win_winadviser_changelist')

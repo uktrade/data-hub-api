@@ -1,5 +1,4 @@
 import pytest
-
 from rest_framework.exceptions import ValidationError
 
 from datahub.company.models import Company
@@ -10,7 +9,6 @@ from datahub.dnb_api.serializers import (
     DNBCompanySerializer,
     SerializerNotPartialError,
 )
-
 
 override_functions = (
     pytest.param(
@@ -29,8 +27,7 @@ override_functions = (
 
 
 def test_dnb_company_serializer_partial_save(db):
-    """
-    Test DNBCompanySerializer.partial_save() method.
+    """Test DNBCompanySerializer.partial_save() method.
     """
     dh_company = CompanyFactory()
     original_company = Company.objects.get(id=dh_company.id)
@@ -48,8 +45,7 @@ def test_dnb_company_serializer_partial_save(db):
 
 
 def test_dnb_change_request_serializer(db):
-    """
-    Test that dnb change requests serialize correctly
+    """Test that dnb change requests serialize correctly.
     """
     change_request = ChangeRequestSerializer(data={'turnover_gbp': 200})
     change_request.is_valid()
@@ -58,8 +54,7 @@ def test_dnb_change_request_serializer(db):
 
 
 def test_dnb_company_serializer_partial_save_serializer_not_partial(db):
-    """
-    Test DNBCompanySerializer.partial_save() method raises an error when the
+    """Test DNBCompanySerializer.partial_save() method raises an error when the
     serializer is not partial.
     """
     dh_company = CompanyFactory()
@@ -73,7 +68,7 @@ def test_dnb_company_serializer_partial_save_serializer_not_partial(db):
 
 
 def test_duns_number_is_not_valid(db):
-    """Tests that serializer is not valid when duns number is not provided"""
+    """Tests that serializer is not valid when duns number is not provided."""
     serializer = DNBCompanyHierarchySerializer(
         {},
         data={'duns_number': None},
@@ -85,7 +80,7 @@ def test_duns_number_is_not_valid(db):
 
 
 def test_duns_number_is_valid(db):
-    """Tests that serializer is valid when duns number is provided"""
+    """Tests that serializer is valid when duns number is provided."""
     dh_company = CompanyFactory(duns_number='123456789')
     serializer = DNBCompanyHierarchySerializer(
         dh_company,

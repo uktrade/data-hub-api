@@ -83,5 +83,5 @@ class PaasIPView(APIView):
 def max_upload_size_view(request):
     """View for testing upload file size limiting."""
     # Force files to be processed
-    request.FILES
+    request.FILES  # noqa: B018
     return TemplateResponse(request, 'empty.html')

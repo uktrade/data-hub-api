@@ -13,7 +13,7 @@ MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 @reversion.register_base_model()
 class Event(BaseModel, DisableableModel):
-    """An event (exhibition etc.)"""
+    """An event (exhibition etc.)."""
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     name = models.CharField(max_length=MAX_LENGTH)
@@ -90,7 +90,7 @@ class Event(BaseModel, DisableableModel):
         return get_front_end_url(self)
 
     def __str__(self):
-        """Human-readable representation"""
+        """Human-readable representation."""
         return self.name
 
 

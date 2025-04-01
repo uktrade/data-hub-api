@@ -6,7 +6,6 @@ from django.conf import settings
 from django.utils.functional import cached_property
 from rest_framework.exceptions import APIException
 
-
 logger = getLogger(__name__)
 
 
@@ -20,8 +19,7 @@ class GOVUKPayAPIException(APIException):
 
 
 def govuk_url(path):
-    """
-    :returns: url to the GOV.UK Pay endpoint defined by `path`
+    """:returns: url to the GOV.UK Pay endpoint defined by `path`
 
     :param path: path without leading `/` e.g. `payments`
     """
@@ -40,8 +38,7 @@ class PayClient:
         }
 
     def _raise_for_status(self, response):
-        """
-        :raises GOVUKPayAPIException if status code >= 400
+        """:raises GOVUKPayAPIException if status code >= 400
 
         :param response: Response instance to check
         """
@@ -51,8 +48,7 @@ class PayClient:
             raise GOVUKPayAPIException(exc) from exc
 
     def _request(self, method, path, **kwargs):
-        """
-        :return: response instance
+        """:return: response instance
         :raises GOVUKPayAPIException if status code >= 400
 
         :param method: HTTP verb (e.g. 'GET')
@@ -80,8 +76,7 @@ class PayClient:
         return response
 
     def create_payment(self, amount, reference, description, return_url):
-        """
-        Create a new payment.
+        """Create a new payment.
 
         :returns: dictionary with the created payment data
         :raises: GOVUKPayAPIException if status code >= 400
@@ -103,8 +98,7 @@ class PayClient:
         ).json()
 
     def get_payment_by_id(self, payment_id):
-        """
-        :returns: dictionary with the payment data for object with id == `payment_id`
+        """:returns: dictionary with the payment data for object with id == `payment_id`
         :raises: GOVUKPayAPIException if status code >= 400
 
         :param payment_id: id of the GOV.UK payment
@@ -112,8 +106,7 @@ class PayClient:
         return self._request('GET', path=f'payments/{payment_id}').json()
 
     def cancel_payment(self, payment_id):
-        """
-        Cancel a payment.
+        """Cancel a payment.
 
         :returns: always None
         :raises: GOVUKPayAPIException if status code >= 400

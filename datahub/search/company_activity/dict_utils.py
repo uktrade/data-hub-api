@@ -37,7 +37,7 @@ def activity_referral_dict(obj):
 
 
 def activity_investment_dict(obj):
-    """Creates dictionary from an investment project containing id, name and investor company"""
+    """Creates dictionary from an investment project containing id, name and investor company."""
     if obj is None:
         return None
 
@@ -57,7 +57,7 @@ def activity_investment_dict(obj):
 
 
 def activity_order_dict(obj):
-    """Creates dictionary from an omis order"""
+    """Creates dictionary from an omis order."""
     if obj is None:
         return None
 
@@ -73,7 +73,7 @@ def activity_order_dict(obj):
 
 
 def activity_great_dict(obj):
-    """Creates dictionary from an great export enquiry"""
+    """Creates dictionary from an great export enquiry."""
     if obj is None:
         return None
 

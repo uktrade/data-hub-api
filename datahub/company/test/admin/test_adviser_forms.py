@@ -2,13 +2,12 @@ import pytest
 from django.core.exceptions import NON_FIELD_ERRORS
 
 from datahub.company.admin.adviser_forms import (
-    AddAdviserFromSSOForm,
     DUPLICATE_USER_MESSAGE,
     NO_MATCHING_USER_MESSAGE,
+    AddAdviserFromSSOForm,
 )
 from datahub.company.test.factories import AdviserFactory
 from datahub.oauth.sso_api_client import SSORequestError, SSOUserDoesNotExistError
-
 
 FAKE_SSO_USER_DATA = {
     'email': 'email@email.test',
@@ -40,18 +39,17 @@ class TestAddAdviserFromSSOForm:
 
     @pytest.mark.parametrize(
         'factory_kwargs',
-        (
+        [
             {'sso_email_user_id': FAKE_SSO_USER_DATA['email_user_id']},
             {'email': FAKE_SSO_USER_DATA['email']},
-        ),
+        ],
     )
     def test_validation_fails_when_adviser_already_exists(
         self,
         factory_kwargs,
         mock_get_user_by_email_user_id,
     ):
-        """
-        Test that validation fails if there's an existing adviser with the same SSO email user
+        """Test that validation fails if there's an existing adviser with the same SSO email user
         ID or email (username).
         """
         mock_get_user_by_email_user_id.return_value = FAKE_SSO_USER_DATA
@@ -69,8 +67,7 @@ class TestAddAdviserFromSSOForm:
         mock_get_user_by_email,
         mock_get_user_by_email_user_id,
     ):
-        """
-        Test that validation fails if there's no matching adviser in Staff SSO.
+        """Test that validation fails if there's no matching adviser in Staff SSO.
         """
         mock_get_user_by_email.side_effect = SSOUserDoesNotExistError()
         mock_get_user_by_email_user_id.side_effect = SSOUserDoesNotExistError()
@@ -83,8 +80,7 @@ class TestAddAdviserFromSSOForm:
         }
 
     def test_validation_fails_when_there_is_a_request_error(self, mock_get_user_by_email_user_id):
-        """
-        Test that validation fails if there's an error communicating with Staff SSO.
+        """Test that validation fails if there's an error communicating with Staff SSO.
         """
         mock_get_user_by_email_user_id.side_effect = SSORequestError('Test error')
 
@@ -119,8 +115,7 @@ class TestAddAdviserFromSSOForm:
         mock_get_user_by_email_user_id,
         mock_get_user_by_email,
     ):
-        """
-        Test that an adviser can be created using its SSO email (when there is no match on
+        """Test that an adviser can be created using its SSO email (when there is no match on
         email user ID).
         """
         mock_get_user_by_email_user_id.side_effect = SSOUserDoesNotExistError()

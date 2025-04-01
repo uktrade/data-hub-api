@@ -38,8 +38,7 @@ def test_updating_order_updates_opensearch(opensearch_with_signals):
 
 
 def test_accepting_quote_updates_opensearch(opensearch_with_signals):
-    """
-    Test that when a quote is accepted and the invoice created, the payment_due_date field
+    """Test that when a quote is accepted and the invoice created, the payment_due_date field
     in OpenSearch gets updated.
     """
     order = OrderWithOpenQuoteFactory()
@@ -62,8 +61,7 @@ def test_accepting_quote_updates_opensearch(opensearch_with_signals):
 
 
 def test_adding_subscribers_syncs_order_to_opensearch(opensearch_with_signals):
-    """
-    Test that when a subscriber is added to an order,
+    """Test that when a subscriber is added to an order,
     the linked order gets synced to OpenSearch.
     """
     order = OrderFactory()
@@ -82,8 +80,7 @@ def test_adding_subscribers_syncs_order_to_opensearch(opensearch_with_signals):
 
 
 def test_removing_subscribers_syncs_order_to_opensearch(opensearch_with_signals):
-    """
-    Test that when a subscriber is removed from an order,
+    """Test that when a subscriber is removed from an order,
     the linked order gets synced to OpenSearch.
     """
     order = OrderFactory()
@@ -103,8 +100,7 @@ def test_removing_subscribers_syncs_order_to_opensearch(opensearch_with_signals)
 
 
 def test_adding_assignees_syncs_order_to_opensearch(opensearch_with_signals):
-    """
-    Test that when an assignee is added to an order,
+    """Test that when an assignee is added to an order,
     the linked order gets synced to OpenSearch.
     """
     order = OrderFactory(assignees=[])
@@ -123,8 +119,7 @@ def test_adding_assignees_syncs_order_to_opensearch(opensearch_with_signals):
 
 
 def test_removing_assignees_syncs_order_to_opensearch(opensearch_with_signals):
-    """
-    Test that when an assignee is removed from an order,
+    """Test that when an assignee is removed from an order,
     the linked order gets synced to OpenSearch.
     """
     order = OrderFactory(assignees=[])
@@ -159,8 +154,7 @@ def test_updating_company_name_updates_orders(opensearch_with_signals):
 
 
 def test_updating_contact_name_updates_orders(opensearch_with_signals):
-    """
-    Test that when a contact's name is updated, the contact's orders are synced to OpenSearch.
+    """Test that when a contact's name is updated, the contact's orders are synced to OpenSearch.
     """
     order = OrderFactory()
     new_first_name = 'Jamie'

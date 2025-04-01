@@ -20,7 +20,7 @@ def investment_projects_and_csv_content():
 {investment_projects[0].id}
 {investment_projects[2].id}
 """
-    yield (investment_projects, csv_content.encode('utf-8'))
+    return (investment_projects, csv_content.encode('utf-8'))
 
 
 def test_run(s3_stubber, caplog, investment_projects_and_csv_content):

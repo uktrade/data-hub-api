@@ -119,8 +119,7 @@ class InteractionAdmin(BaseModelAdminMixin, VersionAdmin):
         description='source',
     )
     def pretty_source(self, obj):
-        """
-        Return the source field formatted with indentation.
+        """Return the source field formatted with indentation.
         """
         return format_json_as_html(obj.source)
 

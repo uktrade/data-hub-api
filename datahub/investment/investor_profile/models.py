@@ -11,7 +11,6 @@ from datahub.core.models import (
 )
 from datahub.core.utils import get_front_end_url
 
-
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
@@ -156,7 +155,7 @@ class LargeCapitalInvestorProfile(BaseModel):
         )
 
     def __str__(self):
-        """Human-readable representation"""
+        """Human-readable representation."""
         return f'{self.investor_company}, Large capital profile'
 
     def get_absolute_url(self):

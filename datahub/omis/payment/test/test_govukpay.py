@@ -1,11 +1,10 @@
 import pytest
 
-from datahub.omis.payment.govukpay import govuk_url, GOVUKPayAPIException, PayClient
+from datahub.omis.payment.govukpay import GOVUKPayAPIException, PayClient, govuk_url
 
 
 def test_govuk_url(settings):
-    """
-    Test that the url to a GOV.UK endpoint is built from the value base
+    """Test that the url to a GOV.UK endpoint is built from the value base
     in the django settings.
     """
     settings.GOVUK_PAY_URL = 'http://test.example.com/'
@@ -55,21 +54,21 @@ class TestPayClientCreatePayment:
         }
 
     @pytest.mark.parametrize(
-        'status_code,error_msg',
-        (
+        ('status_code', 'error_msg'),
+        [
             (400, '400 Client Error'),
             (401, '401 Client Error'),
             (404, '404 Client Error'),
             (409, '409 Client Error'),
             (500, '500 Server Error'),
-        ),
+        ],
     )
     def test_http_error(self, status_code, error_msg, requests_mock):
         """Test that if GOV.UK Pay returns an HTTP error, an exception is raised."""
         url = govuk_url('payments')
         requests_mock.post(url, status_code=status_code, reason=error_msg)
 
-        with pytest.raises(GOVUKPayAPIException) as exc:
+        with pytest.raises(GOVUKPayAPIException) as exc:  # noqa: PT012
             pay = PayClient()
             pay.create_payment(
                 amount=1234,
@@ -110,12 +109,12 @@ class TestPayClientGetPaymentById:
         assert requests_mock.request_history[-1].url == url
 
     @pytest.mark.parametrize(
-        'status_code,error_msg',
-        (
+        ('status_code', 'error_msg'),
+        [
             (401, '401 Client Error'),
             (404, '404 Client Error'),
             (500, '500 Server Error'),
-        ),
+        ],
     )
     def test_http_error(self, status_code, error_msg, requests_mock):
         """Test that if GOV.UK Pay returns an HTTP error, an exception is raised."""
@@ -123,7 +122,7 @@ class TestPayClientGetPaymentById:
         url = govuk_url(f'payments/{payment_id}')
         requests_mock.get(url, status_code=status_code, reason=error_msg)
 
-        with pytest.raises(GOVUKPayAPIException) as exc:
+        with pytest.raises(GOVUKPayAPIException) as exc:  # noqa: PT012
             pay = PayClient()
             pay.get_payment_by_id(payment_id)
         assert exc.value.detail == f'{error_msg}: {error_msg} for url: {url}'
@@ -148,14 +147,14 @@ class TestPayClientCancelPayment:
         assert requests_mock.request_history[-1].url == url
 
     @pytest.mark.parametrize(
-        'status_code,error_msg',
-        (
+        ('status_code', 'error_msg'),
+        [
             (400, '400 Client Error'),
             (401, '401 Client Error'),
             (404, '404 Client Error'),
             (409, '409 Client Error'),
             (500, '500 Server Error'),
-        ),
+        ],
     )
     def test_http_error(self, status_code, error_msg, requests_mock):
         """Test that if GOV.UK Pay returns an HTTP error, an exception is raised."""
@@ -163,7 +162,7 @@ class TestPayClientCancelPayment:
         url = govuk_url(f'payments/{payment_id}/cancel')
         requests_mock.post(url, status_code=status_code, reason=error_msg)
 
-        with pytest.raises(GOVUKPayAPIException) as exc:
+        with pytest.raises(GOVUKPayAPIException) as exc:  # noqa: PT012
             pay = PayClient()
             pay.cancel_payment(payment_id)
         assert exc.value.detail == f'{error_msg}: {error_msg} for url: {url}'

@@ -5,7 +5,6 @@ from datahub.omis.order.models import Order
 from datahub.omis.order.test.factories import OrderFactory
 from datahub.omis.quote.test.factories import CancelledQuoteFactory
 
-
 pytestmark = pytest.mark.django_db
 
 
@@ -13,11 +12,10 @@ class TestOrderManager:
     """Tests for the Order Manager."""
 
     @pytest.mark.parametrize(
-        'include_reopened', (False, True),
+        'include_reopened', [False, True],
     )
     def test_publicly_accessible(self, include_reopened):
-        """
-        Test that `publicly_accessible()` only returns the publicly accessible orders.
+        """Test that `publicly_accessible()` only returns the publicly accessible orders.
         """
         # set up db
         for order_status_choice in OrderStatus.choices:

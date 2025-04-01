@@ -36,8 +36,7 @@ class SearchApp:
 
     @classmethod
     def connect_signals(cls):
-        """
-        Connects all signal handlers so DB models can be synced with OpenSearch on save.
+        """Connects all signal handlers so DB models can be synced with OpenSearch on save.
         """
         for receiver in cls.get_signal_receivers():
             receiver.connect()
@@ -50,8 +49,7 @@ class SearchApp:
 
     @classmethod
     def get_permission_filters(cls, request):
-        """
-        Gets filter arguments used to enforce permissions.
+        """Gets filter arguments used to enforce permissions.
 
         The returned dict contains rules in the form of field names and values. Results must
         match at least one of these rules.
@@ -73,8 +71,7 @@ def get_search_apps():
 
 
 def get_search_apps_by_name(app_names=None):
-    """
-    Returns the apps for a particular set of app names.
+    """Returns the apps for a particular set of app names.
 
     :param app_names: list of search app names to return app instances for, falsey value for
                       all apps
@@ -112,8 +109,7 @@ def are_apps_initialised(apps):
 
 @lru_cache(maxsize=None)
 def get_search_app_by_model(model):
-    """
-    :returns: a single search app (by django model)
+    """:returns: a single search app (by django model)
     :param model: django model for the search app
     :raises LookupError: if it can't find the search app
     """
@@ -125,8 +121,7 @@ def get_search_app_by_model(model):
 
 @lru_cache(maxsize=None)
 def get_search_app_by_search_model(search_model):
-    """
-    :returns: a single search app (by django model)
+    """:returns: a single search app (by django model)
     :param search_model: search model for the search app
     :raises LookupError: if it can't find the search app
     """
@@ -159,8 +154,7 @@ class SearchConfig(AppConfig):
     verbose_name = 'Search'
 
     def ready(self):
-        """
-        Configures the default OpenSearch connection, connects signal receivers and
+        """Configures the default OpenSearch connection, connects signal receivers and
         registers views.
         """
         # The automatic connection configuration is disabled during tests because the connection

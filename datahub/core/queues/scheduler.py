@@ -4,13 +4,14 @@ from django.conf import settings
 from redis import Redis
 from rq import (
     Queue as RqQueue,
+)
+from rq import (
     SimpleWorker,
     Worker,
 )
 from rq.job import Job
 from rq.registry import BaseRegistry
 from rq_scheduler import Scheduler
-
 
 logger = getLogger(__name__)
 
@@ -19,9 +20,8 @@ LONG_RUNNING_QUEUE = 'long-running'
 
 
 class WorkerStrategy:
-    """
-    Worker base facilitating connections and implementations around processing queues
-    See https://python-rq.org/docs/workers/ for more information
+    """Worker base facilitating connections and implementations around processing queues
+    See https://python-rq.org/docs/workers/ for more information.
     """
 
     def __init__(self, connection):
@@ -42,9 +42,8 @@ class Fork(WorkerStrategy):
 
 
 class DataHubScheduler:
-    """
-    Datahub Queue utilising RQ to instantiate different types of Queues
-    for processing work using Redis as the underlying PUB SUB durability layer
+    """Datahub Queue utilising RQ to instantiate different types of Queues
+    for processing work using Redis as the underlying PUB SUB durability layer.
     """
 
     def __init__(

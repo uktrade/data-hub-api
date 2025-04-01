@@ -10,10 +10,8 @@ MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
 
 
 @reversion.register_base_model()
-class IngestedFile(models.Model):
-    """
-    Model to track which Company Activity data source files have been ingested already
-    """
+class IngestedFile(models.Model):  # noqa: DJ008
+    """Model to track which Company Activity data source files have been ingested already."""
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     created_on = models.DateTimeField(
@@ -22,9 +20,7 @@ class IngestedFile(models.Model):
     )
     filepath = models.CharField(
         max_length=MAX_LENGTH,
-        help_text=(
-            'The S3 object path including prefix of the ingested file'
-        ),
+        help_text=('The S3 object path including prefix of the ingested file'),
     )
     file_created = models.DateTimeField(
         default=timezone.now,

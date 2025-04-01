@@ -17,13 +17,11 @@ from datahub.omis.quote.constants import (
     QUOTE_EXPIRY_DAYS_FROM_NOW,
 )
 
-
 QUOTE_TEMPLATE = str(PurePath(__file__).parent / 'templates/content.md')
 
 
 def escape_markdown(content, escape_html=True):
-    """
-    Escape markdown characters so that when it's interpreted
+    """Escape markdown characters so that when it's interpreted
     the converted text is not a valid markdown text.
 
     :param escape_html: html chars are escaped if True.
@@ -44,8 +42,7 @@ def escape_markdown(content, escape_html=True):
 
 
 def generate_quote_reference(order):
-    """
-    :returns: a random unused reference of form:
+    """:returns: a random unused reference of form:
             <order.reference>/Q-<(2) lettes>/<(1) number> e.g. GEA962/16/Q-AB1
     :raises RuntimeError: if no reference can be generated.
     """
@@ -60,8 +57,7 @@ def generate_quote_reference(order):
 
 
 def generate_quote_content(order, expires_on):
-    """
-    :returns: the content of the quote populated with the given order details.
+    """:returns: the content of the quote populated with the given order details.
     """
     company = order.company
     company_address = compose_official_address(company)
@@ -98,10 +94,9 @@ def generate_quote_content(order, expires_on):
 
 
 def calculate_quote_expiry_date(order):
-    """
-    :returns: the calculated expiry date value for the quote attached to the order.
-        At the moment it's whichever is earliest of
-        [delivery date - x days] OR [date quote created + y days]
+    """:returns: the calculated expiry date value for the quote attached to the order.
+    At the moment it's whichever is earliest of
+    [delivery date - x days] OR [date quote created + y days]
     """
     now_date = now().date()
 
@@ -126,8 +121,7 @@ def calculate_quote_expiry_date(order):
 
 
 def get_latest_terms_and_conditions():
-    """
-    :returns: the latest TermsAndConditions object if it exists, None otherwise.
+    """:returns: the latest TermsAndConditions object if it exists, None otherwise.
     """
     from datahub.omis.quote.models import TermsAndConditions
 

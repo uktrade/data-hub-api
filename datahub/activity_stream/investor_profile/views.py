@@ -7,16 +7,14 @@ from datahub.investment.investor_profile.models import LargeCapitalInvestorProfi
 
 
 class LargeCapitalInvestorProfileCursorPagination(ActivityCursorPagination):
-    """
-    Cursor pagination for Large Capital Investor Profile.
+    """Cursor pagination for Large Capital Investor Profile.
     """
 
     summary = 'Large Capital Investor Profile Activities'
 
 
 class LargeCapitalInvestorProfileActivityViewSet(ActivityViewSet):
-    """
-    Large Capital Investor Profile ViewSet for the activity stream
+    """Large Capital Investor Profile ViewSet for the activity stream.
     """
 
     pagination_class = LargeCapitalInvestorProfileCursorPagination

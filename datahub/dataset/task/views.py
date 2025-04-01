@@ -9,7 +9,7 @@ class TasksDatasetView(BaseFilterDatasetView):
     """A GET API view to return the data for recently modified tasks."""
 
     def get_dataset(self, request):
-        """Returns queryset of Task records"""
+        """Returns queryset of Task records."""
         queryset = Task.objects.annotate(
             adviser_ids=ArrayAgg('advisers__id', ordering=[
                 'advisers__first_name',

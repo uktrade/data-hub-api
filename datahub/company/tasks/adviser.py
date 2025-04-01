@@ -1,11 +1,8 @@
 import logging
-
 from datetime import date
 
 import reversion
-
 from dateutil.relativedelta import relativedelta
-
 from django.db.models import Exists, OuterRef, Q
 from django_pglocks import advisory_lock
 
@@ -20,7 +17,6 @@ from datahub.interaction.models import Interaction
 from datahub.investment.opportunity.models import LargeCapitalOpportunity
 from datahub.investment.project.models import InvestmentProject, InvestmentProjectTeamMember
 from datahub.omis.order.models import Order
-
 
 logger = logging.getLogger(__name__)
 
@@ -158,8 +154,7 @@ def schedule_automatic_adviser_deactivate(limit=1000, simulate=False):
 
 
 def automatic_adviser_deactivate(limit=1000, simulate=False):
-    """
-    Deactivate inactive advisers.
+    """Deactivate inactive advisers.
     """
     with advisory_lock('automatic_adviser_deactivate', wait=False) as acquired:
 

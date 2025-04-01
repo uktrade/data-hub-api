@@ -64,7 +64,7 @@ class GroupFactory(factory.django.DjangoModelFactory):
 
 
 class PermissionFactory(factory.django.DjangoModelFactory):
-    """Permission Factory"""
+    """Permission Factory."""
 
     name = factory.Faker('word')
     codename = factory.Faker('word')

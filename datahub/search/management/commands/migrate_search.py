@@ -10,8 +10,7 @@ logger = getLogger(__name__)
 
 
 class Command(BaseCommand):
-    """
-    Command for migrating an OpenSearch index.
+    """Command for migrating an OpenSearch index.
 
     This will also create OpenSearch indices the first time it is run.
     """

@@ -33,8 +33,7 @@ class TestDocsSchemaView(AdminTestMixin):
 
     @pytest.mark.parametrize('version', ['v1', 'v3', 'v4'])
     def test_returns_200_if_logged_in(self, client, version):
-        """
-        Test that a 200 is returned if a user is logged in using session authentication.
+        """Test that a 200 is returned if a user is logged in using session authentication.
 
         This is primarily to make sure that the page is functioning and no views are breaking it.
         """

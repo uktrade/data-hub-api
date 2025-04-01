@@ -3,13 +3,12 @@ from datahub.dataset.core.views import BaseDatasetView
 
 
 class CompanyObjectiveDatasetView(BaseDatasetView):
-    """
-    A GET API view to return the data for company objectives as required
+    """A GET API view to return the data for company objectives as required
     for syncing by Data-flow periodically.
     """
 
     def get_dataset(self):
-        """Returns list of CompanyObjective records"""
+        """Returns list of CompanyObjective records."""
         return Objective.objects.values(
             'id',
             'company_id',

@@ -6,7 +6,6 @@ from datahub.dbmaintenance.management.base import CSVBaseCommand
 from datahub.dbmaintenance.utils import parse_limited_string, parse_uuid
 from datahub.metadata.models import Sector, SectorCluster
 
-
 logger = getLogger(__name__)
 
 

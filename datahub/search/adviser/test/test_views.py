@@ -7,7 +7,6 @@ from datahub.core.test_utils import APITestMixin, create_test_user
 from datahub.metadata.test.factories import TeamFactory
 from datahub.search.adviser import AdviserSearchApp
 
-
 pytestmark = [
     pytest.mark.django_db,
     # Index objects for this search app only
@@ -19,7 +18,7 @@ class TestSearch(APITestMixin):
     """Tests search views."""
 
     def test_adviser_search_no_permissions(self):
-        """Should return 403"""
+        """Should return 403."""
         user = create_test_user(dit_team=TeamFactory())
         api_client = self.create_api_client(user=user)
         url = reverse('api-v4:search:adviser')

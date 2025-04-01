@@ -1,10 +1,8 @@
 import datetime
-
 from uuid import UUID
 
 import factory
 import pytest
-
 from freezegun import freeze_time
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -86,8 +84,7 @@ class TestValidateViewSortByAttributes:
         assert not invalid_fields
 
     def test_sort_by_remapping_keys_are_sort_by_fields(self, search_view):
-        """
-        Validate that the keys of view.es_sort_by_remappings are in serializer.SORT_BY_FIELDS.
+        """Validate that the keys of view.es_sort_by_remappings are in serializer.SORT_BY_FIELDS.
         """
         if not hasattr(search_view, 'es_sort_by_remappings'):
             return
@@ -156,7 +153,7 @@ class TestBasicSearch(APITestMixin):
             end = start + page_size
             assert ids[start:end] == [result['id'] for result in response.data['results']]
 
-    @pytest.mark.parametrize('entity', ('sloth',))
+    @pytest.mark.parametrize('entity', ['sloth'])
     def test_400_with_invalid_entity(self, opensearch_with_collector, entity):
         """Tests case where provided entity is invalid."""
         url = reverse('api-v3:search:basic')
@@ -207,8 +204,8 @@ class TestBasicSearch(APITestMixin):
         ] == [result['name'] for result in response.data['results']]
 
     @pytest.mark.parametrize(
-        'name,search_term,should_match',
-        (
+        ('name', 'search_term', 'should_match'),
+        [
             ('The Risk Advisory Group', 'The Advisory', True),
             ('The Advisory Group', 'The Advisory', True),
             ('The Advisory', 'The Advisory', True),
@@ -226,7 +223,7 @@ class TestBasicSearch(APITestMixin):
             ('Smarterlight Ltd', 'Smarterlight Inc', False),
             ('Charterhouse', 'Hotel', False),
             ('Block C, The Courtyard, 55 Charterhouse Street', 'Hotel', False),
-        ),
+        ],
     )
     def test_fuzzy_quality_single_field(
         self,
@@ -236,8 +233,7 @@ class TestBasicSearch(APITestMixin):
         search_term,
         should_match,
     ):
-        """
-        Tests quality of results for fuzzy matching.
+        """Tests quality of results for fuzzy matching.
 
         This should not only hit on exact matches, but also close matches.
         """
@@ -264,14 +260,14 @@ class TestBasicSearch(APITestMixin):
             assert response.data['count'] == 0
 
     @pytest.mark.parametrize(
-        'name,address,search_term,should_match',
-        (
+        ('name', 'address', 'search_term', 'should_match'),
+        [
             ('Charterhouse', 'Block C, The Courtyard, 55 Charterhouse Street', 'Hotel', False),
             ('Charterhouse', 'Overlook Hotel, Courtyard, 55 Charterhouse', 'Hotel', True),
             ('Charterhouse', 'Overlook Hotel, Courtyard, 55 Charterhouse', 'Hotal', True),
             ('Charterhouse', 'Overlook Hotel, Courtyard, 55 Charterhouse', 'Hartleyhouse', False),
             ('Charterhouse', 'Overlook Hotel, Courtyard, 55 London Road', 'Chatterhouse', True),
-        ),
+        ],
     )
     def test_fuzzy_quality_multi_field(
         self,
@@ -282,8 +278,7 @@ class TestBasicSearch(APITestMixin):
         search_term,
         should_match,
     ):
-        """
-        Tests quality of results for fuzzy matching multiple fields.
+        """Tests quality of results for fuzzy matching multiple fields.
 
         This should not only hit on exact matches, but also close matches.
         """
@@ -315,8 +310,7 @@ class TestBasicSearch(APITestMixin):
         opensearch_with_collector,
         search_support_user,
     ):
-        """
-        Tests quality of results for fuzzy matching across multiple fields.
+        """Tests quality of results for fuzzy matching across multiple fields.
 
         Unfortunately we require "combined_fields" matching (introduced in OpenSearch
         v 7.13) to do fuzzy matching across multiple fields, but we should still be
@@ -363,8 +357,7 @@ class TestBasicSearch(APITestMixin):
         opensearch_with_collector,
         search_support_user,
     ):
-        """
-        Tests that name is more important than other fields in cross field matches.
+        """Tests that name is more important than other fields in cross field matches.
         """
         SimpleModel.objects.create(name='Smaxtec Limited', address='')
         SimpleModel.objects.create(name='Newsmax Media (HQ Florida)', address='')
@@ -538,8 +531,8 @@ class TestBasicSearch(APITestMixin):
         assert all(aggregation in response.data['aggregations'] for aggregation in aggregations)
 
     @pytest.mark.parametrize(
-        'permission,permission_entity',
-        (
+        ('permission', 'permission_entity'),
+        [
             ('view_company', 'company'),
             ('view_contact', 'contact'),
             ('view_event', 'event'),
@@ -548,15 +541,14 @@ class TestBasicSearch(APITestMixin):
             ('view_associated_investmentproject', 'investment_project'),
             ('view_order', 'order'),
             ('view_advisor', 'adviser'),
-        ),
+        ],
     )
     @pytest.mark.parametrize(
         'entity',
-        ('company', 'contact', 'event', 'interaction', 'investment_project', 'order', 'adviser'),
+        ['company', 'contact', 'event', 'interaction', 'investment_project', 'order', 'adviser'],
     )
     def test_permissions(self, opensearch_with_collector, permission, permission_entity, entity):
-        """
-        Tests model permissions enforcement in basic search.
+        """Tests model permissions enforcement in basic search.
 
         TODO: we should test permissions relevant to a specific search app in the tests for that
             search app, and remove this test.
@@ -683,8 +675,7 @@ class TestEntitySearch(APITestMixin):
         hierarchical_sectors,
         opensearch_with_collector,
     ):
-        """
-        Test that the sector_descends filter excludes ancestor sectors
+        """Test that the sector_descends filter excludes ancestor sectors
         (where a child sector already exists) for interactions.
 
         """
@@ -744,8 +735,7 @@ class TestEntitySearch(APITestMixin):
         hierarchical_sectors,
         opensearch_with_collector,
     ):
-        """
-        Test that the sector_descends filter excludes ancestor sectors
+        """Test that the sector_descends filter excludes ancestor sectors
         (where a child sector already exists) for companies.
 
         """

@@ -39,8 +39,7 @@ def sync_company_with_dnb(
     fields_to_update=None,
     update_descriptor=None,
 ):
-    """
-    Sync a company record with data sourced from DNB. This task will interact with dnb-service to
+    """Sync a company record with data sourced from DNB. This task will interact with dnb-service to
     get the latest data for the company.
 
     `company_id` identifies the company record to sync and `fields_to_update` defines an iterable
@@ -87,8 +86,7 @@ def sync_company_with_dnb_rate_limited(
     simulate=False,
     max_requests=5,
 ):
-    """
-    A rate limited wrapper around the sync_company_with_dnb task. This task
+    """A rate limited wrapper around the sync_company_with_dnb task. This task
     can be used for bulk tasks to ensure that we do not exceed our agreed
     rate limit with D&B.
     """
@@ -168,8 +166,7 @@ def sync_outdated_companies_with_dnb(
     simulate=True,
     max_requests=5,
 ):
-    """
-    Sync company records with data sourced from DNB which are determined as outdated.
+    """Sync company records with data sourced from DNB which are determined as outdated.
     This task will filter dnb-matched companies which have a `dnb_modified_on` date which is before
     `dnb_modified_on_before` and will then interact with dnb-service to get the latest data to sync
     these companies.

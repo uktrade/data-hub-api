@@ -9,8 +9,7 @@ def get_unreferenced_objects_query(
     excluded_relations=(),
     relation_exclusion_filter_mapping=None,
 ):
-    """
-    Generates a query set of unreferenced objects for a model.
+    """Generates a query set of unreferenced objects for a model.
 
     :param model: the model to generate a query set of unreferenced objects
     :param excluded_relations: related fields on model that should be ignored
@@ -20,7 +19,7 @@ def get_unreferenced_objects_query(
         objects for that relation prior to checking if any references to the model exist (for
         that relation).
 
-        Example:
+    Example:
             This example will not consider interactions dated before 2015-01-01 when getting
             unreferenced companies.
 
@@ -58,8 +57,7 @@ def get_unreferenced_objects_query(
 
 
 def get_relations_to_delete(model):
-    """
-    Returns all the fields of `model` that point to models which would get deleted
+    """Returns all the fields of `model` that point to models which would get deleted
     (on cascade) as a result this model getting deleted.
 
     :param model: model class

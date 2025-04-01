@@ -2,8 +2,7 @@ from rest_framework.pagination import CursorPagination
 
 
 class DatasetCursorPagination(CursorPagination):
-    """
-    Cursor Pagination for dataset api endpoints
+    """Cursor Pagination for dataset api endpoints.
     """
 
     ordering = ('created_on', 'pk')

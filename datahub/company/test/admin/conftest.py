@@ -5,8 +5,7 @@ import pytest
 
 @pytest.fixture
 def dnb_response():
-    """
-    Minimal valid DNB response
+    """Minimal valid DNB response.
     """
     return {
         'results': [
@@ -45,7 +44,7 @@ def mock_get_user_by_email(monkeypatch):
     """Mock get_user_by_email()."""
     mock = Mock()
     monkeypatch.setattr('datahub.company.admin.adviser_forms.get_user_by_email', mock)
-    yield mock
+    return mock
 
 
 @pytest.fixture
@@ -53,4 +52,4 @@ def mock_get_user_by_email_user_id(monkeypatch):
     """Mock get_user_by_email_user_id()."""
     mock = Mock()
     monkeypatch.setattr('datahub.company.admin.adviser_forms.get_user_by_email_user_id', mock)
-    yield mock
+    return mock

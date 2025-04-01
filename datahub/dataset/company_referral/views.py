@@ -4,13 +4,12 @@ from datahub.dataset.utils import filter_data_by_modified_date
 
 
 class CompanyReferralDatasetView(BaseFilterDatasetView):
-    """
-    A GET API view to return the data for all company referrals for syncing
+    """A GET API view to return the data for all company referrals for syncing
     by data flow periodically.
     """
 
     def get_dataset(self, request):
-        """Returns list of CompanyReferral records"""
+        """Returns list of CompanyReferral records."""
         queryset = CompanyReferral.objects.values(
             'company_id',
             'completed_by_id',

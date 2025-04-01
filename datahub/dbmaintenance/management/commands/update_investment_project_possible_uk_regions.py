@@ -6,13 +6,11 @@ from datahub.dbmaintenance.management.base import CSVBaseCommand
 from datahub.dbmaintenance.utils import parse_bool, parse_uuid, parse_uuid_list
 from datahub.investment.project.models import InvestmentProject
 
-
 logger = getLogger(__name__)
 
 
 class Command(CSVBaseCommand):
-    """
-    Command to update investment_project.uk_region_locations and
+    """Command to update investment_project.uk_region_locations and
     investment_project.allow_blank_possible_uk_regions.
     """
 

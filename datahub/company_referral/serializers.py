@@ -56,8 +56,7 @@ class CompleteCompanyReferralSerializer(InteractionSerializer):
     }
 
     def validate(self, data):
-        """
-        Validate provided data.
+        """Validate provided data.
 
         Checks that the referral has the expected status.
         """

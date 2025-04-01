@@ -34,8 +34,7 @@ def load_file_contents_and_name(token):
 
 
 def save_file_contents_and_name(token, contents, name):
-    """
-    Save the contents of a file and the file's name to the cache.
+    """Save the contents of a file and the file's name to the cache.
 
     (This is used to store the file while the preview page is being displayed to the user.)
     """

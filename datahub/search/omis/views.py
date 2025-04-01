@@ -13,7 +13,7 @@ from datahub.omis.payment.constants import RefundStatus
 from datahub.omis.payment.models import Refund
 from datahub.search.omis import OrderSearchApp
 from datahub.search.omis.serializers import SearchOrderQuerySerializer
-from datahub.search.views import register_v3_view, SearchAPIView, SearchExportAPIView
+from datahub.search.views import SearchAPIView, SearchExportAPIView, register_v3_view
 
 
 class SearchOrderAPIViewMixin:

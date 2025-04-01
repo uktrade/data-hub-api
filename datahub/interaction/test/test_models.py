@@ -22,20 +22,19 @@ def test_interaction_get_absolute_url():
 
 
 class TestInteractionExportCountry:
-    """Tests Interaction export country model"""
+    """Tests Interaction export country model."""
 
     @pytest.mark.django_db
     def test_str(self):
-        """Test the human friendly string representation of the object"""
+        """Test the human friendly string representation of the object."""
         export_country = InteractionExportCountryFactory()
         status = f'{export_country.interaction} {export_country.country} {export_country.status}'
         assert str(export_country) == status
 
     @pytest.mark.django_db
     def test_unique_constraint(self):
-        """
-        Test unique constraint
-        a interaction and country combination can't be added more than once
+        """Test unique constraint
+        a interaction and country combination can't be added more than once.
         """
         interaction = CompanyInteractionFactory()
         country = random_obj_for_model(Country)
@@ -57,8 +56,7 @@ class TestInteraction:
     """Tests for the Interaction model."""
 
     def test_save(self):
-        """
-        Test save also saves to the `CompanyActivity` model.
+        """Test save also saves to the `CompanyActivity` model.
         Test save does not save to the `CompanyActivity` model if it already exists.
         """
         assert not CompanyActivity.objects.all().exists()

@@ -13,8 +13,7 @@ class Command(CSVBaseCommand):
     """
 
     def _parse_company_id(self, company_id):
-        """
-        :param company_id: string representing uuid of the company
+        """:param company_id: string representing uuid of the company
         :return: instance of UUID or None
         """
         if not company_id or company_id.lower().strip() == 'null':
@@ -29,8 +28,7 @@ class Command(CSVBaseCommand):
         uk_company_id,
         uk_company_decided,
     ):
-        """
-        Checks if Investment project should be updated.
+        """Checks if Investment project should be updated.
 
         :param investment_project: instance of InvestmentProject
         :param investor_company: instance of Company or None
@@ -47,8 +45,7 @@ class Command(CSVBaseCommand):
         )
 
     def get_uk_company_decided(self, uk_company_decided):
-        """
-        :param uk_company_decided: string containing either '1' or '0'
+        """:param uk_company_decided: string containing either '1' or '0'
         :return: Boolean
         """
         translate = {

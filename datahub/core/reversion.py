@@ -5,8 +5,7 @@ EXCLUDED_BASE_MODEL_FIELDS = ('created_on', 'created_by', 'modified_on', 'modifi
 
 
 def register_base_model(extra_exclude=None, **kwargs):
-    """
-    Shortcut to reversion.register() which excludes some fields defined on BaseModel
+    """Shortcut to reversion.register() which excludes some fields defined on BaseModel
     by default.
 
     These aren't particularly useful to save in django-reversion versions because
@@ -36,12 +35,11 @@ def register_base_model(extra_exclude=None, **kwargs):
 
 
 class NonAtomicRevisionMiddleware(RevisionMiddleware):
-    """
-    Same as reversion.middleware.RevisionMiddleware but with atomic == False.
+    """Same as reversion.middleware.RevisionMiddleware but with atomic == False.
     Therefore the resulting atomic value depends on:
     - the `ATOMIC_REQUESTS` settings
     - whether `transaction.atomic()` is used
-    - whether `transaction.non_atomic_requests()` is used
+    - whether `transaction.non_atomic_requests()` is used.
     """
 
     atomic = False

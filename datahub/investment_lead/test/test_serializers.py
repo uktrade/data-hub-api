@@ -30,7 +30,7 @@ pytestmark = pytest.mark.django_db
 
 
 class TestCreateEYBLeadTriageSerializer:
-    """Tests for CreateEYBLeadTriageSerializer"""
+    """Tests for CreateEYBLeadTriageSerializer."""
 
     def test_create_lead_from_valid_triage_data(self, eyb_lead_triage_data):
         serializer = CreateEYBLeadTriageSerializer(data=eyb_lead_triage_data)
@@ -167,7 +167,7 @@ class TestCreateEYBLeadTriageSerializer:
 
 
 class TestCreateEYBLeadUserSerializer:
-    """Tests for CreateEYBLeadUserSerializer"""
+    """Tests for CreateEYBLeadUserSerializer."""
 
     def test_create_lead_from_valid_user_data(self, eyb_lead_user_data):
         serializer = CreateEYBLeadUserSerializer(data=eyb_lead_user_data)
@@ -286,12 +286,12 @@ class TestCreateEYBLeadUserSerializer:
         assert_ingested_eyb_user_data(instance, serializer.data)
 
     @pytest.mark.parametrize(
-        'value,expected_value',
-        (
+        ('value', 'expected_value'),
+        [
             (None, 'Not set'),
             ('', 'Not set'),
             ('Abc Def', 'Abc Def'),
-        ),
+        ],
     )
     def test_full_name_defaults_to_not_set_for_empty_or_null(
         self,
@@ -313,7 +313,7 @@ class TestCreateEYBLeadUserSerializer:
 
 
 class TestCreateEYBLeadMarketingSerializer:
-    """Tests for CreateEYBLeadMarketingSerializer"""
+    """Tests for CreateEYBLeadMarketingSerializer."""
 
     def test_lead_is_created_when_all_fields_contain_valid_data(self, eyb_lead_marketing_data):
         serializer = CreateEYBLeadMarketingSerializer(data=eyb_lead_marketing_data)
@@ -385,7 +385,7 @@ class TestCreateEYBLeadMarketingSerializer:
 
 
 class TestRetrieveEYBLeadSerializer:
-    """Tests for RetrieveEYBLeadSerializer"""
+    """Tests for RetrieveEYBLeadSerializer."""
 
     def test_retrieve_eyb_lead(self, eyb_lead_instance_from_db):
         serializer = RetrieveEYBLeadSerializer(eyb_lead_instance_from_db)

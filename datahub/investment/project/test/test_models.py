@@ -15,7 +15,6 @@ from datahub.investment.project.test.factories import (
     InvestmentProjectTeamMemberFactory,
 )
 
-
 pytestmark = pytest.mark.django_db
 
 
@@ -24,7 +23,7 @@ def test_project_code_cdms():
     project = InvestmentProjectFactory(cdms_project_code='P-79661656')
     assert project.project_code == 'P-79661656'
     with pytest.raises(ObjectDoesNotExist):
-        project.investmentprojectcode
+        project.investmentprojectcode  # noqa: B018
 
 
 def test_project_code_datahub():
@@ -53,8 +52,7 @@ def test_interaction_get_absolute_url():
 
 
 def test_client_relationship_manager_team_none():
-    """
-    Tests client_relationship_manager_team for a project without a client relationship
+    """Tests client_relationship_manager_team for a project without a client relationship
     manager.
     """
     project = InvestmentProjectFactory(client_relationship_manager=None)
@@ -62,8 +60,7 @@ def test_client_relationship_manager_team_none():
 
 
 def test_client_relationship_manager_team_valid():
-    """
-    Tests client_relationship_manager_team for a project with a client relationship
+    """Tests client_relationship_manager_team for a project with a client relationship
     manager.
     """
     project = InvestmentProjectFactory()
@@ -71,8 +68,7 @@ def test_client_relationship_manager_team_valid():
 
 
 def test_investor_company_country_none():
-    """
-    Tests client_relationship_manager_team for a project without a client relationship
+    """Tests client_relationship_manager_team for a project without a client relationship
     manager.
     """
     project = InvestmentProjectFactory(investor_company=None)
@@ -118,12 +114,12 @@ def test_project_assurance_team_valid():
 
 @pytest.mark.parametrize(
     'field',
-    (
+    [
         'client_relationship_manager',
         'project_assurance_adviser',
         'project_manager',
         'created_by',
-    ),
+    ],
 )
 def test_associated_advisers_specific_roles(field):
     """Tests that get_associated_advisers() includes advisers in specific roles."""
@@ -184,9 +180,7 @@ def test_doesnt_create_stage_log_if_stage_was_not_modified():
 def test_stage_log_added_when_investment_project_is_created():
     """Tests that stage is being logged when Investment Projects is created."""
     project = InvestmentProjectFactory()
-    assert [
-        (entry.stage.id, entry.created_on) for entry in project.stage_log.all()
-    ] == [
+    assert [(entry.stage.id, entry.created_on) for entry in project.stage_log.all()] == [
         (
             UUID(constants.InvestmentProjectStage.prospect.value.id),
             datetime(2017, 4, 28, 17, 35, tzinfo=timezone.utc),

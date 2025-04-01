@@ -2,10 +2,8 @@ from unittest import mock
 from unittest.mock import patch
 
 import pytest
-
 from django.core.management import call_command
 from django.db import DatabaseError
-
 from reversion.models import Version
 
 from datahub.company.models import Company, Contact
@@ -51,14 +49,13 @@ def test_base_stova_attendee():
 class TestRemoveStovaRelationsCommand:
     @pytest.mark.parametrize(
         ('simulate'),
-        (
+        [
             False,
             pytest.param(True, marks=pytest.mark.xfail(strict=True)),
-        ),
+        ],
     )
     def test_interactions_from_stova_are_removed(self, test_base_stova_attendee, simulate, caplog):
-        """
-        Test interactions created by Stova Attendees are removed and interactions not created by
+        """Test interactions created by Stova Attendees are removed and interactions not created by
         stova are not removed.
         """
         s3_processor_mock = mock.Mock()
@@ -83,14 +80,13 @@ class TestRemoveStovaRelationsCommand:
 
     @pytest.mark.parametrize(
         ('simulate'),
-        (
+        [
             False,
             pytest.param(True, marks=pytest.mark.xfail(strict=True)),
-        ),
+        ],
     )
     def test_contacts_from_stova_are_removed(self, test_base_stova_attendee, simulate, caplog):
-        """
-        Test contacts created by Stova Attendees are removed and contacts not created by stova are
+        """Test contacts created by Stova Attendees are removed and contacts not created by stova are
         not removed.
         """
         s3_processor_mock = mock.Mock()
@@ -116,14 +112,13 @@ class TestRemoveStovaRelationsCommand:
 
     @pytest.mark.parametrize(
         ('simulate'),
-        (
+        [
             False,
             pytest.param(True, marks=pytest.mark.xfail(strict=True)),
-        ),
+        ],
     )
     def test_companies_from_stova_are_removed(self, test_base_stova_attendee, simulate, caplog):
-        """
-        Test companies created by Stova Attendees are removed and companies not created by stova
+        """Test companies created by Stova Attendees are removed and companies not created by stova
         are not removed.
         """
         s3_processor_mock = mock.Mock()
@@ -195,8 +190,7 @@ class TestRemoveStovaRelationsCommand:
         test_base_stova_attendee,
         caplog,
     ):
-        """
-        Tests the transaction is rolled back if there is an issue deleting an object.
+        """Tests the transaction is rolled back if there is an issue deleting an object.
         This transaction creates a reversion which should not happen if the delete fails.
         """
         s3_processor_mock = mock.Mock()
@@ -292,8 +286,7 @@ class TestRemoveStovaRelationsCommand:
         assert Interaction.objects.count() == 1
 
     def test_batch_size(self, test_base_stova_attendee):
-        """
-        Test objects are deleted based on their batch_size from the management command.
+        """Test objects are deleted based on their batch_size from the management command.
         """
         s3_processor_mock = mock.Mock()
         task = StovaAttendeeIngestionTask('dummy-prefix', s3_processor_mock)

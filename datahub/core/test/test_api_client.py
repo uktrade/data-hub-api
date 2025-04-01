@@ -41,7 +41,7 @@ class TestHawkAuth:
             },
         )
 
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError):  # noqa: PT011
             request.register_hook.call_args[0][1](response)
 
     def test_response_not_verified_if_verification_disabled(self):
@@ -54,20 +54,20 @@ class TestHawkAuth:
 
 
 class TestTokenAuth:
-    """
-    Tests TokenAuth.
-    """
+    """Tests TokenAuth."""
 
     @pytest.mark.parametrize(
-        'token_auth_args,expected_authorization',
-        (
+        ('token_auth_args', 'expected_authorization'),
+        [
             (
-                ['abc123'], 'Token abc123',
+                ['abc123'],
+                'Token abc123',
             ),
             (
-                ['foobarbaz', 'Key'], 'Key foobarbaz',
+                ['foobarbaz', 'Key'],
+                'Key foobarbaz',
             ),
-        ),
+        ],
     )
     def test_requests_with_no_body_are_signed(self, token_auth_args, expected_authorization):
         """Tests that requests without a body are signed."""
@@ -93,8 +93,7 @@ class TestAPIClient:
         assert response.request.timeout is None
 
     def test_raises_exception_on_unsuccessful_request_if_flag_is_true(self, requests_mock):
-        """
-        Tests that an exception is raised on an successful request
+        """Tests that an exception is raised on an successful request
         if the raise_for_status argument is True.
         """
         api_url = 'http://test/v1/'
@@ -107,8 +106,7 @@ class TestAPIClient:
         assert excinfo.value.response.status_code == 404
 
     def test_doesnt_raise_exception_on_unsuccessful_request_if_flag_is_false(self, requests_mock):
-        """
-        Tests that no exception is raised on an successful request
+        """Tests that no exception is raised on an successful request
         if the raise_for_status argument is False.
         """
         api_url = 'http://test/v1/'
@@ -151,7 +149,7 @@ class TestAPIClient:
         assert response.status_code == 200
         assert response.request.headers['Accept'] == '*/*'
 
-    @pytest.mark.parametrize('default_timeout', (10, None))
+    @pytest.mark.parametrize('default_timeout', [10, None])
     def test_can_override_timeout_per_request(self, requests_mock, default_timeout):
         """Tests that the timeout can be overridden for a specific request."""
         api_url = 'http://test/v1/'
@@ -191,10 +189,12 @@ class TestAPIClient:
         api_url = 'http://test/v1/'
         requests_mock.get('http://test/v1/path/to/item', status_code=200)
 
-        request = Mock(headers={
-            'x-b3-traceid': '123',
-            'x-b3-spanid': '456',
-        })
+        request = Mock(
+            headers={
+                'x-b3-traceid': '123',
+                'x-b3-spanid': '456',
+            },
+        )
 
         api_client = APIClient(api_url, request=request)
         response = api_client.request(

@@ -3,12 +3,15 @@ from functools import wraps
 from urllib.parse import urlencode
 
 from django import forms
-from django.contrib import admin, messages as django_messages
+from django.contrib import admin
+from django.contrib import messages as django_messages
 from django.contrib.admin.templatetags.admin_urls import admin_urlname
 from django.contrib.admin.views.main import TO_FIELD_VAR
 from django.core.exceptions import ValidationError
 from django.core.files.uploadhandler import FileUploadHandler, SkipFile
-from django.template.defaultfilters import date as date_filter, filesizeformat, time as time_filter
+from django.template.defaultfilters import date as date_filter
+from django.template.defaultfilters import filesizeformat
+from django.template.defaultfilters import time as time_filter
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
@@ -19,7 +22,7 @@ EXPORT_WIN_GROUP_NAME = 'ExportWinAdmin'
 
 
 class DisabledOnFilter(admin.SimpleListFilter):
-    """This filter allows us to filter values that have disabled_on value."""
+    """Filter values that have disabled_on value."""
 
     title = 'Is disabled'
     parameter_name = 'disabled_on'
@@ -44,16 +47,14 @@ class ViewAndChangeOnlyAdmin(admin.ModelAdmin):
     """ModelAdmin subclass that restricts adding and deletion at all times."""
 
     def has_add_permission(self, request, obj=None):
-        """
-        Gets whether the user can add new objects for this model.
+        """Gets whether the user can add new objects for this model.
 
         Always returns False.
         """
         return False
 
     def has_delete_permission(self, request, obj=None):
-        """
-        Gets whether the user can delete objects for this model.
+        """Gets whether the user can delete objects for this model.
 
         Always returns False.
         """
@@ -61,16 +62,14 @@ class ViewAndChangeOnlyAdmin(admin.ModelAdmin):
 
 
 class ViewOnlyAdmin(ViewAndChangeOnlyAdmin):
-    """
-    ModelAdmin subclass that restricts adding, changing and deleting at all times.
+    """ModelAdmin subclass that restricts adding, changing and deleting at all times.
 
     The user must have the relevant view or change permission in order to be able to view the
     model.
     """
 
     def has_change_permission(self, request, obj=None):
-        """
-        Gets whether the user can change objects for this model.
+        """Gets whether the user can change objects for this model.
 
         Always returns False.
         """
@@ -115,9 +114,8 @@ class ExportWinsAdminMixin(admin.ModelAdmin):
 
 
 class BaseModelAdminMixin(ExportWinsAdminMixin):
-    """
-    Mixin for ModelAdmins which adds extra functionalities.
-    Useful when the model extends core.BaseModel
+    """Mixin for ModelAdmins which adds extra functionalities.
+    Useful when the model extends core.BaseModel.
 
     It updates created_by and modified_by automatically from the logged in user.
 
@@ -130,10 +128,12 @@ class BaseModelAdminMixin(ExportWinsAdminMixin):
     def _get_description_for_timed_event(self, event_on, event_by):
         text_parts = []
         if event_on:
-            text_parts.extend((
-                f'on {date_filter(event_on)}',
-                f'at {time_filter(event_on)}',
-            ))
+            text_parts.extend(
+                (
+                    f'on {date_filter(event_on)}',
+                    f'at {time_filter(event_on)}',
+                ),
+            )
         if event_by:
             adviser_admin_url = get_change_link(event_by)
             text_parts.append(f'by {adviser_admin_url}')
@@ -149,9 +149,7 @@ class BaseModelAdminMixin(ExportWinsAdminMixin):
         return self._get_description_for_timed_event(obj.modified_on, obj.modified_by)
 
     def save_model(self, request, obj, form, change):
-        """
-        Populate created_by/modified_by from the logged in user.
-        """
+        """Populate created_by/modified_by from the logged in user."""
         if not change:
             obj.created_by = request.user
         obj.modified_by = request.user
@@ -160,8 +158,7 @@ class BaseModelAdminMixin(ExportWinsAdminMixin):
 
 
 class RawIdWidget(forms.TextInput):
-    """
-    A widget for selecting a model object using a change list in a pop-up window.
+    """A widget for selecting a model object using a change list in a pop-up window.
 
     This is similar to and based on RawForeignKeyIdWidget, however it is not tied to a
     particular model field (as RawForeignKeyIdWidget is).
@@ -215,8 +212,7 @@ class RawIdWidget(forms.TextInput):
 
 
 class MaxSizeFileUploadHandler(FileUploadHandler):
-    """
-    File upload handler that stops uploads that exceed a certain size.
+    """File upload handler that stops uploads that exceed a certain size.
 
     This aborts the process before the file has been loaded into memory or saved to disk.
 
@@ -254,17 +250,16 @@ class MaxSizeFileUploadHandler(FileUploadHandler):
 
 
 def max_upload_size(max_size):
-    """
-    View decorator to enforce a maximum size on uploads.
+    """View decorator to enforce a maximum size on uploads.
 
     Note: If you want to make a view exempt from CSRF protection, you must ensure that
     the @csrf_exempt decorator is applied first. For example::
 
         @max_upload_size(...)
         @csrf_exempt
-        def view():
-            ...
+        def view(): ...
     """
+
     def decorator(view_func):
         @csrf_exempt
         @wraps(view_func)
@@ -280,8 +275,7 @@ def max_upload_size(max_size):
 
 
 def custom_view_permission(permission_codename):
-    """
-    Decorator that allows a custom view permission to be used with ModelAdmin subclasses.
+    """Decorator that allows a custom view permission to be used with ModelAdmin subclasses.
 
     Usage example::
 
@@ -290,6 +284,7 @@ def custom_view_permission(permission_codename):
         class InvestmentProjectAdmin(admin.ModelAdmin):
             pass
     """
+
     def decorator(admin_cls):
         admin_cls.has_view_permission = _make_admin_permission_getter(permission_codename)
         return admin_cls
@@ -298,8 +293,7 @@ def custom_view_permission(permission_codename):
 
 
 def custom_add_permission(permission_codename):
-    """
-    Decorator that allows a custom add permission to be used with ModelAdmin subclasses.
+    """Decorator that allows a custom add permission to be used with ModelAdmin subclasses.
 
     Usage example::
 
@@ -308,6 +302,7 @@ def custom_add_permission(permission_codename):
         class InvestmentProjectAdmin(admin.ModelAdmin):
             pass
     """
+
     def decorator(admin_cls):
         admin_cls.has_add_permission = _make_admin_permission_getter(permission_codename)
         return admin_cls
@@ -316,8 +311,7 @@ def custom_add_permission(permission_codename):
 
 
 def custom_change_permission(permission_codename):
-    """
-    Decorator that allows a custom change permission to be used with ModelAdmin subclasses.
+    """Decorator that allows a custom change permission to be used with ModelAdmin subclasses.
 
     Usage example::
 
@@ -326,6 +320,7 @@ def custom_change_permission(permission_codename):
         class InvestmentProjectAdmin(admin.ModelAdmin):
             pass
     """
+
     def decorator(admin_cls):
         admin_cls.has_change_permission = _make_admin_permission_getter(permission_codename)
         return admin_cls
@@ -334,8 +329,7 @@ def custom_change_permission(permission_codename):
 
 
 def custom_delete_permission(permission_codename):
-    """
-    Decorator that allows a custom delete permission to be used with ModelAdmin subclasses.
+    """Decorator that allows a custom delete permission to be used with ModelAdmin subclasses.
 
     Usage example::
 
@@ -344,6 +338,7 @@ def custom_delete_permission(permission_codename):
         class InvestmentProjectAdmin(admin.ModelAdmin):
             pass
     """
+
     def decorator(admin_cls):
         admin_cls.has_delete_permission = _make_admin_permission_getter(permission_codename)
         return admin_cls
@@ -370,8 +365,7 @@ def get_change_link(obj, site=admin.site):
 
 
 def format_json_as_html(value):
-    """
-    Serialises an object as pretty JSON, and HTML-encodes it in a <pre> tag.
+    """Serialises an object as pretty JSON, and HTML-encodes it in a <pre> tag.
 
     This is useful for displaying JSON fields in the admin site.
 
@@ -393,7 +387,6 @@ def format_json_as_html(value):
 
 
 def handle_export_wins_admin_permissions(request, app_label, check_permission_function):
-
     # The autocomplete fields in django admin have their own permission check on the models
     # referenced by that field. As we have explicitly denied export win admins permission to
     # access anything other than export win models, they will receive errors using these
@@ -414,7 +407,6 @@ def handle_export_wins_admin_permissions(request, app_label, check_permission_fu
 
 def _make_admin_permission_getter(codename):
     def _has_permission(self, request, obj=None):
-
         app_label = self.opts.app_label
         qualified_name = f'{app_label}.{codename}'
 
@@ -423,4 +415,5 @@ def _make_admin_permission_getter(codename):
             app_label,
             request.user.has_perm(qualified_name),
         )
+
     return _has_permission

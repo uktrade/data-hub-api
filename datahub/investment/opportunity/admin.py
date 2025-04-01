@@ -1,7 +1,6 @@
 from django.contrib import admin
 
 from datahub.core.admin import ExportWinsAdminMixin
-
 from datahub.investment.opportunity import models
 
 

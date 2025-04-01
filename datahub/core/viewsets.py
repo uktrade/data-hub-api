@@ -1,8 +1,6 @@
 from copy import copy
 
 from django.core.exceptions import FieldDoesNotExist
-
-
 from rest_framework import mixins
 from rest_framework.viewsets import GenericViewSet
 
@@ -32,8 +30,7 @@ class BaseViewSet(
 
     @classmethod
     def as_action_view(cls, action):
-        """
-        Creates a view for a method decorated with the @action decorator.
+        """Creates a view for a method decorated with the @action decorator.
 
         Usage example:
 
@@ -101,4 +98,4 @@ class SoftDeleteCoreViewSet(
     BaseViewSet,
     SoftDeleteViaArchiveMixin,
 ):
-    """Base class for view sets that need to delete using archive as a soft delete"""
+    """Base class for view sets that need to delete using archive as a soft delete."""

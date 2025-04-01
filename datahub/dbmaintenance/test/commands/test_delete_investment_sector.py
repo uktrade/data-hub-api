@@ -13,12 +13,11 @@ from datahub.investment.project.test.factories import (
 from datahub.metadata.models import Sector
 from datahub.metadata.test.factories import SectorFactory
 
-
 pytestmark = pytest.mark.django_db
 
 
 def test_happy_path(s3_stubber):
-    """Test that command deletes specified investment sectors"""
+    """Test that command deletes specified investment sectors."""
     sectors = SectorFactory.create_batch(
         2,
         segment=factory.Iterator(['sector1', 'sector2']),

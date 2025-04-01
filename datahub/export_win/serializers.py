@@ -6,7 +6,6 @@ from django.conf import settings
 from django.db import transaction
 from django.utils.translation import gettext_lazy
 from rest_framework.exceptions import PermissionDenied
-
 from rest_framework.serializers import (
     BooleanField,
     CharField,
@@ -20,6 +19,7 @@ from datahub.company.serializers import NestedAdviserField
 from datahub.core.serializers import NestedRelatedField
 from datahub.core.utils import get_financial_year
 from datahub.export_win.models import (
+    HVC,
     AssociatedProgramme,
     Breakdown,
     BreakdownType,
@@ -29,7 +29,6 @@ from datahub.export_win.models import (
     ExpectedValueRelation,
     Experience,
     HQTeamRegionOrPost,
-    HVC,
     HVOProgrammes,
     MarketingSource,
     Rating,
@@ -156,7 +155,7 @@ class CustomerResponseSerializer(ModelSerializer):
 
 
 class LegacyCustomerResponseSerializer(ModelSerializer):
-    """Serializer for CustomerResponse to expose confirmation status and date"""
+    """Serializer for CustomerResponse to expose confirmation status and date."""
 
     confirmed = BooleanField(source='agree_with_win', read_only=True)
     date = DateTimeField(source='responded_on', read_only=True)
@@ -452,8 +451,7 @@ class PublicCustomerResponseSerializer(ModelSerializer):
         return field.to_representation(token.company_contact)
 
     def update(self, instance, validated_data):
-        """
-        Update the customer response and invalidate token.
+        """Update the customer response and invalidate token.
         """
         with transaction.atomic():
             instance = super().update(instance, validated_data)
@@ -515,8 +513,7 @@ class PublicCustomerResponseSerializer(ModelSerializer):
 
 
 class DataHubLegacyExportWinSerializer(ModelSerializer):
-    """
-    Legacy read-only serialiser for export win views.
+    """Legacy read-only serialiser for export win views.
     """
 
     response = SerializerMethodField(read_only=True)
@@ -541,9 +538,8 @@ class DataHubLegacyExportWinSerializer(ModelSerializer):
         return win.created_on
 
     def get_value(self, win):
-        """
-        Return breakdown vaules in a value nested dict.
-        Use only breakdown type EXPORT
+        """Return breakdown vaules in a value nested dict.
+        Use only breakdown type EXPORT.
         """
         breakdowns_exports = win.breakdowns.filter(type__name='Export')
         breakdowns = LegacyBreakdownSerializer(breakdowns_exports, many=True)
