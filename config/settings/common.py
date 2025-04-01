@@ -609,7 +609,7 @@ _add_hawk_credentials(
 _add_hawk_credentials(
     'DATA_FLOW_API_ACCESS_KEY_ID',
     'DATA_FLOW_API_SECRET_ACCESS_KEY',
-    (HawkScope.data_flow_api,),
+    (HawkScope.datasets,),
 )
 
 _add_hawk_credentials(
@@ -622,6 +622,12 @@ _add_hawk_credentials(
     'OMIS_PUBLIC_ACCESS_KEY_ID',
     'OMIS_PUBLIC_SECRET_ACCESS_KEY',
     (HawkScope.public_omis,),
+)
+
+_add_hawk_credentials(
+    'REDBOX_ACCESS_KEY_ID',
+    'REDBOX_SECRET_ACCESS_KEY',
+    (HawkScope.datasets,),
 )
 
 # Sending messages to Slack

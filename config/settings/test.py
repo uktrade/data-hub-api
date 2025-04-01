@@ -94,7 +94,7 @@ HAWK_RECEIVER_CREDENTIALS = {
     },
     'data-flow-api-id': {
         'key': 'data-flow-api-key',
-        'scopes': (HawkScope.data_flow_api,),
+        'scopes': (HawkScope.datasets,),
     },
     'omis-public-id': {
         'key': 'omis-public-key',
