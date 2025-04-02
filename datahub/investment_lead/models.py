@@ -9,6 +9,7 @@ from django.core.validators import (
 from django.db import models, transaction
 from mptt.fields import TreeForeignKey
 
+from datahub.company.models import Advisor
 from datahub.company_activity.models import CompanyActivity
 from datahub.core import reversion
 from datahub.core.models import ArchivableModel
@@ -22,6 +23,10 @@ class InvestmentLead(ArchivableModel):
     created_on = models.DateTimeField(db_index=True, null=True, blank=True, auto_now_add=True)
     modified_on = models.DateTimeField(null=True, blank=True, auto_now=True)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    advisers = models.ManyToManyField(
+        Advisor,
+        related_name='+',
+    )
 
     class Meta:
         abstract = True
