@@ -23,6 +23,7 @@ def get_expected_data_from_eyb(eyb_lead):
         ]
 
     data = {
+        'id': str(eyb_lead.id),
         'modified_on': format_date_or_datetime(eyb_lead.modified_on),
         # Triage component
         'triage_hashed_uuid': str(eyb_lead.triage_hashed_uuid),
