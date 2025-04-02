@@ -19,6 +19,7 @@ from datahub.investment.project.models import (
 )
 from datahub.investment.project.query_utils import get_project_code_expression
 from datahub.investment.project.report.spi import get_spi_report_queryset
+from datahub.investment_lead.models import EYBLead
 from datahub.metadata.query_utils import get_sector_name_subquery
 
 
@@ -108,6 +109,12 @@ class InvestmentProjectsDatasetView(BaseFilterDatasetView):
                 'specificprogramme__name',
                 ordering=('specificprogramme__name',),
             ),
+            eyb_lead_ids=get_array_agg_subquery(
+                model=EYBLead.investment_projects.through,
+                join_field_name='investmentproject',
+                expression_to_aggregate='eyblead__id',
+                ordering=('eyblead__id'),
+            ),
         ).values(
             'actual_land_date',
             'actual_uk_region_names',
@@ -174,6 +181,7 @@ class InvestmentProjectsDatasetView(BaseFilterDatasetView):
             'uk_company_id',
             'uk_company_sector',
             'uk_region_location_names',
+            'eyb_lead_ids',
         )
         updated_since = request.GET.get('updated_since')
 

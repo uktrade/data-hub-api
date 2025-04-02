@@ -219,6 +219,9 @@ def get_expected_data_from_project(project, won_date=None):
         )
         if project.uk_region_locations.exists()
         else None,
+        'eyb_lead_ids': [str(lead.id) for lead in project.eyb_leads.all()]
+        if project.eyb_leads.exists()
+        else None,
     }
 
 

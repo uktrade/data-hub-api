@@ -29,6 +29,7 @@ class EYBLeadsDatasetView(BaseFilterDatasetView):
                 ),
             )
             .values(
+                'id',
                 'modified_on',
                 # Triage component
                 'triage_hashed_uuid',
