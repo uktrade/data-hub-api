@@ -74,6 +74,14 @@ class EYBLeadViewSet(SoftDeleteCoreViewSet):
                 filter_query |= Q(is_high_value__isnull=True)
             queryset = queryset.filter(filter_query)
         return queryset
+    
+    def _filter_by_advisers(self, queryset):
+        advisers = self.request.query_params.get('advisers')
+        if advisers:
+            queryset = queryset.filter(
+                Q(advisers__in=[advisers]),
+            )
+        return queryset
 
     def get_queryset(self):
         """Apply filters to queryset based on query parameters (in GET operations)."""
@@ -86,6 +94,7 @@ class EYBLeadViewSet(SoftDeleteCoreViewSet):
         queryset = self._filter_by_company_name(queryset)
         queryset = self._filter_by_sectors(queryset)
         queryset = self._filter_by_values(queryset)
+        queryset = self._filter_by_advisers(queryset)
 
         return queryset
 
