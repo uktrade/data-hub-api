@@ -406,7 +406,15 @@ class ExportBarrierType(BaseOrderedConstantModel):
 
 
 class PostcodeData(models.Model):  # noqa: DJ008
-    """Postcode data (for the manual addition of a company)."""
+    """Model representing ONS Postcode Data (ONSPD).
+
+    The ONSPD relates both current and terminated postcodes in the United Kingdom to a range
+    of current statutory administrative, electoral, health and other area geographies.
+
+    The ONSPD is issued quarterly. See
+    https://geoportal.statistics.gov.uk/datasets/6fb8941d58e54d949f521c92dfb92f2a/about for
+    more details.
+    """
 
     id = models.IntegerField(
         primary_key=True,
@@ -503,13 +511,19 @@ class PostcodeData(models.Model):  # noqa: DJ008
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
-        help_text='Census Output Area',
+        help_text='2001 Census Output Area',
     )
     oa11 = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
-        help_text='Census Output Area/Small Area',
+        help_text='2011 Census Output Area/Small Area',
+    )
+    oa21 = models.CharField(  # noqa: DJ001
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='2021 Census Output Area',
     )
     park = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
@@ -601,25 +615,37 @@ class PostcodeData(models.Model):  # noqa: DJ008
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
-        help_text='Census Lower Layer Super Output Area',
+        help_text='2001 Census Lower Layer Super Output Area',
     )
     lsoa11 = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
-        help_text='Census Lower Layer Super Output Area',
+        help_text='2011 Census Lower Layer Super Output Area',
+    )
+    lsoa21 = models.CharField(  # noqa: DJ001
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='2021 Census Lower Layer Super Output Area',
     )
     msoa01 = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
-        help_text='Census Middle Layer Super Output Area',
+        help_text='2001 Census Middle Layer Super Output Area',
     )
     msoa11 = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,
         null=True,
         blank=True,
-        help_text='Census Middle Layer Super Output Area',
+        help_text='2011 Census Middle Layer Super Output Area',
+    )
+    msoa21 = models.CharField(  # noqa: DJ001
+        max_length=MAX_LENGTH,
+        null=True,
+        blank=True,
+        help_text='2021 Census Middle Layer Super Output Area',
     )
     oslaua = models.CharField(  # noqa: DJ001
         max_length=MAX_LENGTH,

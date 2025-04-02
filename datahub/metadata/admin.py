@@ -194,3 +194,13 @@ class InvestmentProjectStageAdmin(ViewOnlyAdmin):
     list_display = ('name', 'disabled_on', 'exclude_from_investment_flow')
     search_fields = ('name', 'pk')
     list_filter = (DisabledOnFilter,)
+
+
+@admin.register(models.PostcodeData)
+class PostcodeDataAdmin(ViewOnlyAdmin):
+    """View-only admin for postcode data."""
+
+    fields = ('id', 'pcds', 'region_name', 'dointr')
+    list_display = ('pcds', 'region_name', 'dointr')
+    search_fields = ('name', 'pcds', 'region_name')
+    list_filter = ('region_name',)
