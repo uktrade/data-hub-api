@@ -26,4 +26,14 @@ urlpatterns = [
         generic_document_item,
         name='generic-document-item',
     ),
+    path(
+        '<uuid:pk>/upload-callback',
+        GenericDocumentViewSet.as_action_view('upload_complete_callback'),
+        name='generic-document-item-callback',
+    ),
+    path(
+        '<uuid:pk>/download',
+        GenericDocumentViewSet.as_action_view('download'),
+        name='generic-document-item-download',
+    ),
 ]
