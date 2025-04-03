@@ -214,6 +214,15 @@ class SharePointDocument(BaseModel, ArchivableModel):
         return self.title
 
 
+class UploadableDocument(AbstractEntityDocumentModel):
+    """Model to represent an uploadable document."""
+
+    title = models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH, blank=True, default='')
+
+    def __str__(self):
+        return self.original_filename
+
+
 class GenericDocument(BaseModel, ArchivableModel):
     """A single model to represent documents of varying types.
 
