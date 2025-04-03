@@ -1322,6 +1322,159 @@ class TestCreateWinView(APITestMixin):
 
         mock_export_win_serializer_notify.assert_not_called()
 
+    def test_create_win_duplicate_advisers(self, mock_export_win_serializer_notify):
+        """Tests cannot create an export win with duplicate advisers."""
+        url = reverse('api-v4:export-win:collection')
+
+        adviser = self.user
+        lead_officer = AdviserFactory()
+        additional_team_member = AdviserFactory()
+        additional_team_member_2 = AdviserFactory()
+        company = CompanyFactory()
+        contact = ContactFactory(company=company)
+        date_won = now().date()
+        export_experience = ExportExperienceFactory()
+
+        request_data = {
+            'adviser': {
+                'id': str(adviser.id),
+            },
+            'lead_officer': {
+                'id': str(lead_officer.id),
+            },
+            'hq_team': {
+                'id': HQTeamRegionOrPostConstant.td_events_services.value.id,
+            },
+            'team_type': {
+                'id': TeamTypeConstant.itt.value.id,
+            },
+            'business_potential': {
+                'id': BusinessPotentialConstant.high_export_potential.value.id,
+            },
+            'company': {
+                'id': str(company.id),
+            },
+            'company_contacts': [
+                {
+                    'id': str(contact.id),
+                },
+            ],
+            'customer_location': {
+                'id': WinUKRegionConstant.overseas.value.id,
+            },
+            'business_type': 'The best type',
+            'description': 'Description',
+            'name_of_export': 'Sand',
+            'date': date_won,
+            'country': CountryConstant.canada.value.id,
+            'total_expected_export_value': 1000000,
+            'total_expected_non_export_value': 1000000,
+            'total_expected_odi_value': 1000000,
+            'goods_vs_services': {
+                'id': ExpectedValueRelationConstant.both.value.id,
+            },
+            'sector': {
+                'id': SectorConstant.aerospace_assembly_aircraft.value.id,
+            },
+            'type_of_support': [
+                {
+                    'id': SupportTypeConstant.political_and_economic_briefing.value.id,
+                },
+            ],
+            'associated_programme': [
+                {
+                    'id': AssociatedProgrammeConstant.afterburner.value.id,
+                },
+            ],
+            'is_personally_confirmed': False,
+            'is_line_manager_confirmed': False,
+            'name_of_customer': 'Overseas Customer',
+            'name_of_customer_confidential': True,
+            'export_experience': {
+                'id': str(export_experience.id),
+            },
+            'breakdowns': [
+                {
+                    'type': {
+                        'id': BreakdownTypeConstant.export.value.id,
+                    },
+                    'value': 1000,
+                    'year': 2,
+                },
+            ],
+            'contributing_advisers': [
+                {
+                    'adviser': {
+                        'id': str(additional_team_member.id),
+                    },
+                    'hq_team': {
+                        'id': HQTeamRegionOrPostConstant.td_events_services.value.id,
+                    },
+                    'team_type': {
+                        'id': TeamTypeConstant.itt.value.id,
+                    },
+                },
+                {
+                    'adviser': {
+                        'id': str(additional_team_member.id),
+                    },
+                    'hq_team': {
+                        'id': HQTeamRegionOrPostConstant.td_events_services.value.id,
+                    },
+                    'team_type': {
+                        'id': TeamTypeConstant.itt.value.id,
+                    },
+                },
+                {
+                    'adviser': {
+                        'id': str(additional_team_member_2.id),
+                    },
+                    'hq_team': {
+                        'id': HQTeamRegionOrPostConstant.td_events_services.value.id,
+                    },
+                    'team_type': {
+                        'id': TeamTypeConstant.itt.value.id,
+                    },
+                },
+                {
+                    'adviser': {
+                        'id': str(lead_officer.id),
+                    },
+                    'hq_team': {
+                        'id': HQTeamRegionOrPostConstant.td_events_services.value.id,
+                    },
+                    'team_type': {
+                        'id': TeamTypeConstant.itt.value.id,
+                    },
+                },
+            ],
+            'team_members': [
+                {
+                    'id': str(lead_officer.id),
+                },
+                {
+                    'id': str(additional_team_member.id),
+                },
+                {
+                    'id': str(additional_team_member.id),
+                },
+            ],
+        }
+        first_sent = datetime.datetime(year=2012, month=7, day=12, hour=15, minute=6, second=3)
+        with freeze_time(first_sent):
+            response = self.api_client.post(url, data=request_data)
+        response_data = response.json()
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert set(response_data['non_field_errors']) == {
+            'A contributing adviser cannot be a duplicate.',
+            'A team member cannot be a duplicate.',
+            'A contributing adviser cannot also be lead officer.',
+            'A team member cannot also be lead officer.',
+            'A team member cannot also be a contributing adviser.',
+        }
+
+        mock_export_win_serializer_notify.not_called()
+
 
 class TestUpdateWinView(APITestMixin):
     """Update export win view tests."""

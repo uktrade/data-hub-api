@@ -49,6 +49,13 @@ from datahub.export_win.tasks import (
     update_customer_response_for_lead_officer_notification_id,
     update_customer_response_token_for_email_notification_id,
 )
+from datahub.export_win.validators import (
+    DuplicateContributingAdviserValidator,
+    DuplicateTeamMemberValidator,
+    LeadOfficerAndContributingAdviserValidator,
+    LeadOfficerAndTeamMemberValidator,
+    TeamMembersAndContributingAdvisersValidator,
+)
 from datahub.metadata.models import Country, Sector
 
 
@@ -302,6 +309,13 @@ class WinSerializer(ModelSerializer):
             'last_sent',
             'migrated_on',
         )
+        validators = [
+            DuplicateContributingAdviserValidator(),
+            DuplicateTeamMemberValidator(),
+            LeadOfficerAndContributingAdviserValidator(),
+            LeadOfficerAndTeamMemberValidator(),
+            TeamMembersAndContributingAdvisersValidator(),
+        ]
 
     def create(self, validated_data):
         """Create win, corresponding breakdowns and advisers."""
