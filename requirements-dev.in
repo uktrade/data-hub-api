@@ -2,7 +2,7 @@
 
 # Testing and dev
 pytest==8.3.5
-pytest-django==4.10.0
+pytest-django==4.11.1
 pytest-cov==6.1.1
 pytest-mock==3.14.0
 pytest-xdist==3.6.1
