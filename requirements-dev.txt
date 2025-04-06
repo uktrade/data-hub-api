@@ -357,7 +357,7 @@ pytest==8.3.5
     #   pytest-xdist
 pytest-cov==6.0.0
     # via -r requirements-dev.in
-pytest-django==4.10.0
+pytest-django==4.11.1
     # via -r requirements-dev.in
 pytest-mock==3.14.0
     # via -r requirements-dev.in
