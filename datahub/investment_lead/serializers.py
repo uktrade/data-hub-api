@@ -30,6 +30,7 @@ INVESTMENT_LEAD_BASE_FIELDS = [
     'created_on',
     'modified_on',
     'id',
+    'advisers',
 ]
 
 TRIAGE_FIELDS = [
