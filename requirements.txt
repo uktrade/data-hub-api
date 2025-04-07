@@ -128,7 +128,7 @@ djangorestframework==3.16.0
     #   drf-spectacular
 docopt==0.6.2
     # via notifications-python-client
-drf-redesign==0.5.0
+drf-redesign==0.5.1
     # via -r requirements.in
 drf-spectacular==0.28.0
     # via -r requirements.in
