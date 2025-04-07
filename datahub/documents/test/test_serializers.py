@@ -6,14 +6,17 @@ from datahub.documents.models import GenericDocument
 from datahub.documents.serializers import (
     GenericDocumentRetrieveSerializer,
     SharePointDocumentSerializer,
+    UploadableDocumentSerializer,
 )
 from datahub.documents.test.factories import (
     CompanySharePointDocumentFactory,
     SharePointDocumentFactory,
+    UploadableDocumentFactory,
 )
 from datahub.documents.test.test_utils import (
     assert_retrieved_generic_document,
     assert_retrieved_sharepoint_document,
+    assert_retrieved_uploadable_document,
 )
 from datahub.investment.project.test.factories import InvestmentProjectFactory
 
@@ -27,6 +30,15 @@ class TestSharePointDocumentSerializer:
         sharepoint_document = SharePointDocumentFactory()
         serializer = SharePointDocumentSerializer(sharepoint_document)
         assert_retrieved_sharepoint_document(sharepoint_document, serializer.data)
+
+
+class TestUploadableDocumentSerializer:
+    """Tests for UploadableDocumentSerializer."""
+
+    def test_serializing_instance_returns_expected_fields(self):
+        uploadable_document = UploadableDocumentFactory()
+        serializer = UploadableDocumentSerializer(uploadable_document)
+        assert_retrieved_uploadable_document(uploadable_document, serializer.data)
 
 
 class TestGenericDocumentRetrieveSerializer:

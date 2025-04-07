@@ -9,6 +9,7 @@ from datahub.core.serializers import NestedRelatedField
 from datahub.documents.models import (
     GenericDocument,
     SharePointDocument,
+    UploadableDocument,
 )
 from datahub.documents.utils import format_content_type
 
@@ -22,10 +23,41 @@ class SharePointDocumentSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class UploadableDocumentSerializer(serializers.ModelSerializer):
+    created_by = NestedRelatedField(Advisor, extra_fields=['name', 'email'], read_only=True)
+    modified_by = NestedRelatedField(Advisor, extra_fields=['name', 'email'], read_only=True)
+
+    class Meta:
+        model = UploadableDocument
+        fields = [
+            'id',
+            'original_filename',
+            'title',
+            'created_by',
+            'created_on',
+            'modified_by',
+            'modified_on',
+        ]
+
+    def to_representation(self, instance):
+        """Convert model instance to built-in Python (JSON friendly) data types.
+
+        Specifically, add fields to the representation from the nested document object. This
+        avoids potentially confusing nested keys (i.e. data['document']['document']['status'])
+        """
+        representation = super().to_representation(instance)
+        representation.update(
+            {
+                'status': instance.document.get_status_display(),
+            },
+        )
+        return representation
+
+
 class DocumentRelatedField(serializers.RelatedField):
     """Serializer field for the GenericDocument.document field.
 
-    Currently, only SharePointDocument objects are supported.
+    Currently, only SharePointDocument and UploadableDocument objects are supported.
 
     To add support for another document type, add an elif statement to the to_representation
     method to check for the new model and set the serializer accordingly.
@@ -42,6 +74,8 @@ class DocumentRelatedField(serializers.RelatedField):
         """Convert model instance to built-in Python (JSON friendly) data types."""
         if isinstance(instance, SharePointDocument):
             serializer = SharePointDocumentSerializer(instance)
+        elif isinstance(instance, UploadableDocument):
+            serializer = UploadableDocumentSerializer(instance)
         else:
             raise Exception(f'Unexpected document type: {type(instance)}')
         return serializer.data
@@ -110,7 +144,10 @@ class GenericDocumentCreateSerializer(serializers.Serializer):
 
     def validate_document_type(self, value):
         """Validate the document type is supported."""
-        if value not in ['documents.sharepointdocument']:
+        if value not in [
+            'documents.sharepointdocument',
+            'documents.uploadabledocument',
+        ]:
             raise serializers.ValidationError(
                 f"Unsupported document type: {value}. Format should be 'app_label.model'.",
             )
