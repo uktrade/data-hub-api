@@ -99,7 +99,7 @@ class EYBLeadFactory(factory.django.DjangoModelFactory):
     landing_timeframe = factory.LazyAttribute(
         lambda o: random.choice(LANDING_TIME_FRAME_CHOICES),
     )
-    advisers = factory.SubFactory(AdviserFactory)
+    advisers = factory.RelatedFactory(AdviserFactory)
 
     # EYB marketing fields
     utm_name = factory.Faker('pystr')
