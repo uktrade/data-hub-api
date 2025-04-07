@@ -43,6 +43,27 @@ def assert_retrieved_sharepoint_document(instance, retrieved_instance):
     assert instance.url == retrieved_instance['url']
 
 
+def assert_retrieved_uploadable_document(instance, retrieved_instance):
+    """Asserts retrieved JSON contains the correct fields and data from the UploadableDocument."""
+    assert str(instance.id) == retrieved_instance['id']
+
+    assert str(instance.created_by.id) == retrieved_instance['created_by']['id']
+    assert str(instance.modified_by.id) == retrieved_instance['modified_by']['id']
+
+    assert (
+        instance.created_on.timestamp()
+        == datetime.strptime(retrieved_instance['created_on'], DATETIME_FORMAT).timestamp()
+    )
+    assert (
+        instance.modified_on.timestamp()
+        == datetime.strptime(retrieved_instance['modified_on'], DATETIME_FORMAT).timestamp()
+    )
+
+    assert instance.original_filename == retrieved_instance['original_filename']
+    assert instance.title == retrieved_instance['title']
+    assert instance.document.get_status_display() == retrieved_instance['status']
+
+
 def assert_retrieved_generic_document(instance, retrieved_instance):
     """Asserts retrieved JSON contains the correct fields and data from the GenericDocument."""
     assert str(instance.id) == retrieved_instance['id']
