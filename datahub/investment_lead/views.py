@@ -2,11 +2,10 @@ import logging
 
 from django.db.models import Q
 from rest_framework import filters
-from rest_framework.response import Response
 
 from datahub.core.audit import AuditViewSet
 from datahub.core.viewsets import SoftDeleteCoreViewSet
-from datahub.investment_lead.models import EYBLead, InvestmentLead
+from datahub.investment_lead.models import EYBLead
 from datahub.investment_lead.serializers import RetrieveEYBLeadSerializer
 from datahub.metadata.models import Sector
 
@@ -76,13 +75,6 @@ class EYBLeadViewSet(SoftDeleteCoreViewSet):
             queryset = queryset.filter(filter_query)
         return queryset
     
-    def _get_advisers(self, request, pk=None):
-        investment_lead = InvestmentLead.objects.get(pk=pk)
-        data = {
-            'advisers': [{'id': str(adviser.id)} for adviser in investment_lead.advisers.all()],
-        }
-        return Response(data)
-
     def get_queryset(self):
         """Apply filters to queryset based on query parameters (in GET operations)."""
         queryset = EYBLead.objects.filter(archived=False).exclude(
