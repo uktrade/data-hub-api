@@ -25,10 +25,18 @@ from datahub.documents.models import (
     Document,
     GenericDocument,
     SharePointDocument,
+    UploadableDocument,
+    UploadStatus,
 )
-from datahub.documents.test.factories import CompanySharePointDocumentFactory
+from datahub.documents.test.factories import (
+    CompanySharePointDocumentFactory,
+    CompanyUploadableDocumentFactory,
+)
 from datahub.documents.test.my_entity_document.models import MyEntityDocument
-from datahub.documents.test.test_utils import assert_retrieved_generic_document
+from datahub.documents.test.test_utils import (
+    assert_retrieved_generic_document,
+    assert_retrieved_uploadable_document,
+)
 
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
 DOCUMENT_COLLECTION_URL = reverse('api-v4:document:generic-document-collection')
@@ -38,8 +46,19 @@ def document_item_url(pk: uuid.uuid4) -> str:
     return reverse('api-v4:document:generic-document-item', kwargs={'pk': pk})
 
 
+def document_item_upload_callback_url(pk: uuid.uuid4) -> str:
+    return reverse(
+        'api-v4:document:generic-document-item-upload-complete-callback',
+        kwargs={'pk': pk},
+    )
+
+
+def document_item_download_url(pk: uuid.uuid4) -> str:
+    return reverse('api-v4:document:generic-document-item-download', kwargs={'pk': pk})
+
+
 @pytest.fixture
-def test_urls():  # noqa: D403
+def test_urls():
     """Pytest fixture to override the ROOT_URLCONF with test views."""
     with override_settings(ROOT_URLCONF='datahub.documents.test.my_entity_document.urls'):
         yield
@@ -53,6 +72,11 @@ def test_user_with_view_permissions():
 @pytest.fixture
 def test_user_with_add_permissions():
     return create_test_user(permission_codenames=['add_genericdocument'])
+
+
+@pytest.fixture
+def test_user_with_change_permissions():
+    return create_test_user(permission_codenames=['change_genericdocument'])
 
 
 @pytest.fixture
@@ -439,6 +463,83 @@ class TestCreateGenericDocumentView(APITestMixin):
             == f'Related object with id {non_existent_related_object_id} does not exist.'
         )
 
+    def test_upload_complete_callback_with_uploadable_document_schedules_av_scan(
+        self,
+        test_user_with_add_permissions,
+    ):
+        generic_document = CompanyUploadableDocumentFactory()
+        uploadable_document = generic_document.document
+        api_client = self.create_api_client(user=test_user_with_add_permissions)
+
+        with patch('datahub.documents.models.Document.schedule_av_scan') as mock_schedule_scan:
+            response = api_client.post(document_item_upload_callback_url(generic_document.id))
+
+        assert response.status_code == status.HTTP_200_OK
+        mock_schedule_scan.assert_called_once()
+
+        assert_retrieved_generic_document(generic_document, response.data)
+        assert_retrieved_uploadable_document(uploadable_document, response.data['document'])
+
+    def test_upload_complete_callback_with_non_uploadable_document_returns_error(
+        self,
+        test_user_with_add_permissions,
+    ):
+        generic_document = CompanySharePointDocumentFactory()
+        api_client = self.create_api_client(user=test_user_with_add_permissions)
+
+        response = api_client.post(document_item_upload_callback_url(generic_document.id))
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data['error'] == 'This action is only available for uploadable documents'
+
+    def test_download_uploadable_document_returns_document(self, test_user_with_view_permissions):
+        generic_document = CompanyUploadableDocumentFactory()
+        uploadable_document = generic_document.document
+        download_url = 'https://example.com/test-download-url'
+
+        uploadable_document.document.mark_as_scanned(av_clean=True, av_reason='')
+
+        api_client = self.create_api_client(user=test_user_with_view_permissions)
+
+        with patch('datahub.documents.models.Document.get_signed_url') as mock_get_signed_url:
+            mock_get_signed_url.return_value = download_url
+            response = api_client.get(document_item_download_url(generic_document.id))
+
+        assert response.status_code == status.HTTP_200_OK
+        assert_retrieved_generic_document(generic_document, response.data)
+        assert_retrieved_uploadable_document(uploadable_document, response.data['document'])
+        assert 'document_url' in response.data
+        assert response.data['document_url'] == download_url
+
+    def test_download_unscanned_document_returns_error(self, test_user_with_view_permissions):
+        generic_document = CompanyUploadableDocumentFactory()
+
+        api_client = self.create_api_client(user=test_user_with_view_permissions)
+        response = api_client.get(document_item_download_url(generic_document.id))
+
+        assert response.status_code == status.HTTP_503_SERVICE_UNAVAILABLE
+
+    def test_download_virus_infected_document_returns_error(self, test_user_with_view_permissions):
+        generic_document = CompanyUploadableDocumentFactory()
+        uploadable_document = generic_document.document
+
+        uploadable_document.document.mark_as_scanned(av_clean=False, av_reason='Virus detected')
+
+        api_client = self.create_api_client(user=test_user_with_view_permissions)
+        response = api_client.get(document_item_download_url(generic_document.id))
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert 'Document did not pass virus scanning' in response.data['detail']
+
+    def test_download_non_uploadable_document_returns_error(self, test_user_with_view_permissions):
+        generic_document = CompanySharePointDocumentFactory()
+
+        api_client = self.create_api_client(user=test_user_with_view_permissions)
+        response = api_client.get(document_item_download_url(generic_document.id))
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data['error'] == 'This action is only available for uploadable documents'
+
 
 class TestCreateCompanySharePointDocumentView(APITestMixin):
     """Tests for creating company sharepoint documents, specifically."""
@@ -505,6 +606,50 @@ class TestCreateCompanySharePointDocumentView(APITestMixin):
         assert generic_document.related_object == company
 
 
+class TestCreateCompanyUploadableDocumentView(APITestMixin):
+    """Tests for creating company uploadable documents."""
+
+    def test_uploadable_document_is_created(self, test_user_with_add_permissions):
+        """Also tests a generic document is created and linked to the company."""
+        company = CompanyFactory()
+        upload_url = 'https://example.com/test-upload-url'
+
+        api_client = self.create_api_client(user=test_user_with_add_permissions)
+        payload = {
+            'document_type': 'documents.uploadabledocument',
+            'document_data': {
+                'original_filename': 'test.pdf',
+                'title': 'Test Document',
+            },
+            'related_object_type': 'company.company',
+            'related_object_id': str(company.id),
+        }
+
+        with patch(
+            'datahub.documents.models.Document.get_signed_upload_url',
+        ) as mock_get_signed_upload_url:
+            mock_get_signed_upload_url.return_value = upload_url
+            response = api_client.post(DOCUMENT_COLLECTION_URL, data=payload)
+
+        assert response.status_code == status.HTTP_201_CREATED
+
+        assert GenericDocument.objects.count() == 1
+        assert UploadableDocument.objects.count() == 1
+        assert Document.objects.count() == 1
+
+        generic_document = GenericDocument.objects.first()
+        uploadable_document = generic_document.document
+
+        assert_retrieved_generic_document(generic_document, response.data)
+        assert_retrieved_uploadable_document(uploadable_document, response.data['document'])
+
+        assert uploadable_document.document.status == UploadStatus.NOT_VIRUS_SCANNED
+        assert 'signed_upload_url' in response.data
+        assert response.data['signed_upload_url'] == upload_url
+
+        assert generic_document.related_object == company
+
+
 class TestDeleteGenericDocumentView(APITestMixin):
     """Tests for deleting generic documents."""
 
@@ -514,8 +659,7 @@ class TestDeleteGenericDocumentView(APITestMixin):
         assert GenericDocument.objects.count() == 1
 
         api_client = self.create_api_client(user=test_user_with_delete_permissions)
-        url = document_item_url(generic_document.pk)
-        response = api_client.delete(url)
+        response = api_client.delete(document_item_url(generic_document.pk))
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
         generic_document.refresh_from_db()
@@ -530,10 +674,37 @@ class TestDeleteGenericDocumentView(APITestMixin):
         assert SharePointDocument.objects.count() == 1
 
         api_client = self.create_api_client(user=test_user_with_delete_permissions)
-        url = document_item_url(generic_document.pk)
-        response = api_client.delete(url)
+        response = api_client.delete(document_item_url(generic_document.pk))
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
         sharepoint_document.refresh_from_db()
         assert sharepoint_document.archived is True
         assert SharePointDocument.objects.count() == 1
+
+    @patch('datahub.documents.views.schedule_delete_document')
+    def test_uploadable_document_is_deleted(
+        self,
+        mock_schedule_delete,
+        test_user_with_delete_permissions,
+    ):
+        generic_document = CompanyUploadableDocumentFactory()
+        uploadable_document = generic_document.document
+        assert uploadable_document.document.status == UploadStatus.NOT_VIRUS_SCANNED
+
+        api_client = self.create_api_client(user=test_user_with_delete_permissions)
+        response = api_client.delete(document_item_url(generic_document.pk))
+
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+
+        uploadable_document.refresh_from_db()
+        assert uploadable_document.document.status == UploadStatus.DELETION_PENDING
+        mock_schedule_delete.assert_called_once_with(uploadable_document.document.id)
+
+        # Uploadable document instances, linked to documents that are pending deletion,
+        # are excluded from the queryset as per EntityDocumentManager.get_queryset
+        assert not UploadableDocument.objects.filter(pk=uploadable_document.id).exists()
+
+        # Conversely, the generic document instances will be archived
+        assert GenericDocument.objects.filter(pk=generic_document.id).exists()
+        generic_document.refresh_from_db()
+        assert generic_document.archived is True
