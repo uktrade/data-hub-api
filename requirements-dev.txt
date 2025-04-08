@@ -32,15 +32,15 @@ backoff==2.2.1
     #   opentelemetry-exporter-otlp-proto-common
     #   opentelemetry-exporter-otlp-proto-grpc
     #   opentelemetry-exporter-otlp-proto-http
-bigtree==0.25.3
+bigtree==0.25.4
     # via -r requirements.in
 billiard==4.2.0
     # via celery
-boto3==1.37.23
+boto3==1.37.28
     # via
     #   -r requirements.in
     #   moto
-botocore==1.37.23
+botocore==1.37.28
     # via
     #   boto3
     #   moto
@@ -144,11 +144,11 @@ djangorestframework==3.16.0
     #   drf-spectacular
 docopt==0.6.2
     # via notifications-python-client
-drf-redesign==0.5.0
+drf-redesign==0.5.1
     # via -r requirements.in
 drf-spectacular==0.28.0
     # via -r requirements.in
-drf-spectacular-sidecar==2025.3.1
+drf-spectacular-sidecar==2025.4.1
     # via -r requirements.in
 ecs-logging==2.0.2
     # via elastic-apm
@@ -355,9 +355,9 @@ pytest==8.3.5
     #   pytest-django
     #   pytest-mock
     #   pytest-xdist
-pytest-cov==6.0.0
+pytest-cov==6.1.1
     # via -r requirements-dev.in
-pytest-django==4.10.0
+pytest-django==4.11.1
     # via -r requirements-dev.in
 pytest-mock==3.14.0
     # via -r requirements-dev.in
@@ -420,17 +420,17 @@ rpds-py==0.23.1
     # via
     #   jsonschema
     #   referencing
-rq==2.1.0
+rq==2.3.1
     # via
     #   -r requirements.in
     #   rq-scheduler
 rq-scheduler==0.14.0
     # via -r requirements.in
-ruff==0.11.2
+ruff==0.11.4
     # via -r requirements-dev.in
 s3transfer==0.11.1
     # via boto3
-sentry-sdk==2.24.1
+sentry-sdk==2.25.1
     # via -r requirements.in
 simplejson==3.20.1
     # via -r requirements.in
