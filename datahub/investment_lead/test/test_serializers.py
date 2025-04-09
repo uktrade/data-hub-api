@@ -2,6 +2,7 @@ from datetime import datetime
 
 import pytest
 
+from datahub.company.test.factories import AdviserFactory
 from datahub.core import constants
 from datahub.investment_lead.models import EYBLead
 from datahub.investment_lead.serializers import (
@@ -11,6 +12,7 @@ from datahub.investment_lead.serializers import (
     RetrieveEYBLeadSerializer,
 )
 from datahub.investment_lead.test.factories import (
+    EYBLeadFactory,
     eyb_lead_marketing_record_faker,
     generate_hashed_uuid,
 )
@@ -417,3 +419,9 @@ class TestRetrieveEYBLeadSerializer:
         serializer = RetrieveEYBLeadSerializer(queryset, many=True)
         assert len(serializer.data) == 1
         assert_retrieved_eyb_lead_data(eyb_lead_instance_from_db, serializer.data[0])
+
+    def test_retrieve_multiple_advisers(self):
+        advisers = AdviserFactory.create_batch(3)
+        eyb_lead = EYBLeadFactory(advisers=advisers)
+        serializer = RetrieveEYBLeadSerializer(eyb_lead)
+        assert_retrieved_eyb_lead_data(eyb_lead, serializer.data)

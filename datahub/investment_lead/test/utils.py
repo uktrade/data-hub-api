@@ -155,6 +155,9 @@ def assert_retrieved_eyb_lead_data(instance: EYBLead, data: dict):
     assert [str(ip.id) for ip in instance.investment_projects.all()] == [
         data_ip['id'] for data_ip in data['investment_projects']
     ]
+    assert [str(ip.id) for ip in instance.advisers.all()] == [
+        data_ip['id'] for data_ip in data['advisers']
+    ]
 
     # EYB marketing fields
     assert instance.utm_name == data.get('utm_name')
