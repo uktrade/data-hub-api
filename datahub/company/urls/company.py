@@ -1,6 +1,7 @@
 from django.urls import path
 
 from datahub.company.views import (
+    BasicHTMX,
     CompanyAuditViewSet,
     CompanyViewSet,
     ExportWinsForCompanyView,
@@ -120,6 +121,11 @@ urls = [
         'company/<uuid:pk>/export-win',
         ExportWinsForCompanyView.as_view(),
         name='export-win',
+    ),
+    path(
+        'company/htmx',
+        BasicHTMX.as_view(),
+        name='htmx',
     ),
     path('public/company/<uuid:pk>', public_company_item, name='public-item'),
 ]

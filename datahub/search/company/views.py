@@ -3,6 +3,7 @@ from functools import reduce
 from django.db.models.expressions import Case, Value, When
 from django.db.models.fields import CharField
 from django.db.models.functions import Cast, Concat, Upper
+from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
 
 from config.settings.types import HawkScope
 from datahub.company.models import Company as DBCompany
@@ -109,6 +110,11 @@ class SearchCompanyAPIViewMixin:
 @register_v4_view()
 class SearchCompanyAPIView(SearchCompanyAPIViewMixin, SearchAPIView):
     """Filtered company search view."""
+
+    renderer_classes = [JSONRenderer, TemplateHTMLRenderer]
+    template_name = 'company/list/company_list.html'
+    authentication_classes = []
+    permission_classes = []
 
     def deep_get(self, dictionary, keys, default=None):
         """Perform a deep search on a dictionary to find the item at the location provided in the keys."""
