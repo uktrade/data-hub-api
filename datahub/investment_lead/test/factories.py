@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 import factory
 from faker import Faker
 
-from datahub.company.test.factories import AdviserFactory, CompanyFactory
+from datahub.company.test.factories import CompanyFactory
 from datahub.core import constants
 from datahub.core.test.factories import to_many_field
 from datahub.metadata.models import Sector
@@ -99,7 +99,6 @@ class EYBLeadFactory(factory.django.DjangoModelFactory):
     landing_timeframe = factory.LazyAttribute(
         lambda o: random.choice(LANDING_TIME_FRAME_CHOICES),
     )
-    advisers = factory.RelatedFactory(AdviserFactory)
 
     # EYB marketing fields
     utm_name = factory.Faker('pystr')
@@ -110,6 +109,11 @@ class EYBLeadFactory(factory.django.DjangoModelFactory):
     @to_many_field
     def investment_projects(self):
         """Add support for setting `investment_projects`."""
+        return []
+    
+    @to_many_field
+    def advisers(self):
+        """Add support for setting `advisers`."""
         return []
 
 

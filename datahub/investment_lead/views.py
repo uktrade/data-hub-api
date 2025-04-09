@@ -74,9 +74,10 @@ class EYBLeadViewSet(SoftDeleteCoreViewSet):
                 filter_query |= Q(is_high_value__isnull=True)
             queryset = queryset.filter(filter_query)
         return queryset
-    
+
     def get_queryset(self):
         """Apply filters to queryset based on query parameters (in GET operations)."""
+        queryset = EYBLead.objects.prefetch_related('advisers')
         queryset = EYBLead.objects.filter(archived=False).exclude(
             Q(user_hashed_uuid='') | Q(triage_hashed_uuid=''),
         )
