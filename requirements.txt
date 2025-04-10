@@ -97,6 +97,7 @@ django==4.2.20
     #   drf-redesign
     #   drf-spectacular
     #   drf-spectacular-sidecar
+    #   govuk-frontend-django
 django-axes==7.0.2
     # via -r requirements.in
 django-csp==3.8
@@ -154,6 +155,10 @@ googleapis-common-protos==1.63.0
     # via
     #   opentelemetry-exporter-otlp-proto-grpc
     #   opentelemetry-exporter-otlp-proto-http
+govuk-frontend-django==0.15.1
+    # via -r requirements.in
+govuk-frontend-jinja==3.5.0
+    # via govuk-frontend-django
 greenlet==3.1.1
     # via gevent
 grpcio==1.62.1
@@ -174,6 +179,10 @@ inflection==0.5.1
     #   drf-spectacular
 ipaddress==1.0.23
     # via mail-parser
+jinja2==3.1.6
+    # via
+    #   govuk-frontend-django
+    #   govuk-frontend-jinja
 jmespath==1.0.1
     # via
     #   boto3
@@ -187,7 +196,9 @@ kombu==5.3.7
 mail-parser==4.1.2
     # via -r requirements.in
 markupsafe==2.1.2
-    # via werkzeug
+    # via
+    #   jinja2
+    #   werkzeug
 mohawk==1.1.0
     # via -r requirements.in
 multidict==6.0.4
