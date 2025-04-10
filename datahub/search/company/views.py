@@ -112,9 +112,29 @@ class SearchCompanyAPIView(SearchCompanyAPIViewMixin, SearchAPIView):
     """Filtered company search view."""
 
     renderer_classes = [JSONRenderer, TemplateHTMLRenderer]
-    template_name = 'company/list/company_list.html'
+    template_name = 'company/collection.html'
     authentication_classes = []
     permission_classes = []
+
+    def get(self, request, format=None):
+        """Handle GET request, primarily for viewing HTML responses."""
+        # Convert query params for data processing
+        data = {
+            'original_query': request.query_params.get('q', ''),
+            'offset': request.query_params.get('offset', 0),
+            'limit': request.query_params.get('limit', 10),
+        }
+        if 'sortby' in request.query_params:
+            data['sortby'] = request.query_params['sortby']
+
+        # Add any filter fields that exist in query params
+        for field in self.FILTER_FIELDS:
+            if field in request.query_params:
+                data[field] = request.query_params[field]
+
+        # Process same as POST but with GET parameters
+        request.data.update(data)
+        return self.post(request, format=format)
 
     def deep_get(self, dictionary, keys, default=None):
         """Perform a deep search on a dictionary to find the item at the location provided in the keys."""

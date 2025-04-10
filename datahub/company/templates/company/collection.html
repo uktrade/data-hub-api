@@ -1,0 +1,73 @@
+{% extends "base.html" %} {% load govuk_frontend_django %} {% block content %}
+{% gds_breadcrumbs %} {%
+gds_breadcrumb_item text="Home" href="/" %} {% gds_breadcrumb_item
+text="Companies" %} {% endgds_breadcrumbs %}
+
+<div class="govuk-width-container">
+  <!-- {% gds_component "back-link" href="/" %} -->
+  {# <a href="#" class="govuk-back-link">Back</a> #}
+  <main class="govuk-main-wrapper">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-l">Companies</h1>
+      </div>
+    </div>
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-one-third">
+        <h2 class="govuk-heading-m">Filters</h2>
+            <label class="govuk-label govuk-label--s" for="event-name">
+                Company name
+            </label>
+          </h1>
+        <input class="govuk-input" id="event-name" name="eventName" type="text">
+      </div>
+      <div class="govuk-grid-column-two-thirds">
+        <h2 class="govuk-heading-m">{{ count }} Companies</h2>
+        <a href="#" class="govuk-link">Remove all filters</a>
+        <button
+          type="submit"
+          class="govuk-button govuk-button--secondary"
+          data-module="govuk-button"
+        >
+          Add company
+        </button>
+        <hr />
+        <div>
+
+          {% for result in results %}
+          <h3 class="govuk-heading-s">{{ result.name }}</h3>
+          <sub class="">Updated on {{ result.modified_on }}</sub>
+          <ul class="govuk-list">
+            {% if result.sector %}
+                <li class="govuk-body">Sector: {{ result.sector.name }}</li>
+            {% endif %}
+            {% if result.global_headquarters %}
+                <li class="govuk-body">Global Headquarters: {{ result.global_headquarters.name }}</li>
+            {% endif %}
+            {% if result.address %}
+              {% set address = [result.address.line_1, result.address.line_2] %}
+              {% endset %}
+              {% set address_text = {{address.join(', ')}} %}
+              {% endset %}
+              <li class="govuk-body">Address: {{ address_text }}</li>
+              <li class="govuk-body">Address: {{ result.address.line_1 }}, {{ result.address.line_2 }}, {{ result.town }}, {{ result.postcode }}, {{ result.country.name }}</li>
+              {% endif %}
+            {% if result.trading_names %}
+                <li class="govuk-body">Trading names: {{ result.trading_names }}</li>
+            {% endif %}
+            {% if result.latest_interaction_date %}
+                <li class="govuk-body">Last interaction date: {{ result.latest_interaction_date }}</li>
+            {% endif %}
+            {% if result.headquarter_type %}
+                <li class="govuk-body">Headquarter type: {{ result.headquarter_type.name }}</li>
+            {% endif %}
+          </ul>
+          <hr>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+{% endblock content %}

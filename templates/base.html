@@ -1,13 +1,26 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HTMX</title>
-</head>
-<body>
-    {% block content %}{% endblock %}
+{% extends "govuk_frontend_django/base.html" %}
+{% load static govuk_frontend_django %}
+{% block title %}
+    Data Hub
+{% endblock title %}
+{% block head %}
+<link href="{% static 'css/styles.css' %}" rel="stylesheet" type="text/css" />
+{% endblock head %}
+{% block header %}
+    {% gds_header homepageUrl="/" serviceName="Data Hub" serviceUrl="/" containerClasses="govuk-width-container" %}
+        {% gds_header_nav_item href="/v4/search/company" text="Companies" %}
+        {% gds_header_nav_item href="/" text="Contact" %}
+        {% gds_header_nav_item href="/" text="Event" %}
+        {% gds_header_nav_item href="/" text="Interactions" %}
+        {% gds_header_nav_item href="/" text="Investments" %}
+        {% gds_header_nav_item href="/" text="Orders" %}
+        {% gds_header_nav_item href="/" text="Find exporters" %}
+        {% gds_header_nav_item href="/" text="Market access" %}
+        {% gds_header_nav_item href="/" text="Support" %}
+    {% endgds_header %}
+
+{% endblock header %}
+
+{% block body_end %}
     <script src="{% static 'core/htmx/js/htmx.min.js' %}"></script>
-</body>
-</html>
+{% endblock body_end %}
