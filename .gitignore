@@ -96,3 +96,7 @@ tags
 
 # Localstack
 .localstack/mounted 
+
+# Node modules & static assets
+node_modules/
+static/

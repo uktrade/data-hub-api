@@ -1,0 +1,16 @@
+{
+    "dependencies": {
+        "govuk-frontend": "4.6.0",
+        "node-sass": "^8.0.0"
+    },
+    "scripts": {
+        "css:build": "node-sass --include-path node_modules --output-style compressed --source-map true --source-map-contents true datahub/core/static/core/stylesheets/datahub.scss datahub/core/static/core/stylesheets/datahub.css",
+        "css:watch": "node-sass --include-path node_modules --output-style compressed --source-map true --source-map-contents true datahub/core/static/core/stylesheets/datahub.scss datahub/core/static/core/stylesheets/datahub.css --watch",
+        "assets:build": "mkdir -p static/govuk-frontend && cp -r node_modules/govuk-frontend/* static/govuk-frontend",
+        "build": "npm run assets:build && npm run css:build"
+    },
+    "engines": {
+        "node": "18.20.4",
+        "npm": "10.7.0"
+    }
+}
