@@ -4,6 +4,8 @@ from django.db.models.expressions import Case, Value, When
 from django.db.models.fields import CharField
 from django.db.models.functions import Cast, Concat, Upper
 from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from config.settings.types import HawkScope
 from datahub.company.models import Company as DBCompany
@@ -107,12 +109,23 @@ class SearchCompanyAPIViewMixin:
     }
 
 
+class CompanySearchFilters(APIView):
+    """Returns a template containing the filters for the company search endpoint."""
+
+    permission_classes = []
+    authentication_classes = []
+    renderer_classes = [TemplateHTMLRenderer]
+
+    def get(self, request):
+        return Response(template_name='company/collection.html')
+
+
 @register_v4_view()
 class SearchCompanyAPIView(SearchCompanyAPIViewMixin, SearchAPIView):
     """Filtered company search view."""
 
     renderer_classes = [JSONRenderer, TemplateHTMLRenderer]
-    template_name = 'company/collection.html'
+    template_name = 'company/results.html'
     authentication_classes = []
     permission_classes = []
 

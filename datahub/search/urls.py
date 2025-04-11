@@ -5,6 +5,7 @@ from rest_framework.urlpatterns import format_suffix_patterns
 
 from datahub.core.utils import join_truthy_strings
 from datahub.search.views import SearchBasicAPIView, ViewType, v3_view_registry, v4_view_registry
+from datahub.search.company.views import CompanySearchFilters
 
 
 def _construct_path(search_app, view_type, view_cls, suffix=None):
@@ -44,3 +45,9 @@ _urls_v4 = [
 ]
 
 urls_v4 = format_suffix_patterns(_urls_v4)
+
+
+# HTMX related views
+urls_v4 += [
+    path('company-filters', CompanySearchFilters.as_view(), name='company-filters'),
+]

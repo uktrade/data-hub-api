@@ -702,4 +702,4 @@ class BasicHTMX(APIView):
     renderer_classes = [TemplateHTMLRenderer]
 
     def get(self, request):
-        return Response(template_name='company/list/companies.html')
+        return Response(template_name='company/base.html')
