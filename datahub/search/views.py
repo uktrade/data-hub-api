@@ -195,7 +195,10 @@ class SearchAPIView(APIView):
     fields_to_include = None
     fields_to_exclude = None
 
-    http_method_names = ('post',)
+    http_method_names = (
+        'post',
+        'get',
+    )
 
     def _get_filter_data(self, validated_data):
         """Returns filter data."""
@@ -294,14 +297,18 @@ class SearchAPIView(APIView):
         )
         results = execute_search_query(limited_query)
 
-        response = {
+        response_data = {
             'count': results.hits.total.value,
             'results': [x.to_dict() for x in results.hits],
         }
 
-        response = self.enhance_response(results, response, validated_data)
+        response_data = self.enhance_response(results, response_data, validated_data)
 
-        return Response(data=response)
+        # if request.accepted_renderer.format == 'html':
+        #     # Add context for HTML template here
+        #     response_data['key'] = 'value'
+
+        return Response(data=response_data)
 
     def enhance_response(self, results, response, validated_data):
         """Placeholder for a method to enhance the response with custom data."""

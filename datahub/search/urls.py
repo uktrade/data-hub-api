@@ -1,9 +1,11 @@
 """Search views URL config."""
 
 from django.urls import path
+from rest_framework.urlpatterns import format_suffix_patterns
 
 from datahub.core.utils import join_truthy_strings
 from datahub.search.views import SearchBasicAPIView, ViewType, v3_view_registry, v4_view_registry
+from datahub.search.company.views import CompanySearchFilters
 
 
 def _construct_path(search_app, view_type, view_cls, suffix=None):
@@ -37,7 +39,15 @@ urls_v3 = [
 # API V4 - new format for addresses
 
 # TODO add global search when all search apps are v4 ready
-urls_v4 = [
+_urls_v4 = [
     _construct_path(search_app, view_type, view_cls, suffix=name)
     for (search_app, view_type, name), view_cls in v4_view_registry.items()
+]
+
+urls_v4 = format_suffix_patterns(_urls_v4)
+
+
+# HTMX related views
+urls_v4 += [
+    path('company-filters', CompanySearchFilters.as_view(), name='company-filters'),
 ]

@@ -3,6 +3,9 @@ from functools import reduce
 from django.db.models.expressions import Case, Value, When
 from django.db.models.fields import CharField
 from django.db.models.functions import Cast, Concat, Upper
+from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from config.settings.types import HawkScope
 from datahub.company.models import Company as DBCompany
@@ -106,9 +109,45 @@ class SearchCompanyAPIViewMixin:
     }
 
 
+class CompanySearchFilters(APIView):
+    """Returns a template containing the filters for the company search endpoint."""
+
+    permission_classes = []
+    authentication_classes = []
+    renderer_classes = [TemplateHTMLRenderer]
+
+    def get(self, request):
+        return Response(template_name='company/collection.html')
+
+
 @register_v4_view()
 class SearchCompanyAPIView(SearchCompanyAPIViewMixin, SearchAPIView):
     """Filtered company search view."""
+
+    renderer_classes = [JSONRenderer, TemplateHTMLRenderer]
+    template_name = 'company/results.html'
+    authentication_classes = []
+    permission_classes = []
+
+    def get(self, request, format=None):
+        """Handle GET request, primarily for viewing HTML responses."""
+        # Convert query params for data processing
+        data = {
+            'original_query': request.query_params.get('q', ''),
+            'offset': request.query_params.get('offset', 0),
+            'limit': request.query_params.get('limit', 10),
+        }
+        if 'sortby' in request.query_params:
+            data['sortby'] = request.query_params['sortby']
+
+        # Add any filter fields that exist in query params
+        for field in self.FILTER_FIELDS:
+            if field in request.query_params:
+                data[field] = request.query_params[field]
+
+        # Process same as POST but with GET parameters
+        request.data.update(data)
+        return self.post(request, format=format)
 
     def deep_get(self, dictionary, keys, default=None):
         """Perform a deep search on a dictionary to find the item at the location provided in the keys."""
