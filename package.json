@@ -1,6 +1,6 @@
 {
     "dependencies": {
-        "govuk-frontend": "4.6.0",
+        "govuk-frontend": "5.9.0",
         "node-sass": "^8.0.0"
     },
     "scripts": {
@@ -10,7 +10,7 @@
         "build": "npm run assets:build && npm run css:build"
     },
     "engines": {
-        "node": "18.20.4",
-        "npm": "10.7.0"
+        "node": "23.11.0",
+        "npm": "11.3.0"
     }
 }
