@@ -1,31 +1,60 @@
 {% load govuk_frontend_django %}
+
 <div class="govuk-grid-column-one-third">
   <h2 class="govuk-heading-m">Filters</h2>
   <form>
+    <!-- Company name -->
+    <div class="govuk-form-group">
+      <label class="govuk-label govuk-label--s" for="company-name">
+        Company name
+      </label>
+      <input
+        class="govuk-input"
+        id="company-name"
+        name="name"
+        type="text"
+        placeholder="Search company name"
+        value=""
+      />
+    </div>
 
-    <label class="govuk-label govuk-label--s" for="event-name">
-      Company name
-    </label>
-    </h1>
-    <input class="govuk-input" name="name" type="text" placeholder="Search company name" value="">
-
+    <!-- Status  -->
     <div class="govuk-form-group">
       <fieldset class="govuk-fieldset">
         <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
-          <h1 class="govuk-fieldset__heading">
-            Status
-          </h1>
+          <h1 class="govuk-fieldset__heading">Status</h1>
         </legend>
-        <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+        <div
+          class="govuk-checkboxes govuk-checkboxes--small"
+          data-module="govuk-checkboxes"
+        >
           <div class="govuk-checkboxes__item">
-            <input class="govuk-checkboxes__input" id="active" name="archived" type="checkbox" value="false">
+            <input
+              class="govuk-checkboxes__input"
+              id="active"
+              name="status_active"
+              type="checkbox"
+              value="true"
+              hx-post="/api-proxy/v4/search/company.html"
+              hx-trigger="change"
+              hx-target="#htmx-company-results"
+            />
             <label class="govuk-label govuk-checkboxes__label" for="active">
               Active
             </label>
           </div>
           <div class="govuk-checkboxes__item">
-            <input class="govuk-checkboxes__input" id="inactive" name="archived" type="checkbox" value="true">
-            <label class="govuk-label govuk-checkboxes__label govuk-checkboxes__label--small" for="inactive">
+            <input
+              class="govuk-checkboxes__input"
+              id="inactive"
+              name="status_inactive"
+              type="checkbox"
+              value="true"
+              hx-post="/api-proxy/v4/search/company.html"
+              hx-trigger="change"
+              hx-target="#htmx-company-results"
+            />
+            <label class="govuk-label govuk-checkboxes__label" for="inactive">
               Inactive
             </label>
           </div>
@@ -33,10 +62,14 @@
       </fieldset>
     </div>
 
-    <button class="govuk-button" data-module="govuk-button" hx-post="/api-proxy/v4/search/company.html"
-      hx-trigger="click" hx-target="#htmx-company-results">
+    <button
+      class="govuk-button"
+      data-module="govuk-button"
+      hx-post="/api-proxy/v4/search/company.html"
+      hx-trigger="click"
+      hx-target="#htmx-company-results"
+    >
       Load Companies
     </button>
   </form>
-
 </div>

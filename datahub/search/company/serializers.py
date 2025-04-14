@@ -51,11 +51,26 @@ class SearchCompanyQuerySerializer(EntitySearchQuerySerializer):
     )
 
     def to_internal_value(self, data):
-        """Extend default method to remove keys with falsy values."""
+        """Convert incoming JSON data to validated data."""
         incoming_data = data.copy()
+
+        # Remove keys with falsy value
         for field in incoming_data.keys():
             if not data[field]:
                 data.pop(field)
+
+        # Handle status/archived checkbox values
+        status_active = data.get('status_active', None)
+        status_inactive = data.get('status_inactive', None)
+
+        if status_active and not status_inactive:
+            data['archived'] = False
+        if not status_active and status_inactive:
+            data['archived'] = True
+
+        data.pop('status_active', None)
+        data.pop('status_inactive', None)
+
         return super().to_internal_value(data)
 
 
