@@ -8,7 +8,7 @@
 
 {% for result in results %}
 <h3 class="govuk-heading-s">{{ result.name }}</h3>
-<sub class="">Updated on {{ result.modified_on }}</sub>
+<sub class="govuk-body-xs">Updated on {{ result.modified_on }}</sub>
 <ul class="govuk-list">
   {% if result.sector %}
       <li class="govuk-body">Sector: {{ result.sector.name }}</li>
@@ -17,12 +17,13 @@
       <li class="govuk-body">Global Headquarters: {{ result.global_headquarters.name }}</li>
   {% endif %}
   {% if result.address %}
-    {% set address = [result.address.line_1, result.address.line_2] %}
-    {% endset %}
-    {% set address_text = {{address.join(', ')}} %}
-    {% endset %}
-    <li class="govuk-body">Address: {{ address_text }}</li>
-    <li class="govuk-body">Address: {{ result.address.line_1 }}, {{ result.address.line_2 }}, {{ result.town }}, {{ result.postcode }}, {{ result.country.name }}</li>
+    <li class="govuk-body">Address:
+        {% if result.address.line_1 %}{{ result.address.line_1 }}{% endif %}
+        {% if result.address.line_2 %}, {{ result.address.line_2 }}{% endif %}
+        {% if result.address.town %}, {{ result.address.town }}{% endif %}
+        {% if result.address.postcode %}, {{ result.address.postcode }}{% endif %}
+        {% if result.address.country %}, {{ result.address.country.name }}{% endif %}
+    </li>
     {% endif %}
   {% if result.trading_names %}
       <li class="govuk-body">Trading names: {{ result.trading_names }}</li>
