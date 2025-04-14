@@ -9,13 +9,13 @@
 {% for result in results %}
 {% include "./template/result_card.html" with result=result %}
   {% if result.trading_names %}
-      <li class="govuk-body">Trading names: {{ result.trading_names }}</li>
+      <li class="govuk-body-s">Trading names: {{ result.trading_names }}</li>
   {% endif %}
   {% if result.latest_interaction_date %}
-      <li class="govuk-body">Last interaction date: {{ result.latest_interaction_date }}</li>
+      <li class="govuk-body-s">Last interaction date: {{ result.formatted_interaction_date }}</li>
   {% endif %}
   {% if result.headquarter_type %}
-      <li class="govuk-body">Headquarter type: {{ result.headquarter_type.name }}</li>
+      <li class="govuk-body-s">Headquarter type: {{ result.headquarter_type.name }}</li>
   {% endif %}
 </ul>
 <hr>

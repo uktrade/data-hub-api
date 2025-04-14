@@ -4,6 +4,7 @@ import uuid
 from collections import namedtuple
 from enum import Enum, auto
 from itertools import islice
+from datetime import datetime
 
 from django.conf import settings
 from django.utils.text import capfirst
@@ -219,6 +220,18 @@ class SearchAPIView(APIView):
         serializer.is_valid(raise_exception=True)
         return serializer.validated_data
 
+    def format_modified_on_date(self, date_str):
+        if not date_str:
+            return ""
+        dt = datetime.fromisoformat(date_str.replace("Z", "+00:00"))
+        return dt.strftime("%B %d %Y, %I:%M%p").lstrip("0").replace("AM", "am").replace("PM", "pm")
+    
+    def format_latest_interaction_date(self, date_str):
+        if not date_str:
+            return ""
+        dt = datetime.fromisoformat(date_str.replace("Z", "+00:00"))
+        return dt.strftime("%d %B %Y")
+
     def get_base_query(self, request, validated_data):
         """Gets a filtered OpenSearch query for the provided search parameters."""
         filter_data = self._get_filter_data(validated_data)
@@ -297,9 +310,17 @@ class SearchAPIView(APIView):
         )
         results = execute_search_query(limited_query)
 
+        raw_results = [x.to_dict() for x in results.hits]
+
+        for item in raw_results:
+            item['formatted_modified_on_date'] = self.format_modified_on_date(
+                item.get('modified_on')
+            )
+            item['formatted_interaction_date'] = self.format_latest_interaction_date(item.get('latest_interaction_date'))
+
         response_data = {
             'count': results.hits.total.value,
-            'results': [x.to_dict() for x in results.hits],
+            'results': raw_results,
         }
 
         response_data = self.enhance_response(results, response_data, validated_data)

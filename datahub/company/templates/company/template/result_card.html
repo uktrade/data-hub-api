@@ -1,20 +1,27 @@
 {% load govuk_frontend_django %}
 
-
-{% include "./heading_link.html" with name=result.name id=result.id%}
+<div style="float:right; display: inline-block">
 {% include "./country_tag.html" with name=result.address.country.name %}
 {% include "./other_tag.html" with name=result.global_headquarters.name %}
+</div>
+<div style="float: left">
+{% include "./heading_link.html" with name=result.name id=result.id%}
+</div>
 
-<sub class="govuk-body-xs">Updated on {{ result.modified_on}}</sub>
+<sub class="govuk-body-s">Updated on {{ result.formatted_modified_on_date}}</sub>
 <ul class="govuk-list">
   {% if result.sector %}
-      <li class="govuk-body">Sector: {{ result.sector.name }}</li>
+      <li class="govuk-body-s">
+        <span>Sector 
+        </span>
+            {{ result.sector.name }}
+        </li>
   {% endif %}
   {% if result.global_headquarters %}
-      <li class="govuk-body">Global Headquarters: {{ result.global_headquarters.name }}</li>
+      <li class="govuk-body-s">Global Headquarters: {{ result.global_headquarters.name }}</li>
   {% endif %}
   {% if result.address %}
-    <li class="govuk-body">Address:
+    <li class="govuk-body-s">Address:
         {% if result.address.line_1 %}{{ result.address.line_1 }}{% endif %}
         {% if result.address.line_2 %}, {{ result.address.line_2 }}{% endif %}
         {% if result.address.town %}, {{ result.address.town }}{% endif %}
