@@ -4,9 +4,9 @@
         "sass": "1.86.3"
     },
     "scripts": {
-        "css:build": "sass datahub/core/static/core/stylesheets/datahub.scss:datahub/core/static/core/stylesheets/datahub.css --style=compressed --source-map",
-        "css:watch": "sass datahub/core/static/core/stylesheets/datahub.scss:datahub/core/static/core/stylesheets/datahub.css --style=compressed --source-map --watch ",
-        "assets:build": "mkdir -p static/govuk-frontend && cp -r node_modules/govuk-frontend/* static/govuk-frontend",
+        "css:build": "sass datahub/core/static/core/stylesheets/datahub.scss:datahub/core/static/core/stylesheets/datahub.css --style=compressed --source-map --load-path=nodule_modules/",
+        "css:watch": "sass datahub/core/static/core/stylesheets/datahub.scss:datahub/core/static/core/stylesheets/datahub.css --style=compressed --source-map --watch --load-path=nodule_modules/",
+        "assets:build": "mkdir -p static/assets && cp -r node_modules/govuk-frontend/dist/govuk/assets/* static/assets/",
         "build": "npm run assets:build && npm run css:build"
     },
     "engines": {
