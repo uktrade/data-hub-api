@@ -50,6 +50,14 @@ class SearchCompanyQuerySerializer(EntitySearchQuerySerializer):
         'latest_interaction_date',
     )
 
+    def to_internal_value(self, data):
+        """Extend default method to remove keys with falsy values."""
+        incoming_data = data.copy()
+        for field in incoming_data.keys():
+            if not data[field]:
+                data.pop(field)
+        return super().to_internal_value(data)
+
 
 class PublicSearchCompanyQuerySerializer(EntitySearchQuerySerializer):
     """Serialiser used to validate public company search POST bodies."""

@@ -4,8 +4,8 @@ from django.urls import path
 from rest_framework.urlpatterns import format_suffix_patterns
 
 from datahub.core.utils import join_truthy_strings
-from datahub.search.views import SearchBasicAPIView, ViewType, v3_view_registry, v4_view_registry
 from datahub.search.company.views import CompanySearchFilters
+from datahub.search.views import SearchBasicAPIView, ViewType, v3_view_registry, v4_view_registry
 
 
 def _construct_path(search_app, view_type, view_cls, suffix=None):
