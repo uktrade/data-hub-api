@@ -71,6 +71,10 @@ class SearchCompanyQuerySerializer(EntitySearchQuerySerializer):
         data.pop('status_active', None)
         data.pop('status_inactive', None)
 
+        # Sector
+        if 'sector_descends' in data:
+            data['sector_descends'] = [data['sector_descends']]
+
         return super().to_internal_value(data)
 
 

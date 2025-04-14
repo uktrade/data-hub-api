@@ -22,6 +22,8 @@ from datahub.core.query_utils import (
     get_string_agg_subquery,
 )
 from datahub.metadata.query_utils import get_sector_name_subquery
+from datahub.metadata.models import Sector
+from datahub.metadata.serializers import SectorSerializer
 from datahub.search.company import CompanySearchApp
 from datahub.search.company.serializers import (
     PublicSearchCompanyQuerySerializer,
@@ -117,7 +119,10 @@ class CompanySearchFilters(APIView):
     renderer_classes = [TemplateHTMLRenderer]
 
     def get(self, request):
-        return Response(template_name='company/collection.html')
+        context = {
+            'sectors': Sector.objects.filter(level=0),
+        }
+        return Response(template_name='company/collection.html', data=context)
 
 
 @register_v4_view()

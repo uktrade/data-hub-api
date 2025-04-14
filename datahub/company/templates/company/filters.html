@@ -66,6 +66,26 @@
       </fieldset>
     </div>
 
+    <!-- Sector -->
+    <div class="govuk-form-group">
+      <label class="govuk-label govuk-label--s" for="sector"> Sector </label>
+      <select
+        class="govuk-select"
+        id="sector"
+        name="sector_descends"
+        placeholder="Search sector"
+        value=""
+        hx-post="/api-proxy/v4/search/company.html"
+        hx-trigger="change"
+        hx-target="#htmx-company-results"
+      >
+        <option value="" selected="">---------</option>
+        {% for sector in sectors %}
+        <option value="{{ sector.id }}">{{ sector.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
     <button
       class="govuk-button"
       data-module="govuk-button"
