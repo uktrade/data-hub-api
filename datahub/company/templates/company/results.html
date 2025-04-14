@@ -7,24 +7,7 @@
 {% endif %}
 
 {% for result in results %}
-<h3 class="govuk-heading-s">{{ result.name }}</h3>
-<sub class="govuk-body-xs">Updated on {{ result.modified_on }}</sub>
-<ul class="govuk-list">
-  {% if result.sector %}
-      <li class="govuk-body">Sector: {{ result.sector.name }}</li>
-  {% endif %}
-  {% if result.global_headquarters %}
-      <li class="govuk-body">Global Headquarters: {{ result.global_headquarters.name }}</li>
-  {% endif %}
-  {% if result.address %}
-    <li class="govuk-body">Address:
-        {% if result.address.line_1 %}{{ result.address.line_1 }}{% endif %}
-        {% if result.address.line_2 %}, {{ result.address.line_2 }}{% endif %}
-        {% if result.address.town %}, {{ result.address.town }}{% endif %}
-        {% if result.address.postcode %}, {{ result.address.postcode }}{% endif %}
-        {% if result.address.country %}, {{ result.address.country.name }}{% endif %}
-    </li>
-    {% endif %}
+{% include "./template/result_card.html" with result=result %}
   {% if result.trading_names %}
       <li class="govuk-body">Trading names: {{ result.trading_names }}</li>
   {% endif %}
