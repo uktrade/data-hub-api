@@ -2,9 +2,9 @@
 
 import uuid
 from collections import namedtuple
+from datetime import datetime
 from enum import Enum, auto
 from itertools import islice
-from datetime import datetime
 
 from django.conf import settings
 from django.utils.text import capfirst
@@ -314,7 +314,7 @@ class SearchAPIView(APIView):
 
         for item in raw_results:
             item['formatted_modified_on_date'] = self.format_modified_on_date(
-                item.get('modified_on')
+                item.get('modified_on'),
             )
             item['formatted_interaction_date'] = self.format_latest_interaction_date(item.get('latest_interaction_date'))
 

@@ -21,9 +21,8 @@ from datahub.core.query_utils import (
     get_front_end_url_expression,
     get_string_agg_subquery,
 )
-from datahub.metadata.query_utils import get_sector_name_subquery
 from datahub.metadata.models import Sector
-from datahub.metadata.serializers import SectorSerializer
+from datahub.metadata.query_utils import get_sector_name_subquery
 from datahub.search.company import CompanySearchApp
 from datahub.search.company.serializers import (
     PublicSearchCompanyQuerySerializer,
@@ -133,26 +132,6 @@ class SearchCompanyAPIView(SearchCompanyAPIViewMixin, SearchAPIView):
     template_name = 'company/results.html'
     authentication_classes = []
     permission_classes = []
-
-    def get(self, request, format=None):
-        """Handle GET request, primarily for viewing HTML responses."""
-        # Convert query params for data processing
-        data = {
-            'original_query': request.query_params.get('q', ''),
-            'offset': request.query_params.get('offset', 0),
-            'limit': request.query_params.get('limit', 10),
-        }
-        if 'sortby' in request.query_params:
-            data['sortby'] = request.query_params['sortby']
-
-        # Add any filter fields that exist in query params
-        for field in self.FILTER_FIELDS:
-            if field in request.query_params:
-                data[field] = request.query_params[field]
-
-        # Process same as POST but with GET parameters
-        request.data.update(data)
-        return self.post(request, format=format)
 
     def deep_get(self, dictionary, keys, default=None):
         """Perform a deep search on a dictionary to find the item at the location provided in the keys."""
