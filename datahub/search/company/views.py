@@ -21,7 +21,10 @@ from datahub.core.query_utils import (
     get_front_end_url_expression,
     get_string_agg_subquery,
 )
-from datahub.metadata.models import Sector
+from datahub.metadata.models import (
+    Country,
+    Sector,
+)
 from datahub.metadata.query_utils import get_sector_name_subquery
 from datahub.search.company import CompanySearchApp
 from datahub.search.company.serializers import (
@@ -120,6 +123,7 @@ class CompanySearchFilters(APIView):
     def get(self, request):
         context = {
             'sectors': Sector.objects.filter(level=0),
+            'countries': Country.objects.all(),
         }
         return Response(template_name='company/collection.html', data=context)
 

@@ -88,9 +88,38 @@
             hx-trigger="change"
             hx-target="#htmx-company-results"
           >
-            <option value="" selected="">---------</option>
+            <option value="" selected="">Search sector</option>
             {% for sector in sectors %}
             <option value="{{ sector.id }}">{{ sector.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+    </details>
+
+    <!-- Location details section -->
+    <details class="govuk-details" expanded>
+      <summary class="govuk-details__summary">
+        <span class="govuk-details__summary-text">Location details</span>
+      </summary>
+      <div class="govuk-details__text">
+        <!-- Country -->
+        <div class="govuk-form-group">
+          <label class="govuk-label govuk-label--s" for="sector">
+            Country
+          </label>
+          <select
+            class="govuk-select"
+            id="country"
+            name="country"
+            value=""
+            hx-post="/api-proxy/v4/search/company.html"
+            hx-trigger="change"
+            hx-target="#htmx-company-results"
+          >
+            <option value="" selected="">Search country</option>
+            {% for country in countries %}
+            <option value="{{ country.id }}">{{ country.name }}</option>
             {% endfor %}
           </select>
         </div>

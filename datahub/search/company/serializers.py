@@ -75,6 +75,10 @@ class SearchCompanyQuerySerializer(EntitySearchQuerySerializer):
         if 'sector_descends' in data:
             data['sector_descends'] = [data['sector_descends']]
 
+        # Country
+        if 'country' in data:
+            data['country'] = [data['country']]
+
         return super().to_internal_value(data)
 
 
