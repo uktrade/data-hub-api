@@ -59,6 +59,27 @@ class SearchCompanyQuerySerializer(EntitySearchQuerySerializer):
             if not data[field]:
                 data.pop(field)
 
+        # Handle headquarter type checkbox values
+        headquarter_type_map = {
+            'type_european_hq': 'eb59eaeb-eeb8-4f54-9506-a5e08773046b',
+            'type_uk_hq': '3e6debb4-1596-40c5-aa25-f00da0e05af9',
+            'type_ultimate_global_hq': '43281c5e-92a4-4794-867b-b4d5f801e6f3',
+        }
+        headquarter_types = []
+        for hq_name, hq_id in headquarter_type_map.items():
+            value = data.get(hq_name, None)
+            if value:
+                headquarter_types.append(hq_id)
+        data['headquarter_type'] = headquarter_types
+
+        data.pop('type_european_hq', None)
+        data.pop('type_uk_hq', None)
+        data.pop('type_ultimate_global_hq', None)
+
+        # Sector
+        if 'sector_descends' in data:
+            data['sector_descends'] = [data['sector_descends']]
+
         # Handle status/archived checkbox values
         status_active = data.get('status_active', None)
         status_inactive = data.get('status_inactive', None)
@@ -70,10 +91,6 @@ class SearchCompanyQuerySerializer(EntitySearchQuerySerializer):
 
         data.pop('status_active', None)
         data.pop('status_inactive', None)
-
-        # Sector
-        if 'sector_descends' in data:
-            data['sector_descends'] = [data['sector_descends']]
 
         # Country
         if 'country' in data:

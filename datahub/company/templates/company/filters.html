@@ -27,6 +27,94 @@
             value=""
           />
         </div>
+        <!-- Headquarter type  -->
+        <div class="govuk-form-group">
+          <fieldset class="govuk-fieldset">
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+              <h1 class="govuk-fieldset__heading">Type</h1>
+            </legend>
+            <div
+              class="govuk-checkboxes govuk-checkboxes--small"
+              data-module="govuk-checkboxes"
+            >
+              <div class="govuk-checkboxes__item">
+                <input
+                  class="govuk-checkboxes__input"
+                  id="type_european_hq"
+                  name="type_european_hq"
+                  type="checkbox"
+                  value="true"
+                  hx-post="/api-proxy/v4/search/company.html"
+                  hx-trigger="change"
+                  hx-target="#htmx-company-results"
+                />
+                <label
+                  class="govuk-label govuk-checkboxes__label"
+                  for="type_european_hq"
+                >
+                  European HQ
+                </label>
+              </div>
+              <div class="govuk-checkboxes__item">
+                <input
+                  class="govuk-checkboxes__input"
+                  id="type_uk_hq"
+                  name="type_uk_hq"
+                  type="checkbox"
+                  value="true"
+                  hx-post="/api-proxy/v4/search/company.html"
+                  hx-trigger="change"
+                  hx-target="#htmx-company-results"
+                />
+                <label
+                  class="govuk-label govuk-checkboxes__label"
+                  for="type_uk_hq"
+                >
+                  UK HQ
+                </label>
+              </div>
+              <div class="govuk-checkboxes__item">
+                <input
+                  class="govuk-checkboxes__input"
+                  id="type_ultimate_global_hq"
+                  name="type_ultimate_global_hq"
+                  type="checkbox"
+                  value="true"
+                  hx-post="/api-proxy/v4/search/company.html"
+                  hx-trigger="change"
+                  hx-target="#htmx-company-results"
+                />
+                <label
+                  class="govuk-label govuk-checkboxes__label"
+                  for="type_ultimate_global_hq"
+                >
+                  Ultimate/Global HQ
+                </label>
+              </div>
+            </div>
+          </fieldset>
+        </div>
+        <!-- Sector -->
+        <div class="govuk-form-group">
+          <label class="govuk-label govuk-label--s" for="sector">
+            Sector
+          </label>
+          <select
+            class="govuk-select"
+            id="sector"
+            name="sector_descends"
+            placeholder="Search sector"
+            value=""
+            hx-post="/api-proxy/v4/search/company.html"
+            hx-trigger="change"
+            hx-target="#htmx-company-results"
+          >
+            <option value="" selected="">Search sector</option>
+            {% for sector in sectors %}
+            <option value="{{ sector.id }}">{{ sector.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
         <!-- Status  -->
         <div class="govuk-form-group">
           <fieldset class="govuk-fieldset">
@@ -72,27 +160,6 @@
               </div>
             </div>
           </fieldset>
-        </div>
-        <!-- Sector -->
-        <div class="govuk-form-group">
-          <label class="govuk-label govuk-label--s" for="sector">
-            Sector
-          </label>
-          <select
-            class="govuk-select"
-            id="sector"
-            name="sector_descends"
-            placeholder="Search sector"
-            value=""
-            hx-post="/api-proxy/v4/search/company.html"
-            hx-trigger="change"
-            hx-target="#htmx-company-results"
-          >
-            <option value="" selected="">Search sector</option>
-            {% for sector in sectors %}
-            <option value="{{ sector.id }}">{{ sector.name }}</option>
-            {% endfor %}
-          </select>
         </div>
       </div>
     </details>
