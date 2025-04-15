@@ -2,6 +2,7 @@ from django.db.models import Q
 from rest_framework import serializers
 
 from datahub.company.models import Company
+from datahub.company.serializers import NestedAdviserField
 from datahub.core.audit import AuditLogField
 from datahub.core.serializers import (
     AddressSerializer,
@@ -29,6 +30,7 @@ INVESTMENT_LEAD_BASE_FIELDS = [
     'created_on',
     'modified_on',
     'id',
+    'advisers',
 ]
 
 TRIAGE_FIELDS = [
@@ -585,6 +587,10 @@ class RetrieveEYBLeadSerializer(BaseEYBLeadSerializer):
             'audit_log',
         ]
 
+    advisers = NestedAdviserField(
+        many=True,
+        allow_empty=False,
+    )
     sector = NestedRelatedField(Sector)
     proposed_investment_region = NestedRelatedField(UKRegion)
     address = AddressSerializer(

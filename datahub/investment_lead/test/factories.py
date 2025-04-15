@@ -110,6 +110,11 @@ class EYBLeadFactory(factory.django.DjangoModelFactory):
     def investment_projects(self):
         """Add support for setting `investment_projects`."""
         return []
+    
+    @to_many_field
+    def advisers(self):
+        """Add support for setting `advisers`."""
+        return []
 
 
 def random_sector_instance():
