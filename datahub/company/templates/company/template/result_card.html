@@ -1,19 +1,16 @@
 {% load govuk_frontend_django %}
 
-<div style="float:right; display: inline-block">
-{% include "./country_tag.html" with name=result.address.country.name %}
-{% include "./other_tag.html" with name=result.global_headquarters.name %}
+<div class="govuk-exit-this-page">
+    {% include "./country_tag.html" with name=result.address.country.name %}
+    {% include "./other_tag.html" with name=result.global_headquarters.name %}
 </div>
-<div style="float: left">
 {% include "./heading_link.html" with name=result.name id=result.id%}
-</div>
 
-<sub class="govuk-body-s">Updated on {{ result.formatted_modified_on_date}}</sub>
+<sub class="govuk-body-s ">Updated on {{ result.formatted_modified_on_date}}</sub>
 <ul class="govuk-list">
   {% if result.sector %}
       <li class="govuk-body-s">
-        <span>Sector 
-        </span>
+        <span>Sector</span>
             {{ result.sector.name }}
         </li>
   {% endif %}
