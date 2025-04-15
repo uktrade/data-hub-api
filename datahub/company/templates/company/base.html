@@ -1,0 +1,23 @@
+{% extends "base.html" %} {% load govuk_frontend_django %}
+
+{% comment %}
+This includes the headers, nav and footer. Use this when browsing the API without the react
+frontend.
+{% endcomment %}
+
+{% block content %}
+{% gds_breadcrumbs %} {% gds_breadcrumb_item text="Home" href="/" %} {% gds_breadcrumb_item
+text="Companies" %} {% endgds_breadcrumbs %}
+
+  <!-- {% gds_component "back-link" href="/" %} -->
+  {# <a href="#" class="govuk-back-link">Back</a> #}
+  <main class="govuk-main-wrapper">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-l">Companies</h1>
+      </div>
+      {% include "company/collection.html" %}
+    </div>
+  </main>
+
+{% endblock content %}

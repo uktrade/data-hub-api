@@ -3,10 +3,16 @@ from functools import reduce
 from django.db.models.expressions import Case, Value, When
 from django.db.models.fields import CharField
 from django.db.models.functions import Cast, Concat, Upper
+from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from config.settings.types import HawkScope
+from datahub.company.models import (
+    Advisor,
+    CompanyExportCountry,
+)
 from datahub.company.models import Company as DBCompany
-from datahub.company.models import CompanyExportCountry
 from datahub.core.auth import PaaSIPAuthentication
 from datahub.core.constants import HeadquarterType
 from datahub.core.hawk_receiver import (
@@ -17,6 +23,10 @@ from datahub.core.hawk_receiver import (
 from datahub.core.query_utils import (
     get_front_end_url_expression,
     get_string_agg_subquery,
+)
+from datahub.metadata.models import (
+    Country,
+    Sector,
 )
 from datahub.metadata.query_utils import get_sector_name_subquery
 from datahub.search.company import CompanySearchApp
@@ -106,9 +116,30 @@ class SearchCompanyAPIViewMixin:
     }
 
 
+class CompanySearchFilters(APIView):
+    """Returns a template containing the filters for the company search endpoint."""
+
+    permission_classes = []
+    authentication_classes = []
+    renderer_classes = [TemplateHTMLRenderer]
+
+    def get(self, request):
+        context = {
+            'sectors': Sector.objects.filter(level=0),
+            'countries': Country.objects.all(),
+            'advisers': Advisor.objects.all(),
+        }
+        return Response(template_name='company/collection.html', data=context)
+
+
 @register_v4_view()
 class SearchCompanyAPIView(SearchCompanyAPIViewMixin, SearchAPIView):
     """Filtered company search view."""
+
+    renderer_classes = [JSONRenderer, TemplateHTMLRenderer]
+    template_name = 'company/results.html'
+    authentication_classes = []
+    permission_classes = []
 
     def deep_get(self, dictionary, keys, default=None):
         """Perform a deep search on a dictionary to find the item at the location provided in the keys."""
