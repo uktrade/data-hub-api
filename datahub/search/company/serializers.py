@@ -92,6 +92,10 @@ class SearchCompanyQuerySerializer(EntitySearchQuerySerializer):
         data.pop('status_active', None)
         data.pop('status_inactive', None)
 
+        # Adviser
+        if 'adviser' in data:
+            data['adviser'] = [data['adviser']]
+
         # Country
         if 'country' in data:
             data['country'] = [data['country']]

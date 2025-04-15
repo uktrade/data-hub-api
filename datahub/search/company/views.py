@@ -8,8 +8,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from config.settings.types import HawkScope
+from datahub.company.models import (
+    Advisor,
+    CompanyExportCountry,
+)
 from datahub.company.models import Company as DBCompany
-from datahub.company.models import CompanyExportCountry
 from datahub.core.auth import PaaSIPAuthentication
 from datahub.core.constants import HeadquarterType
 from datahub.core.hawk_receiver import (
@@ -124,6 +127,7 @@ class CompanySearchFilters(APIView):
         context = {
             'sectors': Sector.objects.filter(level=0),
             'countries': Country.objects.all(),
+            'advisers': Advisor.objects.all(),
         }
         return Response(template_name='company/collection.html', data=context)
 

@@ -161,6 +161,27 @@
             </div>
           </fieldset>
         </div>
+        <!-- Adviser -->
+        <div class="govuk-form-group">
+          <label class="govuk-label govuk-label--s" for="adviser">
+            Adviser
+          </label>
+          <select
+            class="govuk-select"
+            id="adviser"
+            name="adviser"
+            placeholder="Search adviser"
+            value=""
+            hx-post="/api-proxy/v4/search/company.html"
+            hx-trigger="change"
+            hx-target="#htmx-company-results"
+          >
+            <option value="" selected="">Search adviser</option>
+            {% for adviser in advisers %}
+            <option value="{{ adviser.id }}">{{ adviser.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
       </div>
     </details>
 
