@@ -426,7 +426,7 @@ rq==2.3.1
     #   rq-scheduler
 rq-scheduler==0.14.0
     # via -r requirements.in
-ruff==0.11.4
+ruff==0.11.6
     # via -r requirements-dev.in
 s3transfer==0.11.1
     # via boto3
