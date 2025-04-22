@@ -140,13 +140,11 @@ class TestUpdateInvestmentDeliveryPartnersCommand:
             InvestmentDeliveryPartner.objects.get(pk='14ee950e-0bf1-e511-8ffa-e4115bead28a'),
         ]
 
-        dpis = [
-            dpi,
-            InvestmentDeliveryPartnerFactory(id='182e76ca-868d-4ca4-a336-17a26719f786'),
-            InvestmentDeliveryPartnerFactory(id='dedd7553-63fe-41cc-874f-740d4cec8f97'),
-        ]
+        # dpis
+        InvestmentDeliveryPartnerFactory(id='182e76ca-868d-4ca4-a336-17a26719f786')
+        InvestmentDeliveryPartnerFactory(id='dedd7553-63fe-41cc-874f-740d4cec8f97')
 
-        investment_project = InvestmentProjectFactory(
+        InvestmentProjectFactory(
             actual_land_date=datetime(2025, 4, 1, tzinfo=timezone.utc),
             delivery_partners=leps,
         )
