@@ -19,6 +19,7 @@ from datahub.documents import urls as document_urls
 from datahub.event import urls as event_urls
 from datahub.export_win import urls as export_win_urls
 from datahub.feature_flag import urls as feature_flag_urls
+from datahub.hcsat import urls as hcsat_urls
 from datahub.interaction import urls as interaction_urls
 from datahub.investment.investor_profile import urls as investor_profile_urls
 from datahub.investment.opportunity import urls as opportunity_urls
@@ -116,4 +117,5 @@ v4_urls = [
         ),
     ),
     path('document/', include((document_urls, 'document'), namespace='document')),
+    path('', include((hcsat_urls.urls_v4, 'hcsat'), namespace='hcsat')),
 ] + get_schema_and_docs_for_api_version('v4')

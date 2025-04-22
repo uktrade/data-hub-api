@@ -134,6 +134,7 @@ LOCAL_APPS = [
     'datahub.task',
     'datahub.export_win',
     'datahub.company_activity',
+    'datahub.hcsat',
 ]
 
 # Can be used as a way to load a third-party app that has been removed from the
@@ -300,7 +301,7 @@ SPECTACULAR_SETTINGS = {
     'VERSION': None,
     'SERVE_INCLUDE_SCHEMA': False,
     # Settings for self-contained UI installation (see docs)
-    'SWAGGER_UI_DIST': 'SIDECAR', 
+    'SWAGGER_UI_DIST': 'SIDECAR',
     'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
     'REDOC_DIST': 'SIDECAR',
 }

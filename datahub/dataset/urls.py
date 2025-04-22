@@ -23,6 +23,7 @@ from datahub.dataset.export_wins.views import (
     ExportWinsHVCDatasetView,
     ExportWinsWinDatasetView,
 )
+from datahub.dataset.hcsat.views import HCSATDatasetView
 from datahub.dataset.interaction.views import InteractionsDatasetView
 from datahub.dataset.interaction_export_country.views import InteractionsExportCountryDatasetView
 from datahub.dataset.investment_project.views import (
@@ -117,5 +118,10 @@ urlpatterns = [
         'expand-your-business-dataset',
         EYBLeadsDatasetView.as_view(),
         name='expand-your-business-dataset',
+    ),
+    path(
+        'hcsat-dataset',
+        HCSATDatasetView.as_view(),
+        name='hcsat-dataset',
     ),
 ]
