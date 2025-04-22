@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from typing import NoReturn
 
 import pytest
 from django.core.management import call_command
@@ -51,9 +52,9 @@ class TestUpdateInvestmentDeliveryPartnersCommand:
     )
     def test_actual_land_date(
         self,
-        caplog,
-        lep,
-        dpi,
+        caplog: pytest.LogCaptureFixture,
+        lep: InvestmentDeliveryPartner,
+        dpi: NoReturn,
         actual_land_date,
         delivery_partners,
         expected_partners,
@@ -75,7 +76,12 @@ class TestUpdateInvestmentDeliveryPartnersCommand:
         ) == set([str(expected_partner.id) for expected_partner in expected_partners])
 
     @pytest.mark.django_db
-    def test_multiple_delivery_partners(self, caplog, lep, dpi):
+    def test_multiple_delivery_partners(
+        self,
+        caplog: pytest.LogCaptureFixture,
+        lep: InvestmentDeliveryPartner,
+        dpi: NoReturn,
+    ):
         """Test Investment Project with multiple delivery partners."""
         caplog.set_level('INFO')
 
@@ -129,7 +135,15 @@ class TestUpdateInvestmentDeliveryPartnersCommand:
             ),
         ],
     )
-    def test_arguments(self, caplog, lep, dpi, simulate, delete, caplog_text):
+    def test_arguments(
+        self,
+        caplog: pytest.LogCaptureFixture,
+        lep: InvestmentDeliveryPartner,
+        dpi: NoReturn,
+        simulate,
+        delete,
+        caplog_text,
+    ):
         """Test simulate and delete arguments."""
         caplog.set_level('INFO')
 
@@ -152,3 +166,50 @@ class TestUpdateInvestmentDeliveryPartnersCommand:
         call_command('update_investment_delivery_partners', simulate=simulate, delete=delete)
 
         assert caplog_text in caplog.text
+
+    @pytest.mark.django_db
+    def test_lep_does_not_exist(
+        self,
+        mocker,
+        caplog: pytest.LogCaptureFixture,
+        lep: InvestmentDeliveryPartner,
+    ):
+        """Test dpi doesn't exist."""
+        mocker.patch(
+            'datahub.dbmaintenance.management.commands.update_investment_delivery_partners.delivery_partner_mappings',
+            new=[
+                {
+                    'lep': 'abcdef01-09f1-e511-8ffa-e4115bead28a',
+                    'idp': '4d2d0351-ffaa-4a0d-986a-f13be4ec2198',
+                },
+            ],
+        )
+        caplog.set_level('INFO')
+
+        InvestmentProjectFactory(
+            actual_land_date=datetime(2025, 4, 1, tzinfo=timezone.utc),
+            delivery_partners=[lep],
+        )
+
+        call_command('update_investment_delivery_partners', simulate=False, delete=True)
+        message = "{'projects': {'count': 0, 'errors': []}, 'leps': {'investment_project_count': 0, 'to_delete': 0, 'deleted': 0, 'errors': []}, 'idps': {'investment_project_count': 0, 'to_add': 0, 'added': 0, 'errors': []}"
+
+        assert message in caplog.text
+
+    @pytest.mark.django_db
+    def test_dpi_does_not_exist(
+        self,
+        caplog: pytest.LogCaptureFixture,
+        lep: InvestmentDeliveryPartner,
+    ):
+        """Test dpi doesn't exist."""
+        caplog.set_level('INFO')
+
+        InvestmentProjectFactory(
+            actual_land_date=datetime(2025, 4, 1, tzinfo=timezone.utc),
+            delivery_partners=[lep],
+        )
+        call_command('update_investment_delivery_partners', simulate=False, delete=True)
+        message = "{'projects': {'count': 0, 'errors': []}, 'leps': {'investment_project_count': 1, 'to_delete': 0, 'deleted': 0, 'errors': []}, 'idps': {'investment_project_count': 0, 'to_add': 1, 'added': 1, 'errors': []}}"
+
+        assert message in caplog.text
