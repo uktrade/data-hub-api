@@ -151,8 +151,10 @@ def s3_client(aws_credentials, bucket_name):
 def s3_stubber():
     """S3 stubber using the botocore Stubber class."""
     s3_client = get_s3_client_for_bucket('default')
-    with Stubber(s3_client) as s3_stubber:
-        yield s3_stubber
+    # Ensure same client is returned regardless of use_default_credentials
+    with patch('datahub.documents.utils.get_s3_client_for_bucket', return_value=s3_client):
+        with Stubber(s3_client) as s3_stubber:
+            yield s3_stubber
 
 
 @pytest.fixture
