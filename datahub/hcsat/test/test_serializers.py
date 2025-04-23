@@ -2,6 +2,7 @@ from unittest import mock
 
 import pytest
 
+from datahub.core.test_utils import format_date_or_datetime
 from datahub.hcsat.serializers import CustomerSatisfactionToolFeedbackSerializer
 from datahub.hcsat.test.factories import CustomerSatisfactionToolFeedbackFactory
 
@@ -35,8 +36,8 @@ class TestCustomerSatisfactionToolFeedbackSerializer:
             'other_issues': feedback.other_issues,
             'other_issues_detail': feedback.other_issues_detail,
             'improvement_suggestion': feedback.improvement_suggestion,
-            'created_on': feedback.created_on.isoformat().replace('+00:00', 'Z'),
-            'modified_on': feedback.modified_on.isoformat().replace('+00:00', 'Z'),
+            'created_on': format_date_or_datetime(feedback.created_on),
+            'modified_on': format_date_or_datetime(feedback.modified_on),
         }
 
         # assert anonymity
@@ -45,10 +46,7 @@ class TestCustomerSatisfactionToolFeedbackSerializer:
 
     # create/POST
 
-    @pytest.mark.parametrize(
-        'was_useful_value',
-        [True, False],
-    )
+    @pytest.mark.parametrize('was_useful_value', [True, False])
     def test_create_minimal_valid(self, was_useful_value):
         """Test creating a feedback entry with only required fields."""
         data = {

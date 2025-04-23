@@ -1,4 +1,4 @@
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import IsAuthenticated
 
 from datahub.core.viewsets import CoreViewSet
 from datahub.hcsat.models import CustomerSatisfactionToolFeedback
@@ -10,7 +10,7 @@ class CustomerSatisfactionToolFeedbackViewSet(CoreViewSet):
 
     serializer_class = CustomerSatisfactionToolFeedbackSerializer
 
-    permission_classes = (AllowAny,) # TODO IS THIS CORRECT???
+    permission_classes = (IsAuthenticated,)
 
     queryset = CustomerSatisfactionToolFeedback.objects.all()
     lookup_field = 'pk'
