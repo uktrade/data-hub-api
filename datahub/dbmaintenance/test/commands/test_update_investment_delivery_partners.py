@@ -204,7 +204,7 @@ class TestUpdateInvestmentDeliveryPartnersCommand:
         lep: InvestmentDeliveryPartner,
     ):
         """Test idp doesn't exist."""
-        idp_id = 'abcdef01-ffaa-4a0d-986a-f13be4ec2198'
+        idp_id = 'ef9520d0-4ac6-4afc-a7a5-f52a84d722cd'
         mocker.patch(
             'datahub.dbmaintenance.management.commands.update_investment_delivery_partners.delivery_partner_mappings',
             new=[
@@ -221,6 +221,7 @@ class TestUpdateInvestmentDeliveryPartnersCommand:
             delivery_partners=[lep],
         )
         call_command('update_investment_delivery_partners', simulate=False, delete=True)
+
         message = (
             "{'projects': {'count': 0, 'errors': []}, 'leps': {'investment_project_count': 1, 'to_delete': 0, 'deleted': 0, 'errors': []}, 'idps': {'investment_project_count': 0, 'to_add': 1, 'added': 1, 'errors': ['Missing IDP "
             + str(idp_id)
@@ -231,3 +232,12 @@ class TestUpdateInvestmentDeliveryPartnersCommand:
             + " has not been removed.']}}"
         )
         assert message in caplog.text
+
+        # Add missing idp to investment project to avoid post test issues causing IntegretyError in
+        # investment_investmentdeliverypartner test_case._post_teardown().
+        hack_idp = InvestmentDeliveryPartnerFactory(
+            id='ef9520d0-4ac6-4afc-a7a5-f52a84d722cd',
+            name='Hello world',
+        )
+        investment_project.delivery_partners.add(hack_idp)
+        investment_project.save()
