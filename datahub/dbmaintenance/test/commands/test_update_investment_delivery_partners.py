@@ -204,13 +204,13 @@ class TestUpdateInvestmentDeliveryPartnersCommand:
         lep: InvestmentDeliveryPartner,
     ):
         """Test idp doesn't exist."""
-        idpId = 'abcdef01-ffaa-4a0d-986a-f13be4ec2198'
+        idp_id = 'abcdef01-ffaa-4a0d-986a-f13be4ec2198'
         mocker.patch(
             'datahub.dbmaintenance.management.commands.update_investment_delivery_partners.delivery_partner_mappings',
             new=[
                 {
                     'lep': lep.id,
-                    'idp': idpId,
+                    'idp': idp_id,
                 },
             ],
         )
@@ -223,7 +223,7 @@ class TestUpdateInvestmentDeliveryPartnersCommand:
         call_command('update_investment_delivery_partners', simulate=False, delete=True)
         message = (
             "{'projects': {'count': 0, 'errors': []}, 'leps': {'investment_project_count': 1, 'to_delete': 0, 'deleted': 0, 'errors': []}, 'idps': {'investment_project_count': 0, 'to_add': 1, 'added': 1, 'errors': ['Missing IDP "
-            + str(idpId)
+            + str(idp_id)
             + ' on Investment project '
             + str(investment_project.id)
             + '; LEP '
