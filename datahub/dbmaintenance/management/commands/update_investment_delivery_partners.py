@@ -86,7 +86,7 @@ class Command(BaseCommand):
     for investment projects with an Actual land date values of 1st April 2024 onwards.
     """
 
-    help = 'Update Local Enterprice Partner (LEP) to Investment Delivery Partner (IDP) for investment projects with an Actual land date values of 1st April 2024 onwards'
+    help = 'One off command to update Local Enterprice Partner (LEP) to Investment Delivery Partner (IDP) for investment projects with an Actual land date values of 1st April 2024 onwards'
 
     log: dict
 
@@ -139,5 +139,9 @@ class Command(BaseCommand):
                             project.delivery_partners.remove(delivery_partner_mapping['lep'])
                             project.save()
                             self.log['leps']['deleted'] += 1
+                    else:
+                        self.log['idps']['errors'].append(
+                            f'Missing IDP {delivery_partner_mapping["idp"]} on Investment project {project.id}; LEP {delivery_partner_mapping["lep"]} has not been removed.',
+                        )
 
         logger.info(self.log)
