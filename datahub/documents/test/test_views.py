@@ -649,6 +649,50 @@ class TestCreateCompanyUploadableDocumentView(APITestMixin):
 
         assert generic_document.related_object == company
 
+    @patch('datahub.documents.utils.get_s3_client_for_bucket')
+    def test_uploadable_document_uses_default_credentials(
+        self,
+        mock_get_s3_client,
+        test_user_with_add_permissions,
+    ):
+        upload_url = 'https://example.com/test-upload-url'
+
+        mock_s3_client = Mock()
+        mock_get_s3_client.return_value = mock_s3_client
+        mock_s3_client.generate_presigned_url.return_value = upload_url
+
+        api_client = self.create_api_client(user=test_user_with_add_permissions)
+        payload = {
+            'document_type': 'documents.uploadabledocument',
+            'document_data': {
+                'original_filename': 'test.pdf',
+                'title': 'Test Document',
+            },
+            'related_object_type': 'company.company',
+            'related_object_id': str(CompanyFactory().id),
+        }
+
+        response = api_client.post(DOCUMENT_COLLECTION_URL, data=payload)
+        assert response.status_code == status.HTTP_201_CREATED
+
+        generic_document = GenericDocument.objects.get(pk=response.data['id'])
+        uploadable_document = generic_document.document
+        assert uploadable_document.document.use_default_credentials is True
+
+        mock_get_s3_client.assert_called_with(
+            uploadable_document.document.bucket_id,
+            use_default_credentials=True,
+        )
+
+        mock_s3_client.generate_presigned_url.assert_called_with(
+            ClientMethod='put_object',
+            Params={
+                'Bucket': uploadable_document.document.bucket_id,
+                'Key': uploadable_document.document.path,
+            },
+            ExpiresIn=3600,
+        )
+
 
 class TestDeleteGenericDocumentView(APITestMixin):
     """Tests for deleting generic documents."""
@@ -708,3 +752,25 @@ class TestDeleteGenericDocumentView(APITestMixin):
         assert GenericDocument.objects.filter(pk=generic_document.id).exists()
         generic_document.refresh_from_db()
         assert generic_document.archived is True
+
+    @patch('datahub.documents.utils.get_s3_client_for_bucket')
+    def test_uploadable_document_uses_default_credentials(
+        self,
+        mock_get_s3_client,
+        test_user_with_delete_permissions,
+    ):
+        generic_document = CompanyUploadableDocumentFactory()
+        uploadable_document = generic_document.document
+        assert uploadable_document.document.use_default_credentials is True
+
+        mock_s3_client = Mock()
+        mock_get_s3_client.return_value = mock_s3_client
+
+        api_client = self.create_api_client(user=test_user_with_delete_permissions)
+        response = api_client.delete(document_item_url(generic_document.pk))
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+
+        mock_get_s3_client.assert_called_with(
+            uploadable_document.document.bucket_id,
+            use_default_credentials=True,
+        )
