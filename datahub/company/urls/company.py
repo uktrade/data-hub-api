@@ -54,6 +54,8 @@ update_export_detail = CompanyViewSet.as_action_view(
     'update_export_detail',
 )
 
+kings_awards_list = CompanyViewSet.as_action_view('kings_awards')
+
 one_list_group_core_team = OneListGroupCoreTeamViewSet.as_view(
     {
         'get': 'list',
@@ -120,6 +122,11 @@ urls = [
         'company/<uuid:pk>/export-win',
         ExportWinsForCompanyView.as_view(),
         name='export-win',
+    ),
+    path(
+        'company/<uuid:pk>/kings-awards',
+        kings_awards_list,
+        name='kings-awards-list',
     ),
     path('public/company/<uuid:pk>', public_company_item, name='public-item'),
 ]

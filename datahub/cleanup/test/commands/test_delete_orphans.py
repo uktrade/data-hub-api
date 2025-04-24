@@ -20,6 +20,7 @@ from datahub.company.test.factories import (
     ObjectiveFactory,
     OneListCoreTeamMemberFactory,
 )
+from datahub.company_activity.tests.factories import KingsAwardRecipientFactory
 from datahub.company_referral.test.factories import CompanyReferralFactory
 from datahub.core.exceptions import DataHubError
 from datahub.core.model_helpers import get_related_fields
@@ -91,6 +92,7 @@ MAPPINGS = {
             (LegacyExportWinsToDataHubCompanyFactory, 'company'),
             (ExportFactory, 'company'),
             (ObjectiveFactory, 'company'),
+            (KingsAwardRecipientFactory, 'company'),
         ),
         'implicit_related_models': (),
         'ignored_models': (

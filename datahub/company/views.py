@@ -54,6 +54,8 @@ from datahub.company.serializers import (
     UpdateOneListCoreTeamMembersSerializer,
 )
 from datahub.company.validators import NotATransferredCompanyValidator
+from datahub.company_activity.models import KingsAwardRecipient
+from datahub.company_activity.serializers.kings_award import KingsAwardRecipientSerializer
 from datahub.core.audit import AuditViewSet
 from datahub.core.auth import PaaSIPAuthentication
 from datahub.core.autocomplete import AutocompleteFilter
@@ -317,6 +319,27 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save(request.user)
         return Response(None, status=status.HTTP_204_NO_CONTENT)
+
+    @action(
+        methods=['get'],
+        detail=True,
+        permission_classes=[HasPermissions(f'company.{CompanyPermission.view_company}')],
+        serializer_class=KingsAwardRecipientSerializer,
+        url_path='kings-awards',
+    )
+    def kings_awards(self, request, pk):
+        """Returns a list of King's Awards received by this company."""
+        company = self.get_object()
+        queryset = (
+            KingsAwardRecipient.objects.filter(company=company)
+            .select_related(
+                'company',
+            )
+            .order_by('-year_awarded')
+        )
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class PublicCompanyViewSet(HawkResponseSigningMixin, mixins.RetrieveModelMixin, GenericViewSet):

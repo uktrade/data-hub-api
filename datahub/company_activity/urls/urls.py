@@ -8,4 +8,11 @@ urlpatterns = [
             namespace='stova-event',
         ),
     ),
+    path(
+        'kings-award',
+        include(
+            ('datahub.company_activity.urls.kings_award_urls', 'kings-award'),
+            namespace='kings-award',
+        ),
+    ),
 ]

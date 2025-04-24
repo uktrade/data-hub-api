@@ -25,6 +25,7 @@ from datahub.company_activity.tests.factories import (
     CompanyActivityIngestedFileFactory,
     CompanyActivityInteractionFactory,
     GreatExportEnquiryFactory,
+    KingsAwardRecipientFactory,
     StovaAttendeeFactory,
 )
 from datahub.company_referral.test.factories import (
@@ -78,6 +79,7 @@ MAPPINGS = {
     'company_activity.GreatExportEnquiry': GreatExportEnquiryFactory,
     'company_activity.IngestedFile': CompanyActivityIngestedFileFactory,
     'company_activity.StovaAttendee': StovaAttendeeFactory,
+    'company_activity.KingsAwardRecipient': KingsAwardRecipientFactory,
     'company_list.CompanyListItem': CompanyListItemFactory,
     'company_list.PipelineItem': PipelineItemFactory,
     'company_referral.CompanyReferral': CompanyReferralFactory,
