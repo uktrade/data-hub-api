@@ -174,12 +174,12 @@ class TestUpdateInvestmentDeliveryPartnersCommand:
         caplog: pytest.LogCaptureFixture,
         lep: InvestmentDeliveryPartner,
     ):
-        """Test idp doesn't exist."""
+        """Test lep doesn't exist."""
         mocker.patch(
             'datahub.dbmaintenance.management.commands.update_investment_delivery_partners.delivery_partner_mappings',
             new=[
                 {
-                    'lep': 'abcdef01-09f1-e511-8ffa-e4115bead28a',
+                    'lep': 'abcdef01-09f1-e511-8ffa-e4115bead28a',  # non existing UUID
                     'idp': '4d2d0351-ffaa-4a0d-986a-f13be4ec2198',
                 },
             ],
