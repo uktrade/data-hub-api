@@ -107,7 +107,7 @@ class GenericDocumentViewSet(SoftDeleteCoreViewSet):
     def create(self, request, *args, **kwargs):
         """Create a GenericDocument instance along with a specific-type document instance.
 
-        Example payload to create a SharePointDocument related to a Company:
+        To create a SharePointDocument related to a Company, POST the following payload:
 
         ```
         {
@@ -120,6 +120,25 @@ class GenericDocumentViewSet(SoftDeleteCoreViewSet):
             'related_object_id': '<uuid of company>',
         }
         ```
+
+        To create an UploadableDocument related to a Company, the following steps are required:
+
+        1. POST the following payload to `documents/` to create a GenericDocument instance
+        ```
+        {
+            'document_type': 'documents.uploadabledocument',
+            'document_data': {
+                'original_filename': 'project-proposal.pdf',
+                'title': 'Project Proposal',
+            },
+            'related_object_type': 'company.company',
+            'related_object_id': '<uuid of company>',
+        }
+        ```
+        2. PUT the document contents to the signed upload url received in the response from step 1
+        3. POST the same payload as step 1 to
+        `documents/<uuid of generic document>/upload-complete` to signal upload has complete
+
         """
         # Validate incoming data
         create_serializer = self.get_serializer(data=request.data)
