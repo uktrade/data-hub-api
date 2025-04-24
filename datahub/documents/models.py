@@ -1,6 +1,7 @@
 import uuid
 from logging import getLogger
 
+import environ
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
@@ -10,6 +11,9 @@ from django.utils.timezone import now
 from datahub.core.models import ArchivableModel, BaseModel
 from datahub.documents.tasks import schedule_virus_scan_document
 from datahub.documents.utils import sign_s3_url
+
+env = environ.Env()
+ENVIRONMENT = env('ENVIRONMENT', default='local')
 
 logger = getLogger(__name__)
 
@@ -30,6 +34,10 @@ class Document(BaseModel, ArchivableModel):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     bucket_id = models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH, default='default')
+    use_default_credentials = models.BooleanField(
+        default=False,
+        help_text='Indicates whether default credentials should be used when accessing bucket',
+    )
     path = models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH)
 
     uploaded_on = models.DateTimeField(
@@ -128,6 +136,8 @@ class Document(BaseModel, ArchivableModel):
             return sign_s3_url(
                 self.bucket_id,
                 self.path,
+                method='get_object',
+                use_default_credentials=self.use_default_credentials,
             )
         return None
 
@@ -139,6 +149,7 @@ class Document(BaseModel, ArchivableModel):
             self.bucket_id,
             self.path,
             method='put_object',
+            use_default_credentials=self.use_default_credentials,
         )
 
 
@@ -154,6 +165,7 @@ class EntityDocumentManager(models.Manager):
             bucket_id=self.model.BUCKET,
             path=self._create_document_path(document_pk, original_filename),
             status=UploadStatus.NOT_VIRUS_SCANNED,
+            use_default_credentials=getattr(self.model, 'USE_DEFAULT_CREDENTIALS', False),
         )
         document.save()
         return super().create(
@@ -192,6 +204,7 @@ class AbstractEntityDocumentModel(BaseModel):
     """
 
     BUCKET = 'default'
+    USE_DEFAULT_CREDENTIALS = False
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     original_filename = models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH)
@@ -212,6 +225,18 @@ class SharePointDocument(BaseModel, ArchivableModel):
 
     def __str__(self):
         return self.title
+
+
+class UploadableDocument(AbstractEntityDocumentModel):
+    """Model to represent an uploadable document."""
+
+    BUCKET = f'data-hub-documents{"-" + ENVIRONMENT if ENVIRONMENT else ""}'
+    USE_DEFAULT_CREDENTIALS = True
+
+    title = models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH, blank=True, default='')
+
+    def __str__(self):
+        return self.original_filename
 
 
 class GenericDocument(BaseModel, ArchivableModel):

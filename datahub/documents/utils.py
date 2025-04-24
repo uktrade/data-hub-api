@@ -9,6 +9,8 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from datahub.core.exceptions import DataHubError
 from datahub.documents.exceptions import DocumentDeleteException
+from datahub.ingest.boto3 import get_s3_client
+from datahub.ingest.constants import AWS_REGION
 
 logger = getLogger(__name__)
 
@@ -41,8 +43,18 @@ def get_bucket_name(bucket_id):
 
 
 @lru_cache()
-def get_s3_client_for_bucket(bucket_id):
-    """Get S3 client for bucket id."""
+def get_s3_client_for_bucket(bucket_id, use_default_credentials=False):
+    """Get S3 client for bucket id.
+
+    Args:
+        bucket_id: The bucket ID to get the client for
+        use_default_credentials: If True, uses default AWS credentials instead of specific ones
+
+    """
+    if use_default_credentials:
+        # TODO: check if need to pass config arg to default client
+        return get_s3_client(AWS_REGION)
+
     credentials = get_bucket_credentials(bucket_id)
     return boto3.client(
         's3',
@@ -53,10 +65,14 @@ def get_s3_client_for_bucket(bucket_id):
     )
 
 
-def sign_s3_url(bucket_id, key, method='get_object', expires=3600):
+def sign_s3_url(bucket_id, key, method='get_object', expires=3600, use_default_credentials=False):
     """Sign s3 url with given expiry in seconds."""
-    client = get_s3_client_for_bucket(bucket_id)
-    bucket_name = get_bucket_name(bucket_id)
+    client = get_s3_client_for_bucket(bucket_id, use_default_credentials=use_default_credentials)
+
+    if use_default_credentials:
+        bucket_name = bucket_id
+    else:
+        bucket_name = get_bucket_name(bucket_id)
 
     return client.generate_presigned_url(
         ClientMethod=method,
@@ -96,8 +112,15 @@ def perform_delete_document(document_pk):
     if document.path:
         bucket_id = document.bucket_id
 
-        client = get_s3_client_for_bucket(bucket_id)
-        bucket_name = get_bucket_name(bucket_id)
+        client = get_s3_client_for_bucket(
+            bucket_id,
+            use_default_credentials=document.use_default_credentials,
+        )
+
+        if document.use_default_credentials:
+            bucket_name = bucket_id
+        else:
+            bucket_name = get_bucket_name(bucket_id)
 
         client.delete_object(Bucket=bucket_name, Key=document.path)
 
