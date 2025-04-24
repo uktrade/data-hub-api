@@ -364,11 +364,6 @@ Data Hub API can run on any Heroku-style platform. Configuration is performed vi
 
 | Variable name                                                         | Required                                    | Description                                                                                                                                                                      |
 | --------------------------------------------------------------------- | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ACTIVITY_STREAM_ACCESS_KEY_ID`                                       | No                                          | A non-secret access key ID, corresponding to `ACTIVITY_STREAM_SECRET_ACCESS_KEY`. The holder of the secret key can access the activity stream endpoint by Hawk authentication.   |
-| `ACTIVITY_STREAM_SECRET_ACCESS_KEY`                                   | If `ACTIVITY_STREAM_ACCESS_KEY_ID` is set   | A secret key, corresponding to `ACTIVITY_STREAM_ACCESS_KEY_ID`. The holder of this key can access the activity stream endpoint by Hawk authentication.                           |
-| `ACTIVITY_STREAM_OUTGOING_URL`                                        | No                                          | The URL used to read from activity stream                                                                                                                                        |
-| `ACTIVITY_STREAM_OUTGOING_ACCESS_KEY_ID`                              | No                                          | A non-secret access key ID, corresponding to `ACTIVITY_STREAM_OUTGOING_SECRET_ACCESS_KEY`. This is used when reading from the activity stream at `ACTIVITY_STREAM_OUTGOING_URL`. |
-| `ACTIVITY_STREAM_OUTGOING_SECRET_ACCESS_KEY`                          | No                                          | A secret key, corresponding to `ACTIVITY_STREAM_OUTGOING_ACCESS_KEY_ID`. This is used when reading from the activity stream at `ACTIVITY_STREAM_OUTGOING_URL`.                   |
 | `ADMIN_OAUTH2_ENABLED`                                                | Yes                                         | Enables Django Admin SSO login when is True.                                                                                                                                     |
 | `ADMIN_OAUTH2_BASE_URL`                                               | If `ADMIN_OAUTH2_ENABLED` is set            | A base URL of OAuth provider.                                                                                                                                                    |
 | `ADMIN_OAUTH2_TOKEN_FETCH_PATH`                                       | If `ADMIN_OAUTH2_ENABLED` is set            | OAuth fetch token path for Django Admin SSO login.                                                                                                                               |
@@ -563,13 +558,6 @@ For more details including all the available choices:
 See [Managing dependencies](<docs/Managing dependencies.md>) for information about installing,
 adding and upgrading dependencies.
 
-## Activity Stream
-
-The `/v3/activity-stream/*` endpoints are protected by two mechanisms:
-
-- IP address allowlisting via the `X-Forwarded-For` header, with a comma separated list of allowlisted IPs in the environment variable `PAAS_IP_ALLOWLIST`.
-
-- Hawk authentication via the `Authorization` header, with the credentials in the environment variables `ACTIVITY_STREAM_ACCESS_KEY_ID` and `ACTIVITY_STREAM_SECRET_ACCESS_KEY`.
 
 ### IP address allowlisted
 
@@ -579,7 +567,7 @@ If making requests to this endpoint locally, you must manually add this header o
 
 ### Hawk authentication
 
-In general, Hawk authentication hashing the HTTP payload and `Content-Type` header, and using a nonce, are both _optional_. Here, as with the Activity Stream endpoints in other DIT projects, both are _required_. `Content-Type` may be the empty string, and if there is no payload, then it should be treated as the empty string.
+In general, Hawk authentication hashing the HTTP payload and `Content-Type` header, and using a nonce, are both _optional_. Here, as with the Activity Stream 'DEPRECATED' endpoints in other DIT projects, both are _required_. `Content-Type` may be the empty string, and if there is no payload, then it should be treated as the empty string.
 
 ### Emails
 
