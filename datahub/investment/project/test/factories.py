@@ -236,6 +236,15 @@ class InvestmentActivityFactory(factory.django.DjangoModelFactory):
         model = 'investment.InvestmentActivity'
 
 
+class InvestmentDeliveryPartnerFactory(factory.django.DjangoModelFactory):
+    """Investment Delivery Partner factory."""
+
+    name = factory.Faker('name')
+
+    class Meta:
+        model = 'investment.InvestmentDeliveryPartner'
+
+
 class GVAMultiplierFactory(factory.django.DjangoModelFactory):
     """GVA Multiplier factory."""
 
