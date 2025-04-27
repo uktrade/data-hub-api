@@ -34,9 +34,9 @@ bigtree==0.25.4
     # via -r requirements.in
 billiard==4.2.0
     # via celery
-boto3==1.37.28
+boto3==1.38.3
     # via -r requirements.in
-botocore==1.37.28
+botocore==1.38.3
     # via
     #   boto3
     #   s3transfer
@@ -323,7 +323,7 @@ rq==2.3.1
     #   rq-scheduler
 rq-scheduler==0.14.0
     # via -r requirements.in
-s3transfer==0.11.1
+s3transfer==0.12.0
     # via boto3
 sentry-sdk==2.25.1
     # via -r requirements.in
