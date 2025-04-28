@@ -53,6 +53,7 @@ job_defaults: &job_defaults
     REDIS_BASE_URL: "redis://localhost:6379"
 
   working_directory: ~/app
+  resource_class: medium+
 
   docker:
     - image: <<parameters.python_image>>
@@ -62,6 +63,7 @@ job_defaults: &job_defaults
         discovery.type: single-node
         plugins.security.disabled: "true"
         http.port: 9200
+        OPENSEARCH_JAVA_OPTS: "-Xms2g -Xmx2g" # set jvm heap size for opensearch
 
     - image: <<parameters.postgres_image>>
       name: postgres
