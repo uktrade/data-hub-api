@@ -37,6 +37,8 @@ TIME_ZONE = 'Etc/UTC'
 
 ADMIN_OAUTH2_ENABLED = env.bool('ADMIN_OAUTH2_ENABLED')
 
+ENVIRONMENT = env('ENVIRONMENT', default='')
+
 # If Django Admin OAuth2 authentication is enabled, we swap stock Django admin
 # with our own. We can only have either stock Django admin app or our OAuth2 admin app
 # enabled at a time.
@@ -670,6 +672,8 @@ DOCUMENT_BUCKETS = {
         'aws_region': env('REPORT_AWS_REGION', default=''),
     },
 }
+
+DOCUMENT_BUCKET_NAME = f'data-hub-documents{"-" + ENVIRONMENT if ENVIRONMENT else ""}'
 
 DIT_EMAIL_INGEST_BLOCKLIST = [
     email.lower() for email in env.list('DIT_EMAIL_INGEST_BLOCKLIST', default=[])

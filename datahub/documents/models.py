@@ -1,7 +1,6 @@
 import uuid
 from logging import getLogger
 
-import environ
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
@@ -11,9 +10,6 @@ from django.utils.timezone import now
 from datahub.core.models import ArchivableModel, BaseModel
 from datahub.documents.tasks import schedule_virus_scan_document
 from datahub.documents.utils import sign_s3_url
-
-env = environ.Env()
-ENVIRONMENT = env('ENVIRONMENT', default='local')
 
 logger = getLogger(__name__)
 
@@ -230,7 +226,7 @@ class SharePointDocument(BaseModel, ArchivableModel):
 class UploadableDocument(AbstractEntityDocumentModel):
     """Model to represent an uploadable document."""
 
-    BUCKET = f'data-hub-documents{"-" + ENVIRONMENT if ENVIRONMENT else ""}'
+    BUCKET = settings.DOCUMENT_BUCKET_NAME
     USE_DEFAULT_CREDENTIALS = True
 
     title = models.CharField(max_length=settings.CHAR_FIELD_MAX_LENGTH, blank=True, default='')
