@@ -1,0 +1,22 @@
+<div>
+    <div>
+        {% if results|length is 0 %}
+            <h1>No results to show :(</h1>
+        {% else %}
+            <h1>Some data returned :)</h1>
+        {% endif %}
+
+        <h2>Showing: {{ results|length }} out of {{ count }} results</h2>
+
+        {% for result in results %}
+            <h3>Company: {{ result.name }}</h3>
+            <ul>
+                {% for field, value in result.items %}
+                    <li>{{ field }}: {{ value }}</li>
+                {% endfor %}
+            </ul>
+            <br />
+            <br />
+        {% endfor %}
+    </div>
+</div>

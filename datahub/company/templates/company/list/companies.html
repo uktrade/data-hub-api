@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>HTMX Example - Company List</h1>
+
+    <form>
+        <label for="limit">The number of results to return: </label>
+        <Input name="limit" type="number" placeholder="Limit" value="10"></Input>
+        <br />
+        <br />
+
+        <label for="archived">Is the company archived?</label>
+        <input type="radio" id="archived" name="archived" value="true">
+        <label for="archived">Yes</label>
+        <input type="radio" id="not-archived" name="archived" value="false" checked>
+        <label for="not-archived">No</label>
+        <br>
+        <br>
+
+        <label for="has_name">Does the company have a name?</label>
+        <input type="radio" id="has-name" name="has_name" value="true" checked>
+        <label for="has-name">Yes</label>
+        <input type="radio" id="has-no-name" name="has_name" value="false">
+        <label for="has-no-name">No</label>
+        <br>
+        <br>
+        <br>
+
+        {% comment %}
+            HTMX below, note the .html at the end of the URL to tell DRF to return the HTML
+            response instead of the usual JSON response.
+        {% endcomment %}
+        <button hx-post="{% url 'api-v4:search:company' %}.html" hx-trigger="click" hx-target="#target">
+            Load Companies
+        </button>
+    </form>
+
+    <div id="target"></div>
+{% endblock %}

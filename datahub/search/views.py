@@ -2,6 +2,7 @@
 
 import uuid
 from collections import namedtuple
+from datetime import datetime
 from enum import Enum, auto
 from itertools import islice
 
@@ -195,7 +196,10 @@ class SearchAPIView(APIView):
     fields_to_include = None
     fields_to_exclude = None
 
-    http_method_names = ('post',)
+    http_method_names = (
+        'post',
+        'get',
+    )
 
     def _get_filter_data(self, validated_data):
         """Returns filter data."""
@@ -215,6 +219,18 @@ class SearchAPIView(APIView):
         serializer = self.serializer_class(data=data)
         serializer.is_valid(raise_exception=True)
         return serializer.validated_data
+
+    def format_modified_on_date(self, date_str):
+        if not date_str:
+            return ""
+        dt = datetime.fromisoformat(date_str.replace("Z", "+00:00"))
+        return dt.strftime("%B %d %Y, %I:%M%p").lstrip("0").replace("AM", "am").replace("PM", "pm")
+    
+    def format_latest_interaction_date(self, date_str):
+        if not date_str:
+            return ""
+        dt = datetime.fromisoformat(date_str.replace("Z", "+00:00"))
+        return dt.strftime("%d %B %Y")
 
     def get_base_query(self, request, validated_data):
         """Gets a filtered OpenSearch query for the provided search parameters."""
@@ -294,14 +310,26 @@ class SearchAPIView(APIView):
         )
         results = execute_search_query(limited_query)
 
-        response = {
+        raw_results = [x.to_dict() for x in results.hits]
+
+        for item in raw_results:
+            item['formatted_modified_on_date'] = self.format_modified_on_date(
+                item.get('modified_on'),
+            )
+            item['formatted_interaction_date'] = self.format_latest_interaction_date(item.get('latest_interaction_date'))
+
+        response_data = {
             'count': results.hits.total.value,
-            'results': [x.to_dict() for x in results.hits],
+            'results': raw_results,
         }
 
-        response = self.enhance_response(results, response, validated_data)
+        response_data = self.enhance_response(results, response_data, validated_data)
 
-        return Response(data=response)
+        # if request.accepted_renderer.format == 'html':
+        #     # Add context for HTML template here
+        #     response_data['key'] = 'value'
+
+        return Response(data=response_data)
 
     def enhance_response(self, results, response, validated_data):
         """Placeholder for a method to enhance the response with custom data."""

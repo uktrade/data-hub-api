@@ -89,6 +89,7 @@ THIRD_PARTY_APPS = [
     'axes',
     'drf_spectacular',
     'drf_spectacular_sidecar',
+    'govuk_frontend_django',
 ]
 
 LOCAL_APPS = [
