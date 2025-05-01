@@ -27,7 +27,11 @@ class CustomerSatisfactionToolFeedbackSerializer(serializers.ModelSerializer):
     inaccurate_information = serializers.BooleanField(required=False, allow_null=True)
     other_issues = serializers.BooleanField(required=False, allow_null=True)
     other_issues_detail = serializers.CharField(required=False, allow_null=True, allow_blank=True)
-    improvement_suggestion = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    improvement_suggestion = serializers.CharField(
+        required=False,
+        allow_null=True,
+        allow_blank=True,
+    )
 
     # read-only fields to return in the response
     created_on = serializers.DateTimeField(read_only=True)

@@ -9,7 +9,8 @@ from datahub.hcsat.test.factories import CustomerSatisfactionToolFeedbackFactory
 pytestmark = pytest.mark.django_db
 
 
-def _get_request_mock(): return mock.Mock()
+def _get_request_mock():
+    return mock.Mock()
 
 
 class TestCustomerSatisfactionToolFeedbackSerializer:
@@ -73,14 +74,13 @@ class TestCustomerSatisfactionToolFeedbackSerializer:
         assert not hasattr(instance, 'created_by') or instance.created_by is None
         assert not hasattr(instance, 'modified_by') or instance.modified_by is None
 
-
     def test_create_fails_if_detailed_fields_provided(self):
         """Test create fails if any detailed feedback field is provided."""
         data = {
             'url': 'https://test.com/page',
             'was_useful': False,
-            'lacks_feature': True, # this should not be allowed on create
-            'improvement_suggestion': 'Needs more detail.', # this should not be allowed on create
+            'lacks_feature': True,  # this should not be allowed on create
+            'improvement_suggestion': 'Needs more detail.',  # this should not be allowed on create
         }
         context = {'request': _get_request_mock(), 'view': mock.Mock(action='create')}
         serializer = CustomerSatisfactionToolFeedbackSerializer(data=data, context=context)
@@ -88,7 +88,6 @@ class TestCustomerSatisfactionToolFeedbackSerializer:
         assert not serializer.is_valid()
         assert 'non_field_errors' in serializer.errors
         assert 'detailed_feedback_on_create' in serializer.errors['non_field_errors'][0].code
-
 
     def test_create_fails_if_required_fields_missing(self):
         """Test create fails if required fields (url, was_useful) are missing."""
@@ -124,7 +123,10 @@ class TestCustomerSatisfactionToolFeedbackSerializer:
         }
         context = {'request': _get_request_mock(), 'view': mock.Mock(action='partial_update')}
         serializer = CustomerSatisfactionToolFeedbackSerializer(
-            instance, data=data, partial=True, context=context,
+            instance,
+            data=data,
+            partial=True,
+            context=context,
         )
 
         assert serializer.is_valid(raise_exception=True)
@@ -154,12 +156,17 @@ class TestCustomerSatisfactionToolFeedbackSerializer:
         data = {'lacks_feature': True}
         context = {'request': _get_request_mock(), 'view': mock.Mock(action='partial_update')}
         serializer = CustomerSatisfactionToolFeedbackSerializer(
-            instance, data=data, partial=True, context=context,
+            instance,
+            data=data,
+            partial=True,
+            context=context,
         )
 
         assert not serializer.is_valid()
         assert 'non_field_errors' in serializer.errors
-        assert 'detailed_feedback_on_useful_feedback' in serializer.errors['non_field_errors'][0].code
+        assert (
+            'detailed_feedback_on_useful_feedback' in serializer.errors['non_field_errors'][0].code
+        )
 
     def test_update_fails_if_other_detail_without_other_flag(self):
         """Test update fails if other_issues_detail is provided but other_issues is false."""
@@ -168,13 +175,18 @@ class TestCustomerSatisfactionToolFeedbackSerializer:
         data = {'other_issues_detail': 'This should fail.'}
         context = {'request': _get_request_mock(), 'view': mock.Mock(action='partial_update')}
         serializer = CustomerSatisfactionToolFeedbackSerializer(
-            instance, data=data, partial=True, context=context,
+            instance,
+            data=data,
+            partial=True,
+            context=context,
         )
 
         assert not serializer.is_valid()
         assert 'other_issues_detail' in serializer.errors
-        assert 'other_detail_without_other_selected' in serializer.errors['other_issues_detail'][0].code
-
+        assert (
+            'other_detail_without_other_selected'
+            in serializer.errors['other_issues_detail'][0].code
+        )
 
     def test_update_succeeds_if_other_detail_with_other_flag_true(self):
         """Test update succeeds if other_issues_detail is provided and other_issues is true."""
@@ -186,7 +198,10 @@ class TestCustomerSatisfactionToolFeedbackSerializer:
         }
         context = {'request': _get_request_mock(), 'view': mock.Mock(action='partial_update')}
         serializer = CustomerSatisfactionToolFeedbackSerializer(
-            instance, data=data, partial=True, context=context,
+            instance,
+            data=data,
+            partial=True,
+            context=context,
         )
 
         assert serializer.is_valid(raise_exception=True)
@@ -205,7 +220,10 @@ class TestCustomerSatisfactionToolFeedbackSerializer:
         }
         context = {'request': _get_request_mock(), 'view': mock.Mock(action='partial_update')}
         serializer = CustomerSatisfactionToolFeedbackSerializer(
-            instance, data=data, partial=True, context=context,
+            instance,
+            data=data,
+            partial=True,
+            context=context,
         )
 
         assert serializer.is_valid(raise_exception=True)
@@ -228,7 +246,10 @@ class TestCustomerSatisfactionToolFeedbackSerializer:
         }
         context = {'request': _get_request_mock(), 'view': mock.Mock(action='partial_update')}
         serializer = CustomerSatisfactionToolFeedbackSerializer(
-            instance, data=data, partial=True, context=context,
+            instance,
+            data=data,
+            partial=True,
+            context=context,
         )
 
         assert serializer.is_valid(raise_exception=True)
