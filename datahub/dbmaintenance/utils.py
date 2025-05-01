@@ -6,6 +6,7 @@ from rest_framework.fields import (
     DateField,
     DecimalField,
     EmailField,
+    IntegerField,
     UUIDField,
 )
 
@@ -18,6 +19,11 @@ def parse_bool(value):
 def parse_date(value):
     """Parses a date from a string."""
     return _parse_value(value, DateField())
+
+
+def parse_int(value):
+    """Parses an integer from a string."""
+    return _parse_value(value, IntegerField())
 
 
 def parse_decimal(value, max_digits=19, decimal_places=2):

@@ -2,7 +2,7 @@ import factory.fuzzy
 from django.utils.timezone import now
 
 from datahub.company.test.factories import CompanyFactory, ContactFactory
-from datahub.company_activity.models import CompanyActivity
+from datahub.company_activity.models import CompanyActivity, KingsAwardRecipient
 from datahub.company_referral.test.factories import CompanyReferralFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.investment.project.test.factories import InvestmentProjectFactory
@@ -281,3 +281,16 @@ class StovaAttendeeFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'company_activity.StovaAttendee'
+
+
+class KingsAwardRecipientFactory(factory.django.DjangoModelFactory):
+    """Ingested Kings Award recipient data factory."""
+
+    company = factory.SubFactory(CompanyFactory)
+    year_awarded = factory.fuzzy.FuzzyInteger(1966, now().year)
+    category = factory.fuzzy.FuzzyChoice(KingsAwardRecipient.Category.values)
+    citation = factory.Faker('paragraph')
+    year_expired = factory.LazyAttribute(lambda x: x.year_awarded + 5)
+
+    class Meta:
+        model = KingsAwardRecipient
