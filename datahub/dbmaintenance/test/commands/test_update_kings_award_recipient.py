@@ -181,6 +181,95 @@ def test_skip_invalid_year_expired(s3_setup, company_numbers, csv_content_base):
     assert KingsAwardRecipient.objects.filter(company__company_number=company_numbers[2]).exists()
 
 
+@freeze_time('2025-04-01')
+def test_skip_archived_company(s3_setup, caplog, company_numbers, csv_content_base):
+    """Test that rows with archived company numbers are logged with warning."""
+    caplog.set_level('WARNING')
+
+    archived_company = CompanyFactory(company_number='9876543', archived=True)
+
+    initial_award_count = KingsAwardRecipient.objects.count()
+    archived_company_row = (
+        f'{archived_company.company_number},2025,International Trade,Citation Archived,2030\n'
+    )
+    csv_content = csv_content_base + archived_company_row
+    bucket, object_key = s3_setup(csv_content)
+
+    call_command('update_kings_award_recipient', bucket, object_key)
+
+    assert (
+        f'Company with number {archived_company.company_number} exists but is archived, continuing.'
+        in caplog.text
+    )
+
+    final_award_count = KingsAwardRecipient.objects.count()
+    assert final_award_count - initial_award_count == 3
+    assert not KingsAwardRecipient.objects.filter(
+        company__company_number=archived_company.company_number,
+    ).exists()
+    assert KingsAwardRecipient.objects.filter(company__company_number=company_numbers[0]).exists()
+    assert KingsAwardRecipient.objects.filter(company__company_number=company_numbers[1]).exists()
+    assert KingsAwardRecipient.objects.filter(company__company_number=company_numbers[2]).exists()
+
+
+@freeze_time('2025-04-01')
+def test_skip_multiple_archived_companies(s3_setup, caplog, company_numbers, csv_content_base):
+    """Test that rows with multiple archived companies are logged with warning."""
+    caplog.set_level('WARNING')
+
+    duplicate_number = '5555555'
+    CompanyFactory(company_number=duplicate_number, archived=True)
+    CompanyFactory(company_number=duplicate_number, archived=True)
+
+    initial_award_count = KingsAwardRecipient.objects.count()
+    duplicate_company_row = f'{duplicate_number},2025,International Trade,Citation Multiple,2030\n'
+    csv_content = csv_content_base + duplicate_company_row
+    bucket, object_key = s3_setup(csv_content)
+
+    call_command('update_kings_award_recipient', bucket, object_key)
+
+    assert (
+        f'Skipping - Multiple archived companies with number {duplicate_number} found.'
+        in caplog.text
+    )
+
+    final_award_count = KingsAwardRecipient.objects.count()
+    assert final_award_count - initial_award_count == 3
+    assert not KingsAwardRecipient.objects.filter(
+        company__company_number=duplicate_number,
+    ).exists()
+
+
+@freeze_time('2025-04-01')
+def test_skip_multiple_active_companies(s3_setup, caplog, company_numbers, csv_content_base):
+    """Test that rows with multiple non-archived companies are logged with warning."""
+    caplog.set_level('WARNING')
+
+    duplicate_number = '7777777'
+    CompanyFactory(company_number=duplicate_number, archived=False)
+    CompanyFactory(company_number=duplicate_number, archived=False)
+
+    initial_award_count = KingsAwardRecipient.objects.count()
+    duplicate_company_row = (
+        f'{duplicate_number},2025,International Trade,Citation Multiple Active,2030\n'
+    )
+    csv_content = csv_content_base + duplicate_company_row
+    bucket, object_key = s3_setup(csv_content)
+
+    call_command('update_kings_award_recipient', bucket, object_key)
+
+    assert (
+        f'Skipping - Multiple non-archived companies with number {duplicate_number} found.'
+        in caplog.text
+    )
+
+    final_award_count = KingsAwardRecipient.objects.count()
+    assert final_award_count - initial_award_count == 3
+    assert not KingsAwardRecipient.objects.filter(
+        company__company_number=duplicate_number,
+    ).exists()
+
+
 def test_simulate(s3_stubber, caplog, company_numbers, csv_content_base):
     """Test that the command simulates updates/creations if --simulate is passed in."""
     caplog.set_level('INFO')
