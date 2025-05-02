@@ -12,4 +12,4 @@ This is the process we have identified for dealing with Dependabot PRs that save
 8. If you are satisfied that everything is in order and all the tests have passed, request reviews as normal.
 9. Once merged, deploy to production as soon as possible.
 
-If the main flake8 dependency is updated, the version used by the [pre-commit hook](https://github.com/uktrade/data-hub-api/blob/c5910876ae15598af25f4c191ec8d50c92139f9b/.pre-commit-config.yaml#L3) should also be updated.
+If the main ruff dependency is updated, the version used by the [pre-commit hook](https://github.com/uktrade/data-hub-api/blob/7a00c7254e474a3d082c600128fcedcec1ee1963/.pre-commit-config.yaml#L4) should also be updated.
