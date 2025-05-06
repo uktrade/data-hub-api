@@ -39,10 +39,27 @@ class Command(CSVBaseCommand):
         year_expired = parse_int(row['year_expired'])
 
         try:
-            company = Company.objects.get(company_number=company_number)
+            company = Company.objects.get(company_number=company_number, archived=False)
         except Company.DoesNotExist:
+            companies = Company.objects.filter(company_number=company_number)
+            if companies.exists():
+                if companies.count() > 1:
+                    logger.warning(
+                        f'Skipping - Multiple archived companies with number {company_number} found.',
+                    )
+                    return
+                else:
+                    logger.warning(
+                        f'Company with number {company_number} exists but is archived, continuing.',
+                    )
+            else:
+                logger.warning(
+                    f'Skipping - Company with Companies House number {company_number} does not exist.',
+                )
+                return
+        except Company.MultipleObjectsReturned:
             logger.warning(
-                f'Skipping - Company with Companies House number {company_number} does not exist.',
+                f'Skipping - Multiple non-archived companies with number {company_number} found.',
             )
             return
 
