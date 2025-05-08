@@ -4,6 +4,7 @@ from operator import not_
 from typing import Optional
 from uuid import UUID
 
+import reversion as reversion_api
 from django.conf import settings
 from django.db import models, transaction
 from django.utils.translation import gettext_lazy
@@ -1074,19 +1075,21 @@ class UpdateOneListCoreTeamMembersSerializer(serializers.Serializer):
         """Adds/updates core team members of a company within validated_core_team_members.
         And removes existing ones that are not in the list.
         """
-        for item in validated_core_team_members:
-            company.add_one_list_core_team_member(item['adviser'])
+        with reversion_api.create_revision():
+            for item in validated_core_team_members:
+                company.add_one_list_core_team_member(item['adviser'])
 
-        existing_adviser_ids = [
-            item.adviser.id for item in company.one_list_core_team_members.all()
-        ]
-        new_core_team_member_ids = [item['adviser'].id for item in validated_core_team_members]
-        existing_adviser_ids_delta = list(
-            set(existing_adviser_ids) - set(new_core_team_member_ids),
-        )
+            existing_adviser_ids = [
+                item.adviser.id for item in company.one_list_core_team_members.all()
+            ]
+            new_core_team_member_ids = [item['adviser'].id for item in validated_core_team_members]
+            existing_adviser_ids_delta = list(
+                set(existing_adviser_ids) - set(new_core_team_member_ids),
+            )
 
-        for adviser_id in existing_adviser_ids_delta:
-            company.delete_one_list_core_team_member(adviser_id)
+            for adviser_id in existing_adviser_ids_delta:
+                company.delete_one_list_core_team_member(adviser_id)
+        reversion_api.set_comment('Updated one list core team members')
 
 
 class OneListCoreTeamMemberSerializer(serializers.Serializer):

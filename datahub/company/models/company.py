@@ -63,7 +63,9 @@ class OneListTier(BaseOrderedConstantModel):
     """One List tier."""
 
 
-@reversion.register_base_model()
+@reversion.register_base_model(
+    follow=['one_list_core_team_members'],
+)
 class Company(ArchivableModel, BaseModel):
     """Representation of the company."""
 
