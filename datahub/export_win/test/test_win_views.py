@@ -715,8 +715,8 @@ class TestCreateWinView(APITestMixin):
                     'id': AssociatedProgrammeConstant.afterburner.value.id,
                 },
             ],
-            'is_personally_confirmed': False,
-            'is_line_manager_confirmed': False,
+            'is_personally_confirmed': True,
+            'is_line_manager_confirmed': True,
             'name_of_customer': 'Overseas Customer',
             'name_of_customer_confidential': True,
             'export_experience': {
@@ -968,8 +968,8 @@ class TestCreateWinView(APITestMixin):
                     'id': AssociatedProgrammeConstant.afterburner.value.id,
                 },
             ],
-            'is_personally_confirmed': False,
-            'is_line_manager_confirmed': False,
+            'is_personally_confirmed': True,
+            'is_line_manager_confirmed': True,
             'name_of_customer': 'Overseas Customer',
             'name_of_customer_confidential': True,
             'export_experience': {
@@ -1297,8 +1297,8 @@ class TestCreateWinView(APITestMixin):
                 {'id': SupportTypeConstant.political_and_economic_briefing.value.id},
             ],
             'associated_programme': [{'id': AssociatedProgrammeConstant.afterburner.value.id}],
-            'is_personally_confirmed': False,
-            'is_line_manager_confirmed': False,
+            'is_personally_confirmed': True,
+            'is_line_manager_confirmed': True,
             'name_of_customer': 'Overseas Customer<script>alert("hack");</script>',
             'name_of_customer_confidential': True,
             'export_experience': {'id': str(export_experience.id)},
@@ -1386,8 +1386,8 @@ class TestCreateWinView(APITestMixin):
                     'id': AssociatedProgrammeConstant.afterburner.value.id,
                 },
             ],
-            'is_personally_confirmed': False,
-            'is_line_manager_confirmed': False,
+            'is_personally_confirmed': True,
+            'is_line_manager_confirmed': True,
             'name_of_customer': 'Overseas Customer',
             'name_of_customer_confidential': True,
             'export_experience': {
@@ -1564,8 +1564,8 @@ class TestUpdateWinView(APITestMixin):
                     'id': AssociatedProgrammeConstant.afterburner.value.id,
                 },
             ],
-            'is_personally_confirmed': False,
-            'is_line_manager_confirmed': False,
+            'is_personally_confirmed': True,
+            'is_line_manager_confirmed': True,
             'name_of_customer': 'Overseas Customer',
             'name_of_customer_confidential': True,
             'export_experience': {
@@ -1734,8 +1734,8 @@ class TestUpdateWinView(APITestMixin):
             },
             'hvo_programme': None,
             'is_e_exported': win.is_e_exported,
-            'is_line_manager_confirmed': False,
-            'is_personally_confirmed': False,
+            'is_line_manager_confirmed': True,
+            'is_personally_confirmed': True,
             'is_prosperity_fund_related': win.is_prosperity_fund_related,
             'lead_officer': {
                 'id': str(lead_officer.id),
@@ -1833,6 +1833,51 @@ class TestUpdateWinView(APITestMixin):
         assert version.revision.user == self.user
         assert version.revision.comment == 'Win updated'
 
+    def test_update_data_must_be_confirmed(self):
+        """Tests validation that data provided must be personally confirmed and confirmed by line manager."""
+        company = CompanyFactory()
+        contact = ContactFactory(company=company)
+
+        win = WinFactory(
+            adviser=self.user,
+            company=company,
+            company_contacts=[contact],
+            type_of_support=[
+                SupportTypeConstant.political_and_economic_briefing.value.id,
+            ],
+            associated_programme=[
+                AssociatedProgrammeConstant.afterburner.value.id,
+            ],
+        )
+        customer_response = CustomerResponse(win=win)
+        customer_response.save()
+
+        url = reverse('api-v4:export-win:item', kwargs={'pk': win.pk})
+        request_data = {
+            'business_type': 'The best type',
+            'description': 'Description',
+            'is_personally_confirmed': False,
+            'is_line_manager_confirmed': True,
+        }
+        response = self.api_client.patch(url, data=request_data)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data['non_field_errors'] == [
+            'Export win data must be personally confirmed',
+        ]
+        request_data = {
+            'business_type': 'The best type',
+            'description': 'Description',
+            'is_personally_confirmed': True,
+            'is_line_manager_confirmed': False,
+        }
+        response = self.api_client.patch(url, data=request_data)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+        assert response_data['non_field_errors'] == [
+            'Export win data must be confirmed by line manager',
+        ]
+
     def test_doesnt_update_related_fields_when_not_supplied(self):
         """Tests related fields don't get updated when not supplied."""
         company = CompanyFactory()
@@ -1865,6 +1910,8 @@ class TestUpdateWinView(APITestMixin):
         request_data = {
             'business_type': 'The best type',
             'description': 'Description',
+            'is_line_manager_confirmed': True,
+            'is_personally_confirmed': True,
         }
         assert win.breakdowns.count() == 1
         assert win.advisers.count() == 1
@@ -2161,6 +2208,8 @@ class TestUpdateWinView(APITestMixin):
         url = reverse('api-v4:export-win:item', kwargs={'pk': win.pk})
         request_data = {
             'description': 'Changed',
+            'is_personally_confirmed': True,
+            'is_line_manager_confirmed': True,
         }
         response = self.api_client.patch(url, data=request_data)
         assert response.status_code == status_code
@@ -2275,8 +2324,8 @@ class TestUpdateWinView(APITestMixin):
                     'id': AssociatedProgrammeConstant.afterburner.value.id,
                 },
             ],
-            'is_personally_confirmed': False,
-            'is_line_manager_confirmed': False,
+            'is_personally_confirmed': True,
+            'is_line_manager_confirmed': True,
             'name_of_customer': malicious_script,  # Customer name script injection
             'name_of_customer_confidential': True,
             'export_experience': {

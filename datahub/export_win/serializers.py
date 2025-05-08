@@ -50,6 +50,7 @@ from datahub.export_win.tasks import (
     update_customer_response_token_for_email_notification_id,
 )
 from datahub.export_win.validators import (
+    DataConfirmedValidator,
     DuplicateContributingAdviserValidator,
     DuplicateTeamMemberValidator,
     LeadOfficerAndContributingAdviserValidator,
@@ -315,6 +316,7 @@ class WinSerializer(ModelSerializer):
             LeadOfficerAndContributingAdviserValidator(),
             LeadOfficerAndTeamMemberValidator(),
             TeamMembersAndContributingAdvisersValidator(),
+            DataConfirmedValidator(),
         ]
 
     def create(self, validated_data):
