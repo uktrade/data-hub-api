@@ -54,6 +54,9 @@
   pk: a2dbd807-ae52-421c-8d1d-88adfc7a506b
   fields: {name: "Retail"}
 - model: metadata.investmentbusinessactivity
+  pk: fea31ce4-391c-4e9a-ada2-0f02ce06b8f5
+  fields: {name: "AI Enabling (inc. Data Centres)"}
+- model: metadata.investmentbusinessactivity
   pk: 42b8d11b-dbe7-45b8-985e-c9222c459287
   fields: {name: "Assembly"}
 - model: metadata.investmentbusinessactivity
@@ -66,11 +69,20 @@
   pk: 2527f728-cc5f-4481-ba42-13957d249b3b
   fields: {name: "E-commerce"}
 - model: metadata.investmentbusinessactivity
+  pk: ca3e4958-7db8-428a-995f-04ce2f58d978
+  fields: {name: "Emerging Tech"}
+- model: metadata.investmentbusinessactivity
   pk: fc68d540-a00a-40f8-8b39-05e12fcb856f
   fields: {name: "European headquarters"}
 - model: metadata.investmentbusinessactivity
+  pk: 0b569569-a3cc-428f-8817-727adfe7baeb
+  fields: {name: "EV or Battery"}
+- model: metadata.investmentbusinessactivity
   pk: 77be20b3-05bf-4e06-a517-6989f8b9b922
   fields: {name: "Manufacturing"}
+- model: metadata.investmentbusinessactivity
+  pk: 598e0a30-e9e1-4b7e-8aee-b6bc8e7d5685
+  fields: {name: "New IP"}
 - model: metadata.investmentbusinessactivity
   pk: c40e4af0-382e-44a7-b756-97f180230096
   fields: {name: "Research & development (R&D)"}
