@@ -166,9 +166,11 @@ class WinAdminForm(ModelForm):
 
         legacy_fields = {
             'cdms_reference': 'Data Hub (Companies House) or CDMS reference number',
+            'company_name': 'Company name',
             'customer_email_address': 'Contact email',
             'customer_job_title': 'Job title',
             'line_manager_name': 'Line manager',
+            'lead_officer_name': 'Lead officer name',
             'lead_officer_email_address': 'Lead officer email address',
             'other_official_email_address': 'Secondary email address',
         }
@@ -244,6 +246,7 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
                     'total_expected_export_value',
                     'total_expected_non_export_value',
                     'total_expected_odi_value',
+                    'company_name',  # Legacy field
                 ),
             },
         ),
@@ -284,6 +287,7 @@ class WinAdmin(BaseModelAdminMixin, VersionAdmin):
                     'team_members',
                     'hq_team',
                     'line_manager_name',  # Legacy field
+                    'lead_officer_name', # Legacy field
                     'lead_officer_email_address',  # Legacy field
                     'other_official_email_address',  # Legacy field
                 ),

@@ -369,7 +369,6 @@ class Win(BaseModel):
     lead_officer_name = models.CharField(
         max_length=128,
         verbose_name='Lead officer name',
-        help_text='This is the name that will be included in the email to the customer',
     )
     # Legacy field
     lead_officer_email_address = models.EmailField(
