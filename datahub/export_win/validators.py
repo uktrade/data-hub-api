@@ -94,3 +94,23 @@ class TeamMembersAndContributingAdvisersValidator:
                 'A team member cannot also be a contributing adviser.',
                 code='team_member_as_contributing_adviser',
             )
+
+
+class DataConfirmedValidator:
+    """Validates that data has been personally confirmed by submitter and by their line manager."""
+
+    def __call__(self, data):
+        """Performs validation."""
+        is_personally_confirmed = data.get('is_personally_confirmed', False)
+        is_line_manager_confirmed = data.get('is_line_manager_confirmed', False)
+
+        if not is_personally_confirmed:
+            raise serializers.ValidationError(
+                'Export win data must be personally confirmed',
+                code='is_not_personally_confirmed',
+            )
+        if not is_line_manager_confirmed:
+            raise serializers.ValidationError(
+                'Export win data must be confirmed by line manager',
+                code='is_not_line_manager_confirmed',
+            )
