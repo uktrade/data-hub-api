@@ -1,0 +1,12 @@
+- model: metadata.investmentbusinessactivity
+  pk: fea31ce4-391c-4e9a-ada2-0f02ce06b8f5
+  fields: {name: "AI Enabling (inc. Data Centres)"}
+- model: metadata.investmentbusinessactivity
+  pk: ca3e4958-7db8-428a-995f-04ce2f58d978
+  fields: {name: "Emerging Tech"}
+- model: metadata.investmentbusinessactivity
+  pk: 0b569569-a3cc-428f-8817-727adfe7baeb
+  fields: {name: "EV or Battery"}
+- model: metadata.investmentbusinessactivity
+  pk: 598e0a30-e9e1-4b7e-8aee-b6bc8e7d5685
+  fields: {name: "New IP"}
