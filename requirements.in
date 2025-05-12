@@ -63,7 +63,7 @@ requests_toolbelt==1.0.0
 sentry_sdk==2.25.1
 
 # RQ and associated helpers
-rq==2.3.2
+rq==2.3.3
 rq-scheduler==0.14.0
 
 # For logging tables
