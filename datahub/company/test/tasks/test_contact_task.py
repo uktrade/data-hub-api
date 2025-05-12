@@ -1,7 +1,11 @@
-import datetime
 import json
 import logging
 import uuid
+from datetime import (
+    datetime,
+    timedelta,
+    timezone,
+)
 from unittest import mock
 
 import boto3
@@ -9,7 +13,6 @@ import pytest
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.test import override_settings
-from django.utils import timezone
 from freezegun import freeze_time
 from moto import mock_aws
 
@@ -89,7 +92,7 @@ class TestContactArchiveTask:
     def test_simulate(self, caplog, simulate):
         """Test contact archiving simulate flag."""
         caplog.set_level(logging.INFO, logger='datahub.company.tasks.contact')
-        date = timezone.now() - relativedelta(days=10)
+        date = datetime.now(tz=timezone.utc) - relativedelta(days=10)
         with freeze_time(date):
             company1 = CompanyFactory()
             company2 = CompanyFactory(archived=True)
@@ -145,7 +148,7 @@ class TestContactArchiveTask:
 
     def test_archive_no_updates(self):
         """Test contact archiving with no updates on contacts."""
-        date = timezone.now() - relativedelta(days=10)
+        date = datetime.now(tz=timezone.utc) - relativedelta(days=10)
         with freeze_time(date):
             company1 = CompanyFactory()
             company2 = CompanyFactory()
@@ -168,7 +171,7 @@ class TestContactArchiveTask:
 
     def test_archive_with_updates(self):
         """Test contact archiving with updates on correct contacts."""
-        date = timezone.now() - relativedelta(days=10)
+        date = datetime.now(tz=timezone.utc) - relativedelta(days=10)
         with freeze_time(date):
             company1 = CompanyFactory()
             company2 = CompanyFactory(archived=True)
@@ -237,7 +240,7 @@ def test_files():
 def setup_s3_bucket(bucket_name, test_files):
     mock_s3_client = _create_bucket(bucket_name)
 
-    last_modfied = datetime.datetime.now()
+    last_modfied = datetime.now()
     for file in test_files:
         # use freeze_time to allow uploaded files to have a different LastModified date
         with freeze_time(last_modfied):
@@ -246,7 +249,7 @@ def setup_s3_bucket(bucket_name, test_files):
                 Key=file,
                 Body=json.dumps('Test contents'),
             )
-            last_modfied = last_modfied + datetime.timedelta(seconds=3)
+            last_modfied = last_modfied + timedelta(seconds=3)
 
 
 def _create_bucket(bucket_name):
@@ -298,7 +301,7 @@ class TestContactConsentIngestionTaskScheduler:
 
 @pytest.mark.django_db
 class TestContactConsentIngestionTask:
-    FROZEN_TIME = datetime.datetime(2024, 6, 1, 2, tzinfo=timezone.utc)
+    FROZEN_TIME = datetime(2024, 6, 1, 2, tzinfo=timezone.utc)
 
     @mock_aws
     @override_settings(S3_LOCAL_ENDPOINT_URL=None)
@@ -598,7 +601,7 @@ class TestContactConsentIngestionTask:
         returns True.
         """
         task = ContactConsentIngestionTask()
-        contact = ContactFactory.create(consent_data_last_modified=datetime.datetime.now())
+        contact = ContactFactory.create(consent_data_last_modified=datetime.now())
 
         row = {
             'email': 'a',
@@ -637,7 +640,7 @@ class TestContactConsentIngestionTask:
         """
         task = ContactConsentIngestionTask()
         contact = ContactFactory.create(
-            consent_data_last_modified=datetime.datetime.fromisoformat('2024-08-02T12:00:00'),
+            consent_data_last_modified=datetime.fromisoformat('2024-08-02T12:00:00'),
         )
         row = {
             'email': 'a',
@@ -660,7 +663,7 @@ class TestContactConsentIngestionTask:
         """
         task = ContactConsentIngestionTask()
         contact = ContactFactory.create(
-            consent_data_last_modified=datetime.datetime.fromisoformat('2023-07-20T12:00:00'),
+            consent_data_last_modified=datetime.fromisoformat('2023-07-20T12:00:00'),
         )
         row = {
             'email': 'a',
