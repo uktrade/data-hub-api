@@ -36,17 +36,19 @@ bigtree==0.28.0
     # via -r requirements.in
 billiard==4.2.0
     # via celery
-boto3==1.38.3
+boto3==1.38.13
     # via
     #   -r requirements.in
     #   moto
-botocore==1.38.3
+botocore==1.38.13
     # via
     #   boto3
     #   moto
     #   s3transfer
 build==1.0.3
     # via pip-tools
+bytecode==0.16.1
+    # via ddtrace
 celery==5.4.0
     # via dbt-copilot-python
 certifi==2024.7.4
@@ -85,6 +87,8 @@ cryptography==44.0.1
     # via moto
 dbt-copilot-python==0.2.2
     # via -r requirements.in
+ddtrace==3.2.1
+    # via django-log-formatter-asim
 decorator==5.1.1
     # via ipython
 deprecated==1.2.14
@@ -113,11 +117,11 @@ django==4.2.20
     #   drf-redesign
     #   drf-spectacular
     #   drf-spectacular-sidecar
-django-axes==7.0.2
+django-axes==8.0.0
     # via -r requirements.in
 django-csp==3.8
     # via -r requirements.in
-django-debug-toolbar==5.1.0
+django-debug-toolbar==5.2.0
     # via -r requirements.in
 django-environ==0.12.0
     # via -r requirements.in
@@ -127,7 +131,7 @@ django-filter==25.1
     # via -r requirements.in
 django-js-asset==2.0.0
     # via django-mptt
-django-log-formatter-asim==0.0.6
+django-log-formatter-asim==1.0.0
     # via -r requirements.in
 django-mptt==0.17.0
     # via -r requirements.in
@@ -148,12 +152,14 @@ drf-redesign==0.5.1
     # via -r requirements.in
 drf-spectacular==0.28.0
     # via -r requirements.in
-drf-spectacular-sidecar==2025.4.1
+drf-spectacular-sidecar==2025.5.1
     # via -r requirements.in
 ecs-logging==2.0.2
     # via elastic-apm
 elastic-apm==6.23.0
     # via -r requirements.in
+envier==0.6.1
+    # via ddtrace
 events==0.5
     # via opensearch-py
 exceptiongroup==1.2.1
@@ -188,7 +194,7 @@ greenlet==3.2.1
     # via gevent
 grpcio==1.62.1
     # via opentelemetry-exporter-otlp-proto-grpc
-icalendar==6.1.3
+icalendar==6.2.0
     # via -r requirements.in
 identify==2.5.11
     # via pre-commit
@@ -252,6 +258,7 @@ opensearch-py==2.8.0
     #   opensearch-dsl
 opentelemetry-api==1.22.0
     # via
+    #   ddtrace
     #   opentelemetry-distro
     #   opentelemetry-exporter-otlp-proto-grpc
     #   opentelemetry-exporter-otlp-proto-http
@@ -328,6 +335,7 @@ propcache==0.2.0
     # via yarl
 protobuf==4.25.3
     # via
+    #   ddtrace
     #   googleapis-common-protos
     #   opentelemetry-proto
 psycogreen==1.0.2
@@ -420,17 +428,17 @@ rpds-py==0.23.1
     # via
     #   jsonschema
     #   referencing
-rq==2.3.2
+rq==2.3.3
     # via
     #   -r requirements.in
     #   rq-scheduler
 rq-scheduler==0.14.0
     # via -r requirements.in
-ruff==0.11.7
+ruff==0.11.9
     # via -r requirements-dev.in
 s3transfer==0.12.0
     # via boto3
-sentry-sdk==2.25.1
+sentry-sdk==2.27.0
     # via -r requirements.in
 simplejson==3.20.1
     # via -r requirements.in
@@ -510,6 +518,7 @@ whitenoise==6.9.0
     # via -r requirements.in
 wrapt==1.14.1
     # via
+    #   ddtrace
     #   deprecated
     #   elastic-apm
     #   opentelemetry-instrumentation
@@ -517,7 +526,9 @@ wrapt==1.14.1
 wsgiserver==1.3
     # via -r requirements.in
 xmltodict==0.13.0
-    # via moto
+    # via
+    #   ddtrace
+    #   moto
 yarl==1.17.2
     # via aiohttp
 zipp==3.19.1
