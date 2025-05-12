@@ -26,6 +26,7 @@ class EYBLeadsDatasetView(BaseFilterDatasetView):
                         'investment_projects__id',
                     ],
                     filter=Q(investment_projects__isnull=False),
+                    default=[],
                 ),
             )
             .values(
