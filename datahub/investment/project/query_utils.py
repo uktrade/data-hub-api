@@ -8,7 +8,12 @@ def get_project_code_expression():
         'cdms_project_code',
         Concat(
             Value('DHP-'),
-            Func('investmentprojectcode', Value('fm00000000'), function='to_char'),
+            Func(
+                'investmentprojectcode',
+                Value('fm00000000'),
+                function='to_char',
+                output_field=TextField(),
+            ),
         ),
         output_field=TextField(),
     )
