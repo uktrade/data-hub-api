@@ -259,10 +259,13 @@ Dependencies:
     ./manage.py createinitialrevisions
     ```
 
-14. Optionally, you can load some test data:
+14. Optionally, you can load some test data - this data is required for [OMIS](https://github.com/uktrade/omis-frontend) tests:
 
     ```shell
     ./manage.py loaddata fixtures/test_data.yaml
+    ./manage.py add_quote_to_order
+    ./manage.py add_invoice_to_order
+    ./manage.py set_order_as_paid
     ```
 
     Note that this will queue RQ tasks to index the created records in OpenSearch,
