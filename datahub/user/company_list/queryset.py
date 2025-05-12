@@ -45,7 +45,7 @@ def get_company_list_item_queryset():
                             Q(team__isnull=True),
                         ),
                     ),
-                    ordering=('pk',),
+                    order_by=('pk',),
                 ),
             ),
             latest_interaction_time_ago=ExpressionWrapper(

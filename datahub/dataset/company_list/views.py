@@ -15,7 +15,7 @@ class PipelineItemsDatasetView(BaseDatasetView):
                 PipelineItem.contacts.through,
                 'pipelineitem',
                 'contact__id',
-                ordering=('contact__created_on',),
+                order_by=('contact__created_on',),
             ),
         ).values(
             'adviser_id',

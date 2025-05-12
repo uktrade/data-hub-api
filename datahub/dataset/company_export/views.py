@@ -18,13 +18,13 @@ class CompanyExportDatasetView(BaseFilterDatasetView):
                 CompanyExport.contacts.through,
                 'companyexport',
                 'contact_id',
-                ordering=('contact__created_on',),
+                order_by=('contact__created_on',),
             ),
             team_member_ids=get_array_agg_subquery(
                 CompanyExport.team_members.through,
                 'companyexport',
                 'advisor_id',
-                ordering=('advisor__date_joined',),
+                order_by=('advisor__date_joined',),
             ),
             company_name=F('company__name'),
         ).values(

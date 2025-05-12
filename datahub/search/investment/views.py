@@ -396,7 +396,7 @@ class SearchInvestmentExportAPIView(SearchInvestmentProjectAPIViewMixin, SearchE
         team_member_names=get_string_agg_subquery(
             DBInvestmentProject,
             get_full_name_expression('team_members__adviser'),
-            ordering=('team_members__adviser__first_name', 'team_members__adviser__last_name'),
+            order_by=('team_members__adviser__first_name', 'team_members__adviser__last_name'),
         ),
         delivery_partner_names=get_string_agg_subquery(
             DBInvestmentProject,

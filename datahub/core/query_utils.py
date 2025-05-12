@@ -57,7 +57,7 @@ class JSONBBuildObject(Func):
         super().__init__(*args)
 
 
-def get_string_agg_subquery(model, expression, delimiter=', ', distinct=False, ordering=None):
+def get_string_agg_subquery(model, expression, delimiter=', ', distinct=False, order_by=None):
     """Gets a subquery that uses string_agg to concatenate values in a to-many field.
 
     The passed model must be the model of the query set being annotated.
@@ -74,7 +74,7 @@ def get_string_agg_subquery(model, expression, delimiter=', ', distinct=False, o
         StringAgg(
             expression,
             delimiter,
-            ordering=ordering or (expression,),
+            order_by=order_by or (expression,),
             distinct=distinct,
         ),
     )
@@ -86,7 +86,7 @@ def get_array_agg_subquery(
     expression_to_aggregate,
     filter=None,
     distinct=False,
-    ordering=(),
+    order_by=(),
 ):
     """Get a subquery that aggregates values from a to-many relation as an array.
 
@@ -135,7 +135,7 @@ def get_array_agg_subquery(
         ArrayAgg(
             expression_to_aggregate,
             distinct=distinct,
-            ordering=ordering,
+            order_by=order_by,
             filter=filter,
         ),
         join_field_name=join_field_name,

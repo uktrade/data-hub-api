@@ -310,7 +310,7 @@ def get_spi_report_queryset():
                     adviser_name=get_full_name_expression('adviser'),
                     modified_on='modified_on',
                 ),
-                ordering=('created_on',),
+                order_by=('created_on',),
             ),
             spi_interactions=get_array_agg_subquery(
                 Interaction,
@@ -323,7 +323,7 @@ def get_spi_report_queryset():
                     created_on='created_on',
                 ),
                 filter=Q(service_id__in=ALL_SPI_SERVICE_IDS),
-                ordering=('created_on',),
+                order_by=('created_on',),
             ),
         )
         .order_by('created_on')

@@ -24,30 +24,30 @@ class InteractionsDatasetView(BaseFilterDatasetView):
             .annotate(
                 adviser_ids=get_aggregate_subquery(
                     Interaction,
-                    ArrayAgg('dit_participants__adviser_id', ordering=('dit_participants__id',)),
+                    ArrayAgg('dit_participants__adviser_id', order_by=('dit_participants__id',)),
                 ),
                 contact_ids=get_aggregate_subquery(
                     Interaction,
-                    ArrayAgg('contacts__id', ordering=('contacts__id',)),
+                    ArrayAgg('contacts__id', order_by=('contacts__id',)),
                 ),
                 interaction_link=get_front_end_url_expression('interaction', 'pk'),
                 policy_area_names=get_array_agg_subquery(
                     Interaction.policy_areas.through,
                     'interaction',
                     'policyarea__name',
-                    ordering=('policyarea__order',),
+                    order_by=('policyarea__order',),
                 ),
                 related_trade_agreement_names=get_array_agg_subquery(
                     Interaction.related_trade_agreements.through,
                     'interaction',
                     'tradeagreement__name',
-                    ordering=('tradeagreement__name',),
+                    order_by=('tradeagreement__name',),
                 ),
                 policy_issue_type_names=get_array_agg_subquery(
                     Interaction.policy_issue_types.through,
                     'interaction',
                     'policyissuetype__name',
-                    ordering=('policyissuetype__order',),
+                    order_by=('policyissuetype__order',),
                 ),
                 sector=get_sector_name_subquery('company__sector'),
                 service_delivery=get_service_name_subquery('service'),
@@ -55,7 +55,7 @@ class InteractionsDatasetView(BaseFilterDatasetView):
                     Interaction.export_barrier_types.through,
                     'interaction',
                     'exportbarriertype__name',
-                    ordering=('exportbarriertype__name',),
+                    order_by=('exportbarriertype__name',),
                 ),
             )
             .values(

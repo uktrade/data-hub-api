@@ -169,13 +169,13 @@ class TestGetArrayAggSubquery:
         assert set(actual_author_names.author_names) == set(desired_names)
 
     @pytest.mark.parametrize(
-        ('ordering', 'expected_names'),
+        ('order_by', 'expected_names'),
         [
             ('person__first_name', ['Barbara', 'Claire', 'Samantha']),
             ('-person__first_name', ['Samantha', 'Claire', 'Barbara']),
         ],
     )
-    def test_orders_results_when_ordering_specified(self, ordering, expected_names):
+    def test_orders_results_when_ordering_specified(self, order_by, expected_names):
         """Test that the values are ordered corrected when an ordering is specified."""
         names = ['Barbara', 'Claire', 'Samantha']
         authors = PersonFactory.create_batch(
@@ -190,7 +190,7 @@ class TestGetArrayAggSubquery:
                 Book.authors.through,
                 'book',
                 'person__first_name',
-                ordering=ordering,
+                order_by=order_by,
             ),
         )
         actual_author_names = queryset.first().author_names
