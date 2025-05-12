@@ -1,4 +1,4 @@
-from typing import Any, Callable, Optional
+from typing import Any, Optional
 
 from django.contrib.auth import get_user_model
 from django.db import models
@@ -23,10 +23,11 @@ class AuditLog:
     @staticmethod
     def get_version_pairs(
         versions: list[Version],
-        pre_process_version_list: Callable,
+        pre_process_version_list: Optional[callable] = None,
     ) -> list[tuple[Version, Version]]:
         """Get pairs of consecutive versions to compare changes."""
-        versions = pre_process_version_list(versions)
+        if pre_process_version_list is not None:
+            versions = pre_process_version_list(versions)
         return [(versions[n], versions[n + 1]) for n in range(len(versions) - 1)]
 
     @staticmethod
@@ -79,10 +80,10 @@ class AuditLog:
     def get_audit_log(
         cls,
         instance: models.Model,
-        pre_process_version_list: Callable,
         paginator: Optional[BasePagination] = None,
         request: Optional[Request] = None,
         get_additional_info: Optional[callable] = None,
+        pre_process_version_list: Optional[callable] = None,
     ):
         """Get audit log for an instance.
 
