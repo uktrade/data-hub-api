@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any, Callable, Optional
 
 from django.contrib.auth import get_user_model
 from django.db import models
@@ -23,11 +23,10 @@ class AuditLog:
     @staticmethod
     def get_version_pairs(
         versions: list[Version],
-        pre_process_version_list: Optional[callable] = None,
+        pre_process_version_list: Callable,
     ) -> list[tuple[Version, Version]]:
         """Get pairs of consecutive versions to compare changes."""
-        if pre_process_version_list:
-            versions = pre_process_version_list(versions)
+        versions = pre_process_version_list(versions)
         return [(versions[n], versions[n + 1]) for n in range(len(versions) - 1)]
 
     @staticmethod
@@ -80,10 +79,10 @@ class AuditLog:
     def get_audit_log(
         cls,
         instance: models.Model,
+        pre_process_version_list: Callable,
         paginator: Optional[BasePagination] = None,
         request: Optional[Request] = None,
         get_additional_info: Optional[callable] = None,
-        pre_process_version_list: Optional[callable] = None,
     ):
         """Get audit log for an instance.
 
@@ -205,10 +204,10 @@ class AuditViewSet(ViewSet):
         instance = self.get_object()
         return AuditLog.get_audit_log(
             instance=instance,
+            pre_process_version_list=self._pre_process_version_list,
             paginator=self.pagination_class(),
             request=self.request,
             get_additional_info=self._get_additional_change_information,
-            pre_process_version_list=self._pre_process_version_list,
         )
 
     @classmethod
@@ -218,5 +217,5 @@ class AuditViewSet(ViewSet):
 
     @classmethod
     def _pre_process_version_list(cls, versions):
-        """Pre-process version list before creating version pairs."""
-        return {}
+        """Override to pre-process version list before creating version pairs."""
+        return versions
