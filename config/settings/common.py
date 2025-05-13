@@ -671,6 +671,12 @@ DOCUMENT_BUCKETS = {
         'aws_secret_access_key': env('REPORT_AWS_SECRET_ACCESS_KEY', default=''),
         'aws_region': env('REPORT_AWS_REGION', default=''),
     },
+    'maintenance': {
+        'bucket': env('MAINTENANCE_BUCKET', default=''),
+        'aws_access_key_id': env('MAINTENANCE_AWS_ACCESS_KEY_ID', default=''),
+        'aws_secret_access_key': env('MAINTENANCE_AWS_SECRET_ACCESS_KEY', default=''),
+        'aws_region': env('MAINTENANCE_AWS_REGION', default=''),
+    },
 }
 
 DOCUMENT_BUCKET_NAME = f'data-hub-documents{"-" + ENVIRONMENT if ENVIRONMENT else ""}'
