@@ -473,6 +473,7 @@ class Company(ArchivableModel, BaseModel):
         indexes = [
             # For datasets app which includes API endpoints to be consumed by data-flow
             models.Index(fields=('created_on', 'id')),
+            models.Index(fields=('name',)),
         ]
 
     @property
