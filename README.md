@@ -22,11 +22,10 @@ This project uses Docker compose to setup and run all the necessary components. 
     cd data-hub-api
     ```
 
-2.  Create `.env` files from `sample.env`
+2.  Create a `.env` file
 
     ```shell
-    cp sample.env .env
-    cp config/settings/sample.env config/settings/.env
+    cp sample-docker-dev.env .env
     ```
 
     If you're working with data-hub-frontend and mock-sso, `DJANGO_SUPERUSER_SSO_EMAIL_USER_ID` should be the same as
@@ -87,11 +86,10 @@ There is now a `make` command to bring up the three environments on a single doc
    cd data-hub-api
    ```
 
-2. Create `.env` files from `sample.env`
+2. Create a `.env` file
 
    ```shell
-   cp sample.env .env
-   cp config/settings/sample.env config/settings/.env
+    cp sample-docker-dev.env .env
    ```
 
    Ensure `DJANGO_SUPERUSER_SSO_EMAIL_USER_ID` is the same as `MOCK_SSO_EMAIL_USER_ID`
@@ -142,9 +140,9 @@ There is now a `make` command to bring up the three environments on a single doc
 Dependencies:
 
 - Python 3.10.x
-- PostgreSQL 12
-- redis 6.x
-- OpenSearch 1.x
+- PostgreSQL 16.x
+- redis 7.x
+- OpenSearch 2.x
 
 1.  Clone the repository:
 
@@ -171,7 +169,7 @@ Dependencies:
     brew install libpq
     ```
 
-4.  Install _postgres_, if not done already, as this is required by **psycopg2** in the requirements below
+4.  Install Postgres
 
     On Ubuntu:
 
@@ -183,62 +181,87 @@ Dependencies:
 
     ```shell
     brew install postgresql
+    brew services start postgresql
     ```
 
-5.  Create and activate the virtualenv:
+5. Setup the postgres user and database
+
+    On macOS:
+    ```shell
+    createdb
+    ```
+
+    ```shell
+    psql
+    CREATE DATABASE datahub;
+    CREATE DATABASE test_datahub;
+    CREATE USER datahubuser WITH SUPERUSER PASSWORD 'datahubpassword';
+    \q
+    ```
+
+    nb. SUPERUSER is needed to create 'citext' extension
+
+
+6.  Create and activate the virtualenv:
 
     ```shell
     python3.10 -m venv env
     source env/bin/activate
     pip install -U pip
-    or
-    formally to make sure you have the same version as what is used for cloudfoundry, use buildpack to install the same version e.g. https://github.com/cloudfoundry/python-buildpack/releases e.g. 22.1.2
-    python -m pip install pip==22.1.2
     ```
 
-6.  Install the dependencies:
+7.  Install the dependencies:
 
     ```shell
     pip install -r requirements-dev.txt
     ```
 
-7.  Create an `.env` settings file (it’s gitignored by default):
+8.  Create a `.env` file (it’s gitignored by default):
 
     ```shell
-    cp config/settings/sample.env config/settings/.env
+    cp sample-local-dev.env .env
     ```
 
-8.  Set `DOCKER_DEV=False` and `LOCAL_DEV=True` in `.env`
-
-9.  Make sure you have OpenSearch running locally. If you don't, you can run one in Docker:
+11.  Make sure you have OpenSearch running locally. 
 
     ```shell
-    docker run -p 9200:9200 -e "http.host=0.0.0.0" -e "transport.host=127.0.0.1" -e "plugins.security.disabled=true" opensearchproject/opensearch:1.2.4
+    brew install opensearch
+    brew services start opensearch
+    ```
+    
+12. Install and run redis
+
+    ```shell
+    brew install redis
+    brew services start redis
     ```
 
-10. Make sure you have redis running locally and that the REDIS_BASE_URL in your `.env` is up-to-date.
-
-11. Populate the databases and initialise OpenSearch:
+13. Populate the databases and initialise OpenSearch:
 
     ```shell
     ./manage.py migrate
     ./manage.py migrate_search
 
-    ./manage.py loadinitialmetadata
+    # Force is required as `migrate` already loads some metadata
+    # but loading fixtures will fail without this
+    ./manage.py loadinitialmetadata --force
     ./manage.py createinitialrevisions
     ```
 
-12. Optionally, you can load some test data:
+14. Optionally, you can load some test data - this data is required for [OMIS](https://github.com/uktrade/omis-frontend) tests:
 
     ```shell
     ./manage.py loaddata fixtures/test_data.yaml
+    ./manage.py add_quote_to_order
+    ./manage.py add_invoice_to_order
+    ./manage.py set_order_as_paid
     ```
 
     Note that this will queue RQ tasks to index the created records in OpenSearch,
     and hence the loaded records won‘t be returned by search endpoints until RQ is
     started and the queued tasks have run.
 
-13. Create a superuser:
+15. Create a superuser:
 
     ```shell
     ./manage.py createsuperuser
@@ -246,19 +269,23 @@ Dependencies:
 
     (You can enter any valid email address as the username and SSO email user ID.)
 
-14. Start the server:
+16. Start the server:
 
     ```shell
     ./manage.py runserver
     ```
 
-15. Start RQ (Redis Queue):
+17. Start RQ (Redis Queues):
 
+    Start short running queue working
     ```shell
-    python rq/rq-worker.py
+    ./rq-run.sh short-running-worker.py
     ```
 
-    Note that in production the cron-scheduler:1/1, short-running-working:4/4, long-running-worker:4/4 are run in separate instances .
+    Start long running queue working
+    ```shell
+    ./rq-run.sh long-running-worker.py
+    ```
 
 ## API documentation
 
