@@ -141,7 +141,7 @@ Dependencies:
 
 - Python 3.10.x
 - PostgreSQL 16.x
-- redis 6.x
+- redis 7.x
 - OpenSearch 2.x
 
 1.  Clone the repository:
@@ -201,17 +201,6 @@ Dependencies:
 
     nb. SUPERUSER is needed to create 'citext' extension
 
-    On macOS:
-
-    The default table collation ('C') is case and accent sensitive whereas the default ('en_US.utf8') on Debian (which the Python Docker image is based on) is not. See [this](https://postgresql.verite.pro/blog/2019/10/14/nondeterministic-collations.html) for more information on collation types. Without this a couple of tests will fail.
-
-    ```shell
-    psql
-    update pg_database set datcollate='en_US.UTF-8', datctype='en_US.UTF-8' where datname = 'test_datahub';
-    update pg_database set datcollate='en_US.UTF-8', datctype='en_US.UTF-8' where datname = 'datahub';
-    \q
-    brew services restart postgresql
-    ```
 
 6.  Create and activate the virtualenv:
 
