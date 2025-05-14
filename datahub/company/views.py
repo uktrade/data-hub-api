@@ -399,7 +399,27 @@ class OneListGroupCoreTeamViewSet(CoreViewSet):
 class CompanyAuditViewSet(AuditViewSet):
     """Company audit views."""
 
-    queryset = Company.objects.all()
+    queryset = Company.objects.prefetch_related(
+        Prefetch('one_list_core_team_members', to_attr='one_list_core_team_members_changes'),
+    ).all()
+
+    @classmethod
+    def _pre_process_version_list(cls, versions):
+        """Include changes to One list core team members."""
+        for version in versions:
+            one_list_core_team_members = version.revision.version_set.all().filter(
+                content_type__model='onelistcoreteammember',
+            )
+            version.field_dict['one_list_core_team_members'] = []
+            for one_list_core_team_member in one_list_core_team_members:
+                version.field_dict['one_list_core_team_members'].append(
+                    one_list_core_team_member.object.adviser.name
+                    if one_list_core_team_member.object
+                    else one_list_core_team_member.object_repr.split(' - ')[0],
+                )
+
+            version.field_dict['one_list_core_team_members'].sort()
+        return versions
 
 
 class ContactViewSet(ArchivableViewSetMixin, CoreViewSet):

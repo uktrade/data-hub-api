@@ -21,8 +21,13 @@ class AuditLog:
     """Class to handle audit log operations."""
 
     @staticmethod
-    def get_version_pairs(versions: list[Version]) -> list[tuple[Version, Version]]:
+    def get_version_pairs(
+        versions: list[Version],
+        pre_process_version_list: Optional[callable] = None,
+    ) -> list[tuple[Version, Version]]:
         """Get pairs of consecutive versions to compare changes."""
+        if pre_process_version_list is not None:
+            versions = pre_process_version_list(versions)
         return [(versions[n], versions[n + 1]) for n in range(len(versions) - 1)]
 
     @staticmethod
@@ -78,6 +83,7 @@ class AuditLog:
         paginator: Optional[BasePagination] = None,
         request: Optional[Request] = None,
         get_additional_info: Optional[callable] = None,
+        pre_process_version_list: Optional[callable] = None,
     ):
         """Get audit log for an instance.
 
@@ -86,6 +92,8 @@ class AuditLog:
             paginator: Optional paginator for instance
             request: Optional request object (needed for pagination)
             get_additional_info: Optional callback to get additional version info
+            pre_process_version_list: Optional callback to pre-process versions before pairs
+            are generated.
 
         Returns:
             List of audit log entries, optionally paginated
@@ -96,11 +104,11 @@ class AuditLog:
 
         if paginator and request:
             versions_subset = paginator.paginate_queryset(proxied_versions, request)
-            version_pairs = cls.get_version_pairs(versions_subset)
+            version_pairs = cls.get_version_pairs(versions_subset, pre_process_version_list)
             results = cls.construct_changelog(version_pairs, get_additional_info)
             return paginator.get_paginated_response(results)
 
-        version_pairs = cls.get_version_pairs(versions)
+        version_pairs = cls.get_version_pairs(versions, pre_process_version_list)
         return cls.construct_changelog(version_pairs)
 
 
@@ -197,6 +205,7 @@ class AuditViewSet(ViewSet):
         instance = self.get_object()
         return AuditLog.get_audit_log(
             instance=instance,
+            pre_process_version_list=self._pre_process_version_list,
             paginator=self.pagination_class(),
             request=self.request,
             get_additional_info=self._get_additional_change_information,
@@ -206,3 +215,8 @@ class AuditViewSet(ViewSet):
     def _get_additional_change_information(cls, v_new):
         """Gets additional information about a change for the a change log entry."""
         return {}
+
+    @classmethod
+    def _pre_process_version_list(cls, versions):
+        """Override to pre-process version list before creating version pairs."""
+        return versions
