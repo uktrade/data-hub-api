@@ -3,7 +3,6 @@ import uuid
 from django.conf import settings
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
-from django.contrib.postgres.fields import CICharField
 from django.core.mail import send_mail
 from django.db import models
 from django.utils.functional import cached_property
@@ -70,7 +69,12 @@ class Advisor(AbstractBaseUser, PermissionsMixin):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     # Used as a username. In many cases this is not the user's actual email address. Some do not
     # pass Django's EmailValidator so CICharField is used here.
-    email = CICharField(max_length=MAX_LENGTH, unique=True, verbose_name='username')
+    email = models.CharField(
+        max_length=MAX_LENGTH,
+        unique=True,
+        verbose_name='username',
+        db_collation='und-x-icu',  # Case-insensitive Unicode collation for PostgreSQL
+    )
     first_name = models.CharField(max_length=MAX_LENGTH, blank=True)
     last_name = models.CharField(max_length=MAX_LENGTH, blank=True)
     telephone_number = models.CharField(max_length=MAX_LENGTH, blank=True)

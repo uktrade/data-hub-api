@@ -38,23 +38,23 @@ class InvestmentProjectsDatasetView(BaseFilterDatasetView):
                 InvestmentProject.actual_uk_regions.through,
                 'investmentproject',
                 'ukregion__name',
-                ordering=('ukregion__name',),
+                order_by=('ukregion__name',),
             ),
             business_activity_names=get_array_agg_subquery(
                 InvestmentProject.business_activities.through,
                 'investmentproject',
                 'investmentbusinessactivity__name',
-                ordering=('investmentbusinessactivity__name',),
+                order_by=('investmentbusinessactivity__name',),
             ),
             competing_countries=get_aggregate_subquery(
                 InvestmentProject,
-                ArrayAgg('competitor_countries__name', ordering=('competitor_countries__name',)),
+                ArrayAgg('competitor_countries__name', order_by=('competitor_countries__name',)),
             ),
             delivery_partner_names=get_array_agg_subquery(
                 InvestmentProject.delivery_partners.through,
                 'investmentproject',
                 'investmentdeliverypartner__name',
-                ordering=('investmentdeliverypartner__name',),
+                order_by=('investmentdeliverypartner__name',),
             ),
             investor_company_sector=get_sector_name_subquery('investor_company__sector'),
             level_of_involvement_name=get_empty_string_if_null_expression(
@@ -73,23 +73,23 @@ class InvestmentProjectsDatasetView(BaseFilterDatasetView):
                 InvestmentProject.strategic_drivers.through,
                 'investmentproject',
                 'investmentstrategicdriver__name',
-                ordering=('investmentstrategicdriver__name',),
+                order_by=('investmentstrategicdriver__name',),
             ),
             sector_name=get_sector_name_subquery('sector'),
             team_member_ids=get_aggregate_subquery(
                 InvestmentProject,
-                ArrayAgg('team_members__adviser_id', ordering=('team_members__id',)),
+                ArrayAgg('team_members__adviser_id', order_by=('team_members__id',)),
             ),
             uk_company_sector=get_sector_name_subquery('uk_company__sector'),
             uk_region_location_names=get_array_agg_subquery(
                 InvestmentProject.uk_region_locations.through,
                 'investmentproject',
                 'ukregion__name',
-                ordering=('ukregion__name',),
+                order_by=('ukregion__name',),
             ),
             client_contact_ids=ArrayAgg(
                 'client_contacts__id',
-                ordering=('client_contacts__id',),
+                order_by=('client_contacts__id',),
             ),
             client_contact_names=ArrayAgg(
                 Concat(
@@ -97,23 +97,23 @@ class InvestmentProjectsDatasetView(BaseFilterDatasetView):
                     Value(' '),
                     'client_contacts__last_name',
                 ),
-                ordering=('client_contacts__first_name', 'client_contacts__last_name'),
+                order_by=('client_contacts__first_name', 'client_contacts__last_name'),
             ),
             client_contact_emails=ArrayAgg(
                 'client_contacts__email',
-                ordering=('client_contacts__email',),
+                order_by=('client_contacts__email',),
             ),
             specific_programme_names=get_array_agg_subquery(
                 InvestmentProject.specific_programmes.through,
                 'investmentproject',
                 'specificprogramme__name',
-                ordering=('specificprogramme__name',),
+                order_by=('specificprogramme__name',),
             ),
             eyb_lead_ids=get_array_agg_subquery(
                 model=EYBLead.investment_projects.through,
                 join_field_name='investmentproject',
                 expression_to_aggregate='eyblead__id',
-                ordering=('eyblead__id'),
+                order_by=('eyblead__id'),
             ),
         ).values(
             'actual_land_date',

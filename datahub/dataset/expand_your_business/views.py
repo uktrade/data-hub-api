@@ -21,11 +21,12 @@ class EYBLeadsDatasetView(BaseFilterDatasetView):
             .annotate(
                 investment_project_ids=ArrayAgg(
                     'investment_projects__id',
-                    ordering=[
+                    order_by=[
                         'investment_projects__name',
                         'investment_projects__id',
                     ],
                     filter=Q(investment_projects__isnull=False),
+                    default=[],
                 ),
             )
             .values(

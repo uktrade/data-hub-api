@@ -22,13 +22,13 @@ class EventsDatasetView(BaseFilterDatasetView):
             service_name=get_service_name_subquery('service'),
             team_ids=get_aggregate_subquery(
                 Event,
-                ArrayAgg('teams__id', ordering=('teams__id',)),
+                ArrayAgg('teams__id', order_by=('teams__id',)),
             ),
             related_programme_names=get_array_agg_subquery(
                 Event.related_programmes.through,
                 'event',
                 'programme__name',
-                ordering=('programme__name',),
+                order_by=('programme__name',),
             ),
         ).values(
             'address_1',

@@ -138,7 +138,7 @@ class SearchLargeCapitalOpportunityExportAPIView(
         other_dit_contact_names=get_string_agg_subquery(
             DBLargeCapitalOpportunity,
             get_full_name_expression('other_dit_contacts'),
-            ordering=('other_dit_contacts__first_name', 'other_dit_contacts__last_name'),
+            order_by=('other_dit_contacts__first_name', 'other_dit_contacts__last_name'),
         ),
         investment_type_names=get_string_agg_subquery(
             DBLargeCapitalOpportunity,
