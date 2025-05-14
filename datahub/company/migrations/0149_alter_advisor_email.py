@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('company', '0147_update_onelisttier'),
+        ('company', '0148_add_company_name_index'),
     ]
 
     operations = [
