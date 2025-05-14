@@ -407,12 +407,8 @@ class CompanyAuditViewSet(AuditViewSet):
     def _pre_process_version_list(cls, versions):
         """Include changes to One list core team members."""
         for version in versions:
-            one_list_core_team_members = (
-                version.revision.version_set.all()
-                .filter(
-                    content_type__model='onelistcoreteammember',
-                )
-                .select_related('adviser')
+            one_list_core_team_members = version.revision.version_set.all().filter(
+                content_type__model='onelistcoreteammember',
             )
             version.field_dict['one_list_core_team_members'] = []
             for one_list_core_team_member in one_list_core_team_members:
