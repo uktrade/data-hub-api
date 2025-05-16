@@ -146,6 +146,7 @@ class TestListView(APITestMixin):
             'number_new_jobs',
             'will_new_jobs_last_two_years',
             'average_salary',
+            'actual_average_salary',
             'number_safeguarded_jobs',
             'r_and_d_budget',
             'non_fdi_r_and_d_budget',

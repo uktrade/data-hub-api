@@ -109,6 +109,7 @@ VALUE_FIELDS = (
     'some_new_jobs',
     'number_new_jobs',
     'will_new_jobs_last_two_years',
+    'actual_average_salary',
     'average_salary',
     'number_safeguarded_jobs',
     'r_and_d_budget',
