@@ -434,7 +434,7 @@ rq==2.3.3
     #   rq-scheduler
 rq-scheduler==0.14.0
     # via -r requirements.in
-ruff==0.11.9
+ruff==0.11.10
     # via -r requirements-dev.in
 s3transfer==0.12.0
     # via boto3
@@ -479,6 +479,7 @@ traitlets==5.14.1
 typing-extensions==4.10.0
     # via
     #   asgiref
+    #   ddtrace
     #   dj-database-url
     #   ipython
     #   opentelemetry-sdk
