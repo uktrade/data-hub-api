@@ -372,6 +372,8 @@ class IProjectValueAbstract(models.Model):
     some_new_jobs = models.BooleanField(null=True)
     number_new_jobs = models.IntegerField(null=True, blank=True)
     will_new_jobs_last_two_years = models.BooleanField(null=True)
+
+    actual_average_salary = models.IntegerField(null=True, blank=True)
     average_salary = models.ForeignKey(
         'metadata.SalaryRange',
         related_name='+',
