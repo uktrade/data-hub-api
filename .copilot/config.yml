@@ -1,5 +1,4 @@
 repository: data-hub-api
 builder:
   name: paketobuildpacks/builder-jammy-full
-  version: 0.3.431
-
+  version: 0.3.482

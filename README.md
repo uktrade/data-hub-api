@@ -141,7 +141,7 @@ There is now a `make` command to bring up the three environments on a single doc
 
 Dependencies:
 
-- Python 3.10.x
+- Python 3.12.x
 - PostgreSQL 12
 - redis 6.x
 - OpenSearch 1.x
@@ -153,7 +153,7 @@ Dependencies:
     cd data-hub-api
     ```
 
-2.  Install Python 3.10.
+2.  Install Python 3.12.
 
     [See this guide](https://docs.python-guide.org/starting/installation/) for detailed instructions for different platforms.
 
@@ -162,7 +162,7 @@ Dependencies:
     On Ubuntu:
 
     ```shell
-    sudo apt install build-essential libpq-dev python3.10-dev python3.10-venv
+    sudo apt install build-essential libpq-dev python3.12-dev python3.12-venv
     ```
 
     On macOS:
@@ -188,7 +188,7 @@ Dependencies:
 5.  Create and activate the virtualenv:
 
     ```shell
-    python3.10 -m venv env
+    python3.12 -m venv env
     source env/bin/activate
     pip install -U pip
     or
