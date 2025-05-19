@@ -194,7 +194,7 @@ greenlet==3.2.2
     # via gevent
 grpcio==1.62.1
     # via opentelemetry-exporter-otlp-proto-grpc
-icalendar==6.2.0
+icalendar==6.3.0
     # via -r requirements.in
 identify==2.5.11
     # via pre-commit
