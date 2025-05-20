@@ -16,7 +16,7 @@ def postcode_data_identification_task() -> None:
     logger.info('Postcode data identification task started...')
     identification_task = PostcodeDataIdentificationTask(
         prefix=POSTCODE_DATA_PREFIX, 
-        job_timeout=THIRTY_MINUTES_IN_SECONDS
+        job_timeout=THIRTY_MINUTES_IN_SECONDS,
     )
     identification_task.identify_new_objects(postcode_data_ingestion_task)
     logger.info('Postcode data identification task finished.')
