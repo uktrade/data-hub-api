@@ -1,8 +1,10 @@
+from datetime import timedelta
+
 import factory.fuzzy
 from django.utils.timezone import now
 
 from datahub.company.test.factories import CompanyFactory, ContactFactory
-from datahub.company_activity.models import CompanyActivity, KingsAwardRecipient
+from datahub.company_activity.models import CompanyActivity, KingsAwardRecipient, PromptPayments
 from datahub.company_referral.test.factories import CompanyReferralFactory
 from datahub.interaction.test.factories import CompanyInteractionFactory
 from datahub.investment.project.test.factories import InvestmentProjectFactory
@@ -294,3 +296,45 @@ class KingsAwardRecipientFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = KingsAwardRecipient
+
+
+class PromptPaymentsFactory(factory.django.DjangoModelFactory):
+    """Ingested Prompt Payments data factory."""
+
+    source_id = factory.Sequence(lambda n: n)
+    reporting_period_start_date = factory.Faker('date_object')
+    reporting_period_end_date = factory.LazyAttribute(
+        lambda o: o.reporting_period_start_date
+        + timedelta(days=factory.fuzzy.FuzzyInteger(60, 90).fuzz()),
+    )
+    filing_date = factory.LazyAttribute(
+        lambda o: o.reporting_period_end_date
+        + timedelta(days=factory.fuzzy.FuzzyInteger(1, 30).fuzz()),
+    )
+    company_name = factory.Faker('company')
+    company_house_number = factory.Faker('pystr_format', string_format='??######')
+    company = factory.SubFactory(CompanyFactory)
+    email_address = factory.Faker('email')
+    contact = factory.SubFactory(ContactFactory)
+    approved_by = factory.Faker('name')
+    qualifying_contracts_in_period = factory.Faker('pybool')
+    average_paid_days = factory.Faker('pyint', min_value=0, max_value=100)
+    paid_within_30_days_pct = factory.Faker('pyint', min_value=0, max_value=100)
+    paid_31_to_60_days_pct = factory.Faker('pyint', min_value=0, max_value=100)
+    paid_after_61_days_pct = factory.Faker('pyint', min_value=0, max_value=100)
+    paid_later_than_terms_pct = factory.Faker('pyint', min_value=0, max_value=100)
+    payment_shortest_period_days = factory.Faker('pyint', min_value=0, max_value=30)
+    payment_longest_period_days = factory.Faker('pyint', min_value=30, max_value=90)
+    payment_max_period_days = factory.Faker('pyint', min_value=30, max_value=90)
+    payment_terms_changed_comment = factory.Faker('sentence')
+    payment_terms_changed_notified_comment = factory.Faker('sentence')
+    code_of_practice = factory.Faker('word')
+    other_electronic_invoicing = factory.Faker('pybool')
+    other_supply_chain_finance = factory.Faker('pybool')
+    other_retention_charges_in_policy = factory.Faker('pybool')
+    other_retention_charges_in_past = factory.Faker('pybool')
+    created_on = factory.LazyFunction(now)
+    modified_on = factory.LazyFunction(now)
+
+    class Meta:
+        model = PromptPayments
