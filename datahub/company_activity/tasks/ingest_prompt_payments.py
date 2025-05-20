@@ -52,30 +52,88 @@ class PromptPaymentsIngestionTask(BaseObjectIngestionTask):
     def _get_modified_datetime_str(self, record: dict) -> str:
         return record['filing_date']
 
+    def _get_company(self, company_house_number, company_name, source_id):  # noqa
+        """Attempts to find a company, prioritizing non-archived records.
+        1. By non-archived Company House Number.
+        2. By non-archived Company Name (if CHN not found or no match).
+        3. By archived Company House Number (if no non-archived CHN match).
+        4. By archived Company Name (if no non-archived CHN/Name match and no archived CHN match).
+        """
+        company = None
+
+        if company_house_number:
+            try:
+                company = Company.objects.get(company_number=company_house_number, archived=False)
+                logger.info(
+                    f'Found non-archived company by CHN {company_house_number} for source_id {source_id}.',
+                )
+                return company
+            except Company.DoesNotExist:
+                pass
+            except Company.MultipleObjectsReturned:
+                logger.warning(
+                    f'Multiple non-archived companies found for CHN {company_house_number} '
+                    f'for prompt payment source_id {source_id}. Skipping company linking for CHN.',
+                )
+
+        if company_name:
+            companies_by_name = Company.objects.filter(name=company_name, archived=False)
+            if companies_by_name.count() == 1:
+                company = companies_by_name.first()
+                logger.info(
+                    f'Found non-archived company by name "{company_name}" for source_id {source_id}.',
+                )
+                return company
+            elif companies_by_name.count() > 1:
+                logger.warning(
+                    f'Multiple non-archived companies found for name "{company_name}" '
+                    f'for prompt payment source_id {source_id}. Skipping company linking for name.',
+                )
+
+        if company_house_number:
+            archived_companies_by_chn = Company.objects.filter(
+                company_number=company_house_number,
+                archived=True,
+            )
+            if archived_companies_by_chn.count() == 1:
+                company = archived_companies_by_chn.first()
+                logger.info(
+                    f'Found archived company by CHN {company_house_number} for source_id {source_id}.',
+                )
+                return company
+            elif archived_companies_by_chn.count() > 1:
+                logger.warning(
+                    f'Multiple archived companies found for CHN {company_house_number} '
+                    f'for prompt payment source_id {source_id}. Skipping company linking for CHN.',
+                )
+
+        if company_name:
+            archived_companies_by_name = Company.objects.filter(name=company_name, archived=True)
+            if archived_companies_by_name.count() == 1:
+                company = archived_companies_by_name.first()
+                logger.info(
+                    f'Found archived company by name "{company_name}" for source_id {source_id}.',
+                )
+                return company
+            elif archived_companies_by_name.count() > 1:
+                logger.warning(
+                    f'Multiple archived companies found for name "{company_name}" '
+                    f'for prompt payment source_id {source_id}. Skipping company linking for name.',
+                )
+
+        if not company:
+            logger.info(
+                f'No existing company found for source_id {source_id}. A new one might be created if data is sufficient or it will be ingested without a company link.',
+            )
+        return company
+
     def _process_record(self, record: dict) -> None:  # noqa
         source_id = record.get('id')
         company_house_number = record.get('company_id')
         company_name = record.get('company_name')
         email_address = record.get('email_address')
 
-        company = None
-        if company_house_number:
-            companies = Company.objects.filter(company_number=company_house_number)
-            if companies.count() > 1:
-                logger.warning(
-                    f'Multiple companies found for CHN {company_house_number} '
-                    f'for prompt payments source_id {source_id}. Using the first one found.',
-                )
-            company = companies.first()
-
-        if not company and company_name:
-            companies_by_name = Company.objects.filter(name=company_name)
-            if companies_by_name.count() > 1:
-                logger.warning(
-                    f'Multiple companies found for name "{company_name}" '
-                    f'for prompt payments source_id {source_id}. Using the first one found.',
-                )
-            company = companies_by_name.first()
+        company = self._get_company(company_house_number, company_name, source_id)
 
         contact = None
         if email_address:
