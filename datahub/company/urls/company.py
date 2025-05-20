@@ -56,6 +56,8 @@ update_export_detail = CompanyViewSet.as_action_view(
 
 kings_awards_list = CompanyViewSet.as_action_view('kings_awards')
 
+prompt_payments_list = CompanyViewSet.as_action_view('prompt_payments')
+
 one_list_group_core_team = OneListGroupCoreTeamViewSet.as_view(
     {
         'get': 'list',
@@ -127,6 +129,11 @@ urls = [
         'company/<uuid:pk>/kings-awards',
         kings_awards_list,
         name='kings-awards-list',
+    ),
+    path(
+        'company/<uuid:pk>/prompt-payments',
+        prompt_payments_list,
+        name='prompt-payments-list',
     ),
     path('public/company/<uuid:pk>', public_company_item, name='public-item'),
 ]
