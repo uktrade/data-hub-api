@@ -49,9 +49,6 @@ class PromptPaymentsIngestionTask(BaseObjectIngestionTask):
             return False
         return True
 
-    def _get_modified_datetime_str(self, record: dict) -> str:
-        return record['filing_date']
-
     def _get_company(self, company_house_number, company_name, source_id):  # noqa
         """Attempts to find a company, prioritizing non-archived records.
         1. By non-archived Company House Number.

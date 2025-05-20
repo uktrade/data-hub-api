@@ -154,6 +154,50 @@ class TestPromptPaymentIngestionTask:
         assert pp_record.contact == contact
         assert pp_record.company == company
 
+    def test_multiple_companies_matched_by_chn(self, mock_s3_object_processor):
+        """Test company is not linked if multiple companies match by CHN."""
+        task = PromptPaymentsIngestionTask('dummy_key', mock_s3_object_processor)
+
+        CompanyFactory(company_number='CH123', archived=False)
+        CompanyFactory(company_number='CH123', archived=False)
+        record_data = self._get_base_record_data()
+        record_data['company_id'] = 'CH123'
+
+        task._process_record(record_data)
+        pp_record = PromptPayments.objects.first()
+        assert pp_record.company is None
+
+        CompanyFactory(company_number='CH321', archived=True)
+        CompanyFactory(company_number='CH321', archived=True)
+        record_data = self._get_base_record_data()
+        record_data['company_id'] = 'CH321'
+
+        task._process_record(record_data)
+        pp_record = PromptPayments.objects.first()
+        assert pp_record.company is None
+
+    def test_multiple_companies_matched_by_name(self, mock_s3_object_processor):
+        """Test company is not linked if multiple companies match by name."""
+        task = PromptPaymentsIngestionTask('dummy_key', mock_s3_object_processor)
+
+        CompanyFactory(name='CH123', archived=False)
+        CompanyFactory(name='CH123', archived=False)
+        record_data = self._get_base_record_data()
+        record_data['company_name'] = 'CH123'
+
+        task._process_record(record_data)
+        pp_record = PromptPayments.objects.first()
+        assert pp_record.company is None
+
+        CompanyFactory(name='CH321', archived=True)
+        CompanyFactory(name='CH321', archived=True)
+        record_data = self._get_base_record_data()
+        record_data['company_name'] = 'CH321'
+
+        task._process_record(record_data)
+        pp_record = PromptPayments.objects.first()
+        assert pp_record.company is None
+
     def test_no_company_or_contact_linking_if_unmatched(self, mock_s3_object_processor):
         """Test company and contact FKs are None if no match found."""
         task = PromptPaymentsIngestionTask('dummy_key', mock_s3_object_processor)
