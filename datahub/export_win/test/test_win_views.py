@@ -1473,7 +1473,7 @@ class TestCreateWinView(APITestMixin):
             'A team member cannot also be a contributing adviser.',
         }
 
-        mock_export_win_serializer_notify.not_called()
+        mock_export_win_serializer_notify.assert_not_called()
 
 
 class TestUpdateWinView(APITestMixin):
