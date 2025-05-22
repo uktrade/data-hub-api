@@ -1,9 +1,8 @@
 import gzip
 from datetime import timedelta
+from enum import StrEnum
 
 from django.core.cache import cache
-
-from datahub.core.utils import StrEnum
 
 CACHE_VALUE_TIMEOUT = timedelta(minutes=30)
 CACHE_VALUE_TIMEOUT_SECS = int(CACHE_VALUE_TIMEOUT.total_seconds())

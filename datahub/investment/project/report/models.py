@@ -1,10 +1,10 @@
 import uuid
+from enum import StrEnum
 
 from django.conf import settings
 from django.db import models
 
 from datahub.core.models import BaseModel
-from datahub.core.utils import StrEnum
 from datahub.documents.utils import sign_s3_url
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH

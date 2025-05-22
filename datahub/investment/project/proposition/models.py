@@ -1,6 +1,7 @@
 """Investment project proposition models."""
 
 import uuid
+from enum import StrEnum
 
 from django.conf import settings
 from django.db import models
@@ -9,7 +10,6 @@ from rest_framework.reverse import reverse
 
 from datahub.core.exceptions import APIConflictException
 from datahub.core.models import BaseModel
-from datahub.core.utils import StrEnum
 from datahub.documents.models import AbstractEntityDocumentModel, UploadStatus
 from datahub.investment.project.proposition.constants import PropositionStatus
 

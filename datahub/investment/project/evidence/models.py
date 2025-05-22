@@ -1,10 +1,11 @@
 """Investment project evidence models."""
 
+from enum import StrEnum
+
 from django.db import models
 from rest_framework.reverse import reverse
 
 from datahub.core.models import BaseConstantModel
-from datahub.core.utils import StrEnum
 from datahub.documents.models import AbstractEntityDocumentModel
 
 

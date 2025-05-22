@@ -24,7 +24,7 @@ class TestPurgeQueueCommandShould:
 
         assert str(excinfo.value) == (
             "Error: argument queue_name: invalid choice: 'invalid-queue' "
-            "(choose from 'long-running', 'short-running', 'test-rq-health')"
+            '(choose from long-running, short-running, test-rq-health)'
         )
 
     def test_fail_when_unsupported_queue_state_assigned(self):
@@ -35,7 +35,7 @@ class TestPurgeQueueCommandShould:
 
         assert str(excinfo.value) == (
             "Error: argument --queue_state: invalid choice: 'finished' "
-            "(choose from 'queued', 'failed', 'scheduled')"
+            '(choose from queued, failed, scheduled)'
         )
 
     def test_purging_queued_queues_succeeds(self, monkeypatch):

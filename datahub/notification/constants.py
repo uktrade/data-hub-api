@@ -1,4 +1,4 @@
-from datahub.core.utils import StrEnum
+from enum import StrEnum
 
 
 class NotifyServiceName(StrEnum):

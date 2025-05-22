@@ -1,7 +1,6 @@
 import json
+from enum import StrEnum
 from typing import NamedTuple
-
-from datahub.core.utils import StrEnum
 
 
 class SortDirection(StrEnum):

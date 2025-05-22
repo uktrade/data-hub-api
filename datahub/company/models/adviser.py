@@ -1,4 +1,5 @@
 import uuid
+from enum import StrEnum
 
 from django.conf import settings
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
@@ -9,7 +10,7 @@ from django.utils.functional import cached_property
 from django.utils.timezone import now
 
 from datahub.core import reversion
-from datahub.core.utils import StrEnum, join_truthy_strings
+from datahub.core.utils import join_truthy_strings
 from datahub.metadata import models as metadata_models
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
