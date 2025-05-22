@@ -1,4 +1,4 @@
-FROM python:3.12.10
+FROM python:3.12.8
 
 # Install dockerize https://github.com/jwilder/dockerize
 ENV DOCKERIZE_VERSION v0.6.1
