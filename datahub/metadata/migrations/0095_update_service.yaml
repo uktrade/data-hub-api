@@ -1,0 +1,12 @@
+- model: metadata.service
+  pk: 58184511-2b55-424c-8f53-e1b7c0912ecb
+  fields:
+    disabled_on: ~
+    order: 1327
+    segment: London Tech Week
+    parent:
+    contexts: ["export_service_delivery", "export_interaction", "event"]
+    lft: 0
+    rght: 0
+    tree_id: 0
+    level: 0
