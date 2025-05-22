@@ -25,6 +25,7 @@ class Command(BaseCleanupCommand):
                 Contact._meta.get_field('wins'),
                 Contact._meta.get_field('great_export_enquiries'),
                 Contact._meta.get_field('stova_attendee'),
+                Contact._meta.get_field('prompt_payments'),
             ),
         ),
         'company.Company': ModelCleanupConfig(
@@ -41,6 +42,7 @@ class Command(BaseCleanupCommand):
                 Company._meta.get_field('no_recent_export_interaction_reminders'),
                 Company._meta.get_field('wins'),
                 Company._meta.get_field('task_company'),
+                Company._meta.get_field('prompt_payments'),
             ),
         ),
         'event.Event': ModelCleanupConfig(

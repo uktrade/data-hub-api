@@ -471,7 +471,10 @@ class Company(ArchivableModel, BaseModel):
                 CompanyPermission.change_one_list_core_team_member.value,
                 'Can change one list core team member associated with company',
             ),
-            (CompanyPermission.view_export_win.value, 'Can view company export win'),
+            (
+                CompanyPermission.view_export_win.value,
+                'Can view company export win',
+            ),
         )
         indexes = [
             # For datasets app which includes API endpoints to be consumed by data-flow

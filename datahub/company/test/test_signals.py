@@ -1,3 +1,4 @@
+import logging
 from unittest import mock
 from uuid import UUID
 
@@ -15,7 +16,10 @@ from datahub.company.test.factories import (
     CompanyExportCountryFactory,
     CompanyExportCountryHistoryFactory,
     CompanyFactory,
+    ContactFactory,
 )
+from datahub.company_activity.models import PromptPayments
+from datahub.company_activity.tests.factories import PromptPaymentsFactory
 from datahub.core.test_utils import random_obj_for_model
 from datahub.metadata.models import BusinessType
 from datahub.metadata.models import Country as CountryModel
@@ -194,3 +198,185 @@ class TestExportCountryHistoryCustomSignals:
             history_type=CompanyExportCountryHistory.HistoryType.DELETE,
         )
         assert history.count() == 0
+
+
+class TestPromptPaymentLinkingSignal:
+    def test_new_company_links_existing_unlinked_prompt_payments(self):
+        """When a new Company is created, existing PromptPayments records with
+        a matching company_house_number and no current company link should be
+        linked.
+        """
+        chn = '12345678'
+        pp1 = PromptPaymentsFactory(company_house_number=chn, company=None)
+        pp2 = PromptPaymentsFactory(company_house_number=chn, company=None)
+
+        PromptPaymentsFactory(company_house_number='87654321', company=None)
+
+        already_linked_company = CompanyFactory()
+        PromptPaymentsFactory(company_house_number=chn, company=already_linked_company)
+
+        assert (
+            PromptPayments.objects.filter(company__isnull=True, company_house_number=chn).count()
+            == 2
+        )
+
+        new_company = CompanyFactory(company_number=chn)
+
+        pp1.refresh_from_db()
+        pp2.refresh_from_db()
+
+        assert pp1.company == new_company
+        assert pp2.company == new_company
+        assert not PromptPayments.objects.filter(
+            company__isnull=True,
+            company_house_number=chn,
+        ).exists()
+        assert (
+            PromptPayments.objects.get(company=already_linked_company).company
+            == already_linked_company
+        )
+
+    def test_company_update_with_new_chn_links_prompt_payments(self):
+        """If a Company's company_number is updated to a new value, it should
+        link PromptPayments records matching that new CHN.
+        """
+        chn_new = 'NEW12345'
+        PromptPaymentsFactory(company_house_number=chn_new, company=None)
+        company = CompanyFactory(company_number='OLD98765')
+
+        company.company_number = chn_new
+        company.save()
+
+        assert PromptPayments.objects.get(company_house_number=chn_new).company == company
+
+    def test_no_linking_if_company_number_is_blank(self):
+        """If a company is saved with a blank company number, no linking should occur."""
+        PromptPaymentsFactory(company_house_number='12345', company=None)
+        CompanyFactory(company_number='')
+
+        assert not PromptPayments.objects.filter(
+            company_house_number='12345',
+            company__isnull=False,
+        ).exists()
+
+    def test_linking_multiple_prompt_payments_to_one_company(self):
+        """Test that if multiple prompt payments match, all are linked."""
+        chn = 'MULTI789'
+        PromptPaymentsFactory.create_batch(3, company_house_number=chn, company=None)
+        company = CompanyFactory(company_number=chn)
+
+        assert (
+            PromptPayments.objects.filter(company=company, company_house_number=chn).count() == 3
+        )
+
+    def test_new_company_links_contact_on_prompt_payment(self):
+        """When a new Company is created and links to a PromptPayment,
+        if the PromptPayment has an email matching a Contact in that Company,
+        the Contact should also be linked.
+        """
+        chn = 'CONTACT_LINK_1'
+        email = 'contact@example.com'
+
+        pp = PromptPaymentsFactory(
+            company_house_number=chn,
+            email_address=email,
+            company=None,
+            contact=None,
+        )
+
+        company = CompanyFactory(company_number=chn)
+
+        ContactFactory(company=company, email=email)
+        company.save()
+
+        pp.refresh_from_db()
+        assert pp.company == company
+        assert pp.contact is not None
+        assert pp.contact.email.lower() == email.lower()
+        assert pp.contact.company == company
+
+    def test_contact_linking_only_if_email_exists_and_not_already_linked(self):
+        """Contact linking should only happen if PromptPayment has an email
+        and is not already linked to a contact.
+        """
+        chn = 'CONTACT_LINK_2'
+        company = CompanyFactory(company_number=chn)
+        contact_in_company = ContactFactory(company=company, email='contact@example.com')
+
+        pp_already_linked = PromptPaymentsFactory(
+            company_house_number=chn,
+            email_address='contact@example.com',
+            company=company,
+            contact=ContactFactory(company=company),
+        )
+
+        pp_no_email = PromptPaymentsFactory(
+            company_house_number=chn,
+            email_address='',
+            company=company,
+            contact=None,
+        )
+
+        pp_to_be_linked = PromptPaymentsFactory(
+            company_house_number=chn,
+            email_address='contact@example.com',
+            company=None,
+            contact=None,
+        )
+
+        company.name = 'Updated Company Name'
+        company.save()
+
+        pp_already_linked.refresh_from_db()
+        pp_no_email.refresh_from_db()
+        pp_to_be_linked.refresh_from_db()
+
+        assert pp_already_linked.contact != contact_in_company
+        assert pp_no_email.contact is None
+        assert pp_to_be_linked.contact == contact_in_company
+
+    def test_contact_linking_handles_multiple_contacts_with_same_email_in_company(self, caplog):
+        """If multiple contacts in the same company have the same email,
+        a warning should be logged and no contact should be linked to avoid ambiguity.
+        """
+        caplog.set_level(logging.WARNING)
+        chn = 'CONTACT_LINK_MULTI'
+        email = 'duplicate@example.com'
+        company = CompanyFactory(company_number=chn)
+        ContactFactory(company=company, email=email)
+        ContactFactory(company=company, email=email)
+
+        pp = PromptPaymentsFactory(
+            company_house_number=chn,
+            email_address=email,
+            company=None,
+            contact=None,
+        )
+
+        company.save()
+
+        pp.refresh_from_db()
+        assert pp.company == company
+        assert pp.contact is None
+        assert (
+            f'Multiple contacts found with email "{email}" in Company {company.pk}' in caplog.text
+        )
+
+    def test_contact_linking_is_case_insensitive_for_email(self):
+        chn = 'CONTACT_LINK_CASE'
+        email_lower = 'case@test.com'
+        email_upper = 'CASE@TEST.COM'
+        company = CompanyFactory(company_number=chn)
+        contact = ContactFactory(company=company, email=email_lower)
+        pp = PromptPaymentsFactory(
+            company_house_number=chn,
+            email_address=email_upper,
+            company=None,
+            contact=None,
+        )
+
+        company.save()
+
+        pp.refresh_from_db()
+        assert pp.company == company
+        assert pp.contact == contact

@@ -86,6 +86,7 @@ class Command(BaseCleanupCommand):
                 Company._meta.get_field('eyb_leads'): (),
                 Company._meta.get_field('stova_attendee'): (),
                 Company._meta.get_field('kings_awards'): (),
+                Company._meta.get_field('prompt_payments'): (),
                 Company._meta.get_field('great_export_enquiries'): (),
             },
             # We want to delete the relations below along with any expired companies
@@ -123,6 +124,7 @@ class Command(BaseCleanupCommand):
                 Contact._meta.get_field('tokens'): (),
                 Contact._meta.get_field('transferred_from'): (),
                 Contact._meta.get_field('wins'): (),
+                Contact._meta.get_field('prompt_payments'): (),
             },
         ),
         'company_referral.CompanyReferral': ModelCleanupConfig(

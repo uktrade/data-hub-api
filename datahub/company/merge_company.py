@@ -29,6 +29,7 @@ from datahub.company_activity.models import (
     CompanyActivity,
     GreatExportEnquiry,
     KingsAwardRecipient,
+    PromptPayments,
     StovaAttendee,
 )
 from datahub.company_referral.models import CompanyReferral
@@ -80,6 +81,7 @@ ALLOWED_RELATIONS_FOR_MERGING = {
     Order.company.field,
     StovaAttendee.company.field,
     KingsAwardRecipient.company.field,
+    PromptPayments.company.field,
     Task.company.field,
     # Merging is allowed if the source company has export countries, but note that
     # they aren't moved to the target company (these can be manually moved in
@@ -129,6 +131,7 @@ MERGE_CONFIGURATION = [
     MergeConfiguration(NoRecentExportInteractionReminder, ('company',), Company),
     MergeConfiguration(StovaAttendee, ('company',), Company),
     MergeConfiguration(KingsAwardRecipient, ('company',), Company),
+    MergeConfiguration(PromptPayments, ('company',), Company),
     MergeConfiguration(Task, ('company',), Company),
     MergeConfiguration(CompanyListItem, ('company',), Company, company_list_item_updater),
     MergeConfiguration(PipelineItem, ('company',), Company, pipeline_item_updater),

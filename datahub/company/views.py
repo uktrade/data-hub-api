@@ -54,8 +54,12 @@ from datahub.company.serializers import (
     UpdateOneListCoreTeamMembersSerializer,
 )
 from datahub.company.validators import NotATransferredCompanyValidator
-from datahub.company_activity.models import KingsAwardRecipient
+from datahub.company_activity.models import (
+    KingsAwardRecipient,
+    PromptPayments,
+)
 from datahub.company_activity.serializers.kings_award import KingsAwardRecipientSerializer
+from datahub.company_activity.serializers.prompt_payments import PromptPaymentsSerializer
 from datahub.core.audit import AuditViewSet
 from datahub.core.auth import PaaSIPAuthentication
 from datahub.core.autocomplete import AutocompleteFilter
@@ -336,6 +340,25 @@ class CompanyViewSet(ArchivableViewSetMixin, CoreViewSet):
                 'company',
             )
             .order_by('-year_awarded')
+        )
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    @action(
+        methods=['get'],
+        detail=True,
+        permission_classes=[HasPermissions(f'company.{CompanyPermission.view_company}')],
+        serializer_class=PromptPaymentsSerializer,
+        url_path='prompt-payments',
+    )
+    def prompt_payments(self, request, pk):
+        """Returns a list of Prompt Payments records for this company."""
+        company = self.get_object()
+        queryset = (
+            PromptPayments.objects.filter(company=company)
+            .select_related('company', 'contact')
+            .order_by('-filing_date', '-reporting_period_end_date')
         )
 
         serializer = self.get_serializer(queryset, many=True)
