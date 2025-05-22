@@ -180,7 +180,7 @@ freezegun==1.5.1
     # via
     #   -r requirements-dev.in
     #   rq-scheduler
-frozenlist==1.3.3
+frozenlist==1.6.0
     # via
     #   aiohttp
     #   aiosignal
@@ -240,7 +240,7 @@ mohawk==1.1.0
     # via -r requirements.in
 moto==5.1.4
     # via -r requirements-dev.in
-multidict==6.0.4
+multidict==6.4.4
     # via
     #   aiohttp
     #   yarl
