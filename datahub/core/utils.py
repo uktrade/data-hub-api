@@ -1,4 +1,3 @@
-from enum import Enum
 from itertools import islice
 from logging import getLogger
 from uuid import UUID
@@ -10,13 +9,6 @@ from django.urls import reverse
 from django.utils.http import urlencode
 
 logger = getLogger(__name__)
-
-
-class StrEnum(str, Enum):
-    """Enum subclass where members are also str instances.
-
-    Defined as per https://docs.python.org/3.8/library/enum.html#others
-    """
 
 
 class Echo:

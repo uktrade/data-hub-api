@@ -1,3 +1,4 @@
+from enum import StrEnum
 from uuid import uuid4
 
 from django.conf import settings
@@ -5,7 +6,6 @@ from django.db import models
 
 from datahub.core import reversion
 from datahub.core.models import ArchivableModel, BaseModel
-from datahub.core.utils import StrEnum
 from datahub.metadata import models as metadata_models
 
 

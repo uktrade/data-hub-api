@@ -1,4 +1,5 @@
 import uuid
+from enum import StrEnum
 
 from django.conf import settings
 from django.contrib.postgres.indexes import GinIndex
@@ -15,7 +16,7 @@ from datahub.core.models import (
     BaseModel,
     BaseOrderedConstantModel,
 )
-from datahub.core.utils import StrEnum, get_front_end_url
+from datahub.core.utils import get_front_end_url
 from datahub.metadata import models as metadata_models
 
 MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH

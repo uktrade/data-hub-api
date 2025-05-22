@@ -1,3 +1,5 @@
+from enum import StrEnum
+
 from django.db.models.query_utils import Q
 from rest_framework.filters import BaseFilterBackend
 
@@ -7,7 +9,6 @@ from datahub.core.permissions import (
     ViewBasedModelPermissions,
     get_model_action_for_view_action,
 )
-from datahub.core.utils import StrEnum
 from datahub.investment.project.models import InvestmentProject
 
 

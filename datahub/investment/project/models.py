@@ -2,6 +2,7 @@
 
 import uuid
 from collections import namedtuple
+from enum import StrEnum
 from itertools import chain
 
 from django.conf import settings
@@ -20,7 +21,7 @@ from datahub.core.models import (
     BaseModel,
     BaseOrderedConstantModel,
 )
-from datahub.core.utils import StrEnum, force_uuid, get_financial_year, get_front_end_url
+from datahub.core.utils import force_uuid, get_financial_year, get_front_end_url
 from datahub.investment.project import constants
 from datahub.investment.project.validate import validate
 

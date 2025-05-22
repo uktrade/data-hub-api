@@ -1,4 +1,5 @@
 import uuid
+from enum import StrEnum
 
 from django.conf import settings
 from django.db import models
@@ -6,7 +7,7 @@ from django.utils.timezone import now
 
 from datahub.core import reversion
 from datahub.core.models import ArchivableModel, BaseModel
-from datahub.core.utils import StrEnum, get_front_end_url, join_truthy_strings
+from datahub.core.utils import get_front_end_url, join_truthy_strings
 from datahub.core.validators import (
     InternationalTelephoneValidator,
 )

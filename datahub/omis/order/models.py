@@ -1,6 +1,7 @@
 import secrets
 import uuid
 from datetime import datetime, time, timezone
+from enum import StrEnum
 from functools import partial
 
 from django.conf import settings
@@ -18,7 +19,7 @@ from datahub.core.models import (
     BaseModel,
     BaseOrderedConstantModel,
 )
-from datahub.core.utils import StrEnum, get_front_end_url
+from datahub.core.utils import get_front_end_url
 from datahub.metadata.models import Country, Sector, Team, UKRegion
 from datahub.omis.core.utils import generate_reference
 from datahub.omis.invoice.models import Invoice

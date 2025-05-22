@@ -1,10 +1,11 @@
+from enum import StrEnum
+
 from rest_framework.exceptions import ValidationError
 
 from datahub.core.permissions import (
     IsAssociatedToObjectPermission,
     ViewBasedModelPermissions,
 )
-from datahub.core.utils import StrEnum
 from datahub.interaction.models import Interaction
 from datahub.investment.project.permissions import (
     InvestmentProjectAssociationCheckerBase,
