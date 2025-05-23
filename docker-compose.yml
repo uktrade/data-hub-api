@@ -6,30 +6,40 @@ services:
       - "8000:8000"
     volumes:
       - .:/app
-    entrypoint: dockerize -wait tcp://postgres:5432 -wait tcp://opensearch:9200 -wait tcp://redis:6379 -timeout 120s
     env_file: .env
     depends_on:
-      - postgres
-      - opensearch
-      - redis
+      postgres:
+        condition: service_healthy
+      opensearch:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     command: /app/start-dev.sh
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/pingdom/ping.xml || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
 
   rq_short:
     build:
       context: .
     volumes:
       - .:/app
-    entrypoint: dockerize -wait tcp://postgres:5432 -wait tcp://opensearch:9200 -wait tcp://redis:6379 -wait tcp://api:8000 -timeout 300s
     env_file: .env
     depends_on:
-      - api
+      api:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      opensearch:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     command: python short-running-worker.py
     healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "python ./manage.py rq_health_check --queue=short-running",
-        ]
+      test: ["CMD-SHELL", "python ./manage.py rq_health_check --queue=short-running"]
       interval: 10s
       timeout: 5s
       retries: 2
@@ -40,14 +50,19 @@ services:
       context: .
     volumes:
       - .:/app
-    entrypoint: dockerize -wait tcp://postgres:5432 -wait tcp://opensearch:9200 -wait tcp://redis:6379 -wait tcp://api:8000 -timeout 300s
     env_file: .env
     depends_on:
-      - api
+      api:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      opensearch:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     command: python long-running-worker.py
     healthcheck:
-      test:
-        ["CMD-SHELL", "python ./manage.py rq_health_check --queue=long-running"]
+      test: ["CMD-SHELL", "python ./manage.py rq_health_check --queue=long-running"]
       interval: 10s
       timeout: 5s
       retries: 2
@@ -58,10 +73,16 @@ services:
       context: .
     volumes:
       - .:/app
-    entrypoint: dockerize -wait tcp://postgres:5432 -wait tcp://opensearch:9200 -wait tcp://redis:6379 -wait tcp://api:8000 -timeout 300s
     env_file: .env
     depends_on:
-      - api
+      api:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      opensearch:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     command: python cron-scheduler.py
 
   postgres:
@@ -72,6 +93,12 @@ services:
     environment:
       - POSTGRES_DB=datahub
       - POSTGRES_PASSWORD=datahub
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   opensearch:
     image: opensearchproject/opensearch:2.11.0
@@ -83,12 +110,24 @@ services:
       - bootstrap.memory_lock=true
     ports:
       - "9200:9200"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
 
   redis:
     image: redis:7.2.4
     restart: always
     ports:
       - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
 
   rq_exporter:
     image: mdawar/rq-exporter:latest
@@ -100,7 +139,8 @@ services:
     environment:
       RQ_REDIS_HOST: "redis"
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
 
   localstack:
     build:
