@@ -16,4 +16,4 @@ pre-commit==3.8.0
 moto==5.1.4
 
 # Code static analysis
-ruff==0.11.10
+ruff==0.11.11
