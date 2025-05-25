@@ -230,7 +230,7 @@ matplotlib-inline==0.1.6
     # via ipython
 mohawk==1.1.0
     # via -r requirements.in
-moto==5.1.4
+moto==5.1.5
     # via -r requirements-dev.in
 multidict==6.4.3
     # via
