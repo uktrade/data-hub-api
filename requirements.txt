@@ -144,7 +144,7 @@ events==0.5
     # via opensearch-py
 filelock==3.13.3
     # via virtualenv
-freezegun==1.5.1
+freezegun==1.5.2
     # via rq-scheduler
 frozenlist==1.6.0
     # via
