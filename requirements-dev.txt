@@ -204,8 +204,10 @@ iniconfig==1.1.1
     # via pytest
 ipaddress==1.0.23
     # via mail-parser
-ipython==8.36.0
+ipython==9.2.0
     # via -r requirements-dev.in
+ipython-pygments-lexers==1.1.1
+    # via ipython
 jedi==0.18.2
     # via ipython
 jinja2==3.1.6
@@ -341,7 +343,9 @@ pure-eval==0.2.2
 pycparser==2.22
     # via cffi
 pygments==2.15.0
-    # via ipython
+    # via
+    #   ipython
+    #   ipython-pygments-lexers
 pyjwt==2.6.0
     # via notifications-python-client
 pyproject-hooks==1.0.0
