@@ -168,7 +168,7 @@ faker==15.3.4
     # via factory-boy
 filelock==3.17.0
     # via virtualenv
-freezegun==1.5.1
+freezegun==1.5.2
     # via
     #   -r requirements-dev.in
     #   rq-scheduler
