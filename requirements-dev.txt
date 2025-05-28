@@ -32,11 +32,11 @@ bigtree==0.29.2
     # via -r requirements.in
 billiard==4.2.0
     # via celery
-boto3==1.38.18
+boto3==1.38.23
     # via
     #   -r requirements.in
     #   moto
-botocore==1.38.18
+botocore==1.38.23
     # via
     #   boto3
     #   moto
@@ -168,7 +168,7 @@ faker==15.3.4
     # via factory-boy
 filelock==3.17.0
     # via virtualenv
-freezegun==1.5.1
+freezegun==1.5.2
     # via
     #   -r requirements-dev.in
     #   rq-scheduler
@@ -186,7 +186,7 @@ greenlet==3.2.2
     # via gevent
 grpcio==1.62.1
     # via opentelemetry-exporter-otlp-proto-grpc
-icalendar==6.3.0
+icalendar==6.3.1
     # via -r requirements.in
 identify==2.5.11
     # via pre-commit
@@ -204,8 +204,10 @@ iniconfig==1.1.1
     # via pytest
 ipaddress==1.0.23
     # via mail-parser
-ipython==8.36.0
+ipython==9.2.0
     # via -r requirements-dev.in
+ipython-pygments-lexers==1.1.1
+    # via ipython
 jedi==0.18.2
     # via ipython
 jinja2==3.1.6
@@ -230,7 +232,7 @@ matplotlib-inline==0.1.6
     # via ipython
 mohawk==1.1.0
     # via -r requirements.in
-moto==5.1.4
+moto==5.1.5
     # via -r requirements-dev.in
 multidict==6.4.3
     # via
@@ -341,7 +343,9 @@ pure-eval==0.2.2
 pycparser==2.22
     # via cffi
 pygments==2.15.0
-    # via ipython
+    # via
+    #   ipython
+    #   ipython-pygments-lexers
 pyjwt==2.6.0
     # via notifications-python-client
 pyproject-hooks==1.0.0
@@ -426,11 +430,11 @@ rq==2.3.3
     #   rq-scheduler
 rq-scheduler==0.14.0
     # via -r requirements.in
-ruff==0.11.10
+ruff==0.11.11
     # via -r requirements-dev.in
-s3transfer==0.12.0
+s3transfer==0.13.0
     # via boto3
-sentry-sdk==2.28.0
+sentry-sdk==2.29.1
     # via -r requirements.in
 simplejson==3.20.1
     # via -r requirements.in
