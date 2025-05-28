@@ -180,6 +180,7 @@ class Interaction(ArchivableModel, BaseModel):
         INVESTMENT = ('investment', 'Investment')
         LARGE_CAPITAL_OPPORTUNITY = ('large_capital_opportunity', 'Large capital opportunity')
         TRADE_AGREEMENT = ('trade_agreement', 'Trade agreement')
+        DOMESTIC = ('domestic', 'Domestic')
         OTHER = ('other', 'Something else')
 
         __empty__ = 'Not set'
