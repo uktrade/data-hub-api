@@ -20,6 +20,8 @@ if env.bool('DOCKER_DEV', True):
 
 DEBUG_TOOLBAR_CONFIG = {
     'DISABLE_PANELS': [
+        #Python 3.12 does not allow concurrent requests with the profiling panel, see: https://django-debug-toolbar.readthedocs.io/en/latest/panels.html
+        "debug_toolbar.panels.profiling.ProfilingPanel", 
         'debug_toolbar.panels.redirects.RedirectsPanel',
     ],
     'SHOW_TEMPLATE_CONTEXT': True,
