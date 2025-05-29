@@ -776,3 +776,7 @@ class PostcodeData(models.Model):  # noqa: DJ008
         blank=True,
         help_text='Secondary Local Enterprise Partnership Name',
     )
+
+    def __str__(self):
+        """String representation of the model."""
+        return self.pcds
