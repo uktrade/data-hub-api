@@ -3,13 +3,6 @@
 # on circleCI. For more information about how this is used please see
 # https://github.com/uktrade/data-hub-frontend#continuous-integration
 
-es_amp=""
-## If ES_APM_ENABLED is True wait for it to start
-if [ "$ES_APM_ENABLED" = 'True' ] ; then
-   es_amp="-wait tcp://es-apm:8200"
-fi
-dockerize -wait  tcp://postgres:5432 -wait tcp://opensearch:9200  -wait tcp://redis:6379 $es_amp
-
 python /app/manage.py migrate
 python /app/manage.py migrate_search
 python /app/manage.py loadinitialmetadata --force
